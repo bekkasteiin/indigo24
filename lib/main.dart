@@ -1,117 +1,161 @@
+import 'dart:async';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/chat_list.dart';
+
+import 'db/chats_db.dart';
+import 'db/chats_model.dart';
+import 'pages/profile.dart';
+import 'pages/tapes.dart';
+import 'pages/wallet_tab.dart';
+import 'services/my_connectivity.dart';
+import 'services/socket.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Tabs(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class Tabs extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _TabsState createState() => _TabsState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  TabController _tabController; 
+   
+  MyConnectivity _connectivity = MyConnectivity.instance;
+  Map _source = {ConnectivityResult.none: false};
+  
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  var chatsDB = ChatsDB();
+
+  @override
+  void initState() {
+    _tabController = new TabController(length: 4, vsync: this);
+
+
+  _connectivity.initialise();
+    _connectivity.myStream.listen((source) {
+      setState(() => _source = source);
+      switch (source.keys.toList()[0]) {
+      case ConnectivityResult.none:
+        
+        break;
+      default:   
+        ChatRoom.shared.setStream();
+        _connect();
+        ChatRoom.shared.init();
+        break;
+    }
+    });
+     _getChats();
+
+    super.initState();
+  }
+
+  _connect() async {
+    ChatRoom.shared.listen();
+    ChatRoom.shared.onChange.listen((e) async {
+      print("LISTENING EVENT");
+      print(e.json);
+
+      setState(() {
+        myList = e.json['data'].toList();
+        chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();   
+      });
+      // await chatsDB.insertChats(chatsModel);
+    });
+    
+  }
+  
+
+
+  Future _getChats() async {
+    Future<List<ChatsModel>> chats = chatsDB.getAllChats();
+    chats.then((value) {
+      setState(() {
+        dbChats.addAll(value);
+      });
+      print("DB CHATS IN GET $dbChats");
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      body: TabBarView(
+        physics: NeverScrollableScrollPhysics(),
+        children: [
+          ChatsListPage(),
+          UserProfilePage(),
+          TapesPage(),
+          WalletTab(),
+        ],
+        controller: _tabController,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+              bottomNavigationBar: SafeArea(
+                child: PreferredSize(
+                  preferredSize: Size.fromHeight(50.0),
+                  child: Container(
+            padding: EdgeInsets.only(
+              top: 0,
+              left: 0,
+              right: 0,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+            height: 45,
+          child: TabBar(
+            indicatorPadding: EdgeInsets.all(0),            
+            labelPadding: EdgeInsets.all(0),
+            indicatorWeight: 0.0000000000001,
+            controller: _tabController,
+            unselectedLabelColor: Color(0xff001D52),
+            labelColor: Color(0xff0543B8),
+            tabs: [
+              new Tab(
+                  icon: new Image(image: AssetImage("assets/images/chat.png"), width: 20,),
+                  child: Text("Чат", style: TextStyle(fontSize: 12)),
+              ),
+              new Tab(
+                  icon: new Image(image: AssetImage("assets/images/profile.png"), width: 20,),
+                  child: Text("Профиль", style: TextStyle(fontSize: 12)),
+              ),
+              new Tab(
+                  icon: new Image(image: AssetImage("assets/images/tape.png"), width: 20,),
+                  child: Text("Лента", style: TextStyle(fontSize: 12)),
+              ),
+              new Tab(
+                  icon: new Image(image: AssetImage("assets/images/wallet.png"), width: 20,),
+                  child: Text("Кошелек", style: TextStyle(fontSize: 12)),
+              )
+            ]
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+                ),
+      )
     );
   }
+  @override
+  void dispose() {
+    super.dispose();
+    _connectivitySubscription.cancel();
+  }
 }
+
