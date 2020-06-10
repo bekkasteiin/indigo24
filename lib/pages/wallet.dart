@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/refill.dart';
+import 'package:indigo24/pages/withdraw.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:polygon_clipper/polygon_border.dart';
 import '../style/fonts.dart';
@@ -73,6 +75,7 @@ class _WalletTabState extends State<WalletTab> {
                   _payments(size),
                   SizedBox(height: 20),
                   _transfer(size),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
@@ -82,78 +85,96 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
-  ButtonTheme _transfer(Size size) {
-    return ButtonTheme(
-      minWidth: size.width * 0.8,
-      height: 70,
-      child: RaisedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TransferListPage()),
-          );
-        },
-        child: Container(
-          width: size.width * 0.72,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Image(
-                image: AssetImage("assets/images/transfers.png"),
-                height: 40,
-              ),
-              Text(
-                'Переводы',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-              ),
-              Container(width: 10),
-            ],
+  Container _transfer(Size size) {
+    return Container(
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(0.0, 0.0))
+      ]),
+      child: ButtonTheme(
+        minWidth: size.width * 0.8,
+        height: 70,
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TransferListPage()),
+            );
+          },
+          child: Container(
+            width: size.width * 0.72,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Image(
+                  image: AssetImage("assets/images/transfers.png"),
+                  height: 40,
+                ),
+                Text(
+                  'Переводы',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
+                ),
+                Container(width: 10),
+              ],
+            ),
           ),
-        ),
-        color: Color(0xFFFFFFFF),
-        textColor: Color(0xFF001D52),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            10.0,
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
           ),
         ),
       ),
     );
   }
 
-  ButtonTheme _payments(Size size) {
-    return ButtonTheme(
-      minWidth: size.width * 0.8,
-      height: 70,
-      child: RaisedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => PaymentsCategoryPage()),
-          );
-        },
-        child: Container(
-          width: size.width * 0.72,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Image(
-                image: AssetImage("assets/images/payments.png"),
-                height: 40,
-              ),
-              Text(
-                'Платежи',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-              ),
-              Container(width: 10),
-            ],
+  Container _payments(Size size) {
+    return Container(
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(0.0, 0.0))
+      ]),
+      child: ButtonTheme(
+        minWidth: size.width * 0.8,
+        height: 70,
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PaymentsCategoryPage()),
+            );
+          },
+          child: Container(
+            width: size.width * 0.72,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Image(
+                  image: AssetImage("assets/images/payments.png"),
+                  height: 40,
+                ),
+                Text(
+                  'Платежи',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
+                ),
+                Container(width: 10),
+              ],
+            ),
           ),
-        ),
-        color: Color(0xFFFFFFFF),
-        textColor: Color(0xFF001D52),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            10.0,
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
           ),
         ),
       ),
@@ -176,13 +197,13 @@ class _WalletTabState extends State<WalletTab> {
   }
 
   Text _balanceAmount() {
-    if (_symbol == '\$' || _symbol == '€')
+    if (_symbol == '\$')
       return Text(
-        '$_symbol $_amount',
+        '$_symbol ${_amount.toStringAsFixed(2)}',
         style: fS26(c: 'ffffff'),
       );
     return Text(
-      '$_amount $_symbol',
+      '${_amount.toStringAsFixed(2)} $_symbol',
       style: fS26(c: 'ffffff'),
     );
   }
@@ -196,7 +217,7 @@ class _WalletTabState extends State<WalletTab> {
         children: <Widget>[
           Text('Баланс в обработке', style: fS18w200(c: 'ffffff')),
           Container(height: 5),
-          Text('$_blockedAmount ₸', style: fS26w200(c: 'ffffff')),
+          Text('${_blockedAmount.toStringAsFixed(2)} ₸', style: fS26w200(c: 'ffffff')),
         ],
       ),
     );
@@ -206,42 +227,68 @@ class _WalletTabState extends State<WalletTab> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        ButtonTheme(
-          minWidth: size.width * 0.35,
-          height: 50,
-          child: RaisedButton(
-            onPressed: () {
-              print('пополнить is pressed');
-            },
-            child: const Text(
-              'ПОПОЛНИТЬ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            color: Color(0xFFFFFFFF),
-            textColor: Color(0xFF0543B8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                10.0,
+        Container(
+          decoration: BoxDecoration(boxShadow: [
+            BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                spreadRadius: -2,
+                offset: Offset(0.0, 0.0))
+          ]),
+          child: ButtonTheme(
+            minWidth: size.width * 0.35,
+            height: 50,
+            child: RaisedButton(
+              onPressed: () {
+                print('пополнить is pressed');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RefillPage()),
+                );
+              },
+              child: const Text(
+                'ПОПОЛНИТЬ',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              color: Color(0xFFFFFFFF),
+              textColor: Color(0xFF0543B8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  10.0,
+                ),
               ),
             ),
           ),
         ),
-        ButtonTheme(
-          minWidth: size.width * 0.35,
-          height: 50,
-          child: RaisedButton(
-            onPressed: () {
-              print('вывести is pressed');
-            },
-            child: Text(
-              'ВЫВЕСТИ',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            color: Color(0xFFFFFFFF),
-            textColor: Color(0xFF0543B8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                10.0,
+        Container(
+          decoration: BoxDecoration(boxShadow: [
+            BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                spreadRadius: -2,
+                offset: Offset(0.0, 0.0))
+          ]),
+          child: ButtonTheme(
+            minWidth: size.width * 0.35,
+            height: 50,
+            child: RaisedButton(
+              onPressed: () {
+                print('вывести is pressed');
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => WithdrawPage()),
+                );
+              },
+              child: Text(
+                'ВЫВЕСТИ',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              color: Color(0xFFFFFFFF),
+              textColor: Color(0xFF0543B8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  10.0,
+                ),
               ),
             ),
           ),

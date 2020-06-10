@@ -73,7 +73,7 @@ class _TransferListPageState extends State<TransferListPage> {
     return Column(
       children: <Widget>[
         SizedBox(
-          height: 10,
+          height: 20,
         ),
         transferlist(context),
         SizedBox(
@@ -91,12 +91,11 @@ class _TransferListPageState extends State<TransferListPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            // Image.asset('assets/mobileShopPurple.png', width: 30.0),
+            Image.asset('assets/images/profile.png', width: 30.0),
             Container(
               margin: EdgeInsets.only(left: 20),
-              padding: EdgeInsets.only(top: 10),
               child: Text(
-                "Клиенту Indigo",
+                "Клиенту Indigo24",
                 style: TextStyle(fontSize: 14),
               ),
             ),
@@ -112,6 +111,13 @@ class _TransferListPageState extends State<TransferListPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26.withOpacity(0.2),
+            blurRadius: 10.0,
+            spreadRadius: -2,
+          )
+        ],
       ),
       margin: EdgeInsets.only(left: 20, right: 20),
     );

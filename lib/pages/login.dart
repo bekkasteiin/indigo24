@@ -218,6 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                               ],
                             ),
                             TextField(
+                              keyboardType: TextInputType.number,
                               controller: loginController,
                               decoration: InputDecoration(
                                   prefixText: "+" + phonePrefix,

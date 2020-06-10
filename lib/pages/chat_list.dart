@@ -23,7 +23,7 @@ List<ChatsModel> dbChats = [];
 List myList = [];
 List<ChatsModel> chatsModel = [];
 
-class _ChatsListPageState extends State<ChatsListPage> {
+class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveClientMixin{
   bool isOffline = false;
 
   int _counter = 0;
@@ -66,25 +66,21 @@ class _ChatsListPageState extends State<ChatsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    String string = 'Title';
+    String string = 'Чаты';
     return Scaffold(
       appBar: AppBar(
-        title: Text(string),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.navigate_next),
-            onPressed: () {},
-          )
-        ],
+        backgroundColor: Colors.white,
+        title: Text(string, style: TextStyle(color: Colors.black),),
         brightness: Brightness.light,
       ),
       body: Container(child: _listView(context, string)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ChatContactsPage())).whenComplete(() {
-                ChatRoom.shared.closeContactsStream();
-              });
+                  MaterialPageRoute(builder: (context) => ChatContactsPage()))
+              .whenComplete(() {
+            ChatRoom.shared.closeContactsStream();
+          });
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -148,4 +144,8 @@ class _ChatsListPageState extends State<ChatsListPage> {
     // messageMinutes = '${roomBooked.minute}';
     return '${roomBooked.hour}:${roomBooked.minute}';
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

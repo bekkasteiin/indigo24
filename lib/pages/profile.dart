@@ -116,10 +116,11 @@ class UserProfilePage extends StatelessWidget {
         children: <Widget>[
           Text("Email"),
           SizedBox(height: 5),
-          TextField(
-            decoration: null,
-            controller: emailController,
-          ),
+          Text('${user.email}'),
+          // TextField(
+          //   decoration: null,
+          //   controller: emailController,
+          // ),
           SizedBox(height: 5)
         ],
       ),
@@ -326,12 +327,12 @@ class UserProfilePage extends StatelessWidget {
                   SizedBox(height: 10),
                   _buildEmailSection(screenSize),
                   _buildSeparator(screenSize),
-                  SizedBox(height: 10),
-                  _buildCountySection(screenSize),
-                  _buildSeparator(screenSize),
-                  SizedBox(height: 10),
-                  _buildCitySection(screenSize),
-                  _buildSeparator(screenSize),
+                  // SizedBox(height: 10),
+                  // _buildCountySection(screenSize),
+                  // _buildSeparator(screenSize),
+                  // SizedBox(height: 10),
+                  // _buildCitySection(screenSize),
+                  // _buildSeparator(screenSize),
 
 
     

@@ -17,6 +17,28 @@ class Api {
 
   Dio dio = new Dio(options);
 
+  withdraw(amount) async {
+    try {
+      String _token = "1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2";
+      response = await dio.post("/pay/out", data: {
+        "&_token": "$_token",
+        "amount": "$amount",
+        "customerID": "$customerID",
+        "unique": "$unique"
+      });
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
   doTransfer(toID, amount) async {
     try {
       response = await dio.post("/check/send/money'", data: {
@@ -137,6 +159,28 @@ class Api {
     }
   }
 
+  refill(amount) async {
+    try {
+      String _token = "1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2";
+      response = await dio.post("/pay/in", data: {
+        "&_token": "$_token",
+        "amount": "$amount",
+        "customerID": "$customerID",
+        "unique": "$unique"
+      });
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
   getCategories() async {
     try {
       response = await dio.post("/get/categories",
@@ -154,8 +198,7 @@ class Api {
     }
   }
 
-  
-  getCountries() async{
+  getCountries() async {
     try {
       response = await dio.post("/get/countries", data: {
         "_token": "8F@RgTHf7Ae1_M#Lv0!K4kmcNb6por52QU39",
@@ -226,8 +269,7 @@ class Api {
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
-      } else {
-      }
+      } else {}
     }
   }
 

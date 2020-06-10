@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/api.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
   @override
@@ -6,7 +7,8 @@ class PaymentHistoryPage extends StatefulWidget {
 }
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
-  
+  Api api = Api();
+
   Widget _historyBuilder(BuildContext context, String logo, String account,
       String amount, String title, String date, int index) {
     return Column(
@@ -33,57 +35,63 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
 
   Container _paymentLogo(String logo) {
     return Container(
-            margin: EdgeInsets.only(right: 10),
-            alignment: Alignment.topCenter,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Image.network('$logo', width: 50.0),
-            ),
-          );
+      margin: EdgeInsets.only(right: 10),
+      alignment: Alignment.topCenter,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Image.network('$logo', width: 50.0),
+      ),
+    );
   }
 
-  Text _paymentAmount(String amount) {
-    return Text(
-            "$amount KZT",
-            style: TextStyle(
-              fontSize: 18,
-              color: Color(0xFF001D52),
-            ),
-          );
+  Container _paymentAmount(String amount) {
+    return Container(
+      child: Text(
+        "$amount KZT",
+        style: TextStyle(
+          fontSize: 18,
+          color: Color(0xFF001D52),
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 
   Expanded _paymentInfo(String title, String account, String date) {
     return Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "$title",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF001D52),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  "Аккаунт $account",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF001D52),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  "$date",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            "$title",
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF001D52),
+              fontWeight: FontWeight.w500,
             ),
-          );
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            "Аккаунт $account",
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xFF001D52),
+              fontWeight: FontWeight.w400,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            "$date",
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w300,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
   }
 
   AppBar buildAppBar() {
@@ -116,24 +124,34 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: _paymentHistroyBody(),
+      body: FutureBuilder(
+          future: api.getHistories(),
+          builder: (context, snapshot) {
+            print(snapshot.data);
+            if (snapshot.hasData)
+              return _paymentHistroyBody(snapshot.data);
+            else
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+          }),
     );
   }
 
-  SafeArea _paymentHistroyBody() {
+  SafeArea _paymentHistroyBody(snapshot) {
     return SafeArea(
       child: ListView.builder(
-        itemCount: 15,
+        itemCount: snapshot['payments'].length,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
             padding: const EdgeInsets.only(top: 5),
             child: _historyBuilder(
               context,
-              "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/BMW_logo_%28white_%2B_grey_background_square%29.svg/600px-BMW_logo_%28white_%2B_grey_background_square%29.svg.png",
-              "8707 123 45 68",
-              "200,00",
-              "Beeline",
-              "08.06.2020",
+              "${snapshot['logoURL']}${snapshot['payments'][index]['logo']}",
+              "${snapshot['payments'][index]['account']}",
+              "${snapshot['payments'][index]['amount']}",
+              "${snapshot['payments'][index]['title']}",
+              "${snapshot['payments'][index]['data']}",
               index,
             ),
           );

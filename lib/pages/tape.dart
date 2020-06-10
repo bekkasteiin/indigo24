@@ -86,148 +86,17 @@ class _TapePageState extends State<TapePage>
                       ),
                       child: Container(
                         color: Color(0xfff7f8fa),
-                        // color: Colors.yellow,
                         padding: const EdgeInsets.only(
                           top: 10,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(25.0),
-                                    child: Image.network(
-                                      // 'https://media.indigo24.com/avatars/${result[index]['avatar']}',
-                                      'https://media.indigo24.com/avatars/noAvatar.png',
-                                      width: 35,
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      // Padding(
-                                      //   padding: const EdgeInsets.only(
-                                      //       left: 10.0),
-                                      //   child: Text(
-                                      //       '${result[index]['name']}'),
-                                      // ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10.0),
-                                        child: Text('${widget.tape['title']}'),
-                                        // child: Text('title'),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            GestureDetector(
-                              // onDoubleTap: () async {
-                              //   await likeTape('${result[index]['id']}');
-                              //   setState(() {
-                              //     if (likeResult['result']['myLike']) {
-                              //       _saved.add(result[index]['id']);
-                              //       result[index]['likesCount'] += 1;
-                              //       final snackBar = SnackBar(
-                              //         elevation: 200,
-                              //         duration: Duration(seconds: 2),
-                              //         content: Text(
-                              //           'Вам лайкнули пост ${result[index]['title']} от ${result[index]['name']}',
-                              //           style: TextStyle(
-                              //               color: Colors.white,
-                              //               fontWeight: FontWeight.w600),
-                              //         ),
-                              //         backgroundColor: Colors.blue,
-                              //       );
-                              //       Scaffold.of(context).showSnackBar(snackBar);
-                              //     } else {
-                              //       _saved.remove(result[index]['id']);
-                              //       result[index]['likesCount'] -= 1;
-                              //     }
-                              //   });
-                              // },
-                              child: Center(
-                                child: FadeInImage.assetNetwork(
-                                  placeholder: 'assets/loading.gif',
-                                  image:
-                                      // 'https://image.freepik.com/free-photo/colorful-paper-flowers-background_44527-808.jpg',
-                                      'https://indigo24.xyz/uploads/tapes/${widget.tape['media']}',
-                                ),
-                              ),
-                            ),
-                            Row(
-                              children: <Widget>[
-                                IconButton(
-                                  onPressed: (){
-                                    
-                                  },
-                                  icon: Icon(
-                                    Icons.favorite,
-                                    // color: _saved.contains(result[index]['id'])
-                                    //     ? Colors.red
-                                    //     : Colors.grey,
-                                    color: Colors.red,
-                                    size: 35,
-                                  ),
-                                  // onPressed: () async {
-                                  //   await likeTape('${result[index]['id']}');
-
-                                  //   setState(() {
-                                  //     if (likeResult['result']['myLike']) {
-                                  //       _saved.add(result[index]['id']);
-                                  //       result[index]['likesCount'] += 1;
-                                  //     } else {
-                                  //       _saved.remove(result[index]['id']);
-                                  //       result[index]['likesCount'] -= 1;
-                                  //     }
-                                  //   });
-                                  // },
-                                ),
-                                Text(
-                                  '${widget.tape['likesCount']}',
-                                  // '44'
-                                ),
-                                // IconButton(
-                                //   icon: Icon(
-                                //     Icons.share,
-                                //     size: 35,
-                                //   ),
-                                //     onPressed: () {},
-                                // ),
-                                Expanded(
-                                  child: Text(''),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 10.0),
-                                  child: Text(
-                                    '${widget.tape['created']}',
-                                    // 'craeted',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 0.0),
-                              child: Text(
-                                'Описание: ${widget.tape['description']}',
-                                // 'description',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 16),
-                                maxLines: 2,
-                              ),
+                            Text(
+                              'Описание: ${widget.tape['description']}',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 16),
+                              maxLines: 2,
                             ),
                             SizedBox(
                               height: 10,
@@ -238,15 +107,52 @@ class _TapePageState extends State<TapePage>
                               shrinkWrap: true,
                               itemCount: tapeResult['comments'].length,
                               itemBuilder: (context, index) {
-                                return Row(
+                                print(tapeResult['comments'][index]);
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Flexible(
-                                      child: Text(
-                                        '${tapeResult['comments'][index]['comment']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 5,
+                                    Container(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      child: Row(
+                                        children: <Widget>[
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(45.0),
+                                            child: Image.network(
+                                              'https://indigo24.xyz/uploads/avatars/${tapeResult['comments'][index]['avatar']}',
+                                              width: 35.0,
+                                              height: 35.0,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                              '${tapeResult['comments'][index]['name']}'),
+                                        ],
                                       ),
                                     ),
+                                    Row(
+                                      children: <Widget>[
+                                        Flexible(
+                                          child: Text(
+                                            '${tapeResult['comments'][index]['comment']}',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.symmetric(vertical: 5),
+                                      height: 0.2,
+                                      width: MediaQuery.of(context).size.width,
+                                      color: Colors.black,
+                                      child: Text('1'),
+                                    )
                                   ],
                                 );
                               },
@@ -322,15 +228,15 @@ class _TapePageState extends State<TapePage>
                             suffixIcon: IconButton(
                               icon: Icon(Icons.send),
                               onPressed: () async {
-                              setState(() {
-                                tapeResult.cast<String, dynamic>();
-                              });
-                              await api.addCommentToTape(
-                                '${widget.tape['id']}',
-                                '${_commentController.text}',
-                              );
-                              _commentController.text = "";
-                            },
+                                setState(() {
+                                  tapeResult.cast<String, dynamic>();
+                                });
+                                await api.addCommentToTape(
+                                  '${widget.tape['id']}',
+                                  '${_commentController.text}',
+                                );
+                                _commentController.text = "";
+                              },
                             ),
                             border: InputBorder.none,
                             hintText: "enter your message",

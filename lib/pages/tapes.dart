@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 
 import 'tape.dart';
@@ -30,7 +32,6 @@ class _TapesPageState extends State<TapesPage>
   }
 
   _scrollListener() {
-    print("${controller.position.extentAfter} $isLoaded $tapePage");
     if (controller.position.extentAfter <= 0 && !isLoaded) {
       tapePage += 1;
       setState(() {
@@ -109,24 +110,21 @@ class _TapesPageState extends State<TapesPage>
                   itemCount: result.length,
                   controller: controller,
                   itemBuilder: (BuildContext context, int index) {
-                    if (result[index]['media'].endsWith('mp4')) {
-                      print(result[index]['media']);
-                      _controller =
-                          VideoPlayerController.network(result[index]['media'])
-                            ..initialize().then((_) {
-                              print('inited');
-                              setState(() {});
-                            });
-                    }
+                    // if (result[index]['media'].endsWith('mp4')) {
+                    //   print(result[index]['media']);
+                    //   _controller =
+                    //       VideoPlayerController.network(result[index]['media'])
+                    //         ..initialize().then((_) {
+                    //           print('inited');
+                    //           setState(() {});
+                    //         });
+                    // }
+                    if (result[index]['media'].endsWith('mp4'))
+                      return Container();
                     return Container(
                       child: Column(
                         children: <Widget>[
                           Container(
-                            padding: const EdgeInsets.only(
-                              left: 10,
-                              right: 10,
-                              top: 10,
-                            ),
                             child: Container(
                               color: Color(0xfff7f8fa),
                               padding: const EdgeInsets.only(
@@ -146,7 +144,7 @@ class _TapesPageState extends State<TapesPage>
                                               BorderRadius.circular(25.0),
                                           child: Image.network(
                                             // 'https://media.indigo24.com/avatars/${result[index]['avatar']}',
-                                            'https://media.indigo24.com/avatars/noAvatar.png',
+                                            'https://indigo24.xyz/uploads/avatars/${result[index]['avatar']}',
                                             width: 35,
                                           ),
                                         ),
@@ -197,21 +195,15 @@ class _TapesPageState extends State<TapesPage>
                                         }
                                       });
                                     },
-                                    child: Center(
-                                      child: result[index]['media']
-                                                  .endsWith('mp4') ==
-                                              true
-                                          ? AspectRatio(
-                                              aspectRatio:
-                                                  _controller.value.aspectRatio,
-                                              child: VideoPlayer(_controller),
-                                            )
-                                          : FadeInImage.assetNetwork(
-                                              placeholder: 'assets/loading.gif',
-                                              image:
-                                                  // 'https://image.freepik.com/free-photo/colorful-paper-flowers-background_44527-808.jpg',
-                                                  'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
-                                            ),
+                                    child: Container(
+                                      height: MediaQuery.of(context).size.width,
+                                      child: Center(
+                                        child: PhotoView(
+                                          imageProvider: NetworkImage(
+                                            "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   Row(
@@ -270,6 +262,12 @@ class _TapesPageState extends State<TapesPage>
                                             ),
                                           );
                                         },
+                                      ),
+                                      Container(
+                                        width: 30,
+                                        child: Text(
+                                          '${result[index]['commentsCount']}',
+                                        ),
                                       ),
                                       Expanded(
                                         child: Text(''),

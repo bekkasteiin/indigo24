@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../services/api.dart';
 import '../style/fonts.dart';
+import 'package:indigo24/services/user.dart' as user;
 
 class TransferPage extends StatefulWidget {
   @override
@@ -54,7 +55,7 @@ class _TransferPageState extends State<TransferPage> {
               Stack(
                 children: <Widget>[
                   Image.asset(
-                    'assets/images/walletBackground.png',
+                    'assets/images/background_little.png',
                     fit: BoxFit.fill,
                   ),
                   Positioned(
@@ -65,13 +66,15 @@ class _TransferPageState extends State<TransferPage> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 100, left: 20, right: 20),
+                    margin: EdgeInsets.only(top: 45, left: 20, right: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          height: 1,
-                          color: Colors.white,
+                          height: 0.6,
+                          margin: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          color: Color(0xFFD1E1FF),
                         ),
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
@@ -85,7 +88,7 @@ class _TransferPageState extends State<TransferPage> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '123',
+                                '${user.balance}',
                                 style: fS18(c: 'FFFFFF'),
                               ),
                             ],
@@ -178,6 +181,7 @@ class _TransferPageState extends State<TransferPage> {
                   children: <Widget>[
                     Container(
                       child: TextFormField(
+                        keyboardType: TextInputType.number,
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(25),
                         ],
@@ -193,7 +197,9 @@ class _TransferPageState extends State<TransferPage> {
               ),
               Container(
                 width: 40,
-                child: Image.network('https://media.indigo24.com/avatars/noAvatar.png', width: 40.0),
+                child: Image.network(
+                    'https://media.indigo24.com/avatars/noAvatar.png',
+                    width: 40.0),
               ),
             ],
           ),
@@ -206,6 +212,7 @@ class _TransferPageState extends State<TransferPage> {
               Expanded(
                 child: Container(
                   child: TextFormField(
+                    keyboardType: TextInputType.number,
                     controller: sumController,
                     decoration: InputDecoration.collapsed(hintText: 'Сумма'),
                     style: TextStyle(fontSize: 20),

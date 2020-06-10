@@ -47,7 +47,7 @@ class ChatRoom {
   closeCabinetStream() {
     cabinetController.close();
   }
-  
+
   closeContactsStream() {
     contactController.close();
   }
@@ -105,31 +105,31 @@ class ChatRoom {
     }
   }
 
-  userCheck(phone){
+  userCheck(phone) {
     var data = json.encode({
-        "cmd": "user:check",
-        "data": {
-            "user_id": userId,
-            "userToken": "$userToken",
-            "phone": phone,
-        }
-      });
-      print('added');
-      channel.sink.add(data);
+      "cmd": "user:check",
+      "data": {
+        "user_id": userId,
+        "userToken": "$userToken",
+        "phone": phone,
+      }
+    });
+    print('added');
+    channel.sink.add(data);
   }
 
-  cabinetCreate(ids, type){
+  cabinetCreate(ids, type) {
     var data = json.encode({
-        "cmd": "chat:create",
-        "data": {
-            "user_id": userId,
-            "userToken": "$userToken",
-            "user_ids": ids,
-            "type": type
-        }
-      });
-      print('cabinet created $data');
-      channel.sink.add(data);
+      "cmd": "chat:create",
+      "data": {
+        "user_id": userId,
+        "userToken": "$userToken",
+        "user_ids": ids,
+        "type": type
+      }
+    });
+    print('cabinet created $data');
+    channel.sink.add(data);
   }
 
   listen() {
@@ -143,6 +143,7 @@ class ChatRoom {
 
       switch (cmd) {
         case "init":
+          print(userId);
           print(data);
           if (data['status'] == 'true') {
             var data = {

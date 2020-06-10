@@ -18,9 +18,9 @@ class MyConnectivity {
   void initialise() async {
     ConnectivityResult result = await connectivity.checkConnectivity();
     _checkStatus(result);
-    connectivity.onConnectivityChanged.listen((result) {
-      _checkStatus(result);
-    });
+    // connectivity.onConnectivityChanged.listen((result) {
+    //   _checkStatus(result);
+    // });
   }
 
   void _checkStatus(ConnectivityResult result) async {

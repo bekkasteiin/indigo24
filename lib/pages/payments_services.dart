@@ -20,32 +20,30 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: api.getServices(widget.categoryID).then((services) {
-        return services;
-      }),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        future: api.getServices(widget.categoryID).then((services) {
+          return services;
+        }),
+        builder: (context, snapshot) {
           return Scaffold(
             appBar: buildAppBar(),
-            body: ListView.builder(
-              itemCount: snapshot.data["services"].length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: _paymentsList(
-                    context,
-                    "https://api.indigo24.xyz/logos/${snapshot.data["services"][index]['logo']}",
-                    "${snapshot.data["services"][index]['title']}",
-                    snapshot.data["services"][index]['id'],
-                  ),
-                );
-              },
-            ),
+            body: snapshot.hasData == true
+                ? ListView.builder(
+                    itemCount: snapshot.data["services"].length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: _paymentsList(
+                          context,
+                          "https://api.indigo24.xyz/logos/${snapshot.data["services"][index]['logo']}",
+                          "${snapshot.data["services"][index]['title']}",
+                          snapshot.data["services"][index]['id'],
+                        ),
+                      );
+                    },
+                  )
+                : Center(child: CircularProgressIndicator()),
           );
-        } else
-          return CircularProgressIndicator();
-      },
-    );
+        });
   }
 
   AppBar buildAppBar() {
@@ -92,7 +90,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
             Expanded(
               child: Text(
                 '$_serviceTitle',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
               ),
             ),
           ],
