@@ -253,12 +253,13 @@ class Api {
 
   addCommentToTape(String comment, String tapeID) async {
     try {
-      response = await dio.post("/get/tapes", data: {
+      response = await dio.post("/tape/comment/add", data: {
         "customerID": "$customerID",
         "unique": "$unique",
         "comment": "$comment",
         "tapeID": "$tapeID",
       });
+      print(response.data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {

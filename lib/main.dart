@@ -100,6 +100,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
     user.email = await SharedPreferencesHelper.getString('email');
     user.avatar = await SharedPreferencesHelper.getString('avatar');
     user.unique = await SharedPreferencesHelper.getString('unique');
+    user.balance =  await SharedPreferencesHelper.getString('balance');
+    user.balanceInBlock = await SharedPreferencesHelper.getString('balanceInBlock'); 
   }
 
   _connect() async {

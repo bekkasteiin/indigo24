@@ -76,6 +76,7 @@ class _ChatsListPageState extends State<ChatsListPage> {
             onPressed: () {},
           )
         ],
+        brightness: Brightness.light,
       ),
       body: Container(child: _listView(context, string)),
       floatingActionButton: FloatingActionButton(

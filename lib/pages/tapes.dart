@@ -78,6 +78,7 @@ class _TapesPageState extends State<TapesPage>
   }
 
   final Set _saved = Set();
+  VideoPlayerController _controller;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +109,15 @@ class _TapesPageState extends State<TapesPage>
                   itemCount: result.length,
                   controller: controller,
                   itemBuilder: (BuildContext context, int index) {
+                    if (result[index]['media'].endsWith('mp4')) {
+                      print(result[index]['media']);
+                      _controller =
+                          VideoPlayerController.network(result[index]['media'])
+                            ..initialize().then((_) {
+                              print('inited');
+                              setState(() {});
+                            });
+                    }
                     return Container(
                       child: Column(
                         children: <Widget>[
@@ -188,12 +198,20 @@ class _TapesPageState extends State<TapesPage>
                                       });
                                     },
                                     child: Center(
-                                      child: FadeInImage.assetNetwork(
-                                        placeholder: 'assets/loading.gif',
-                                        image:
-                                            // 'https://image.freepik.com/free-photo/colorful-paper-flowers-background_44527-808.jpg',
-                                            'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
-                                      ),
+                                      child: result[index]['media']
+                                                  .endsWith('mp4') ==
+                                              true
+                                          ? AspectRatio(
+                                              aspectRatio:
+                                                  _controller.value.aspectRatio,
+                                              child: VideoPlayer(_controller),
+                                            )
+                                          : FadeInImage.assetNetwork(
+                                              placeholder: 'assets/loading.gif',
+                                              image:
+                                                  // 'https://image.freepik.com/free-photo/colorful-paper-flowers-background_44527-808.jpg',
+                                                  'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
+                                            ),
                                     ),
                                   ),
                                   Row(

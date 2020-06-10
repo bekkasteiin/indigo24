@@ -11,7 +11,8 @@ class TapePage extends StatefulWidget {
   _TapePageState createState() => _TapePageState();
 }
 
-class _TapePageState extends State<TapePage> with AutomaticKeepAliveClientMixin {
+class _TapePageState extends State<TapePage>
+    with AutomaticKeepAliveClientMixin {
   Future _future;
 
   @override
@@ -31,7 +32,7 @@ class _TapePageState extends State<TapePage> with AutomaticKeepAliveClientMixin 
     });
   }
 
-  int foo(){
+  int foo() {
     return 1;
   }
 
@@ -290,38 +291,34 @@ class _TapePageState extends State<TapePage> with AutomaticKeepAliveClientMixin 
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10.0, top: 10),
                     child: Container(
-                      height: 35,
-                      child: TextFormField(
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(151),
-                        ],
-                        maxLines: 3,
-                        controller: _commentController,
-                        onChanged: (value) {
-                          if (value.length < tempCount.length) {
-                            setState(() {
-                              letterCount = letterCount + 1;
-                            });
-                          }
-                          if (value.length > tempCount.length) {
-                            setState(() {
-                              letterCount = letterCount - 1;
-                            });
-                          }
-                          tempCount = value;
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Написать комментарий',
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 0.0, horizontal: 15.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(25.0),
-                            ),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.send),
-                            onPressed: () async {
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: TextField(
+                          maxLines: 6,
+                          minLines: 1,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(151),
+                          ],
+                          controller: _commentController,
+                          onChanged: (value) {
+                            if (value.length < tempCount.length) {
+                              setState(() {
+                                letterCount = letterCount + 1;
+                              });
+                            }
+                            if (value.length > tempCount.length) {
+                              setState(() {
+                                letterCount = letterCount - 1;
+                              });
+                            }
+                            tempCount = value;
+                          },
+                          decoration: InputDecoration(
+                            // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.send),
+                              onPressed: () async {
                               setState(() {
                                 tapeResult.cast<String, dynamic>();
                               });
@@ -331,10 +328,59 @@ class _TapePageState extends State<TapePage> with AutomaticKeepAliveClientMixin 
                               );
                               _commentController.text = "";
                             },
+                            ),
+                            border: InputBorder.none,
+                            hintText: "enter your message",
                           ),
                         ),
                       ),
                     ),
+                    // Container(
+                    //   height: 35,
+                    //   child: TextFormField(
+                    //     inputFormatters: [
+                    //       LengthLimitingTextInputFormatter(151),
+                    //     ],
+                    //     maxLines: 3,
+                    //     controller: _commentController,
+                    //     onChanged: (value) {
+                    //       if (value.length < tempCount.length) {
+                    //         setState(() {
+                    //           letterCount = letterCount + 1;
+                    //         });
+                    //       }
+                    //       if (value.length > tempCount.length) {
+                    //         setState(() {
+                    //           letterCount = letterCount - 1;
+                    //         });
+                    //       }
+                    //       tempCount = value;
+                    //     },
+                    //     decoration: InputDecoration(
+                    //       hintText: 'Написать комментарий',
+                    //       contentPadding: EdgeInsets.symmetric(
+                    //           vertical: 0.0, horizontal: 15.0),
+                    //       border: OutlineInputBorder(
+                    //         borderRadius: BorderRadius.all(
+                    //           Radius.circular(25.0),
+                    //         ),
+                    //       ),
+                    //       suffixIcon: IconButton(
+                    //         icon: Icon(Icons.send),
+                    //         onPressed: () async {
+                    //           setState(() {
+                    //             tapeResult.cast<String, dynamic>();
+                    //           });
+                    //           await api.addCommentToTape(
+                    //             '${widget.tape['id']}',
+                    //             '${_commentController.text}',
+                    //           );
+                    //           _commentController.text = "";
+                    //         },
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ),
                 ),
                 Padding(
