@@ -129,7 +129,7 @@ class _ChatsListPageState extends State<ChatsListPage> {
                       backgroundImage: NetworkImage(
                           "https://media.indigo24.com/avatars/noAvatar.png"),
                     ),
-                    title: Text(myList[i]["name"]),
+                    title: Text("${myList[i]["name"]}"),
                     subtitle: Text("${myList[i]['last_message']["text"]}"),
                     trailing: Text(myList[i]['last_message']["time"] == null
                         ? "null"

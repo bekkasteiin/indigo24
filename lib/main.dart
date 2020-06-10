@@ -152,9 +152,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
               left: 0,
               right: 0,
             ),
-            height: 45,
+            height: 50,
           child: TabBar(
-            indicatorPadding: EdgeInsets.all(0),            
+            indicatorPadding: EdgeInsets.all(1),            
             labelPadding: EdgeInsets.all(0),
             indicatorWeight: 0.0000000000001,
             controller: _tabController,

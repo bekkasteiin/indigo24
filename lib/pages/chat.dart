@@ -97,7 +97,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name),
+        title: Text("${widget.name}"),
       ),
       body: SafeArea(
           child: Container(
@@ -128,7 +128,7 @@ class _ChatPageState extends State<ChatPage> {
                     child: Container(
                       child: myList.isEmpty
                           ? Center(
-                              child: Text("2"),
+                              child: Text("Loading"),
                             )
                           : NotificationListener<ScrollNotification>(
                               onNotification: (ScrollNotification scrollInfo) {
