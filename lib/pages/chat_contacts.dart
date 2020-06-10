@@ -4,8 +4,10 @@ import 'dart:convert';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/pages/chat.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:indigo24/services/socket.dart';
 
 class ChatContactsPage extends StatefulWidget {
   @override
@@ -43,11 +45,53 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   void initState() {
     _future = getContacts();
     super.initState();
+    ChatRoom.shared.setContactsStream();
+    listen();
   }
+  listen() {
+    ChatRoom.shared.onContactChange.listen((e) {
+      print("Contact EVENT");
+      print(e.json);
+      var cmd = e.json['cmd'];
+      switch (cmd) {
+        case "user:check":
+            ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
+          break;
+        case "chat:create":
+          print("STATUS ${e.json["data"]["status"]}");
+          if(e.json["data"]["status"].toString() == "true"){
+            var name = e.json["data"]["chat_name"];
+            var chatID = e.json["data"]["chat_id"];
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
+            ).whenComplete(() {
+              ChatRoom.shared.closeCabinetStream();
+            });
+          } else {
+            var name = e.json["data"]["name"];
+            var chatID = e.json["data"]["chat_id"];
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
+            ).whenComplete(() {
+              ChatRoom.shared.closeCabinetStream();
+            });
+          }
+          break;
+
+        default:
+      }
+    });
+  }
+
 
   @override
   void dispose() {
     super.dispose();
+    ChatRoom.shared.contactController.close();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
@@ -254,7 +298,11 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                         ),
                                       ],
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      print("${actualList[index]['name']} ${actualList[index]['phone']} pressed");
+                                      ChatRoom.shared.userCheck(actualList[index]['phone']);
+
+                                    },
                                   ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),

@@ -22,8 +22,11 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+<<<<<<< HEAD
 	<key>NSAllowsArbitraryLoads</key>
 	<true/>
+=======
+>>>>>>> e4b99d5ed3a1b29051b60178b79feea2b65f8dd0
 	<key>NSContactsUsageDescription</key>
 	<string>This app requires contacts access to function properly.</string>
 	<key>UILaunchStoryboardName</key>
