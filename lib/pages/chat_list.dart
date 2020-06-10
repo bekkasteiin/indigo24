@@ -81,7 +81,9 @@ class _ChatsListPageState extends State<ChatsListPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ChatContactsPage()));
+              MaterialPageRoute(builder: (context) => ChatContactsPage())).whenComplete(() {
+                ChatRoom.shared.closeContactsStream();
+              });
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),

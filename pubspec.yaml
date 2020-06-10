@@ -40,7 +40,8 @@ dependencies:
   http: ^0.12.1
   shared_preferences: any
   permission_handler: ^5.0.0+hotfix.6
-  
+  video_player: ^0.10.11+1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

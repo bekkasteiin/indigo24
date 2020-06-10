@@ -11,19 +11,28 @@ class ChatRoom {
 
   var changeController;
   var cabinetController;
+  var contactController;
+
   Stream<MyEvent> get onChange => changeController.stream;
+  Stream<MyContactEvent> get onContactChange => contactController.stream;
   Stream<MyCabinetEvent> get onCabinetChange => cabinetController.stream;
 
   var lastMessage;
-  var user_id = user.id;
-  var user_token = user.unique;
+  var userId = user.id;
+  var userToken = user.unique;
 
   setStream() {
     print("Setting StreamController for Events");
     changeController = new StreamController<MyEvent>();
   }
 
+  setContactsStream() {
+    print("Setting StreamController for Contact Events");
+    contactController = new StreamController<MyContactEvent>();
+  }
+
   setCabinetStream() {
+    print("Setting StreamController for Cabinet Events");
     cabinetController = new StreamController<MyCabinetEvent>();
   }
 
@@ -38,6 +47,10 @@ class ChatRoom {
   closeCabinetStream() {
     cabinetController.close();
   }
+  
+  closeContactsStream() {
+    contactController.close();
+  }
 
   closeStream() {
     changeController.close();
@@ -49,8 +62,8 @@ class ChatRoom {
     var data = json.encode({
       "cmd": 'init',
       "data": {
-        "user_id": "$user_id",
-        "userToken": "$user_token",
+        "user_id": "$userId",
+        "userToken": "$userToken",
       }
     });
     channel.sink.add(data);
@@ -63,8 +76,8 @@ class ChatRoom {
       "cmd": 'chat:get',
       "data": {
         "chat_id": "$chatID",
-        "user_id": "$user_id",
-        "userToken": "$user_token",
+        "user_id": "$userId",
+        "userToken": "$userToken",
         "page": 1,
       }
     });
@@ -79,8 +92,8 @@ class ChatRoom {
       var data = json.encode({
         "cmd": 'message:create',
         "data": {
-          "user_id": "$user_id",
-          "userToken": "$user_token",
+          "user_id": "$userId",
+          "userToken": "$userToken",
           "chat_id": "$chatID",
           "text": '$message'
         }
@@ -92,6 +105,32 @@ class ChatRoom {
     }
   }
 
+  userCheck(phone){
+    var data = json.encode({
+        "cmd": "user:check",
+        "data": {
+            "user_id": userId,
+            "userToken": "$userToken",
+            "phone": phone,
+        }
+      });
+      print('added');
+      channel.sink.add(data);
+  }
+
+  cabinetCreate(ids, type){
+    var data = json.encode({
+        "cmd": "chat:create",
+        "data": {
+            "user_id": userId,
+            "userToken": "$userToken",
+            "user_ids": ids,
+            "type": type
+        }
+      });
+      print('cabinet created $data');
+      channel.sink.add(data);
+  }
 
   listen() {
     print("Listen is called");
@@ -109,8 +148,8 @@ class ChatRoom {
             var data = {
               "cmd": 'chats:get',
               "data": {
-                "user_id": "$user_id",
-                "userToken": "$user_token",
+                "user_id": "$userId",
+                "userToken": "$userToken",
                 "page": '1',
               }
             };
@@ -134,11 +173,15 @@ class ChatRoom {
               print("new message in CHATS page");
             }
           }
-
           break;
-
+        case "user:check":
+          contactController.add(new MyContactEvent(json));
+          break;
+        case "chat:create":
+          contactController.add(new MyContactEvent(json));
+          break;
         default:
-          print('default print: $json');
+          print('default print cmd: $cmd json: $json');
       }
     });
   }
@@ -148,6 +191,14 @@ class MyEvent {
   var json;
 
   MyEvent(var json) {
+    this.json = json;
+  }
+}
+
+class MyContactEvent {
+  var json;
+
+  MyContactEvent(var json) {
     this.json = json;
   }
 }
