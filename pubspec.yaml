@@ -36,7 +36,11 @@ dependencies:
   flutter_slidable: ^0.5.4
   polygon_clipper: ^1.0.2
   dio: ^3.0.9
-
+  flutter_progress_button: ^1.0.0
+  http: ^0.12.1
+  shared_preferences: any
+  permission_handler: ^5.0.0+hotfix.6
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

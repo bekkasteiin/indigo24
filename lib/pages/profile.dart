@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/intro.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProfilePage extends StatelessWidget {
   final String _fullName = "Иван Иванов";
@@ -373,8 +375,14 @@ class UserProfilePage extends StatelessWidget {
                       Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: (){
-                            print("lol");
+                          onTap: () async {
+                            SharedPreferences preferences = await SharedPreferences.getInstance();
+                            await preferences.clear();
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (context) => IntroPage()
+                              ), (r) => false
+                            );
                           },
                           child: Ink(
                             child: Text("Выйти", style: TextStyle(color: Colors.white)),

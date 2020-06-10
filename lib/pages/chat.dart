@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/socket.dart';
-
+import 'package:indigo24/services/user.dart' as user;
 import 'chat_page_view_test.dart';
 
 class ChatPage extends StatefulWidget {
@@ -192,7 +192,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
-    return m['user_id'] == '113626' ? Sended(m) : Received(m);
+    return m['user_id'] == user.id ? Sended(m) : Received(m);
   }
 }
 

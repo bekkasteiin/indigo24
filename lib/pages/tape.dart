@@ -52,6 +52,7 @@ class _TapePageState extends State<TapePage> with AutomaticKeepAliveClientMixin 
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
+          color: Colors.black,
           onPressed: () {
             Navigator.pop(context);
           },

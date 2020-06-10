@@ -18,27 +18,25 @@ class _TapesPageState extends State<TapesPage>
   var api = Api();
   List result;
   ScrollController controller;
-  
+  int tapePage = 1;
   @override
   void initState() {
     controller = new ScrollController()..addListener(_scrollListener);
-    api.getTapes('1').then((tapes) {
-
+    api.getTapes('$tapePage').then((tapes) {
       return setTapes(tapes);
     });
-
     super.initState();
   }
 
   _scrollListener() {
-    print("${controller.position.extentAfter} $isLoaded");
+    print("${controller.position.extentAfter} $isLoaded $tapePage");
     if (controller.position.extentAfter <= 0 && !isLoaded) {
+      tapePage += 1;
       setState(() {
         isLoaded = true;
       });
-
-      api.getTapes('2').then((tapes) {
-        print("PAGE 2 $tapes");
+      api.getTapes('$tapePage').then((tapes) {
+        print("PAGE $tapePage $tapes");
         return addTapes(tapes);
       });
     }
@@ -85,12 +83,6 @@ class _TapesPageState extends State<TapesPage>
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         brightness: Brightness.light,
         title: Text(
           "Лента",
@@ -115,212 +107,202 @@ class _TapesPageState extends State<TapesPage>
                   itemCount: result.length,
                   controller: controller,
                   itemBuilder: (BuildContext context, int index) {
-                    return Column(
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 10,
-                          ),
-                          child: Container(
-                            color: Color(0xfff7f8fa),
-                            // color: Colors.yellow,
+                    return Container(
+                      child: Column(
+                        children: <Widget>[
+                          Container(
                             padding: const EdgeInsets.only(
+                              left: 10,
+                              right: 10,
                               top: 10,
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(25.0),
-                                        child: Image.network(
-                                          // 'https://media.indigo24.com/avatars/${result[index]['avatar']}',
-                                          'https://media.indigo24.com/avatars/noAvatar.png',
-                                          width: 35,
-                                        ),
-                                      ),
-                                      Flexible(
-                                        child: Container(
-                                          padding: EdgeInsets.only(left: 10.0),
-                                          child: Text(
-                                            '${result[index]['title']}',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                GestureDetector(
-                                  onDoubleTap: () async {
-                                    await api
-                                        .likeTape('${result[index]['id']}')
-                                        .then((value) {
-                                      likeResult = value;
-                                    });
-                                    setState(() {
-                                      if (likeResult['result']['myLike']) {
-                                        _saved.add(result[index]['id']);
-                                        result[index]['likesCount'] += 1;
-                                        final snackBar = SnackBar(
-                                          elevation: 200,
-                                          duration: Duration(seconds: 2),
-                                          content: Text(
-                                            'Вам лайкнули пост ${result[index]['title']} от ${result[index]['name']}',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                          backgroundColor: Colors.blue,
-                                        );
-                                        Scaffold.of(context)
-                                            .showSnackBar(snackBar);
-                                      } else {
-                                        _saved.remove(result[index]['id']);
-                                        result[index]['likesCount'] -= 1;
-                                      }
-                                    });
-                                  },
-                                  child: Center(
-                                    child: FadeInImage.assetNetwork(
-                                      placeholder: 'assets/loading.gif',
-                                      image:
-                                          // 'https://image.freepik.com/free-photo/colorful-paper-flowers-background_44527-808.jpg',
-                                          'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.favorite,
-                                        color:
-                                            _saved.contains(result[index]['id'])
-                                                ? Colors.red
-                                                : Colors.grey,
-                                        size: 35,
-                                      ),
-                                      onPressed: () async {
-                                        await api
-                                            .likeTape('${result[index]['id']}')
-                                            .then((value) {
-                                          print(value);
-                                          setState(() {
-                                            likeResult = value;
-                                          });
-                                        });
-
-                                        setState(() {
-                                          if (likeResult['result']['myLike']) {
-                                            _saved.add(result[index]['id']);
-                                            result[index]['likesCount'] += 1;
-                                          } else {
-                                            _saved.remove(result[index]['id']);
-                                            result[index]['likesCount'] -= 1;
-                                          }
-                                        });
-                                      },
-                                    ),
-                                    Text(
-                                      '${result[index]['likesCount']}',
-                                    ),
-                                    // IconButton(
-                                    //   icon: Icon(
-                                    //     Icons.share,
-                                    //     size: 35,
-                                    //   ),
-                                    //     onPressed: () {},
-                                    // ),
-                                    Expanded(
-                                      child: Text(''),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 10.0),
-                                      child: Text(
-                                        '${result[index]['created']}',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10.0),
-                                  child: Text(
-                                    '${result[index]['description']}',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(fontSize: 16),
-                                    maxLines: 2,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10.0, top: 10),
-                                        child: ClipRRect(
+                            child: Container(
+                              color: Color(0xfff7f8fa),
+                              padding: const EdgeInsets.only(
+                                top: 10,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(25.0),
-                                          // child: Image.network(
-                                          //   'https://indigo24.xyz/uploads/avatars/${db.getItem('own_avatar')}',
-                                          //   width: 35,
-                                          // ),
+                                          child: Image.network(
+                                            // 'https://media.indigo24.com/avatars/${result[index]['avatar']}',
+                                            'https://media.indigo24.com/avatars/noAvatar.png',
+                                            width: 35,
+                                          ),
+                                        ),
+                                        Flexible(
+                                          child: Container(
+                                            padding:
+                                                EdgeInsets.only(left: 10.0),
+                                            child: Text(
+                                              '${result[index]['title']}',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  GestureDetector(
+                                    onDoubleTap: () async {
+                                      await api
+                                          .likeTape('${result[index]['id']}')
+                                          .then((value) {
+                                        likeResult = value;
+                                      });
+                                      setState(() {
+                                        if (likeResult['result']['myLike']) {
+                                          _saved.add(result[index]['id']);
+                                          result[index]['likesCount'] += 1;
+                                          final snackBar = SnackBar(
+                                            elevation: 200,
+                                            duration: Duration(seconds: 2),
+                                            content: Text(
+                                              'Вы лайнули пост ${result[index]['title']} от ${result[index]['name']}',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            backgroundColor: Colors.blue,
+                                          );
+                                          Scaffold.of(context)
+                                              .showSnackBar(snackBar);
+                                        } else {
+                                          _saved.remove(result[index]['id']);
+                                          result[index]['likesCount'] -= 1;
+                                        }
+                                      });
+                                    },
+                                    child: Center(
+                                      child: FadeInImage.assetNetwork(
+                                        placeholder: 'assets/loading.gif',
+                                        image:
+                                            // 'https://image.freepik.com/free-photo/colorful-paper-flowers-background_44527-808.jpg',
+                                            'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.favorite,
+                                          color: _saved
+                                                  .contains(result[index]['id'])
+                                              ? Colors.red
+                                              : Colors.grey,
+                                          size: 35,
+                                        ),
+                                        onPressed: () async {
+                                          await api
+                                              .likeTape(
+                                                  '${result[index]['id']}')
+                                              .then((value) {
+                                            print(value);
+                                            setState(() {
+                                              likeResult = value;
+                                            });
+                                          });
+
+                                          setState(() {
+                                            if (likeResult['result']
+                                                ['myLike']) {
+                                              _saved.add(result[index]['id']);
+                                              result[index]['likesCount'] += 1;
+                                            } else {
+                                              _saved
+                                                  .remove(result[index]['id']);
+                                              result[index]['likesCount'] -= 1;
+                                            }
+                                          });
+                                        },
+                                      ),
+                                      Container(
+                                        width: 30,
+                                        child: Text(
+                                          '${result[index]['likesCount']}',
                                         ),
                                       ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10.0, top: 10),
-                                          child: FlatButton(
-                                            child: Column(
-                                              children: <Widget>[
-                                                SizedBox(height: 20),
-                                                Container(
-                                                  height: 35,
-                                                  child: Text(
-                                                    'Написать комментарий',
-                                                  ),
-                                                ),
-                                              ],
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.comment,
+                                          size: 35,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TapePage(result[index]),
                                             ),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      TapePage(result[index]),
-                                                ),
-                                              );
-                                            },
+                                          );
+                                        },
+                                      ),
+                                      Expanded(
+                                        child: Text(''),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 10.0),
+                                        child: Text(
+                                          '${result[index]['created']}',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w400,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: Text(
+                                      '${result[index]['description']}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: 16),
+                                      maxLines: 2,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 10.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10.0, top: 10),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(25.0),
+                                            // child: Image.network(
+                                            //   'https://indigo24.xyz/uploads/avatars/${db.getItem('own_avatar')}',
+                                            //   width: 35,
+                                            // ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 );
@@ -334,6 +316,5 @@ class _TapesPageState extends State<TapesPage>
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }

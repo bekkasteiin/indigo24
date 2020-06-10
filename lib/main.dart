@@ -3,18 +3,42 @@ import 'dart:async';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat_list.dart';
+import 'package:indigo24/pages/intro.dart';
+import 'package:indigo24/pages/wallet.dart';
+import 'package:indigo24/services/helper.dart';
 
+import 'package:indigo24/services/user.dart' as user;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
 import 'db/chats_model.dart';
 import 'pages/profile.dart';
 import 'pages/tapes.dart';
-import 'pages/wallet_tab.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 
-void main() {
-  runApp(MyApp());
+// void main() {
+//   runApp(MyApp());
+// }
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var phone = prefs.getString('phone');
+  print(phone);
+  
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: phone == null ? IntroPage() : Tabs(),
+    )
+  );
+
 }
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -25,7 +49,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Tabs(),
+      home: IntroPage(),
     );
   }
 }
@@ -48,9 +72,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
 
   @override
   void initState() {
-    _tabController = new TabController(length: 4, vsync: this);
-
-
+  _tabController = new TabController(length: 4, vsync: this);
+  _setUser();
   _connectivity.initialise();
     _connectivity.myStream.listen((source) {
       setState(() => _source = source);
@@ -68,6 +91,15 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
      _getChats();
 
     super.initState();
+  }
+  
+  _setUser() async {
+    user.id = await SharedPreferencesHelper.getString('customerID');
+    user.phone = await SharedPreferencesHelper.getString('phone');
+    user.name = await SharedPreferencesHelper.getString('name');
+    user.email = await SharedPreferencesHelper.getString('email');
+    user.avatar = await SharedPreferencesHelper.getString('avatar');
+    user.unique = await SharedPreferencesHelper.getString('unique');
   }
 
   _connect() async {

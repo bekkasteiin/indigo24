@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 
+import '../services/api.dart';
+
 class TransferHistoryPage extends StatefulWidget {
   @override
   _TransferHistoryPageState createState() => _TransferHistoryPageState();
 }
 
 class _TransferHistoryPageState extends State<TransferHistoryPage> {
+  Api api = Api();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: _transferHistoryBody(),
+      body: FutureBuilder(
+        future: api.getTransactions(1).then((transactions) {
+          print('ho $transactions');
+          return transactions;
+        }),
+        builder: (context, snapshot) {
+          print(snapshot.data);
+          return _transferHistoryBody();
+        },
+      ),
     );
   }
 

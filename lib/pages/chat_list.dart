@@ -5,6 +5,7 @@ import 'package:indigo24/db/Student_DAO.dart';
 import 'package:indigo24/db/chats_model.dart';
 import 'package:indigo24/db/student.dart';
 import 'package:indigo24/pages/chat.dart';
+import 'package:indigo24/pages/chat_contacts.dart';
 import 'package:indigo24/services/socket.dart';
 
 import 'chat_page_view_test.dart';
@@ -72,19 +73,16 @@ class _ChatsListPageState extends State<ChatsListPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.navigate_next),
-            onPressed: () {
-              // StudentDao().deleteAll();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ChatPageView()),
-              );
-            },
+            onPressed: () {},
           )
         ],
       ),
       body: Container(child: _listView(context, string)),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ChatContactsPage()));
+        },
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),

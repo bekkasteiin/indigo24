@@ -15,20 +15,10 @@ class StudentDao{
     print('Student Inserted successfully !!');
   }
 
-  Future updateStudent(Student student) async{
-    final finder = Finder(filter: Filter.byKey(student.rollNo));
-    await _studentFolder.update(await _db, student.toJson(),finder: finder);
-
-  }
 
 
   Future deleteAll() async{
     await _studentFolder.delete(await _db);
-  }
-
-  Future delete(Student student) async{
-    final finder = Finder(filter: Filter.byKey(student.rollNo));
-    await _studentFolder.delete(await _db, finder: finder);
   }
 
 

@@ -30,21 +30,10 @@ class ChatsDB{
     }).toList();
   }
 
-  Future updateStudent(ChatsModel chat) async{
-    final finder = Finder(filter: Filter.byKey(chat.id));
-    await _chatsFolder.update(await _db, chat.toJson(),finder: finder);
-
-  }
 
 
   Future deleteAll() async{
     print("Deleted all data from local db");
     await _chatsFolder.delete(await _db);
   }
-
-  Future delete(ChatsModel chat) async{
-    final finder = Finder(filter: Filter.byKey(chat.id));
-    await _chatsFolder.delete(await _db, finder: finder);
-  }
-
 }
