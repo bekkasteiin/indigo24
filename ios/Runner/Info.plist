@@ -20,6 +20,8 @@
 	<string>????</string>
 	<key>NSContactsUsageDescription</key>  
  	<string>This app requires contacts access to function properly.</string>
+	<key>NSAllowsArbitraryLoads</key>
+  	<true/>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>

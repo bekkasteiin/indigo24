@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:video_player/video_player.dart';
 
 import 'tape.dart';
 

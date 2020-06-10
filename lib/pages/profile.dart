@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:indigo24/services/user.dart' as user;
 
 class UserProfilePage extends StatelessWidget {
-  final String _fullName = "Иван Иванов";
+  final String _fullName = '${user.name}';
   final String _status = "Software Developer";
   final String _bio =
       "\"Hi, I am a Freelance developer working for hourly basis. If you wants to contact me to build your product leave a message.\"";
@@ -30,7 +31,7 @@ class UserProfilePage extends StatelessWidget {
         height: 100.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSBWXyk_J29zFOujj_OVI9etvoysAWbLD-wdJeuRk6gnOERR98e&usqp=CAU'),
+            image: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
@@ -105,45 +106,7 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatContainer() {
-    return Container(
-      height: 60.0,
-      margin: EdgeInsets.only(top: 8.0),
-      decoration: BoxDecoration(
-        color: Color(0xFFEFF4F7),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          _buildStatItem("Followers", _followers),
-          _buildStatItem("Posts", _posts),
-          _buildStatItem("Scores", _scores),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBio(BuildContext context) {
-    TextStyle bioTextStyle = TextStyle(
-      fontFamily: 'Spectral',
-      fontWeight: FontWeight.w400,//try changing weight to w500 if not thin
-      fontStyle: FontStyle.italic,
-      color: Color(0xFF799497),
-      fontSize: 16.0,
-    );
-
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: EdgeInsets.all(8.0),
-      child: Text(
-        _bio,
-        textAlign: TextAlign.center,
-        style: bioTextStyle,
-      ),
-    );
-  }
-
-  TextEditingController emailController = new TextEditingController(text: "example1234567890@gmail.com");
+  TextEditingController emailController = new TextEditingController(text:  '${user.email}');
 
   Widget _buildEmailSection(Size screenSize){
     return Container(
@@ -171,7 +134,7 @@ class UserProfilePage extends StatelessWidget {
         children: <Widget>[
           Text("НОМЕР ТЕЛЕФОНА"),
           SizedBox(height: 5),
-          Text("+7 700 000 0000", textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+          Text('${user.phone}', textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
           SizedBox(height: 5),
         ],
       ),
@@ -295,6 +258,45 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
+ Widget _buildStatContainer() {
+    return Container(
+      height: 60.0,
+      margin: EdgeInsets.only(top: 8.0),
+      decoration: BoxDecoration(
+        color: Color(0xFFEFF4F7),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          _buildStatItem("Followers", _followers),
+          _buildStatItem("Posts", _posts),
+          _buildStatItem("Scores", _scores),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBio(BuildContext context) {
+    TextStyle bioTextStyle = TextStyle(
+      fontFamily: 'Spectral',
+      fontWeight: FontWeight.w400,//try changing weight to w500 if not thin
+      fontStyle: FontStyle.italic,
+      color: Color(0xFF799497),
+      fontSize: 16.0,
+    );
+
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      padding: EdgeInsets.all(8.0),
+      child: Text(
+        _bio,
+        textAlign: TextAlign.center,
+        style: bioTextStyle,
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -307,7 +309,7 @@ class UserProfilePage extends StatelessWidget {
             SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  SizedBox(height: 120),
+                  SizedBox(height: 130),
                   // _buildFullName(),
                   // _buildStatus(context),
                   // _buildStatContainer(),
@@ -333,12 +335,12 @@ class UserProfilePage extends StatelessWidget {
 
 
     
-                  SizedBox(height: 10),
-                  _buildWhateverSection(screenSize),
-                  _buildSeparator(screenSize),
-                  SizedBox(height: 10),
-                  _buildWhateverSection(screenSize),
-                  _buildSeparator(screenSize),
+                  // SizedBox(height: 10),
+                  // _buildWhateverSection(screenSize),
+                  // _buildSeparator(screenSize),
+                  // SizedBox(height: 10),
+                  // _buildWhateverSection(screenSize),
+                  // _buildSeparator(screenSize),
 
 
                     
