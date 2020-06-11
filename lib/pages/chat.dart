@@ -166,13 +166,13 @@ class _ChatPageState extends State<ChatPage> {
                   // height: 500,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    // decoration: BoxDecoration(
-                    //   image: DecorationImage(
-                    //       image: AssetImage(
-                    //           'assets/images/background_login.png'),
-                    //       fit: BoxFit.cover,
-                    //       colorFilter: ColorFilter.linearToSrgbGamma()),
-                    // ),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage(
+                              'assets/images/background_chat.png'),
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.linearToSrgbGamma()),
+                    ),
                     child: Container(
                       child: myList.isEmpty
                           ? Center(

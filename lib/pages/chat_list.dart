@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/db/Student_DAO.dart';
 import 'package:indigo24/db/chats_model.dart';
@@ -98,10 +99,8 @@ class _ChatsListPageState extends State<ChatsListPage>
                       goToChat(dbChats[i].name, dbChats[i].id);
                     },
                     leading: CircleAvatar(
-                      backgroundImage:
-                          //  NetworkImage('https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
-                          NetworkImage(
-                              "https://media.indigo24.com/avatars/noAvatar.png"),
+                      backgroundImage: CachedNetworkImageProvider('https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
+                      // NetworkImage("https://media.indigo24.com/avatars/noAvatar.png"),
                     ),
                     title: Text(dbChats[i].name),
                     subtitle: Text(dbChats[i].lastMessage["text"]),
@@ -123,15 +122,11 @@ class _ChatsListPageState extends State<ChatsListPage>
                           memberCount: myList[i]['members_count']);
                     },
                     leading: CircleAvatar(
-                        backgroundImage: (myList[i]["avatar"] == null ||
-                                myList[i]["avatar"] == '' ||
-                                myList[i]["avatar"] == false)
-                            ? NetworkImage(
-                                "https://media.indigo24.com/avatars/noAvatar.png")
-                            :
-                            // NetworkImage('https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')
-                            NetworkImage(
-                                "https://media.indigo24.com/avatars/noAvatar.png")),
+                      backgroundImage: (myList[i]["avatar"]==null || myList[i]["avatar"]=='' || myList[i]["avatar"] == false)?
+                      CachedNetworkImageProvider("https://media.indigo24.com/avatars/noAvatar.png")
+                      :
+                      CachedNetworkImageProvider('https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')
+                    ),
                     title: Text("${myList[i]["name"]}"),
                     subtitle: Text(
                       "${myList[i]['last_message']["text"]}",
