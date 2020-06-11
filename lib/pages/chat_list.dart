@@ -23,7 +23,7 @@ List<ChatsModel> dbChats = [];
 List myList = [];
 List<ChatsModel> chatsModel = [];
 
-class _ChatsListPageState extends State<ChatsListPage> {
+class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveClientMixin{
   bool isOffline = false;
 
   int _counter = 0;
@@ -32,7 +32,6 @@ class _ChatsListPageState extends State<ChatsListPage> {
   void initState() {
     super.initState();
 
-    // chatsDB.deleteAll();
   }
 
   @override
@@ -40,50 +39,35 @@ class _ChatsListPageState extends State<ChatsListPage> {
     super.dispose();
   }
 
-  void _incrementCounter() {
-    var st = StudentDao();
-    Student student =
-        Student(name: "Name $_counter", rollNo: _counter, grades: myList);
-    st.insertStudent(student);
-    Future<List<Student>> students = st.getAllStudents();
-    students.then((value) {
-      print(value);
-    });
-
-    setState(() {
-      _counter++;
-    });
-  }
 
   goToChat(name, chatID) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
     ).whenComplete(() {
+      ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    String string = 'Title';
+    String string = 'Чаты';
     return Scaffold(
       appBar: AppBar(
-        title: Text(string),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.navigate_next),
-            onPressed: () {},
-          )
-        ],
+        backgroundColor: Colors.white,
+        title: Text(string, style: TextStyle(color: Colors.black),),
+        brightness: Brightness.light,
       ),
       body: Container(child: _listView(context, string)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ChatContactsPage())).whenComplete(() {
-                ChatRoom.shared.closeContactsStream();
-              });
+                  MaterialPageRoute(builder: (context) => ChatContactsPage()))
+              .whenComplete(() {
+            ChatRoom.shared.forceGetChat();
+            ChatRoom.shared.closeContactsStream();
+          });
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -104,8 +88,8 @@ class _ChatsListPageState extends State<ChatsListPage> {
                       goToChat(dbChats[i].name, dbChats[i].id);
                     },
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          "https://media.indigo24.com/avatars/noAvatar.png"),
+                      backgroundImage: NetworkImage('https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
+                      // NetworkImage("https://media.indigo24.com/avatars/noAvatar.png"),
                     ),
                     title: Text(dbChats[i].name),
                     subtitle: Text(dbChats[i].lastMessage["text"]),
@@ -126,14 +110,34 @@ class _ChatsListPageState extends State<ChatsListPage> {
                       goToChat(myList[i]['name'], myList[i]['id']);
                     },
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          "https://media.indigo24.com/avatars/noAvatar.png"),
+                      backgroundImage: (myList[i]["avatar"]==null || myList[i]["avatar"]=='' || myList[i]["avatar"] == false)?
+                      NetworkImage("https://media.indigo24.com/avatars/noAvatar.png")
+                      :
+                      NetworkImage('https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')
                     ),
                     title: Text("${myList[i]["name"]}"),
                     subtitle: Text("${myList[i]['last_message']["text"]}"),
-                    trailing: Text(myList[i]['last_message']["time"] == null
-                        ? "null"
-                        : time(myList[i]['last_message']["time"])),
+                    trailing: Wrap(
+                      direction: Axis.vertical,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      alignment: WrapAlignment.center,
+                      children: <Widget>[
+                        Text(myList[i]['last_message']["time"] == null? 
+                        "null" : time(myList[i]['last_message']["time"])
+                        ),
+                        myList[i]['unread_messages']==0?
+                        Container()
+                        :
+                        Container(
+                          // width: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.blue[300],
+                            borderRadius: BorderRadius.circular(10)
+                          ),
+                          child: Text(" ${myList[i]['unread_messages']} ", style: TextStyle(color: Colors.white))
+                        )
+                      ],
+                    ),
                   );
                 },
               );
@@ -147,4 +151,7 @@ class _ChatsListPageState extends State<ChatsListPage> {
     // messageMinutes = '${roomBooked.minute}';
     return '${roomBooked.hour}:${roomBooked.minute}';
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

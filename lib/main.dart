@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/pages/wallet.dart';
@@ -41,6 +42,7 @@ Future<void> main() async {
 
 
 class MyApp extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -96,6 +98,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
   _setUser() async {
     user.id = await SharedPreferencesHelper.getString('customerID');
     user.phone = await SharedPreferencesHelper.getString('phone');
+    user.balance = await SharedPreferencesHelper.getString('balance');
+    user.balanceInBlock = await SharedPreferencesHelper.getString('balanceInBlock');
     user.name = await SharedPreferencesHelper.getString('name');
     user.email = await SharedPreferencesHelper.getString('email');
     user.avatar = await SharedPreferencesHelper.getString('avatar');
@@ -114,7 +118,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
       });
       // await chatsDB.insertChats(chatsModel);
     });
-    
   }
   
 
@@ -132,6 +135,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarBrightness: Brightness.light) // Or Brightness.dark
+    );
     return Scaffold(
       body: TabBarView(
         physics: NeverScrollableScrollPhysics(),

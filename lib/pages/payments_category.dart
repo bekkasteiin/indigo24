@@ -120,28 +120,26 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         return categories;
       }),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Scaffold(
-            appBar: buildAppBar(),
-            body: ListView.builder(
-              itemCount: snapshot.data["categories"].length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: _paymentsList(
-                    context,
-                    snapshot.data["logoURL"] +
-                        snapshot.data["categories"][index]['logo'],
-                    snapshot.data["categories"][index]['title'],
-                    snapshot.data["categories"][index]['ID'],
-                  ),
-                );
-              },
-            ),
-          );
-        } else {
-          return CircularProgressIndicator();
-        }
+        return Scaffold(
+          appBar: buildAppBar(),
+          body: snapshot.hasData == true
+              ? ListView.builder(
+                  itemCount: snapshot.data["categories"].length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: _paymentsList(
+                        context,
+                        snapshot.data["logoURL"] +
+                            snapshot.data["categories"][index]['logo'],
+                        snapshot.data["categories"][index]['title'],
+                        snapshot.data["categories"][index]['ID'],
+                      ),
+                    );
+                  },
+                )
+              : Center(child: CircularProgressIndicator()),
+        );
       },
     );
   }
@@ -205,7 +203,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
             Expanded(
               child: Text(
                 '$name',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
               ),
             ),
           ],
@@ -226,9 +224,9 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: Colors.black26.withOpacity(0.2),
-              blurRadius: 10.0,
-              spreadRadius: -2,
+            color: Colors.black26.withOpacity(0.2),
+            blurRadius: 10.0,
+            spreadRadius: -2,
           )
         ],
         color: Colors.white,

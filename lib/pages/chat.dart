@@ -83,7 +83,6 @@ class _ChatPageState extends State<ChatPage> {
       getMessages(widget.chatID);
     });
     print("load more");
-
     // update data and loading status
   }
 
@@ -97,7 +96,12 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.name}"),
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        title: Text("${widget.name}", style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        brightness: Brightness.light,
       ),
       body: SafeArea(
           child: Container(

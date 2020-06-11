@@ -1,17 +1,45 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/intro.dart';
+import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/helper.dart';
+import 'package:platform_action_sheet/platform_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:indigo24/services/user.dart' as user;
 
-class UserProfilePage extends StatelessWidget {
-  final String _fullName = '${user.name}';
-  final String _status = "Software Developer";
-  final String _bio =
-      "\"Hi, I am a Freelance developer working for hourly basis. If you wants to contact me to build your product leave a message.\"";
-  final String _followers = "173";
-  final String _posts = "24";
-  final String _scores = "450";
+class UserProfilePage extends StatefulWidget {
+  @override
+  _UserProfilePageState createState() => _UserProfilePageState();
+}
 
+class _UserProfilePageState extends State<UserProfilePage> {
+  final String _fullName = '${user.name}';
+
+  File _image;
+
+  final picker = ImagePicker();
+  var api = Api();
+  
+  Future getImage(ImageSource imageSource) async {
+    final pickedFile = await picker.getImage(source: imageSource);
+    if(pickedFile != null){
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      api.uploadAvatar(_image.path).then((r) async{
+        if(r["success"]){
+          await SharedPreferencesHelper.setString('avatar', '${r["fileName"]}');
+          setState(() {
+            user.avatar = r["fileName"];
+          });
+        }
+      });
+
+    }
+  }
+  
   Widget _buildCoverImage(Size screenSize) {
     return Container(
       height: 100,
@@ -25,19 +53,47 @@ class UserProfilePage extends StatelessWidget {
   }
 
   Widget _buildProfileImage() {
-    return Center(
-      child: Container(
-        width: 100.0,
-        height: 100.0,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
-            fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(80.0),
-          border: Border.all(
-            color: Color(0xFF001D52),
-            width: 5.0,
+    return InkWell(
+      onTap: () => PlatformActionSheet().displaySheet(
+                  context: context,
+                  message: Text("Выберите опцию"),
+                  actions: [
+                    ActionSheetAction(
+                      text: "Сфотографировать",
+                      onPressed: (){
+                        getImage(ImageSource.camera);
+                        Navigator.pop(context);
+                      },
+                      hasArrow: true,
+                    ),
+                    ActionSheetAction(
+                      text: "Выбрать из галереи",
+                      onPressed: (){
+                        getImage(ImageSource.gallery);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ActionSheetAction(
+                      text: "Назад",
+                      onPressed: () => Navigator.pop(context),
+                      isCancel: true,
+                      defaultAction: true,
+                    )
+                  ]),
+      child: Center(
+        child: Container(
+          width: 100.0,
+          height: 100.0,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.circular(80.0),
+            border: Border.all(
+              color: Color(0xFF001D52),
+              width: 5.0,
+            ),
           ),
         ),
       ),
@@ -55,25 +111,6 @@ class UserProfilePage extends StatelessWidget {
     return Text(
       _fullName,
       style: _nameTextStyle,
-    );
-  }
-
-  Widget _buildStatus(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      child: Text(
-        _status,
-        style: TextStyle(
-          fontFamily: 'Spectral',
-          color: Colors.black,
-          fontSize: 20.0,
-          fontWeight: FontWeight.w300,
-        ),
-      ),
     );
   }
 
@@ -116,10 +153,11 @@ class UserProfilePage extends StatelessWidget {
         children: <Widget>[
           Text("Email"),
           SizedBox(height: 5),
-          TextField(
-            decoration: null,
-            controller: emailController,
-          ),
+          Text('${user.email}'),
+          // TextField(
+          //   decoration: null,
+          //   controller: emailController,
+          // ),
           SizedBox(height: 5)
         ],
       ),
@@ -258,45 +296,6 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
- Widget _buildStatContainer() {
-    return Container(
-      height: 60.0,
-      margin: EdgeInsets.only(top: 8.0),
-      decoration: BoxDecoration(
-        color: Color(0xFFEFF4F7),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          _buildStatItem("Followers", _followers),
-          _buildStatItem("Posts", _posts),
-          _buildStatItem("Scores", _scores),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBio(BuildContext context) {
-    TextStyle bioTextStyle = TextStyle(
-      fontFamily: 'Spectral',
-      fontWeight: FontWeight.w400,//try changing weight to w500 if not thin
-      fontStyle: FontStyle.italic,
-      color: Color(0xFF799497),
-      fontSize: 16.0,
-    );
-
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: EdgeInsets.all(8.0),
-      child: Text(
-        _bio,
-        textAlign: TextAlign.center,
-        style: bioTextStyle,
-      ),
-    );
-  }
-
-
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -326,12 +325,12 @@ class UserProfilePage extends StatelessWidget {
                   SizedBox(height: 10),
                   _buildEmailSection(screenSize),
                   _buildSeparator(screenSize),
-                  SizedBox(height: 10),
-                  _buildCountySection(screenSize),
-                  _buildSeparator(screenSize),
-                  SizedBox(height: 10),
-                  _buildCitySection(screenSize),
-                  _buildSeparator(screenSize),
+                  // SizedBox(height: 10),
+                  // _buildCountySection(screenSize),
+                  // _buildSeparator(screenSize),
+                  // SizedBox(height: 10),
+                  // _buildCitySection(screenSize),
+                  // _buildSeparator(screenSize),
 
 
     

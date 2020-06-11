@@ -17,13 +17,14 @@ class Api {
 
   Dio dio = new Dio(options);
 
-  doTransfer(toID, amount) async {
+  withdraw(amount) async {
     try {
-      response = await dio.post("/check/send/money'", data: {
+      String _token = "1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2";
+      response = await dio.post("/pay/out", data: {
+        "&_token": "$_token",
+        "amount": "$amount",
         "customerID": "$customerID",
-        "unique": "$unique",
-        "toID": "$toID",
-        "amount": "$toID",
+        "unique": "$unique"
       });
       return response.data;
     } on DioError catch (e) {
@@ -31,6 +32,30 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
+  doTransfer(toID, amount) async {
+    try {
+      var data = {
+        "customerID": "$customerID",
+        "unique": "$unique",
+        "toID": "$toID",
+        "amount": "$amount",
+      };
+
+      response = await dio.post("/check/send/money'", data: data);
+      return response.data;
+    } on DioError catch (e) {
+      print("ERROR HERE");
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request.uri);
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -137,6 +162,28 @@ class Api {
     }
   }
 
+  refill(amount) async {
+    try {
+      String _token = "1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2";
+      response = await dio.post("/pay/in", data: {
+        "&_token": "$_token",
+        "amount": "$amount",
+        "customerID": "$customerID",
+        "unique": "$unique"
+      });
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
   getCategories() async {
     try {
       response = await dio.post("/get/categories",
@@ -154,8 +201,7 @@ class Api {
     }
   }
 
-  
-  getCountries() async{
+  getCountries() async {
     try {
       response = await dio.post("/get/countries", data: {
         "_token": "8F@RgTHf7Ae1_M#Lv0!K4kmcNb6por52QU39",
@@ -226,8 +272,7 @@ class Api {
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
-      } else {
-      }
+      } else {}
     }
   }
 
@@ -251,14 +296,68 @@ class Api {
     }
   }
 
+  addTape(_path, title, description) async {
+    try {
+      FormData formData = FormData.fromMap({
+        "customerID": "$customerID",
+        "unique": "$unique",
+        "file": await MultipartFile.fromFile(_path),
+        "title": title,
+        "description": description
+      });
+
+      print("Adding tape with data ${formData.fields}");
+
+      response = await dio.post("/tape/add", data: formData);
+      print("Getting response from TAPE upload ${response.data}");
+
+      return response.data;
+      
+    } on DioError catch(e) {
+      if(e.response != null) {
+        print(e.response.data);
+      } else{
+        print(e.request);
+        print(e.message);
+      }
+    } 
+  }
+
+  uploadAvatar(_path) async {
+    try {
+      FormData formData = FormData.fromMap({
+        "customerID": "$customerID",
+        "unique": "$unique",
+        "file": await MultipartFile.fromFile(_path),
+      });
+
+      print("Uploading avatar with data ${formData.fields}");
+
+      response = await dio.post("/avatar/upload", data: formData);
+      print("Getting response from avatar upload ${response.data}");
+
+      return response.data;
+      
+    } on DioError catch(e) {
+      if(e.response != null) {
+        print(e.response.data);
+      } else{
+        print(e.request);
+        print(e.message);
+      }
+    } 
+  }
+
+
   addCommentToTape(String comment, String tapeID) async {
     try {
-      response = await dio.post("/get/tapes", data: {
+      response = await dio.post("/tape/comment/add", data: {
         "customerID": "$customerID",
         "unique": "$unique",
         "comment": "$comment",
         "tapeID": "$tapeID",
       });
+      print(response.data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {

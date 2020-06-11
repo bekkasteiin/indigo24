@@ -172,6 +172,13 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         if (snapshot.hasData == true) {
           return Scaffold(
               appBar: AppBar(
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back_ios),
+                  color: Colors.black,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
                 centerTitle: true,
                 brightness: Brightness.light,
                 title: Text(
@@ -183,15 +190,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                actions: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.contact_phone,
-                      color: Colors.black,
-                    ),
-                    onPressed: () async {},
-                  ),
-                ],
                 backgroundColor: Colors.white,
               ),
               body: snapshot.hasData
@@ -241,6 +239,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                     child: Center(
                                                       child: Text(
                                                         '${actualList[index]['name'][0]}',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: TextStyle(
                                                           color: Colors.white,
                                                           fontSize: 16.0,
@@ -253,44 +253,43 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                   width: 20,
                                                 ),
                                                 Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width /
-                                                      1.5,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: <Widget>[
-                                                      Text(
-                                                        index != 0
-                                                            ? actualList[index][
-                                                                        'name'] ==
-                                                                    actualList[
-                                                                            index -
-                                                                                1]
-                                                                        ['name']
-                                                                ? '${actualList[index]['name']} [copy] '
-                                                                : '${actualList[index]['name']}'
-                                                            : '${actualList[index]['name']}',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                            fontSize: 14),
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                      ),
-                                                      Text(
-                                                        '${actualList[index]['phone']}',
-                                                        style: TextStyle(
-                                                            fontSize: 10),
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 1,
-                                                      ),
-                                                    ],
+                                                  child: Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Text(
+                                                          index != 0
+                                                              ? actualList[index]
+                                                                          [
+                                                                          'name'] ==
+                                                                      actualList[index -
+                                                                              1]
+                                                                          [
+                                                                          'name']
+                                                                  ? '${actualList[index]['name']} [copy] '
+                                                                  : '${actualList[index]['name']}'
+                                                              : '${actualList[index]['name']}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                              fontSize: 14),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                        Text(
+                                                          '${actualList[index]['phone']}',
+                                                          style: TextStyle(
+                                                              fontSize: 10),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ],

@@ -15,12 +15,13 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       appBar: buildAppBar(),
       body: FutureBuilder(
         future: api.getTransactions(1).then((transactions) {
-          print('ho $transactions');
           return transactions;
         }),
         builder: (context, snapshot) {
-          print(snapshot.data);
-          return _transferHistoryBody();
+          if (snapshot.hasData)
+            return _transferHistoryBody(snapshot.data);
+          else
+            return Center(child: CircularProgressIndicator());
         },
       ),
     );
@@ -60,6 +61,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               color: Color(0xFF001D52),
               fontWeight: FontWeight.w500,
             ),
+            overflow: TextOverflow.ellipsis,
           ),
           Text(
             "$date",
@@ -75,50 +77,56 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
 
   Widget _historyBuilder(BuildContext context, String logo, String amount,
       String title, String type, String date, int index) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        SizedBox(height: 20),
-        Row(
-          children: <Widget>[
-            SizedBox(width: 20),
-            _transferLogo(logo),
-            _transferInfo(title, date),
-            _transferAmount(type, amount),
-            SizedBox(width: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Container(
-                  height: 10,
-                  width: 10,
-                  color: type == 'in' ? Color(0xFF77E7B1) : Color(0xFFEB818E)),
-            ),
-            SizedBox(width: 20),
-          ],
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 20, right: 20, left: 20),
-          height: 1,
-          color: Color(0xFF7D8E9B),
-        ),
-      ],
+    return Container(
+      height: 90.6,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          SizedBox(height: 20),
+          Row(
+            children: <Widget>[
+              SizedBox(width: 20),
+              _transferLogo(logo),
+              _transferInfo(title, date),
+              _transferAmount(type, amount),
+              SizedBox(width: 10),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Container(
+                    height: 10,
+                    width: 10,
+                    color: type == 'in' ? Color(0xFF77E7B1) : Color(0xFFEB818E)),
+              ),
+              SizedBox(width: 20),
+            ],
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 20, right: 20, left: 20),
+            height: 0.6,
+            color: Color(0xFF7D8E9B),
+          ),
+        ],
+      ),
     );
   }
 
-  SafeArea _transferHistoryBody() {
+  SafeArea _transferHistoryBody(snapshot) {
+    print(snapshot);
     return SafeArea(
       child: ListView.builder(
-        itemCount: 15,
+        itemCount: snapshot['transactions'].length,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
             padding: const EdgeInsets.only(top: 5),
             child: _historyBuilder(
               context,
+              // "${snapshot['avatarURL'] + snapshot['transactions'][index]['avatar']}",
               "https://lh3.googleusercontent.com/IeNJWoKYx1waOhfWF6TiuSiWBLfqLb18lmZYXSgsH1fvb8v1IYiZr5aYWe0Gxu-pVZX3",
-              "200,00",
-              "Aseke",
-              'in',
-              "08.06.2020",
+              "${snapshot['transactions'][index]['amount']}",
+              // "${snapshot['transactions'][index]['from']}",
+              'asdiads0oafskojasfkodfokfdsokfssfdfdsokfsdjfdsfds',
+              '${snapshot['transactions'][index]['type']}',
+              "${snapshot['transactions'][index]['data']}",
               index,
             ),
           );

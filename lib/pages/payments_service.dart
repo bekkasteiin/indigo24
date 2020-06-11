@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../services/api.dart';
 import '../style/fonts.dart';
+import 'package:indigo24/services/user.dart' as user;
 
 class PaymentsServicePage extends StatefulWidget {
   String _logo;
@@ -59,8 +58,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               Stack(
                 children: <Widget>[
                   Image.asset(
-                    'assets/images/walletBackground.png',
-                    fit: BoxFit.fill,
+                    'assets/images/background_little.png',
                   ),
                   Positioned(
                     child: AppBar(
@@ -70,13 +68,15 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 100, left: 20, right: 20),
+                    margin: EdgeInsets.only(top: 45, left: 20, right: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          height: 1,
-                          color: Colors.white,
+                          height: 0.6,
+                          margin: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          color: Color(0xFFD1E1FF),
                         ),
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
@@ -90,7 +90,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '123',
+                                '${user.balance}',
                                 style: fS18(c: 'FFFFFF'),
                               ),
                             ],
@@ -139,13 +139,16 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     return Container(
       height: 50,
       width: 200,
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [
-        BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                spreadRadius: -2,
+                offset: Offset(0.0, 0.0))
+          ]),
       alignment: Alignment.center,
       margin: EdgeInsets.only(top: 20, bottom: 10),
       child: ButtonTheme(
@@ -167,7 +170,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           child: Text(
             'Оплатить',
             style: TextStyle(
-                color: Color(0xFF0543B8), fontWeight: FontWeight.w600),
+                color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
           ),
         ),
       ),
@@ -189,6 +192,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   children: <Widget>[
                     Container(
                       child: TextFormField(
+                        keyboardType: TextInputType.number,
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(25),
                         ],
@@ -217,6 +221,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               Expanded(
                 child: Container(
                   child: TextFormField(
+                    keyboardType: TextInputType.number,
                     controller: sumController,
                     decoration: InputDecoration.collapsed(hintText: 'Сумма'),
                     style: TextStyle(fontSize: 20),
