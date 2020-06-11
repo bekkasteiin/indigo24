@@ -12,10 +12,12 @@ class ChatRoom {
   var changeController;
   var cabinetController;
   var contactController;
+  var chatInfoController;
 
   Stream<MyEvent> get onChange => changeController.stream;
   Stream<MyContactEvent> get onContactChange => contactController.stream;
   Stream<MyCabinetEvent> get onCabinetChange => cabinetController.stream;
+  Stream<MyChatInfoEvent> get onChatInfoChange => chatInfoController.stream;
 
   var lastMessage;
   var userId = user.id;
@@ -24,6 +26,11 @@ class ChatRoom {
   setStream() {
     print("Setting StreamController for Events");
     changeController = new StreamController<MyEvent>();
+  }
+
+  setChatInfoStream() {
+    print("Setting StreamController for Chat Info Events");
+    chatInfoController = new StreamController<MyChatInfoEvent>();
   }
 
   setContactsStream() {
@@ -78,6 +85,7 @@ class ChatRoom {
         "userToken": "$userToken",
       }
     });
+    print('user:check:online ids $ids');
     channel.sink.add(data);
   }
 
@@ -114,6 +122,20 @@ class ChatRoom {
     } else {
       print('message is empty');
     }
+  }
+
+  chatMembers(users_ids, chatId) {
+    var data = json.encode({
+      "cmd": "chat:members",
+      "data": {
+        "userToken": "$userToken",
+        "users_ids": "$users_ids",
+        "chat_id": chatId,
+        "user_id": userId,
+      }
+    });
+    print('checked members');
+    channel.sink.add(data);
   }
 
   userCheck(phone) {
@@ -158,26 +180,11 @@ class ChatRoom {
   }
 
   listen() {
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-    print("Listen is called");
-
     channel.stream.listen((event) {
       var json = jsonDecode(event);
 
       var cmd = json['cmd'];
       var data = json['data'];
-
       switch (cmd) {
         case "init":
           print(userId);
@@ -221,6 +228,10 @@ class ChatRoom {
         case "chat:create":
           contactController.add(new MyContactEvent(json));
           break;
+        case "chat:members":
+          print('added to chatInfoController');
+          chatInfoController.add(new MyChatInfoEvent(json));
+          break;
         default:
           print('default print cmd: $cmd json: $json');
       }
@@ -248,6 +259,14 @@ class MyCabinetEvent {
   var json;
 
   MyCabinetEvent(var json) {
+    this.json = json;
+  }
+}
+
+class MyChatInfoEvent {
+  var json;
+
+  MyChatInfoEvent(var json) {
     this.json = json;
   }
 }

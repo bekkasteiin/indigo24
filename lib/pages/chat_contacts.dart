@@ -71,8 +71,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                      e.json['data']['user_id'], e.json['data']['chat_id'])),
+                  builder: (context) => ChatPage(e.json['data']['user_id'], e.json['data']['chat_id'], memberCount: 2, userIds: e.json['data']['user_id'])),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();

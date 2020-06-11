@@ -187,20 +187,23 @@ class DeviderMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 5.0),
-      height: 25,
-      width: 50,
-      decoration: BoxDecoration(
-          color: Colors.black12,
-          borderRadius: BorderRadius.all(
-            Radius.circular(8.0),
-          )),
-      child: Center(
-          child: Text(
-        date,
-        style: TextStyle(fontSize: 11),
-      )),
+    return Center(
+      child: Container(
+        margin: EdgeInsets.all(5),
+        padding: EdgeInsets.all(5),
+        height: 30,
+        width: 140,
+        decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            borderRadius: BorderRadius.all(
+              Radius.circular(12.0),
+            )),
+        child: Center(
+            child: Text(
+          date,
+          style: TextStyle(fontSize: 16, color: Color(0xFF5E5E5E)),
+        )),
+      ),
     );
   }
 }
@@ -231,7 +234,7 @@ class SendedMessageWidget extends StatelessWidget {
                 topLeft: Radius.circular(15),
                 topRight: Radius.circular(15)),
             child: Container(
-              color: Color(0xFFF7F7F7),
+              color: Colors.white,
               // margin: const EdgeInsets.only(left: 10.0),
               child: Stack(children: <Widget>[
                 Padding(
@@ -273,33 +276,58 @@ class ReceivedMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: 150.0,
-      ),
-      child: Container(
-          child: Padding(
-        padding: const EdgeInsets.only(
-            right: 75.0, left: 8.0, top: 8.0, bottom: 8.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(0),
-              bottomRight: Radius.circular(15),
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15)),
-          child: Container(
-            color: Color(0xFFF7F7F7),
-            child: Stack(children: <Widget>[
-              Padding(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        SizedBox(width: 5),
+        CircleAvatar(
+          backgroundImage: NetworkImage(image),
+        ),
+        Flexible(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: 130.0,
+            ),
+            child: Container(
+              child: Padding(
                 padding: const EdgeInsets.only(
-                    right: 8.0, left: 8.0, top: 8.0, bottom: 15.0),
-                child: Text(
-                  content,
+                    right: 75.0, left: 8.0, top: 8.0, bottom: 8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(0),
+                      bottomRight: Radius.circular(15),
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15)),
+                  child: Container(
+                    color: Color(0xFFF7F7F7),
+                    child: Stack(children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            right: 8.0, left: 8.0, top: 8.0, bottom: 15.0),
+                        child: Text(
+                          content,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 1,
+                        right: 10,
+                        child: Text(
+                          time,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                        ),
+                      )
+                    ]),
+                  ),
                 ),
               ),
-            ]),
+            ),
           ),
-      ),
-    )));
+        ),
+      ],
+    );
   }
 }

@@ -86,21 +86,9 @@ class _TapePageState extends State<TapePage>
                       ),
                       child: Container(
                         color: Color(0xfff7f8fa),
-                        padding: const EdgeInsets.only(
-                          top: 10,
-                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Описание: ${widget.tape['description']}',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 16),
-                              maxLines: 2,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
                             Text('Комментарий:'),
                             ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
@@ -232,8 +220,8 @@ class _TapePageState extends State<TapePage>
                                   tapeResult.cast<String, dynamic>();
                                 });
                                 await api.addCommentToTape(
-                                  '${widget.tape['id']}',
                                   '${_commentController.text}',
+                                  '${widget.tape['id']}',
                                 );
                                 _commentController.text = "";
                               },

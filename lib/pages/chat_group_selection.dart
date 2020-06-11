@@ -88,6 +88,8 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             var chatID = e.json["data"]["chat_id"];
             print('${e.json["data"]}');
             ChatRoom.shared.setCabinetStream();
+            ChatRoom.shared.getMessages('$chatID');
+            Navigator.pop(context);
             Navigator.pop(context);
             Navigator.push(
               context,
@@ -225,7 +227,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       icon: Icon(Icons.forward),
                       color: Colors.black,
                       onPressed: () {
-                        if (_userIds.length > 2) {
+                        if (_userIds.length > 1) {
                           if (_titleController.text.isNotEmpty) {
                             ChatRoom.shared.cabinetCreate(
                               _userIds.join(', ') + '${user.id}',
