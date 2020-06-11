@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/chat_info.dart';
+import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'chat_page_view_test.dart';
@@ -8,7 +10,8 @@ import 'chat_page_view_test.dart';
 class ChatPage extends StatefulWidget {
   final name;
   final chatID;
-  ChatPage(this.name, this.chatID);
+  final memberCount;
+  ChatPage(this.name, this.chatID, {this.memberCount});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -17,11 +20,12 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   List myList = [];
   TextEditingController _text = new TextEditingController();
+  var online;
 
+  Api api = Api();
   @override
   initState() {
     super.initState();
-    ChatRoom.shared.setCabinetStream();
     listen();
   }
 
@@ -30,7 +34,7 @@ class _ChatPageState extends State<ChatPage> {
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
       print("CABINET EVENT");
-      print(e.json);
+      // print(e.json);
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
@@ -39,48 +43,54 @@ class _ChatPageState extends State<ChatPage> {
               myList = e.json['data'].toList();
             });
           } else {
+            print(
+                '____________________________________________________________$pageCounter');
             setState(() {
-              myList = e.json['data'].reversed.toList();
+              myList.addAll(e.json['data'].reversed.toList());
             });
           }
-
           break;
         case "message:create":
           var message = e.json['data'];
+          if ('${widget.chatID}' == '${e.json['data']['chat_id']}') {
+            setState(() {
+              ChatRoom.shared.lastMessage = message;
+              myList.insert(0, message);
+            });
+          }
+          break;
+        case "chat:create":
+          ChatRoom.shared.getMessages(widget.chatID);
+          break;
+        case "user:check:online":
+          // print('${e.json['data']['online']}');
+          print(e.json);
           setState(() {
-            ChatRoom.shared.lastMessage = message;
-            myList.insert(0, message);
+            online = '${e.json['data'][0]['online']}';
           });
           break;
-
         default:
+          print('yes');
+          print('yes');
+          print('yes');
+          print('yes');
+          print('yes');
+          print('yes');
+          print('yes');
+          print('yes');
+          print('yes');
       }
     });
   }
 
   bool isLoading = false;
 
-  getMessages(String chatID) {
-    print("getMessages is called");
-
-    var data = json.encode({
-      "cmd": 'chat:get',
-      "data": {
-        "chat_id": "$chatID",
-        "user_id": "113626",
-        "userToken": "113626",
-        "page": pageCounter,
-      }
-    });
-    ChatRoom.shared.channel.sink.add(data);
-  }
-
   Future _loadData() async {
     // perform fetching data delay
     pageCounter++;
     setState(() {
       isLoading = false;
-      getMessages(widget.chatID);
+      ChatRoom.shared.getMessages(widget.chatID, page: pageCounter);
     });
     print("load more");
     // update data and loading status
@@ -99,7 +109,41 @@ class _ChatPageState extends State<ChatPage> {
         iconTheme: IconThemeData(
           color: Colors.black,
         ),
-        title: Text("${widget.name}", style: TextStyle(color: Colors.black)),
+        title: Wrap(
+          direction: Axis.vertical,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: WrapAlignment.center,
+          children: <Widget>[
+            Text("${widget.name}", style: TextStyle(color: Colors.black)),
+            widget.memberCount != 2
+                ? Text(
+                    'Участников ${widget.memberCount}',
+                    style: TextStyle(color: Colors.black, fontSize: 14),
+                  )
+                : Text(
+                    'был в сети $online',
+                    style: TextStyle(color: Colors.black, fontSize: 14),
+                  ),
+          ],
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.info_outline),
+            color: Colors.black,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatProfileInfo(
+                    chatName: widget.name,
+                    chatAvatar: 'noAvatar.png',
+                    chatMembers: widget.memberCount,
+                  ),
+                ),
+              );
+            },
+          )
+        ],
         backgroundColor: Colors.white,
         brightness: Brightness.light,
       ),
@@ -147,11 +191,12 @@ class _ChatPageState extends State<ChatPage> {
                                 }
                               },
                               child: ListView.builder(
-                                  itemCount: myList.length,
-                                  reverse: true,
-                                  itemBuilder: (context, i) {
-                                    return message(myList[i]);
-                                  }),
+                                itemCount: myList.length,
+                                reverse: true,
+                                itemBuilder: (context, i) {
+                                  return message(myList[i]);
+                                },
+                              ),
                             ),
                     ),
                   ),
@@ -172,6 +217,7 @@ class _ChatPageState extends State<ChatPage> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {
+                            print('+++++++++++++++___________+++++');
                             ChatRoom.shared
                                 .sendMessage('${widget.chatID}', _text.text);
                             setState(() {
@@ -208,9 +254,9 @@ class Received extends StatelessWidget {
     return Align(
       alignment: Alignment(-1, 0),
       child: ReceivedMessageWidget(
-        content: '${m['text']}',
-        time: time('${m['time']}'),
-      ),
+          content: '${m['text']}',
+          time: time('${m['time']}'),
+          image: 'https://indigo24.xyz/uploads/avatars/${m['avatar']}'),
     );
   }
 

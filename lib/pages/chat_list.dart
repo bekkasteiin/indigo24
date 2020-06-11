@@ -23,7 +23,8 @@ List<ChatsModel> dbChats = [];
 List myList = [];
 List<ChatsModel> chatsModel = [];
 
-class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveClientMixin{
+class _ChatsListPageState extends State<ChatsListPage>
+    with AutomaticKeepAliveClientMixin {
   bool isOffline = false;
 
   int _counter = 0;
@@ -31,7 +32,6 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -39,11 +39,14 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
     super.dispose();
   }
 
-
-  goToChat(name, chatID) {
+  goToChat(name, chatID, {memberCount, userIds}) {
+    ChatRoom.shared.setCabinetStream();
+    ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
+      MaterialPageRoute(
+          builder: (context) =>
+              ChatPage(name, chatID, memberCount: memberCount)),
     ).whenComplete(() {
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
@@ -56,22 +59,29 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text(string, style: TextStyle(color: Colors.black),),
+        title: Text(
+          string,
+          style: TextStyle(color: Colors.black),
+        ),
         brightness: Brightness.light,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.group_add),
+            color: Colors.black,
+            onPressed: () {
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChatContactsPage()))
+                  .whenComplete(() {
+                ChatRoom.shared.forceGetChat();
+                ChatRoom.shared.closeContactsStream();
+              });
+            },
+          )
+        ],
       ),
       body: Container(child: _listView(context, string)),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ChatContactsPage()))
-              .whenComplete(() {
-            ChatRoom.shared.forceGetChat();
-            ChatRoom.shared.closeContactsStream();
-          });
-        },
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
     );
   }
 
@@ -88,8 +98,10 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
                       goToChat(dbChats[i].name, dbChats[i].id);
                     },
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage('https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
-                      // NetworkImage("https://media.indigo24.com/avatars/noAvatar.png"),
+                      backgroundImage:
+                          //  NetworkImage('https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
+                          NetworkImage(
+                              "https://media.indigo24.com/avatars/noAvatar.png"),
                     ),
                     title: Text(dbChats[i].name),
                     subtitle: Text(dbChats[i].lastMessage["text"]),
@@ -107,35 +119,42 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
                   return ListTile(
                     onTap: () {
                       ChatRoom.shared.getMessages(myList[i]['id']);
-                      goToChat(myList[i]['name'], myList[i]['id']);
+                      goToChat(myList[i]['name'], myList[i]['id'],
+                          memberCount: myList[i]['members_count']);
                     },
                     leading: CircleAvatar(
-                      backgroundImage: (myList[i]["avatar"]==null || myList[i]["avatar"]=='' || myList[i]["avatar"] == false)?
-                      NetworkImage("https://media.indigo24.com/avatars/noAvatar.png")
-                      :
-                      NetworkImage('https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')
-                    ),
+                        backgroundImage: (myList[i]["avatar"] == null ||
+                                myList[i]["avatar"] == '' ||
+                                myList[i]["avatar"] == false)
+                            ? NetworkImage(
+                                "https://media.indigo24.com/avatars/noAvatar.png")
+                            :
+                            // NetworkImage('https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')
+                            NetworkImage(
+                                "https://media.indigo24.com/avatars/noAvatar.png")),
                     title: Text("${myList[i]["name"]}"),
-                    subtitle: Text("${myList[i]['last_message']["text"]}"),
+                    subtitle: Text(
+                      "${myList[i]['last_message']["text"]}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                     trailing: Wrap(
                       direction: Axis.vertical,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       alignment: WrapAlignment.center,
                       children: <Widget>[
-                        Text(myList[i]['last_message']["time"] == null? 
-                        "null" : time(myList[i]['last_message']["time"])
-                        ),
-                        myList[i]['unread_messages']==0?
-                        Container()
-                        :
-                        Container(
-                          // width: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.blue[300],
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          child: Text(" ${myList[i]['unread_messages']} ", style: TextStyle(color: Colors.white))
-                        )
+                        Text(myList[i]['last_message']["time"] == null
+                            ? "null"
+                            : time(myList[i]['last_message']["time"])),
+                        myList[i]['unread_messages'] == 0
+                            ? Container()
+                            : Container(
+                                // width: 20,
+                                decoration: BoxDecoration(
+                                    color: Colors.blue[300],
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Text(" ${myList[i]['unread_messages']} ",
+                                    style: TextStyle(color: Colors.white)))
                       ],
                     ),
                   );

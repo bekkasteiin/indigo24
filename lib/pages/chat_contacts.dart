@@ -5,6 +5,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
+import 'package:indigo24/pages/chat_group_selection.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/socket.dart';
@@ -48,18 +49,43 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     ChatRoom.shared.setContactsStream();
     listen();
   }
+
   listen() {
     ChatRoom.shared.onContactChange.listen((e) {
       print("Contact EVENT");
       print(e.json);
       var cmd = e.json['cmd'];
+
       switch (cmd) {
         case "user:check":
+          if (e.json['data']['chat_id'] != null &&
+              e.json['data']['status'] == 'true') {
+            ChatRoom.shared.setCabinetStream();
+            print("_______________ NOT NULL ____________");
+            print("_______________ NOT NULL ____________");
+            print("_______________ NOT NULL ____________");
+            print("_______________ NOT NULL ____________");
+            print("_______________ NOT NULL ____________");
+            print("_______________ NOT NULL ____________");
+            ChatRoom.shared.getMessages(e.json['data']['chat_id']);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChatPage(
+                      e.json['data']['user_id'], e.json['data']['chat_id'])),
+            ).whenComplete(() {
+              ChatRoom.shared.forceGetChat();
+              ChatRoom.shared.closeCabinetStream();
+            });
+          } else if (e.json['data']['status'] == 'true') {
+            ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
+          }
           break;
         case "chat:create":
           print("STATUS ${e.json["data"]["status"]}");
-          if(e.json["data"]["status"].toString() == "true"){
+          if (e.json["data"]["status"].toString() == "true") {
+            ChatRoom.shared.setCabinetStream();
             var name = e.json["data"]["chat_name"];
             var chatID = e.json["data"]["chat_id"];
             Navigator.pop(context);
@@ -70,6 +96,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               ChatRoom.shared.closeCabinetStream();
             });
           } else {
+            ChatRoom.shared.setCabinetStream();
             var name = e.json["data"]["name"];
             var chatID = e.json["data"]["chat_id"];
             Navigator.pop(context);
@@ -86,7 +113,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
       }
     });
   }
-
 
   @override
   void dispose() {
@@ -190,6 +216,20 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.add_box),
+                    color: Colors.black,
+                    onPressed: () {
+                      print('add group');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatGroupSelection()),
+                      );
+                    },
+                  )
+                ],
                 backgroundColor: Colors.white,
               ),
               body: snapshot.hasData
@@ -299,9 +339,10 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                       ],
                                     ),
                                     onPressed: () {
-                                      print("${actualList[index]['name']} ${actualList[index]['phone']} pressed");
-                                      ChatRoom.shared.userCheck(actualList[index]['phone']);
-
+                                      print(
+                                          "${actualList[index]['name']} ${actualList[index]['phone']} pressed");
+                                      ChatRoom.shared.userCheck(
+                                          actualList[index]['phone']);
                                     },
                                   ),
                                   decoration: BoxDecoration(

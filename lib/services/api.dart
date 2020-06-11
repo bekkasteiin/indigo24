@@ -127,6 +127,7 @@ class Api {
 
   getServices(categoryID) async {
     try {
+      print('tried to get services');
       response = await dio.post("/get/services", data: {
         "customerID": "$customerID",
         "unique": "$unique",
@@ -186,6 +187,7 @@ class Api {
 
   getCategories() async {
     try {
+      print('attempt to get categories');
       response = await dio.post("/get/categories",
           data: {"customerID": "$customerID", "unique": "$unique"});
       return response.data;

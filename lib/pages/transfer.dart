@@ -153,6 +153,7 @@ class _TransferPageState extends State<TransferPage> {
           onPressed: () async {
             api.checkPhoneForSendMoney(receiverController.text).then((result) {
               print('to id ${result["toID"]}, ${sumController.text}');
+              print('$result');
               if(result["success"]){
                 api.doTransfer(result["toID"], sumController.text).then((res){
                   print("sending $res");

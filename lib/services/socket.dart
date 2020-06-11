@@ -69,16 +69,27 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
-  getMessages(String chatID) {
-    print("getMessages is called");
+  checkUserOnline(ids) {
+    var data = json.encode({
+      "cmd": 'user:check:online',
+      "data": {
+        "user_id": '$userId',
+        "users_ids": '$ids',
+        "userToken": "$userToken",
+      }
+    });
+    channel.sink.add(data);
+  }
 
+  getMessages(String chatID, {page}) {
+    print("getMessages is called");
     var data = json.encode({
       "cmd": 'chat:get',
       "data": {
         "chat_id": "$chatID",
         "user_id": "$userId",
         "userToken": "$userToken",
-        "page": 1,
+        "page": page == null ? 1 : page,
       }
     });
     channel.sink.add(data);
@@ -118,21 +129,22 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
-  cabinetCreate(ids, type) {
+  cabinetCreate(ids, type, {title}) {
     var data = json.encode({
       "cmd": "chat:create",
       "data": {
         "user_id": userId,
         "userToken": "$userToken",
         "user_ids": ids,
-        "type": type
+        "type": type,
+        "chat_name": title,
       }
     });
     print('cabinet created $data');
     channel.sink.add(data);
   }
 
-  forceGetChat(){
+  forceGetChat() {
     print("Force updating chats");
     var data = {
       "cmd": 'chats:get',
@@ -146,6 +158,18 @@ class ChatRoom {
   }
 
   listen() {
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
+    print("Listen is called");
     print("Listen is called");
 
     channel.stream.listen((event) {
@@ -177,7 +201,6 @@ class ChatRoom {
           cabinetController.add(new MyCabinetEvent(json));
           break;
         case "message:create":
-          forceGetChat();
           if (cabinetController == null) {
             print("new message in CHATS null page");
           } else {
@@ -191,6 +214,9 @@ class ChatRoom {
           break;
         case "user:check":
           contactController.add(new MyContactEvent(json));
+          break;
+        case "user:check:online":
+          cabinetController.add(new MyCabinetEvent(json));
           break;
         case "chat:create":
           contactController.add(new MyContactEvent(json));

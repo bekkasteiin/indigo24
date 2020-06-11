@@ -32,6 +32,7 @@ class _TapesPageState extends State<TapesPage>
 
   getTapes(){
     api.getTapes('$tapePage').then((tapes) {
+      print(tapes);
       return setTapes(tapes);
     });
   }
