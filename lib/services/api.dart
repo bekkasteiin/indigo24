@@ -213,7 +213,7 @@ class Api {
         print(e.response.headers);
         print(e.response.request);
       } else {
-        print(e.response.statusCode);
+        // print(e.response.statusCode);
       }
     }
   }

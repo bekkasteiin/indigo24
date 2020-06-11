@@ -48,7 +48,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  Expanded _transferInfo(String name, String date) {
+  Expanded _transferInfo(String name, String date, String phone) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,6 +60,15 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               fontSize: 16,
               color: Color(0xFF001D52),
               fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            "$phone",
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xFF001D52),
+              fontWeight: FontWeight.w400,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -76,7 +85,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   }
 
   Widget _historyBuilder(BuildContext context, String logo, String amount,
-      String title, String type, String date, int index) {
+      String title, String phone, String type, String date, int index) {
     return Container(
       height: 90.6,
       child: Column(
@@ -87,7 +96,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             children: <Widget>[
               SizedBox(width: 20),
               _transferLogo(logo),
-              _transferInfo(title, date),
+              _transferInfo(title, date, phone),
               _transferAmount(type, amount),
               SizedBox(width: 10),
               ClipRRect(
@@ -120,11 +129,12 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             padding: const EdgeInsets.only(top: 5),
             child: _historyBuilder(
               context,
-              // "${snapshot['avatarURL'] + snapshot['transactions'][index]['avatar']}",
-              "https://lh3.googleusercontent.com/IeNJWoKYx1waOhfWF6TiuSiWBLfqLb18lmZYXSgsH1fvb8v1IYiZr5aYWe0Gxu-pVZX3",
+              "${snapshot['avatarURL'] + snapshot['transactions'][index]['avatar']}",
+              // "https://lh3.googleusercontent.com/IeNJWoKYx1waOhfWF6TiuSiWBLfqLb18lmZYXSgsH1fvb8v1IYiZr5aYWe0Gxu-pVZX3",
               "${snapshot['transactions'][index]['amount']}",
-              // "${snapshot['transactions'][index]['from']}",
-              'asdiads0oafskojasfkodfokfdsokfssfdfdsokfsdjfdsfds',
+              "${snapshot['transactions'][index]['name']}",
+              "${snapshot['transactions'][index]['phone']}",
+              // 'asdiads0oafskojasfkodfokfdsokfssfdfdsokfsdjfdsfds',
               '${snapshot['transactions'][index]['type']}',
               "${snapshot['transactions'][index]['data']}",
               index,

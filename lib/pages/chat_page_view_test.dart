@@ -231,7 +231,7 @@ class SendedMessageWidget extends StatelessWidget {
                 topLeft: Radius.circular(15),
                 topRight: Radius.circular(15)),
             child: Container(
-              color: Color(0xA654C5E6),
+              color: Color(0xFFF7F7F7),
               // margin: const EdgeInsets.only(left: 10.0),
               child: Stack(children: <Widget>[
                 Padding(
@@ -285,7 +285,7 @@ class ReceivedMessageWidget extends StatelessWidget {
               topLeft: Radius.circular(15),
               topRight: Radius.circular(15)),
           child: Container(
-            color: Color(0xFFFF8C00),
+            color: Color(0xFFF7F7F7),
             child: Stack(children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(
