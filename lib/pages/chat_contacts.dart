@@ -58,15 +58,15 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
       switch (cmd) {
         case "user:check":
-          if (e.json['data']['chat_id'] != null &&
-              e.json['data']['status'] == 'true') {
+          if (e.json['data']['chat_id'] != false &&
+              e.json['data']['status'] == true) {
             ChatRoom.shared.setCabinetStream();
             print("_______________ NOT NULL ____________");
             print("_______________ NOT NULL ____________");
             print("_______________ NOT NULL ____________");
             print("_______________ NOT NULL ____________");
             print("_______________ NOT NULL ____________");
-            print("_______________ NOT NULL ____________");
+            print("${e.json['data']}");
             ChatRoom.shared.getMessages(e.json['data']['chat_id']);
             Navigator.push(
               context,

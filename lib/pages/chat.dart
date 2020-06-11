@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat_info.dart';
 import 'package:indigo24/services/api.dart';
@@ -21,12 +22,29 @@ class _ChatPageState extends State<ChatPage> {
   List myList = [];
   TextEditingController _text = new TextEditingController();
   var online;
+  ScrollController controller;
+  bool isLoaded = false;
 
   Api api = Api();
+  int page = 1;
+
   @override
   initState() {
+    controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
     listen();
+  }
+
+  _scrollListener() async {
+    print(controller.position.extentAfter);
+    print("${controller.position.extentAfter <= 0 && !isLoaded}");
+    if (controller.position.extentAfter <= 0 && !isLoaded) {
+      page += 1;
+      setState(() {
+        isLoaded = true;
+      });
+      await _loadData();
+    }
   }
 
   int pageCounter = 1;
@@ -38,13 +56,13 @@ class _ChatPageState extends State<ChatPage> {
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
-          if (pageCounter == 1) {
+          if (page == 1) {
             setState(() {
               myList = e.json['data'].toList();
             });
           } else {
             print(
-                '____________________________________________________________$pageCounter');
+                '____________________________________________________________$page');
             setState(() {
               myList.addAll(e.json['data'].reversed.toList());
             });
@@ -83,22 +101,24 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  bool isLoading = false;
+  // bool isLoading = false;
 
   Future _loadData() async {
     // perform fetching data delay
-    pageCounter++;
+    print("WTF?????? $isLoaded"); 
     setState(() {
-      isLoading = false;
-      ChatRoom.shared.getMessages(widget.chatID, page: pageCounter);
+      isLoaded = false;
+      ChatRoom.shared.getMessages(widget.chatID, page: page);
     });
-    print("load more");
+    
+    print("load more with page $page");
     // update data and loading status
   }
 
   @override
   void dispose() {
     ChatRoom.shared.cabinetController.close();
+    controller.removeListener(_scrollListener);
     super.dispose();
   }
 
@@ -178,26 +198,14 @@ class _ChatPageState extends State<ChatPage> {
                           ? Center(
                               child: Text("Loading"),
                             )
-                          : NotificationListener<ScrollNotification>(
-                              onNotification: (ScrollNotification scrollInfo) {
-                                if (!isLoading &&
-                                    scrollInfo.metrics.pixels ==
-                                        scrollInfo.metrics.maxScrollExtent) {
-                                  print('start');
-                                  _loadData();
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                }
-                              },
-                              child: ListView.builder(
+                          :  ListView.builder(
+                                controller: controller,
                                 itemCount: myList.length,
                                 reverse: true,
                                 itemBuilder: (context, i) {
                                   return message(myList[i]);
                                 },
                               ),
-                            ),
                     ),
                   ),
                 ),
@@ -214,6 +222,7 @@ class _ChatPageState extends State<ChatPage> {
                       controller: _text,
                       decoration: InputDecoration(
                         // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        
                         suffixIcon: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {

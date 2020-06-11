@@ -125,6 +125,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                       backgroundImage: (myList[i]["avatar"]==null || myList[i]["avatar"]=='' || myList[i]["avatar"] == false)?
                       CachedNetworkImageProvider("https://media.indigo24.com/avatars/noAvatar.png")
                       :
+                      // CachedNetworkImageProvider("https://media.indigo24.com/avatars/noAvatar.png")
                       CachedNetworkImageProvider('https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')
                     ),
                     title: Text("${myList[i]["name"]}"),
@@ -159,7 +160,7 @@ class _ChatsListPageState extends State<ChatsListPage>
 
   String time(timestamp) {
     var date = DateTime.fromMillisecondsSinceEpoch(
-      int.parse(timestamp) * 1000,
+      int.parse("$timestamp") * 1000,
     );
     TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
     // messageMinutes = '${roomBooked.minute}';
