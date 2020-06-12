@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
@@ -15,31 +16,36 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
   final String _fullName = '${user.name}';
 
   File _image;
 
   final picker = ImagePicker();
   var api = Api();
-  
+
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(source: imageSource);
-    if(pickedFile != null){
+    if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
-      api.uploadAvatar(_image.path).then((r) async{
-        if(r["success"]){
+      api.uploadAvatar(_image.path).then((r) async {
+        if (r["success"]) {
           await SharedPreferencesHelper.setString('avatar', '${r["fileName"]}');
           setState(() {
             user.avatar = r["fileName"];
           });
         }
       });
-
     }
   }
-  
+
   Widget _buildCoverImage(Size screenSize) {
     return Container(
       height: 100,
@@ -55,38 +61,39 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildProfileImage() {
     return InkWell(
       onTap: () => PlatformActionSheet().displaySheet(
-                  context: context,
-                  message: Text("Выберите опцию"),
-                  actions: [
-                    ActionSheetAction(
-                      text: "Сфотографировать",
-                      onPressed: (){
-                        getImage(ImageSource.camera);
-                        Navigator.pop(context);
-                      },
-                      hasArrow: true,
-                    ),
-                    ActionSheetAction(
-                      text: "Выбрать из галереи",
-                      onPressed: (){
-                        getImage(ImageSource.gallery);
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ActionSheetAction(
-                      text: "Назад",
-                      onPressed: () => Navigator.pop(context),
-                      isCancel: true,
-                      defaultAction: true,
-                    )
-                  ]),
+          context: context,
+          message: Text("Выберите опцию"),
+          actions: [
+            ActionSheetAction(
+              text: "Сфотографировать",
+              onPressed: () {
+                getImage(ImageSource.camera);
+                Navigator.pop(context);
+              },
+              hasArrow: true,
+            ),
+            ActionSheetAction(
+              text: "Выбрать из галереи",
+              onPressed: () {
+                getImage(ImageSource.gallery);
+                Navigator.pop(context);
+              },
+            ),
+            ActionSheetAction(
+              text: "Назад",
+              onPressed: () => Navigator.pop(context),
+              isCancel: true,
+              defaultAction: true,
+            )
+          ]),
       child: Center(
         child: Container(
           width: 100.0,
           height: 100.0,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+              image: NetworkImage(
+                  'https://indigo24.xyz/uploads/avatars/${user.avatar}'),
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(80.0),
@@ -143,9 +150,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  TextEditingController emailController = new TextEditingController(text:  '${user.email}');
+  TextEditingController emailController =
+      new TextEditingController(text: '${user.email}');
 
-  Widget _buildEmailSection(Size screenSize){
+  Widget _buildEmailSection(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
       child: Column(
@@ -164,7 +172,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildPhoneSection(Size screenSize){
+  Widget _buildPhoneSection(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
       child: Column(
@@ -172,14 +180,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: <Widget>[
           Text("НОМЕР ТЕЛЕФОНА"),
           SizedBox(height: 5),
-          Text('${user.phone}', textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+          Text('${user.phone}',
+              textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
           SizedBox(height: 5),
         ],
       ),
     );
   }
 
-  Widget _buildCountySection(Size screenSize){
+  Widget _buildCountySection(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
       child: Column(
@@ -187,14 +196,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: <Widget>[
           Text("СТРАНА"),
           SizedBox(height: 5),
-          Text("Казахстан", textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+          Text("Казахстан",
+              textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
           SizedBox(height: 5),
         ],
       ),
     );
   }
 
-  Widget _buildCitySection(Size screenSize){
+  Widget _buildCitySection(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
       child: Column(
@@ -202,14 +212,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: <Widget>[
           Text("ГОРОД"),
           SizedBox(height: 5),
-          Text("Алматы", textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+          Text("Алматы",
+              textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
           SizedBox(height: 5),
         ],
       ),
     );
   }
 
-  Widget _buildWhateverSection(Size screenSize){
+  Widget _buildWhateverSection(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
       child: Column(
@@ -217,7 +228,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: <Widget>[
           Text("WHATEVER", style: TextStyle(color: Colors.grey)),
           SizedBox(height: 5),
-          Text("Whatever", textAlign: TextAlign.left, style: TextStyle(fontSize: 18, color: Colors.grey)),
+          Text("Whatever",
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 18, color: Colors.grey)),
           SizedBox(height: 5),
         ],
       ),
@@ -303,8 +316,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       child: Scaffold(
         body: Stack(
           children: <Widget>[
-            
-            
             SingleChildScrollView(
               child: Column(
                 children: <Widget>[
@@ -318,7 +329,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   // _buildGetInTouch(context),
                   // SizedBox(height: 8.0),
                   // _buildButtons(),
-                  
+
                   SizedBox(height: 10),
                   _buildPhoneSection(screenSize),
                   _buildSeparator(screenSize),
@@ -332,8 +343,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   // _buildCitySection(screenSize),
                   // _buildSeparator(screenSize),
 
-
-    
                   // SizedBox(height: 10),
                   // _buildWhateverSection(screenSize),
                   // _buildSeparator(screenSize),
@@ -341,8 +350,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   // _buildWhateverSection(screenSize),
                   // _buildSeparator(screenSize),
 
-
-                    
                   SizedBox(height: 100),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -350,64 +357,58 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: (){
-                            print("lol 12");
-                          },
-                          child: Ink(
-                            child: Text("Служба поддержки", style: TextStyle(color: Colors.grey)),
-                          )
-                        ),
+                            onTap: () {
+                              print("lol 12");
+                            },
+                            child: Ink(
+                              child: Text("Служба поддержки",
+                                  style: TextStyle(color: Colors.grey)),
+                            )),
                       ),
-                      
                       SizedBox(width: 10),
                     ],
                   ),
                 ],
               ),
             ),
-
             _buildCoverImage(screenSize),
             Column(
               children: <Widget>[
-                SizedBox(height:5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
+                SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
                           onTap: () async {
-                            SharedPreferences preferences = await SharedPreferences.getInstance();
+                            SharedPreferences preferences =
+                                await SharedPreferences.getInstance();
                             await preferences.clear();
                             Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => IntroPage()
-                              ), (r) => false
-                            );
+                                MaterialPageRoute(
+                                    builder: (context) => IntroPage()),
+                                (r) => false);
                           },
                           child: Ink(
-                            child: Text("Выйти", style: TextStyle(color: Colors.white)),
-                          )
-                        ),
-                      ),
-                      
-                      SizedBox(width: 10),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(width: 10),
-                      _buildProfileImage(),
-                      SizedBox(width: 10),
-                      _buildFullName(),
-                    ],
-                  ),
+                            child: Text("Выйти",
+                                style: TextStyle(color: Colors.white)),
+                          )),
+                    ),
+                    SizedBox(width: 10),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(width: 10),
+                    _buildProfileImage(),
+                    SizedBox(width: 10),
+                    _buildFullName(),
+                  ],
+                ),
               ],
             ),
-
-
-
           ],
         ),
       ),

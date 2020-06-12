@@ -122,10 +122,13 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   Future _getChats() async {
     Future<List<ChatsModel>> chats = chatsDB.getAllChats();
     chats.then((value) {
+      // print('       ');
+      // print(value);
+      // print('       ');
       setState(() {
         dbChats.addAll(value);
       });
-      print("DB CHATS IN GET $dbChats");
+      // print("DB CHATS IN GET $dbChats");
     });
   }
 
@@ -200,6 +203,5 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     super.dispose();
-    _connectivitySubscription.cancel();
   }
 }

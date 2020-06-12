@@ -90,7 +90,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.getMessages('$chatID');
             Navigator.pop(context);
-            Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -117,6 +116,26 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
         default:
       }
     });
+  }
+
+  Future<void> _showError(BuildContext context, m) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Ошибка'),
+          content: Text(m),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -237,9 +256,12 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                             );
                           } else {
                             print('chat name is empty');
+                            _showError(context, 'Название чата пуст');
                           }
                         } else {
                           print('member count less than 3');
+                          _showError(
+                              context, 'Минимальное количество участников : 3');
                         }
                       })
                 ],
@@ -266,7 +288,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                           child: Center(
                             child: TextField(
                               decoration: new InputDecoration(
-                                prefixIcon: Icon(Icons.search,color: Color(0xFF001D52),),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: Color(0xFF001D52),
+                                ),
                                 hintText: "Поиск",
                                 fillColor: Color(0xFF001D52),
                               ),
@@ -285,10 +310,14 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Container(
                                   child: CheckboxListTile(
-                                    title: Text(
-                                      '${actualList[index]['name']}',
-                                      style: TextStyle(fontSize: 16.0),
-                                      overflow: TextOverflow.ellipsis,
+                                    title: Wrap(
+                                      children: <Widget>[
+                                        Text(
+                                          '${actualList[index]['name']}',
+                                          style: TextStyle(fontSize: 16.0),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     ),
                                     subtitle: Text(
                                       '${actualList[index]['phone']}',
@@ -300,8 +329,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                       setState(() {
                                         if (val == true) {
                                           tempIndex = index;
-                                          ChatRoom.shared.userCheck(
-                                              actualList[index]['phone']);
+                                          ChatRoom.shared.userCheck(actualList[index]['phone']);
                                         } else {
                                           _saved.remove(index);
                                         }

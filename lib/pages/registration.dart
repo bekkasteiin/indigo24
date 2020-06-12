@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
 import 'package:http/http.dart' as http;
@@ -90,6 +91,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
       print(_);
       return "disconnect";
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   checkPhone() async {
@@ -247,9 +254,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => PhoneConfirmPage(
-                                          smsCode,
-                                          phonePrefix + loginController.text)),
+                                    builder: (context) => PhoneConfirmPage(
+                                        smsCode,
+                                        phonePrefix + loginController.text),
+                                  ),
                                 );
                               }
                             }

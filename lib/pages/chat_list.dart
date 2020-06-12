@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/db/Student_DAO.dart';
 import 'package:indigo24/db/chats_model.dart';
 import 'package:indigo24/db/student.dart';
@@ -36,8 +38,9 @@ class _ChatsListPageState extends State<ChatsListPage>
   }
 
   @override
-  dispose() {
+  void dispose() {
     super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   goToChat(name, chatID, {memberCount, userIds}) {
@@ -46,8 +49,8 @@ class _ChatsListPageState extends State<ChatsListPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              ChatPage(name, chatID, memberCount: memberCount, userIds: userIds)),
+          builder: (context) => ChatPage(name, chatID,
+              memberCount: memberCount, userIds: userIds)),
     ).whenComplete(() {
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
@@ -90,94 +93,146 @@ class _ChatsListPageState extends State<ChatsListPage>
   }
 
   _listView(context, status) {
-    return status == "Offline"
-        ? dbChats.isEmpty
-            ? Text("Загрузка")
-            : ListView.builder(
-                itemCount: dbChats.length,
-                itemBuilder: (context, i) {
-                  return ListTile(
-                    onTap: () {
-                      ChatRoom.shared.getMessages(dbChats[i].id);
-                      goToChat(dbChats[i].name, dbChats[i].id);
-                    },
-                    leading: CircleAvatar(
-                        backgroundImage: CachedNetworkImageProvider(
-                            'https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
-                        // NetworkImage("https://media.indigo24.com/avatars/noAvatar.png"),
-                        ),
-                    title: Text(dbChats[i].name),
-                    subtitle: Text(dbChats[i].lastMessage["text"]),
-                    trailing: Text(dbChats[i].lastMessage["time"] == null
-                        ? "null"
-                        : time(dbChats[i].lastMessage["time"])),
-                  );
-                },
-              )
-        : myList.isEmpty
+    return myList.isEmpty
+        // ? dbChats.isNotEmpty
+        //     ? localChatBuilder(dbChats)
             ? Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                itemCount: myList.length,
-                itemBuilder: (context, i) {
-                  // print(myList[i]);
-                  return ListTile(
-                    onTap: () {
-                      // ChatRoom.shared.checkUserOnline(ids);
-                      ChatRoom.shared.getMessages(myList[i]['id']);
-                      goToChat(
-                        myList[i]['name'],
-                        myList[i]['id'],
-                        memberCount: myList[i]['members_count'],
-                        userIds: myList[i]['another_user_id'],
-                      );
-                    },
-                    leading: CircleAvatar(
-                      radius: 25.0,
-                      backgroundImage: (myList[i]["avatar"] == null ||
-                              myList[i]["avatar"] == '' ||
-                              myList[i]["avatar"] == false)
-                          ? CachedNetworkImageProvider(
-                              "https://media.indigo24.com/avatars/noAvatar.png")
-                          : CachedNetworkImageProvider(
-                              'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}'),
-                    ),
-                    title: Text(
-                      myList[i]["name"].length != 0 ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}" : "",
-                      style: TextStyle(
-                          color: Color(0xFF001D52),
-                          fontWeight: FontWeight.w400),
-                    ),
-                    subtitle: Text(
-                      myList[i]["last_message"].length != 0 ?  "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"  : "",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(color: Color(0xFF5E5E5E)),
-                    ),
-                    trailing: Wrap(
-                      direction: Axis.vertical,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      alignment: WrapAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          myList[i]['last_message']["time"] == null
-                              ? "null"
-                              : time(myList[i]['last_message']["time"]),
-                          style: TextStyle(color: Color(0xFF001D52)),
-                        ),
-                        myList[i]['unread_messages'] == 0
-                            ? Container()
-                            : Container(
-                                // width: 20,
-                                decoration: BoxDecoration(
-                                    color: Color(0xFFA9C7D2),
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Text(" ${myList[i]['unread_messages']} ",
-                                    style: TextStyle(color: Colors.white)))
-                      ],
-                    ),
-                  );
-                },
-              );
+        : chatBuilder(myList);
+  }
+
+  ListView localChatBuilder(tempList) {
+    return ListView.builder(
+      itemCount: tempList.length,
+      itemBuilder: (context, i) {
+        return ListTile(
+          onTap: () {
+            // ChatRoom.shared.checkUserOnline(ids);
+            ChatRoom.shared.getMessages(tempList[i].id);
+            goToChat(
+              tempList[i].name,
+              tempList[i].id,
+              memberCount: tempList[i].membersCount,
+              userIds: tempList[i].anotherUserID,
+            );
+          },
+          leading: CircleAvatar(
+            radius: 25.0,
+            backgroundImage: (tempList[i].avatar == null ||
+                    tempList[i].avatar == '' ||
+                    tempList[i].avatar == false)
+                ? CachedNetworkImageProvider(
+                    "https://media.indigo24.com/avatars/noAvatar.png")
+                : CachedNetworkImageProvider(
+                    'https://indigo24.xyz/uploads/avatars/${tempList[i].avatar}'),
+          ),
+          title: Text(
+            tempList[i].name.length != 0
+                ? "${tempList[i].name[0].toUpperCase() + tempList[i].name.substring(1)}"
+                : "",
+            style: TextStyle(
+                color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+          ),
+          subtitle: Text(
+            tempList[i].lastMessage.length != 0
+                ? "${tempList[i].lastMessage['text'][0].toUpperCase() + tempList[i].lastMessage['text'].substring(1)}"
+                : "",
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: TextStyle(color: Color(0xFF5E5E5E)),
+          ),
+          trailing: Wrap(
+            direction: Axis.vertical,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: WrapAlignment.center,
+            children: <Widget>[
+              Text(
+                tempList[i].lastMessage['time'] == null
+                    ? "null"
+                    : time(tempList[i].lastMessage['time']),
+                style: TextStyle(color: Color(0xFF001D52)),
+              ),
+              tempList[i].unreadMessage == 0
+                  ? Container()
+                  : Container(
+                      // width: 20,
+                      decoration: BoxDecoration(
+                          color: Color(0xFFA9C7D2),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Text(" ${tempList[i].unreadMessage} ",
+                          style: TextStyle(color: Colors.white)))
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  ListView chatBuilder(tempList) {
+    return ListView.builder(
+      itemCount: tempList.length,
+      itemBuilder: (context, i) {
+        // print('this is templist INDEX ${tempList[i]}');
+        return ListTile(
+          onTap: () {
+            // ChatRoom.shared.checkUserOnline(ids);
+            ChatRoom.shared.getMessages(tempList[i]['id']);
+            goToChat(
+              tempList[i]['name'],
+              tempList[i]['id'],
+              memberCount: tempList[i]['members_count'],
+              userIds: tempList[i]['another_user_id'],
+            );
+          },
+          leading: CircleAvatar(
+            radius: 25.0,
+            backgroundImage: (tempList[i]["avatar"] == null ||
+                    tempList[i]["avatar"] == '' ||
+                    tempList[i]["avatar"] == false)
+                ? CachedNetworkImageProvider(
+                    "https://media.indigo24.com/avatars/noAvatar.png")
+                : CachedNetworkImageProvider(
+                    'https://indigo24.xyz/uploads/avatars/${tempList[i]["avatar"]}'),
+          ),
+          title: Text(
+            tempList[i]["name"].length != 0
+                ? "${tempList[i]["name"][0].toUpperCase() + tempList[i]["name"].substring(1)}"
+                : "",
+            style: TextStyle(
+                color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+          ),
+          subtitle: Text(
+            tempList[i]["last_message"].length != 0
+                ? "${tempList[i]["last_message"]['text'][0].toUpperCase() + tempList[i]["last_message"]['text'].substring(1)}"
+                : "",
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: TextStyle(color: Color(0xFF5E5E5E)),
+          ),
+          trailing: Wrap(
+            direction: Axis.vertical,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: WrapAlignment.center,
+            children: <Widget>[
+              Text(
+                tempList[i]['last_message']["time"] == null
+                    ? "null"
+                    : time(tempList[i]['last_message']["time"]),
+                style: TextStyle(color: Color(0xFF001D52)),
+              ),
+              tempList[i]['unread_messages'] == 0
+                  ? Container()
+                  : Container(
+                      // width: 20,
+                      decoration: BoxDecoration(
+                          color: Color(0xFFA9C7D2),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Text(" ${tempList[i]['unread_messages']} ",
+                          style: TextStyle(color: Colors.white)))
+            ],
+          ),
+        );
+      },
+    );
   }
 
   String time(timestamp) {

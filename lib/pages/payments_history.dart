@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
@@ -55,6 +56,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         overflow: TextOverflow.ellipsis,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   Expanded _paymentInfo(String title, String account, String date) {

@@ -46,7 +46,7 @@ dependencies:
   platform_action_sheet: ^0.0.3
   cached_network_image: ^2.2.0+1
   chewie: ^0.9.10
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

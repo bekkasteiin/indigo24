@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +13,7 @@ class PhoneConfirmPage extends StatefulWidget {
   final smsCode;
   final phone;
 
-  const PhoneConfirmPage(this.smsCode,this.phone);
+  const PhoneConfirmPage(this.smsCode, this.phone);
 
   @override
   _PhoneConfirmPageState createState() => _PhoneConfirmPageState();
@@ -57,6 +58,12 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
       print(_);
       return "disconnect";
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   Future<void> _showError(BuildContext context, m) {
@@ -179,7 +186,8 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => UserRegistrationPage(widget.phone)),
+                              builder: (context) =>
+                                  UserRegistrationPage(widget.phone)),
                         );
                       }
                     },

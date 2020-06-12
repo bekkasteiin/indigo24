@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
 import 'package:http/http.dart' as http;
@@ -62,6 +63,12 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
       print(_);
       return "disconnect";
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   Future<void> _showError(BuildContext context, m) {

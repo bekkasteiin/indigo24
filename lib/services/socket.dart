@@ -89,6 +89,20 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  deleteMembers(String chatID, members) {
+    print("delete members is called $chatID $members");
+    var data = json.encode({
+      "cmd": 'chat:members:delete',
+      "data": {
+        "chat_id": "$chatID",
+        "user_id": "$userId",
+        "userToken": "$userToken",
+        "members": "$members",
+      }
+    });
+    channel.sink.add(data);
+  }
+
   getMessages(String chatID, {page}) {
     print("getMessages is called");
     var data = json.encode({
@@ -117,7 +131,7 @@ class ChatRoom {
           "text": '$message'
         }
       });
-      print('added');
+      print('added message');
       channel.sink.add(data);
     } else {
       print('message is empty');
@@ -147,7 +161,7 @@ class ChatRoom {
         "phone": phone,
       }
     });
-    print('added');
+    print('added user check');
     channel.sink.add(data);
   }
 
@@ -180,62 +194,68 @@ class ChatRoom {
   }
 
   listen() {
-    channel.stream.listen((event) {
-      var json = jsonDecode(event);
+    channel.stream.listen(
+      (event) {
+        var json = jsonDecode(event);
 
-      var cmd = json['cmd'];
-      var data = json['data'];
-      switch (cmd) {
-        case "init":
-          print(userId);
-          print(data);
-          if (data['status'] == 'true') {
-            var data = {
-              "cmd": 'chats:get',
-              "data": {
-                "user_id": "$userId",
-                "userToken": "$userToken",
-                "page": '1',
-              }
-            };
-            channel.sink.add(jsonEncode(data));
-          }
-          break;
-        case "chats:get":
-          changeController.add(new MyEvent(json));
-          break;
-        case "chat:get":
-          cabinetController.add(new MyCabinetEvent(json));
-          break;
-        case "message:create":
-          if (cabinetController == null) {
-            print("new message in CHATS null page");
-          } else {
-            if (!cabinetController.isClosed) {
-              print("new message in CHAT page");
-              cabinetController.add(new MyCabinetEvent(json));
-            } else {
-              print("new message in CHATS page");
+        var cmd = json['cmd'];
+        var data = json['data'];
+        switch (cmd) {
+          case "init":
+            print(userId);
+            print(data);
+            if (data['status'] == 'true') {
+              var data = {
+                "cmd": 'chats:get',
+                "data": {
+                  "user_id": "$userId",
+                  "userToken": "$userToken",
+                  "page": '1',
+                }
+              };
+              channel.sink.add(jsonEncode(data));
             }
-          }
-          break;
-        case "user:check":
-          contactController.add(new MyContactEvent(json));
-          break;
-        case "user:check:online":
-          cabinetController.add(new MyCabinetEvent(json));
-          break;
-        case "chat:create":
-          contactController.add(new MyContactEvent(json));
-          break;
-        case "chat:members":
-          print('added to chatInfoController');
-          chatInfoController.add(new MyChatInfoEvent(json));
-          break;
-        default:
-          print('default print cmd: $cmd json: $json');
-      }
-    });
+            break;
+          case "chats:get":
+            changeController.add(new MyEvent(json));
+            break;
+          case "chat:get":
+            cabinetController.add(new MyCabinetEvent(json));
+            break;
+          case "message:create":
+            forceGetChat();
+            if (cabinetController == null) {
+              print("new message in CHATS null page");
+            } else {
+              if (!cabinetController.isClosed) {
+                print("new message in CHAT page");
+                cabinetController.add(new MyCabinetEvent(json));
+              } else {
+                print("new message in CHATS page");
+              }
+            }
+            break;
+          case "user:check":
+            contactController.add(new MyContactEvent(json));
+            break;
+          case "user:check:online":
+            cabinetController.add(new MyCabinetEvent(json));
+            break;
+          case "chat:create":
+            contactController.add(new MyContactEvent(json));
+            break;
+          case "chat:members":
+            print('added to chatInfoController');
+            chatInfoController.add(new MyChatInfoEvent(json));
+            break;
+          default:
+            print('default print cmd: $cmd json: $json');
+        }
+      },
+      onDone: () {
+        init();
+      },
+    );
   }
 }
 
