@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/login.dart';
 
+import 'registration.dart';
+
 class IntroPage extends StatefulWidget {
   @override
   _IntroPageState createState() => _IntroPageState();
@@ -10,54 +12,49 @@ class _IntroPageState extends State<IntroPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-  
+
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0.0),
-        child: AppBar(
-          backgroundColor: Colors.white, // status bar color
-          brightness: Brightness.light, // status bar brightness
-        ),
-      ),
-      body: Stack(
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/background_login.png"),
-                fit: BoxFit.cover 
-              ),
-              
-            )
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(0.0),
+          child: AppBar(
+            backgroundColor: Colors.white, // status bar color
+            brightness: Brightness.light, // status bar brightness
           ),
-          SingleChildScrollView(
-            child: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  _space(size.height/2.5),
-                  _signInButton(size),
-                  _space(10),
-                  _signUpButton(size),
-                  _space(size.height/5),
-                  
-                ],
+        ),
+        body: Stack(
+          children: <Widget>[
+            Container(
+                decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/background_login.png"),
+                  fit: BoxFit.cover),
+            )),
+            SingleChildScrollView(
+              child: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _space(size.height / 2.5),
+                    _signInButton(size),
+                    _space(10),
+                    _signUpButton(size),
+                    _space(size.height / 5),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      )
-    );
+          ],
+        ));
   }
 
-  _space(double h){
+  _space(double h) {
     return Container(
       height: h,
     );
   }
 
-  _signInButton(Size size){
+  _signInButton(Size size) {
     return ButtonTheme(
       minWidth: size.width * 0.75,
       height: 60,
@@ -84,13 +81,17 @@ class _IntroPageState extends State<IntroPage> {
     );
   }
 
-  _signUpButton(Size size){
+  _signUpButton(Size size) {
     return ButtonTheme(
       minWidth: size.width * 0.75,
       height: 60,
       child: RaisedButton(
         onPressed: () {
           print('Register is pressed');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RegistrationPage()),
+          );
         },
         child: const Text(
           'Регистрация',
@@ -107,4 +108,3 @@ class _IntroPageState extends State<IntroPage> {
     );
   }
 }
-

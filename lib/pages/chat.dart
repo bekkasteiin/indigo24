@@ -116,23 +116,27 @@ class _ChatPageState extends State<ChatPage> {
           crossAxisAlignment: WrapCrossAlignment.center,
           alignment: WrapAlignment.center,
           children: <Widget>[
-            Text("${widget.name}", style: TextStyle(color: Colors.black)),
+            Text(
+              widget.name.length != 0 ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}" : "",
+              style: TextStyle(
+                  color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+            ),
             (widget.memberCount > 2)
                 ? Text(
                     'Участников ${widget.memberCount}',
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+                    style: TextStyle(color: Color(0xFF001D52), fontSize: 14, fontWeight: FontWeight.w400),
                   )
                 : Text(
                     'был в сети $online',
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+                    style: TextStyle(color: Color(0xFF001D52), fontSize: 14, fontWeight: FontWeight.w400),
                   ),
           ],
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.info_outline),
-            color: Colors.black,
-            onPressed: () {
+          InkWell(
+            child: Image.network(
+                'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
+            onTap: () {
               ChatRoom.shared.setChatInfoStream();
               Navigator.push(
                 context,
@@ -144,10 +148,28 @@ class _ChatPageState extends State<ChatPage> {
                     chatId: widget.chatID,
                   ),
                 ),
-              ).whenComplete(() {
-              });
+              ).whenComplete(() {});
             },
-          )
+          ),
+          // IconButton(
+          //   icon: Image.network(
+          //       'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
+          //   color: Colors.black,
+          //   onPressed: () {
+          //     ChatRoom.shared.setChatInfoStream();
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ChatProfileInfo(
+          //           chatName: widget.name,
+          //           chatAvatar: 'noAvatar.png',
+          //           chatMembers: widget.memberCount,
+          //           chatId: widget.chatID,
+          //         ),
+          //       ),
+          //     ).whenComplete(() {});
+          //   },
+          // )
         ],
         backgroundColor: Colors.white,
         brightness: Brightness.light,
@@ -212,7 +234,7 @@ class _ChatPageState extends State<ChatPage> {
                 Container(
                   color: Colors.white,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
+                    padding: const EdgeInsets.only(left: 20, right: 5),
                     child: TextField(
                       maxLines: 6,
                       minLines: 1,
@@ -222,7 +244,6 @@ class _ChatPageState extends State<ChatPage> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {
-                            print('+++++++++++++++___________+++++');
                             ChatRoom.shared
                                 .sendMessage('${widget.chatID}', _text.text);
                             setState(() {
@@ -231,7 +252,7 @@ class _ChatPageState extends State<ChatPage> {
                           },
                         ),
                         border: InputBorder.none,
-                        hintText: "enter your message",
+                        hintText: "Введите сообщение",
                       ),
                     ),
                   ),
@@ -323,7 +344,14 @@ class Sended extends StatelessWidget {
       int.parse(timestamp) * 1000,
     );
     TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
-    // messageMinutes = '${roomBooked.minute}';
-    return '${roomBooked.hour}:${roomBooked.minute}';
+    var hours;
+    var minutes;
+    hours = '${roomBooked.hour}';
+    minutes = '${roomBooked.minute}';
+
+    if (roomBooked.hour.toString().length == 1) hours = '0${roomBooked.hour}';
+    if (roomBooked.minute.toString().length == 1)
+      minutes = '0${roomBooked.minute}';
+    return '$hours:$minutes';
   }
 }

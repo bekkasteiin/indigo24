@@ -214,18 +214,19 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 centerTitle: true,
                 brightness: Brightness.light,
                 title: Text(
-                  "Контакты",
+                  "Создать группу",
                   style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
+                    color: Color(0xFF001D52),
                     fontWeight: FontWeight.w400,
+                    fontSize: 22,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 actions: <Widget>[
                   IconButton(
-                      icon: Icon(Icons.forward),
-                      color: Colors.black,
+                      icon: Icon(Icons.group_add),
+                      iconSize: 30,
+                      color: Color(0xFF001D52),
                       onPressed: () {
                         if (_userIds.length > 1) {
                           if (_titleController.text.isNotEmpty) {
@@ -258,21 +259,22 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                             controller: _titleController,
                           ),
                         ),
-                        Padding(
+                        Container(
+                          height: 50,
                           padding: const EdgeInsets.only(
                               top: 10.0, left: 10.0, right: 10, bottom: 0),
-                          child: TextField(
-                            decoration: new InputDecoration(
-                              hintText: "Поиск",
-                              fillColor: Colors.white,
-                              border: new OutlineInputBorder(
-                                borderSide: new BorderSide(),
+                          child: Center(
+                            child: TextField(
+                              decoration: new InputDecoration(
+                                prefixIcon: Icon(Icons.search,color: Color(0xFF001D52),),
+                                hintText: "Поиск",
+                                fillColor: Color(0xFF001D52),
                               ),
+                              onChanged: (value) {
+                                search(value);
+                              },
+                              controller: _searchController,
                             ),
-                            onChanged: (value) {
-                              search(value);
-                            },
-                            controller: _searchController,
                           ),
                         ),
                         Expanded(

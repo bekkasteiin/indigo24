@@ -241,7 +241,8 @@ class SendedMessageWidget extends StatelessWidget {
                   padding: const EdgeInsets.only(
                       right: 12.0, left: 23.0, top: 8.0, bottom: 15.0),
                   child: Text(
-                    content,
+                    "${content[0].toUpperCase() + content.substring(1)}",
+                    style: TextStyle(fontWeight: FontWeight.w300),
                   ),
                 ),
                 Positioned(
@@ -306,7 +307,8 @@ class ReceivedMessageWidget extends StatelessWidget {
                         padding: const EdgeInsets.only(
                             right: 8.0, left: 8.0, top: 8.0, bottom: 15.0),
                         child: Text(
-                          content,
+                          "${content[0].toUpperCase() + content.substring(1)}",
+                          style: TextStyle(fontWeight: FontWeight.w300),
                         ),
                       ),
                       Positioned(
