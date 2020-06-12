@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,6 +14,12 @@ class _WithdrawPageState extends State<WithdrawPage> {
   final amountController = TextEditingController();
 
   Api api = Api();
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
 
   @override
   Widget build(BuildContext context) {

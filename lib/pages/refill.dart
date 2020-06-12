@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:indigo24/services/api.dart';
 
@@ -10,6 +11,13 @@ class RefillPage extends StatefulWidget {
 }
 
 class _RefillPageState extends State<RefillPage> {
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+  
   var client = new http.Client();
 
   final amountController = TextEditingController();

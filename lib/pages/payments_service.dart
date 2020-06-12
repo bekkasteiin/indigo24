@@ -17,6 +17,7 @@ class PaymentsServicePage extends StatefulWidget {
 }
 
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
+  
   Api api = Api();
   var _balance;
   String _logo;

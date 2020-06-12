@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/pages/refill.dart';
 import 'package:indigo24/pages/withdraw.dart';
 import 'package:indigo24/services/api.dart';
@@ -133,6 +134,12 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
   Container _payments(Size size) {
     return Container(
       decoration: BoxDecoration(boxShadow: [
@@ -217,7 +224,8 @@ class _WalletTabState extends State<WalletTab> {
         children: <Widget>[
           Text('Баланс в обработке', style: fS18w200(c: 'ffffff')),
           Container(height: 5),
-          Text('${_blockedAmount.toStringAsFixed(2)} ₸', style: fS26w200(c: 'ffffff')),
+          Text('${_blockedAmount.toStringAsFixed(2)} ₸',
+              style: fS26w200(c: 'ffffff')),
         ],
       ),
     );
@@ -274,7 +282,7 @@ class _WalletTabState extends State<WalletTab> {
             child: RaisedButton(
               onPressed: () {
                 print('вывести is pressed');
-                 Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => WithdrawPage()),
                 );

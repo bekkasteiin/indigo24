@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat_info.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/socket.dart';
@@ -177,6 +178,7 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     ChatRoom.shared.cabinetController.close();
     controller.removeListener(_scrollListener);
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.dispose();
   }
 
@@ -187,26 +189,52 @@ class _ChatPageState extends State<ChatPage> {
         iconTheme: IconThemeData(
           color: Colors.black,
         ),
-        title: Wrap(
-          direction: Axis.vertical,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          alignment: WrapAlignment.center,
-          children: <Widget>[
-            Text(
-              widget.name.length != 0 ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}" : "",
-              style: TextStyle(
-                  color: Color(0xFF001D52), fontWeight: FontWeight.w400),
-            ),
-            (widget.memberCount > 2)
-                ? Text(
-                    'Участников ${widget.memberCount}',
-                    style: TextStyle(color: Color(0xFF001D52), fontSize: 14, fontWeight: FontWeight.w400),
-                  )
-                : Text(
-                    'был в сети $online',
-                    style: TextStyle(color: Color(0xFF001D52), fontSize: 14, fontWeight: FontWeight.w400),
-                  ),
-          ],
+        title: InkWell(
+          child: Wrap(
+            direction: Axis.vertical,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: WrapAlignment.center,
+            children: <Widget>[
+              Text(
+                widget.name.length != 0
+                    ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}"
+                    : "",
+                style: TextStyle(
+                    color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+              ),
+              (widget.memberCount > 2)
+                  ? Text(
+                      'Участников ${widget.memberCount}',
+                      style: TextStyle(
+                          color: Color(0xFF001D52),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400),
+                    )
+                  : online == null
+                      ? Container()
+                      : Text(
+                          'был в сети $online',
+                          style: TextStyle(
+                              color: Color(0xFF001D52),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400),
+                        ),
+            ],
+          ),
+          onTap: () {
+            ChatRoom.shared.setChatInfoStream();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatProfileInfo(
+                  chatName: widget.name,
+                  chatAvatar: 'noAvatar.png',
+                  chatMembers: widget.memberCount,
+                  chatId: widget.chatID,
+                ),
+              ),
+            ).whenComplete(() {});
+          },
         ),
         actions: <Widget>[
           InkWell(
@@ -351,25 +379,22 @@ class _ChatPageState extends State<ChatPage> {
                             });
                           },
                         ),
-                        border: InputBorder.none,
-                        hintText: "Введите сообщение",
                       ),
                     ),
                   ),
-                ),
-                // ),
-              ],
-            ),
-          ],
-        ),
-      )),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )),
     );
   }
 
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
-    if (m['id'] == 'chat:message:create') return Devider(m);
-    return "${m['user_id']}" == "${user.id}" ? Sended(m) : Received(m);
+    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7') return Devider(m);
+    return '${m['user_id']}' == '${user.id}' ? Sended(m) : Received(m);
   }
 }
 

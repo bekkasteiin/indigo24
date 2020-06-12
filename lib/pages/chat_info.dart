@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
@@ -42,7 +44,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   listen() {
     ChatRoom.shared.onChatInfoChange.listen((e) {
       print("CHAT INFO EVENT");
-      // print(e.json);
+      print(e.json);
       var cmd = e.json['cmd'];
       var message = e.json['data'];
 
@@ -93,6 +95,12 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   Widget _buildProfileImage() {
@@ -215,25 +223,62 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       : Flexible(
                           child: ListView.builder(
                             itemCount: membersList.length,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, i) {
                               // print(membersList[i]);
-                              return ListTile(
-                                onTap: () {
-                                  // ChatRoom.shared.checkUserOnline(ids);
-                                  // ChatRoom.shared
-                                  //     .getMessages(membersList[i]['id']);
-                                },
-                                leading: CircleAvatar(
-                                    backgroundImage: (membersList[i]
-                                                    ["avatar"] ==
-                                                null ||
-                                            membersList[i]["avatar"] == '' ||
-                                            membersList[i]["avatar"] == false)
-                                        ? CachedNetworkImageProvider(
-                                            "https://media.indigo24.com/avatars/noAvatar.png")
-                                        : CachedNetworkImageProvider(
-                                            'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}')),
-                                title: Text("${membersList[i]["user_name"]}"),
+                              return Slidable(
+                                actionPane: SlidableDrawerActionPane(),
+                                actionExtentRatio: 0.25,
+                                // actions: <Widget>[
+                                //   IconSlideAction(
+                                //     caption: 'Archive',
+                                //     color: Colors.blue,
+                                //     icon: Icons.archive,
+                                //   ),
+                                //   IconSlideAction(
+                                //     caption: 'Share',
+                                //     color: Colors.indigo,
+                                //     icon: Icons.share,
+                                //   ),
+                                // ],
+                                secondaryActions: <Widget>[
+                                  // IconSlideAction(
+                                  //   caption: 'More',
+                                  //   color: Colors.black45,
+                                  //   icon: Icons.more_horiz,
+                                  // ),
+                                  IconSlideAction(
+                                    caption: 'Удалить',
+                                    color: Colors.red,
+                                    icon: Icons.delete,
+                                    onTap: () {
+                                      ChatRoom.shared.deleteMembers(
+                                          '${widget.chatId}',
+                                          membersList[i]['user_id']);
+                                      setState(() {
+                                        membersList.remove(i);
+                                      });
+                                    },
+                                  ),
+                                ],
+                                child: ListTile(
+                                  onTap: () {
+                                    // ChatRoom.shared.checkUserOnline(ids);
+                                    // ChatRoom.shared
+                                    //     .getMessages(membersList[i]['id']);
+                                  },
+                                  leading: CircleAvatar(
+                                      backgroundImage: (membersList[i]
+                                                      ["avatar"] ==
+                                                  null ||
+                                              membersList[i]["avatar"] == '' ||
+                                              membersList[i]["avatar"] == false)
+                                          ? CachedNetworkImageProvider(
+                                              "https://media.indigo24.com/avatars/noAvatar.png")
+                                          : CachedNetworkImageProvider(
+                                              'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}')),
+                                  title: Text("${membersList[i]["user_name"]}"),
+                                ),
                               );
                             },
                           ),

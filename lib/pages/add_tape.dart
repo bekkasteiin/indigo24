@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 
 class AddTapePage extends StatefulWidget {
@@ -26,7 +28,7 @@ class _AddTapePageState extends State<AddTapePage> {
   TextEditingController titleController = new TextEditingController();
   TextEditingController descriptionController = new TextEditingController();
   var api = Api();
-  
+
   Future<void> _playVideo(File file) async {
     if (file != null && mounted) {
       await _disposeVideoController();
@@ -54,9 +56,7 @@ class _AddTapePageState extends State<AddTapePage> {
         _imageFile = await ImagePicker.pickImage(source: source);
         _currentFile = _imageFile;
         print("image file from on image $_imageFile");
-        setState(() {
-          
-        });
+        setState(() {});
       } catch (e) {
         _pickImageError = e;
       }
@@ -104,21 +104,15 @@ class _AddTapePageState extends State<AddTapePage> {
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Название'
-              )
-            ),
+                controller: titleController,
+                decoration: InputDecoration(labelText: 'Название')),
           ),
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
-              maxLines: 4,
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Описание'
-              )
-            ),
+                maxLines: 4,
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Описание')),
           ),
         ],
       ),
@@ -133,25 +127,25 @@ class _AddTapePageState extends State<AddTapePage> {
     if (_imageFile != null) {
       return ListView(
         children: <Widget>[
-          Image.file(_imageFile),
           Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Название'
-              )
+            height: MediaQuery.of(context).size.width,
+            width: MediaQuery.of(context).size.width,
+            child: PhotoView(
+              imageProvider: FileImage(_imageFile),
             ),
           ),
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
-              maxLines: 4,
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Описание'
-              )
-            ),
+                controller: titleController,
+                decoration: InputDecoration(labelText: 'Название')),
+          ),
+          Container(
+            margin: EdgeInsets.all(10),
+            child: TextField(
+                maxLines: 4,
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Описание')),
           ),
         ],
       );
@@ -189,16 +183,17 @@ class _AddTapePageState extends State<AddTapePage> {
   }
 
   Future addTape() async {
-    api.addTape(_currentFile.path, titleController.text, descriptionController.text).then((r) {
+    api
+        .addTape(
+            _currentFile.path, titleController.text, descriptionController.text)
+        .then((r) {
       print("MY response $r");
-      if(r["success"]){
+      if (r["success"]) {
         titleController.text = "";
         descriptionController.text = "";
         Navigator.pop(context);
       }
-      
     });
-    
   }
 
   @override
@@ -210,17 +205,19 @@ class _AddTapePageState extends State<AddTapePage> {
           color: Colors.black,
         ),
         brightness: Brightness.light,
-        title: Text('Добавить', 
-          style: TextStyle(
+        title: Text('Добавить',
+            style: TextStyle(
               color: Colors.black,
               fontSize: 22,
               fontWeight: FontWeight.w400,
             ),
-            textAlign: TextAlign.center
-        ),
+            textAlign: TextAlign.center),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add, color: Colors.black,),
+            icon: Icon(
+              Icons.add,
+              color: Colors.black,
+            ),
             onPressed: () async {
               await addTape();
             },
@@ -232,7 +229,8 @@ class _AddTapePageState extends State<AddTapePage> {
         child: Platform.isAndroid
             ? FutureBuilder<void>(
                 future: retrieveLostData(),
-                builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<void> snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
@@ -356,6 +354,7 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
   @override
   void dispose() {
     controller.removeListener(_onVideoControllerUpdate);
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.dispose();
   }
 

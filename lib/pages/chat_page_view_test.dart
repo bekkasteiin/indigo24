@@ -194,8 +194,7 @@ class DeviderMessageWidget extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.all(5),
         padding: EdgeInsets.all(5),
-        height: 30,
-        width: 140,
+        width: MediaQuery.of(context).size.width / 2,
         decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.9),
             borderRadius: BorderRadius.all(

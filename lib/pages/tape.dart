@@ -307,6 +307,12 @@ class _TapePageState extends State<TapePage>
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }

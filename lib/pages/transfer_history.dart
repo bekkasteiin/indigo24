@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../services/api.dart';
 
@@ -104,7 +105,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                 child: Container(
                     height: 10,
                     width: 10,
-                    color: type == 'in' ? Color(0xFF77E7B1) : Color(0xFFEB818E)),
+                    color:
+                        type == 'in' ? Color(0xFF77E7B1) : Color(0xFFEB818E)),
               ),
               SizedBox(width: 20),
             ],
@@ -166,6 +168,11 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     // } catch (_) {
     //   return "disconnect";
     // }
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   AppBar buildAppBar() {

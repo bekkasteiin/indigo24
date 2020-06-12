@@ -7,7 +7,7 @@ class ChatsModel {
   var unreadMessage;
   var phone;
   var lastMessage;
-
+  var anotherUserID;
   ChatsModel({
     this.id,
     this.name,
@@ -16,7 +16,8 @@ class ChatsModel {
     this.membersCount,
     this.unreadMessage,
     this.phone,
-    this.lastMessage
+    this.lastMessage,
+    this.anotherUserID
   });
 
   factory ChatsModel.fromJson(Map<String, dynamic> json) => ChatsModel(
@@ -28,6 +29,7 @@ class ChatsModel {
     unreadMessage: json["unread_messages"],
     phone: json["phone"],
     lastMessage: json["last_message"],
+    anotherUserID: json["another_user_id"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -39,6 +41,7 @@ class ChatsModel {
     "unread_messages": unreadMessage,
     "phone": phone,
     "last_message": lastMessage,
+    "another_user_id": anotherUserID,
   };
 
 
@@ -52,7 +55,8 @@ class ChatsModel {
       "membersCount": $membersCount,
       "unreadMessage": $unreadMessage,
       "phone": $phone,
-      "lastMessage": $lastMessage
+      "lastMessage": $lastMessage,
+      "anotherUserID": $anotherUserID,
     }""";
   }
 }

@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/db/Student_DAO.dart';
 import 'package:indigo24/db/chats_model.dart';
 import 'package:indigo24/db/student.dart';
@@ -66,8 +68,9 @@ class _ChatsListPageState extends State<ChatsListPage>
   }
 
   @override
-  dispose() {
+  void dispose() {
     super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   goToChat(name, chatID, {memberCount, userIds}) {
@@ -76,8 +79,8 @@ class _ChatsListPageState extends State<ChatsListPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              ChatPage(name, chatID, memberCount: memberCount, userIds: userIds)),
+          builder: (context) => ChatPage(name, chatID,
+              memberCount: memberCount, userIds: userIds)),
     ).whenComplete(() {
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
@@ -120,31 +123,9 @@ class _ChatsListPageState extends State<ChatsListPage>
   }
 
   _listView(context, status) {
-    return status == "Offline"
-        ? dbChats.isEmpty
-            ? Text("Загрузка")
-            : ListView.builder(
-                itemCount: dbChats.length,
-                itemBuilder: (context, i) {
-                  return ListTile(
-                    onTap: () {
-                      ChatRoom.shared.getMessages(dbChats[i].id);
-                      goToChat(dbChats[i].name, dbChats[i].id);
-                    },
-                    leading: CircleAvatar(
-                        backgroundImage: CachedNetworkImageProvider(
-                            'https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
-                        // NetworkImage("https://media.indigo24.com/avatars/noAvatar.png"),
-                        ),
-                    title: Text(dbChats[i].name),
-                    subtitle: Text(dbChats[i].lastMessage["text"]),
-                    trailing: Text(dbChats[i].lastMessage["time"] == null
-                        ? "null"
-                        : time(dbChats[i].lastMessage["time"])),
-                  );
-                },
-              )
-        : myList.isEmpty
+    return myList.isEmpty
+        // ? dbChats.isNotEmpty
+        //     ? localChatBuilder(dbChats)
             ? Center(child: CircularProgressIndicator())
             : 
             SmartRefresher(
