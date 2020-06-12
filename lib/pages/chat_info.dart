@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:platform_action_sheet/platform_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,23 +16,56 @@ class ChatProfileInfo extends StatefulWidget {
   final chatName;
   final chatAvatar;
   final chatMembers;
-  ChatProfileInfo({this.chatName, this.chatAvatar, this.chatMembers});
+  final chatId;
+  ChatProfileInfo(
+      {this.chatId, this.chatName, this.chatAvatar, this.chatMembers});
   @override
   _ChatProfileInfoState createState() => _ChatProfileInfoState();
 }
 
 class _ChatProfileInfoState extends State<ChatProfileInfo> {
+  List membersList = [];
   String _chatTitle;
 
   File _image;
   @override
   void initState() {
     _chatTitle = '${widget.chatName}';
+    listen();
+    ChatRoom.shared.chatMembers(13, widget.chatId);
     super.initState();
   }
 
   final picker = ImagePicker();
   var api = Api();
+
+  listen() {
+    ChatRoom.shared.onChatInfoChange.listen((e) {
+      print("CHAT INFO EVENT");
+      // print(e.json);
+      var cmd = e.json['cmd'];
+      var message = e.json['data'];
+
+      switch (cmd) {
+        case "chat:members":
+          setState(() {
+            membersList = message;
+          });
+          break;
+        default:
+          print(message);
+          print('no');
+          print('no');
+          print(cmd);
+          print('no');
+          print('no');
+          print('no');
+          print('no');
+          print('no');
+      }
+    });
+  }
+
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(source: imageSource);
     if (pickedFile != null) {
@@ -150,7 +185,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       IconButton(
                         icon: Icon(Icons.more_vert),
                         color: Colors.white,
-                        onPressed: (){},
+                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -161,10 +196,48 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       _buildProfileImage(),
                     ],
                   ),
-                  _buildChatName(),
                   SizedBox(height: 10),
-                  _buildChatName(),
-                  Text('grustno')
+                  Row(children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(left: 20),
+                      child: Text(
+                        'Участники',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ]),
+                  SizedBox(height: 10),
+                  membersList.isEmpty
+                      ? Center(child: CircularProgressIndicator())
+                      : Flexible(
+                          child: ListView.builder(
+                            itemCount: membersList.length,
+                            itemBuilder: (context, i) {
+                              print(membersList[i]);
+                              return ListTile(
+                                onTap: () {
+                                  // ChatRoom.shared.checkUserOnline(ids);
+                                  // ChatRoom.shared
+                                  //     .getMessages(membersList[i]['id']);
+                                },
+                                leading: CircleAvatar(
+                                    backgroundImage: (membersList[i]
+                                                    ["avatar"] ==
+                                                null ||
+                                            membersList[i]["avatar"] == '' ||
+                                            membersList[i]["avatar"] == false)
+                                        ? CachedNetworkImageProvider(
+                                            "https://media.indigo24.com/avatars/noAvatar.png")
+                                        : CachedNetworkImageProvider(
+                                            'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}')),
+                                title: Text("${membersList[i]["user_name"]}"),
+                              );
+                            },
+                          ),
+                        ),
                 ],
               ),
             ],

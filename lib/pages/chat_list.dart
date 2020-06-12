@@ -99,9 +99,10 @@ class _ChatsListPageState extends State<ChatsListPage>
                       goToChat(dbChats[i].name, dbChats[i].id);
                     },
                     leading: CircleAvatar(
-                      backgroundImage: CachedNetworkImageProvider('https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
-                      // NetworkImage("https://media.indigo24.com/avatars/noAvatar.png"),
-                    ),
+                        backgroundImage: CachedNetworkImageProvider(
+                            'https://indigo24.xyz/uploads/avatars/${dbChats[i].avatar}')
+                        // NetworkImage("https://media.indigo24.com/avatars/noAvatar.png"),
+                        ),
                     title: Text(dbChats[i].name),
                     subtitle: Text(dbChats[i].lastMessage["text"]),
                     trailing: Text(dbChats[i].lastMessage["time"] == null
@@ -111,23 +112,31 @@ class _ChatsListPageState extends State<ChatsListPage>
                 },
               )
         : myList.isEmpty
-            ? Text("Загрузка")
+            ? Center(child: CircularProgressIndicator())
             : ListView.builder(
                 itemCount: myList.length,
                 itemBuilder: (context, i) {
+                  // print(myList[i]);
                   return ListTile(
                     onTap: () {
+                      // ChatRoom.shared.checkUserOnline(ids);
                       ChatRoom.shared.getMessages(myList[i]['id']);
-                      goToChat(myList[i]['name'], myList[i]['id'],
-                          memberCount: myList[i]['members_count']);
+                      goToChat(
+                        myList[i]['name'],
+                        myList[i]['id'],
+                        memberCount: myList[i]['members_count'],
+                        userIds: myList[i]['id'],
+                      );
                     },
                     leading: CircleAvatar(
-                      backgroundImage: (myList[i]["avatar"]==null || myList[i]["avatar"]=='' || myList[i]["avatar"] == false)?
-                      CachedNetworkImageProvider("https://media.indigo24.com/avatars/noAvatar.png")
-                      :
-                      // CachedNetworkImageProvider("https://media.indigo24.com/avatars/noAvatar.png")
-                      CachedNetworkImageProvider('https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')
-                    ),
+
+                        backgroundImage: (myList[i]["avatar"] == null ||
+                                myList[i]["avatar"] == '' ||
+                                myList[i]["avatar"] == false)
+                            ? CachedNetworkImageProvider(
+                                "https://media.indigo24.com/avatars/noAvatar.png")
+                            : CachedNetworkImageProvider(
+                                'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')),
                     title: Text("${myList[i]["name"]}"),
                     subtitle: Text(
                       "${myList[i]['last_message']["text"]}",
@@ -163,8 +172,16 @@ class _ChatsListPageState extends State<ChatsListPage>
       int.parse("$timestamp") * 1000,
     );
     TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
+    var hours;
+    var minutes;
     // messageMinutes = '${roomBooked.minute}';
-    return '${roomBooked.hour}:${roomBooked.minute}';
+    hours = '${roomBooked.hour}';
+    minutes = '${roomBooked.minute}';
+
+    if (roomBooked.hour.toString().length == 1) hours = '0${roomBooked.hour}';
+    if (roomBooked.minute.toString().length == 1)
+      minutes = '0${roomBooked.minute}';
+    return '$hours:$minutes';
   }
 
   @override

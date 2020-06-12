@@ -30,7 +30,7 @@ class _TapesPageState extends State<TapesPage>
     super.initState();
   }
 
-  getTapes(){
+  getTapes() {
     api.getTapes('$tapePage').then((tapes) {
       print(tapes);
       return setTapes(tapes);
@@ -59,15 +59,15 @@ class _TapesPageState extends State<TapesPage>
   }
 
   Future setTapes(tapes) async {
-      setState((){
-        result = tapes["result"].toList();
-        _listFuture = Future(foo);
-        result.forEach((el) async {
-          if (el['myLike'] == true) {
-            _saved.add(el['id']);
-          }
-        });
+    setState(() {
+      result = tapes["result"].toList();
+      _listFuture = Future(foo);
+      result.forEach((el) async {
+        if (el['myLike'] == true) {
+          _saved.add(el['id']);
+        }
       });
+    });
   }
 
   int foo() {
@@ -104,13 +104,15 @@ class _TapesPageState extends State<TapesPage>
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add_photo_alternate, color: Colors.black,),
-            onPressed: (){
+            icon: Icon(
+              Icons.add_photo_alternate,
+              color: Colors.black,
+            ),
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      AddTapePage(),
+                  builder: (context) => AddTapePage(),
                 ),
               ).whenComplete(() {
                 getTapes();
@@ -171,14 +173,33 @@ class _TapesPageState extends State<TapesPage>
                                           ),
                                         ),
                                         Flexible(
-                                          child: Container(
-                                            padding:
-                                                EdgeInsets.only(left: 10.0),
-                                            child: Text(
-                                              '${result[index]['title']}',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 10.0),
+                                                child: Text(
+                                                  '${result[index]['name']}',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style:
+                                                      TextStyle(fontSize: 18),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 10.0),
+                                                child: Text(
+                                                  '${result[index]['title']}',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],

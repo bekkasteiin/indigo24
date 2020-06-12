@@ -1,18 +1,22 @@
 import 'dart:convert';
 
-import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat_info.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'chat_page_view_test.dart';
+import 'package:flutter_emoji/flutter_emoji.dart';
+
+var parser = EmojiParser();
 
 class ChatPage extends StatefulWidget {
   final name;
   final chatID;
   final memberCount;
-  ChatPage(this.name, this.chatID, {this.memberCount});
+  final userIds;
+  ChatPage(this.name, this.chatID, {this.memberCount, this.userIds});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -27,11 +31,15 @@ class _ChatPageState extends State<ChatPage> {
 
   Api api = Api();
   int page = 1;
+  RefreshController _refreshController = RefreshController();
+  ScrollController _scrollController = ScrollController();
+  
 
   @override
   initState() {
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
+    ChatRoom.shared.checkUserOnline(widget.userIds);
     listen();
   }
 
@@ -64,7 +72,7 @@ class _ChatPageState extends State<ChatPage> {
             print(
                 '____________________________________________________________$page');
             setState(() {
-              myList.addAll(e.json['data'].reversed.toList());
+              myList.addAll(e.json['data'].toList());
             });
           }
           break;
@@ -135,7 +143,7 @@ class _ChatPageState extends State<ChatPage> {
           alignment: WrapAlignment.center,
           children: <Widget>[
             Text("${widget.name}", style: TextStyle(color: Colors.black)),
-            widget.memberCount != 2
+            (widget.memberCount > 2)
                 ? Text(
                     'Участников ${widget.memberCount}',
                     style: TextStyle(color: Colors.black, fontSize: 14),
@@ -151,6 +159,7 @@ class _ChatPageState extends State<ChatPage> {
             icon: Icon(Icons.info_outline),
             color: Colors.black,
             onPressed: () {
+              ChatRoom.shared.setChatInfoStream();
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -158,9 +167,11 @@ class _ChatPageState extends State<ChatPage> {
                     chatName: widget.name,
                     chatAvatar: 'noAvatar.png',
                     chatMembers: widget.memberCount,
+                    chatId: widget.chatID,
                   ),
                 ),
-              );
+              ).whenComplete(() {
+              });
             },
           )
         ],
@@ -188,8 +199,8 @@ class _ChatPageState extends State<ChatPage> {
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage(
-                              'assets/images/background_chat.png'),
+                          image:
+                              AssetImage('assets/images/background_chat.png'),
                           fit: BoxFit.cover,
                           colorFilter: ColorFilter.linearToSrgbGamma()),
                     ),
@@ -226,7 +237,8 @@ class _ChatPageState extends State<ChatPage> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {
-                            print('+++++++++++++++___________+++++');
+                            print('+++++++++++++++___________+++++++++++');
+                            
                             ChatRoom.shared
                                 .sendMessage('${widget.chatID}', _text.text);
                             setState(() {
@@ -251,7 +263,30 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
+    if (m['id'] == 'chat:message:create') return Devider(m);
     return m['user_id'] == user.id ? Sended(m) : Received(m);
+  }
+}
+
+class Devider extends StatelessWidget {
+  final m;
+  Devider(this.m);
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment(-1, 0),
+      child: DeviderMessageWidget(
+        date: m['text'],
+      ),
+    );
+  }
+
+  String time(timestamp) {
+    var date = DateTime.fromMillisecondsSinceEpoch(
+      int.parse(timestamp) * 1000,
+    );
+    TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
+    return '${roomBooked.hour}:${roomBooked.minute}';
   }
 }
 
@@ -274,7 +309,15 @@ class Received extends StatelessWidget {
       int.parse(timestamp) * 1000,
     );
     TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
-    return '${roomBooked.hour}:${roomBooked.minute}';
+    var hours;
+    var minutes;
+    hours = '${roomBooked.hour}';
+    minutes = '${roomBooked.minute}';
+
+    if (roomBooked.hour.toString().length == 1) hours = '0${roomBooked.hour}';
+    if (roomBooked.minute.toString().length == 1)
+      minutes = '0${roomBooked.minute}';
+    return '$hours:$minutes';
   }
 }
 

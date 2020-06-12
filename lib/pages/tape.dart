@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
-
+import 'package:indigo24/services/user.dart' as user;
 class TapePage extends StatefulWidget {
   final tape;
   TapePage(this.tape);
@@ -28,6 +28,7 @@ class _TapePageState extends State<TapePage>
     setState(() {
       print('this is result $result');
       tapeResult = result["result"];
+      com = result["result"]["comments"].toList();
       _future = Future(foo);
     });
   }
@@ -39,7 +40,7 @@ class _TapePageState extends State<TapePage>
   TextEditingController _commentController = TextEditingController();
   var commentResult;
   var tapeResult;
-
+  List com = [];
   int letterCount = 150;
   var api = Api();
   String tempCount = " ";
@@ -86,26 +87,14 @@ class _TapePageState extends State<TapePage>
                       ),
                       child: Container(
                         color: Color(0xfff7f8fa),
-                        padding: const EdgeInsets.only(
-                          top: 10,
-                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Описание: ${widget.tape['description']}',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 16),
-                              maxLines: 2,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
                             Text('Комментарий:'),
                             ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: tapeResult['comments'].length,
+                              itemCount: com.length,
                               itemBuilder: (context, index) {
                                 print(tapeResult['comments'][index]);
                                 return Column(
@@ -122,7 +111,7 @@ class _TapePageState extends State<TapePage>
                                             borderRadius:
                                                 BorderRadius.circular(45.0),
                                             child: Image.network(
-                                              'https://indigo24.xyz/uploads/avatars/${tapeResult['comments'][index]['avatar']}',
+                                              'https://indigo24.xyz/uploads/avatars/${com[index]['avatar']}',
                                               width: 35.0,
                                               height: 35.0,
                                             ),
@@ -131,7 +120,7 @@ class _TapePageState extends State<TapePage>
                                             width: 10,
                                           ),
                                           Text(
-                                              '${tapeResult['comments'][index]['name']}'),
+                                              '${com[index]['name']}'),
                                         ],
                                       ),
                                     ),
@@ -139,7 +128,7 @@ class _TapePageState extends State<TapePage>
                                       children: <Widget>[
                                         Flexible(
                                           child: Text(
-                                            '${tapeResult['comments'][index]['comment']}',
+                                            '${com[index]['comment']}',
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 5,
                                           ),
@@ -232,9 +221,21 @@ class _TapePageState extends State<TapePage>
                                   tapeResult.cast<String, dynamic>();
                                 });
                                 await api.addCommentToTape(
-                                  '${widget.tape['id']}',
                                   '${_commentController.text}',
-                                );
+                                  '${widget.tape['id']}',
+                                ).then((v) {
+                                  // tapeResult
+                                  // {avatar: image4.png, comment: hahahahah, customerID: 113626, email: test@test.ru, name: test, phone: 77076562123}
+                                  var result = {
+                                    "avatar" : "${user.avatar}",
+                                    "comment" : "${_commentController.text}",
+                                    "name": "${user.name}",
+                                  };
+                                  setState((){
+                                    com.add(result);
+                                  });
+                                  print(v);
+                                });
                                 _commentController.text = "";
                               },
                             ),

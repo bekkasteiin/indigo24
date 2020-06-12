@@ -58,8 +58,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
       switch (cmd) {
         case "user:check":
-          if (e.json['data']['chat_id'] != false &&
-              e.json['data']['status'] == true) {
+          if (e.json['data']['chat_id'].toString() != 'false' &&
+              e.json['data']['status'].toString() == 'true') {
             ChatRoom.shared.setCabinetStream();
             print("_______________ NOT NULL ____________");
             print("_______________ NOT NULL ____________");
@@ -71,13 +71,12 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                      e.json['data']['user_id'], e.json['data']['chat_id'])),
+                  builder: (context) => ChatPage(e.json['data']['user_id'], e.json['data']['chat_id'], memberCount: 2, userIds: e.json['data']['user_id'])),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
             });
-          } else if (e.json['data']['status'] == 'true') {
+          } else if (e.json['data']['status'].toString() == 'true') {
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
           }
@@ -102,7 +101,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             Navigator.pop(context);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
+              MaterialPageRoute(builder: (context) => ChatPage(name, chatID, memberCount: 2,)),
             ).whenComplete(() {
               ChatRoom.shared.closeCabinetStream();
             });
