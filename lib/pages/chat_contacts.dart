@@ -71,7 +71,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ChatPage(e.json['data']['user_id'], e.json['data']['chat_id'], memberCount: 2, userIds: e.json['data']['user_id'])),
+                  builder: (context) => ChatPage(
+                      '${e.json['data']['name']}', e.json['data']['chat_id'],
+                      memberCount: 2, userIds: e.json['data']['user_id'])),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
@@ -116,7 +118,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   @override
   void dispose() {
     super.dispose();
-    ChatRoom.shared.contactController.close();
+    // ChatRoom.shared.contactController.close();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
@@ -209,7 +211,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                 title: Text(
                   "Контакты",
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Color(0xFF001D52),
                     fontSize: 22,
                     fontWeight: FontWeight.w400,
                   ),
@@ -217,10 +219,12 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                 ),
                 actions: <Widget>[
                   IconButton(
-                    icon: Icon(Icons.add_box),
-                    color: Colors.black,
+                    icon: Icon(Icons.group),
+                    iconSize: 30,
+                    color: Color(0xFF001D52),
                     onPressed: () {
                       print('add group');
+                      Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(

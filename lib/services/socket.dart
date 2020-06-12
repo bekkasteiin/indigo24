@@ -166,14 +166,14 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
-  forceGetChat() {
+  forceGetChat({page}) {
     print("Force updating chats");
     var data = {
       "cmd": 'chats:get',
       "data": {
         "user_id": "$userId",
         "userToken": "$userToken",
-        "page": '1',
+        "page": page==null? '1': "$page",
       }
     };
     channel.sink.add(jsonEncode(data));

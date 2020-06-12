@@ -110,11 +110,25 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
       print(e.json);
-
-      setState(() {
-        myList = e.json['data'].toList();
-        chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
-      });
+       setState(() {
+          chatsPage += 1;
+          myList = e.json['data'].toList();
+          chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
+        });
+      // if (chatsPage == 1) {
+      //   setState(() {
+      //     chatsPage += 1;
+      //     myList = e.json['data'].toList();
+      //     chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
+      //   });
+      // } else {
+      //   print(
+      //       '____________________________________________________________$chatsPage');
+      //   // setState(() {
+      //   //   chatsPage += 1;
+      //   //   myList.addAll(e.json['data'].toList());
+      //   // });
+      // }
       // await chatsDB.insertChats(chatsModel);
     });
   }

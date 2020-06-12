@@ -248,6 +248,7 @@ class SendedMessageWidget extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(
                       right: 12.0, left: 23.0, top: 8.0, bottom: 15.0),
+// <<<<<<< HEAD
                   child: (a[0]==":" && a[l]==":" && content.length<9)?
                   Text(content, style: TextStyle(fontSize: 40))
                   :
@@ -256,6 +257,11 @@ class SendedMessageWidget extends StatelessWidget {
                   : 
                   Text(
                     content,
+// =======
+//                   child: Text(
+//                     "${content[0].toUpperCase() + content.substring(1)}",
+//                     style: TextStyle(fontWeight: FontWeight.w300),
+// >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
                   ),
                 ),
                 Positioned(
@@ -280,12 +286,13 @@ class ReceivedMessageWidget extends StatelessWidget {
   final String content;
   final String time;
   final String image;
-
+  final String name;
   const ReceivedMessageWidget({
     Key key,
     this.content,
     this.time,
     this.image,
+    this.name
   }) : super(key: key);
 
   @override
@@ -316,20 +323,34 @@ class ReceivedMessageWidget extends StatelessWidget {
                       topLeft: Radius.circular(15),
                       topRight: Radius.circular(15)),
                   child: Container(
-                    color: Color(0xFFF7F7F7),
+                    color: Color(0xFFFFFFFF),
                     child: Stack(children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            right: 8.0, left: 8.0, top: 8.0, bottom: 15.0),
-                        child: (a[0]==":" && a[l]==":" && content.length<9)?
-                        Text(content, style: TextStyle(fontSize: 40))
-                        :
-                        (a[0]==":" && a[l]==":" && content.length>8)?
-                        Text(content, style: TextStyle(fontSize: 24))
-                        : 
-                        Text(
-                          content,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 5.0, bottom: 0.0),
+                            child: Text(name, style: TextStyle(color: Colors.amber,fontWeight: FontWeight.w500)),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 0.0, bottom: 15.0),
+// <<<<<<< HEAD
+                            child: (a[0]==":" && a[l]==":" && content.length<9)?
+                            Text(content, style: TextStyle(fontSize: 40))
+                            :
+                            (a[0]==":" && a[l]==":" && content.length>8)?
+                            Text(content, style: TextStyle(fontSize: 24))
+                            : 
+                            Text(
+                              content,
+// =======
+//                         child: Text(
+//                           "${content[0].toUpperCase() + content.substring(1)}",
+//                           style: TextStyle(fontWeight: FontWeight.w300),
+// >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
+                            ),
+                          ),
+                        ],
                       ),
                       Positioned(
                         bottom: 1,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat_info.dart';
 import 'package:indigo24/services/api.dart';
@@ -10,6 +11,11 @@ import 'chat_page_view_test.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 
 var parser = EmojiParser();
+
+Image backgroundForChat = Image(
+  image: AssetImage('assets/images/background_chat.png'),
+  fit: BoxFit.fill,
+);
 
 class ChatPage extends StatefulWidget {
   final name;
@@ -31,9 +37,38 @@ class _ChatPageState extends State<ChatPage> {
 
   Api api = Api();
   int page = 1;
-  RefreshController _refreshController = RefreshController();
+  // RefreshController _refreshController = RefreshController();
   ScrollController _scrollController = ScrollController();
-  
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  void _onRefresh() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    print("_onRefresh ");
+    // print("_onRefresh ");
+    // print("_onRefresh ");
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async{
+    // monitor network fetch
+
+    // await Future.delayed(Duration(milliseconds: 1000));
+
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    // items.add((items.length+1).toString());
+    print("_onLoading ");
+    // print("_onLoading ");
+    if(mounted)
+    setState(() {
+      print("mounted ");
+      // page += 1;
+    });
+    _loadData();
+    _refreshController.loadComplete();
+  }
 
   @override
   initState() {
@@ -44,18 +79,26 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   _scrollListener() async {
-    print(controller.position.extentAfter);
-    print("${controller.position.extentAfter <= 0 && !isLoaded}");
-    if (controller.position.extentAfter <= 0 && !isLoaded) {
-      page += 1;
-      setState(() {
-        isLoaded = true;
-      });
-      await _loadData();
-    }
+    // print(controller.position.extentAfter);
+    // print("${controller.position.extentAfter <= 0 && !isLoaded}");
+    // if (controller.position.extentAfter <= 0 && !isLoaded) {
+    //   page += 1;
+    //   setState(() {
+    //     isLoaded = true;
+    //   });
+    //   await _loadData();
+    // }
   }
 
   int pageCounter = 1;
+
+  // [{id: message:27886:346, user_id: 27886, user_name: AdilTest, 
+  // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/, 
+  // text: 40, time: 1591947445, type: 0, write: 0},
+
+// [{id: 145959, user_id: 27886, user_name: AdilTest, 
+// avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/, 
+// text: 20, time: 1591947417, type: 0, write: 0},
 
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
@@ -66,12 +109,14 @@ class _ChatPageState extends State<ChatPage> {
         case "chat:get":
           if (page == 1) {
             setState(() {
+              page += 1;
               myList = e.json['data'].toList();
             });
           } else {
             print(
                 '____________________________________________________________$page');
             setState(() {
+              page += 1;
               myList.addAll(e.json['data'].toList());
             });
           }
@@ -116,7 +161,12 @@ class _ChatPageState extends State<ChatPage> {
     print("WTF?????? $isLoaded"); 
     setState(() {
       isLoaded = false;
-      ChatRoom.shared.getMessages(widget.chatID, page: page);
+      // if(page==1){
+      //   ChatRoom.shared.getMessages(widget.chatID, page: 2);
+      // } else {
+        ChatRoom.shared.getMessages(widget.chatID, page: page);
+      // }
+      
     });
     
     print("load more with page $page");
@@ -142,23 +192,27 @@ class _ChatPageState extends State<ChatPage> {
           crossAxisAlignment: WrapCrossAlignment.center,
           alignment: WrapAlignment.center,
           children: <Widget>[
-            Text("${widget.name}", style: TextStyle(color: Colors.black)),
+            Text(
+              widget.name.length != 0 ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}" : "",
+              style: TextStyle(
+                  color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+            ),
             (widget.memberCount > 2)
                 ? Text(
                     'Участников ${widget.memberCount}',
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+                    style: TextStyle(color: Color(0xFF001D52), fontSize: 14, fontWeight: FontWeight.w400),
                   )
                 : Text(
                     'был в сети $online',
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+                    style: TextStyle(color: Color(0xFF001D52), fontSize: 14, fontWeight: FontWeight.w400),
                   ),
           ],
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.info_outline),
-            color: Colors.black,
-            onPressed: () {
+          InkWell(
+            child: Image.network(
+                'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
+            onTap: () {
               ChatRoom.shared.setChatInfoStream();
               Navigator.push(
                 context,
@@ -170,19 +224,49 @@ class _ChatPageState extends State<ChatPage> {
                     chatId: widget.chatID,
                   ),
                 ),
-              ).whenComplete(() {
-              });
+              ).whenComplete(() {});
             },
-          )
+          ),
+          // IconButton(
+          //   icon: Image.network(
+          //       'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
+          //   color: Colors.black,
+          //   onPressed: () {
+          //     ChatRoom.shared.setChatInfoStream();
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ChatProfileInfo(
+          //           chatName: widget.name,
+          //           chatAvatar: 'noAvatar.png',
+          //           chatMembers: widget.memberCount,
+          //           chatId: widget.chatID,
+          //         ),
+          //       ),
+          //     ).whenComplete(() {});
+          //   },
+          // )
         ],
         backgroundColor: Colors.white,
         brightness: Brightness.light,
       ),
       body: SafeArea(
-          child: Container(
+      child: Container(
         child: Stack(
           fit: StackFit.loose,
           children: <Widget>[
+            // Image(
+            //   width: MediaQuery.of(context).size.width,
+            //   image:
+            //       ExactAssetImage('assets/images/background_chat.png'),
+            //   fit: BoxFit.cover,
+            //   // colorFilter: ColorFilter.linearToSrgbGamma()
+            // ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: backgroundForChat
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisAlignment: MainAxisAlignment.start,
@@ -196,27 +280,45 @@ class _ChatPageState extends State<ChatPage> {
                   fit: FlexFit.tight,
                   // height: 500,
                   child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image:
-                              AssetImage('assets/images/background_chat.png'),
-                          fit: BoxFit.cover,
-                          colorFilter: ColorFilter.linearToSrgbGamma()),
-                    ),
+                    // width: MediaQuery.of(context).size.width,
+                    // decoration: BoxDecoration(
+                    //   image: DecorationImage(
+                    //       image:
+                    //           AssetImage('assets/images/background_chat.png'),
+                    //       fit: BoxFit.cover,
+                    //       colorFilter: ColorFilter.linearToSrgbGamma()),
+                    // ),
                     child: Container(
                       child: myList.isEmpty
                           ? Center(
                               child: Text("Loading"),
                             )
-                          :  ListView.builder(
-                                controller: controller,
-                                itemCount: myList.length,
-                                reverse: true,
-                                itemBuilder: (context, i) {
-                                  return message(myList[i]);
-                                },
-                              ),
+                          :  
+                          SmartRefresher(
+                            enablePullDown: false,
+                            enablePullUp: true,
+                            // header: WaterDropHeader(),
+                            footer: CustomFooter(
+                              builder: (BuildContext context,LoadStatus mode){
+                                Widget body ;
+                                return Container(
+                                  height: 55.0,
+                                  child: Center(child:body),
+                                );
+                              },
+                            ),
+                            controller: _refreshController,
+                            onRefresh: _onRefresh,
+                            onLoading: _onLoading,
+                            child: ListView.builder(
+                                  controller: controller,
+                                  itemCount: myList.length,
+                                  reverse: true,
+                                  itemBuilder: (context, i) {
+                                    return message(myList[i]);
+                                  },
+                                ),
+                          ),
                     ),
                   ),
                 ),
@@ -226,7 +328,7 @@ class _ChatPageState extends State<ChatPage> {
                 Container(
                   color: Colors.white,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
+                    padding: const EdgeInsets.only(left: 20, right: 5),
                     child: TextField(
                       maxLines: 6,
                       minLines: 1,
@@ -237,8 +339,11 @@ class _ChatPageState extends State<ChatPage> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {
-                            print('+++++++++++++++___________+++++++++++');
+// <<<<<<< HEAD
+//                             print('+++++++++++++++___________+++++++++++');
                             
+// =======
+// >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
                             ChatRoom.shared
                                 .sendMessage('${widget.chatID}', _text.text);
                             setState(() {
@@ -247,7 +352,7 @@ class _ChatPageState extends State<ChatPage> {
                           },
                         ),
                         border: InputBorder.none,
-                        hintText: "enter your message",
+                        hintText: "Введите сообщение",
                       ),
                     ),
                   ),
@@ -264,7 +369,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
     if (m['id'] == 'chat:message:create') return Devider(m);
-    return m['user_id'] == user.id ? Sended(m) : Received(m);
+    return "${m['user_id']}" == "${user.id}" ? Sended(m) : Received(m);
   }
 }
 
@@ -300,6 +405,7 @@ class Received extends StatelessWidget {
       child: ReceivedMessageWidget(
           content: '${m['text']}',
           time: time('${m['time']}'),
+          name: '${m['user_name']}',
           image: 'https://indigo24.xyz/uploads/avatars/${m['avatar']}'),
     );
   }
@@ -339,7 +445,14 @@ class Sended extends StatelessWidget {
       int.parse(timestamp) * 1000,
     );
     TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
-    // messageMinutes = '${roomBooked.minute}';
-    return '${roomBooked.hour}:${roomBooked.minute}';
+    var hours;
+    var minutes;
+    hours = '${roomBooked.hour}';
+    minutes = '${roomBooked.minute}';
+
+    if (roomBooked.hour.toString().length == 1) hours = '0${roomBooked.hour}';
+    if (roomBooked.minute.toString().length == 1)
+      minutes = '0${roomBooked.minute}';
+    return '$hours:$minutes';
   }
 }
