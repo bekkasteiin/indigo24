@@ -213,10 +213,12 @@ class DeviderMessageWidget extends StatelessWidget {
 class SendedMessageWidget extends StatelessWidget {
   final String content;
   final String time;
+  final String write;
   const SendedMessageWidget({
     Key key,
     this.content,
     this.time,
+    this.write,
   }) : super(key: key);
 
   
@@ -262,6 +264,21 @@ class SendedMessageWidget extends StatelessWidget {
 //                     style: TextStyle(fontWeight: FontWeight.w300),
 // >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
                   ),
+                ),
+                Positioned(
+                  bottom: -1,
+                  right: 3,
+                  child: write == '1'
+                      ? Icon(
+                          Icons.done_all,
+                          size: 16,
+                          color: Colors.blue,
+                        )
+                      : Icon(
+                          Icons.done,
+                          size: 16,
+                          color: Colors.grey[500],
+                        ),
                 ),
                 Positioned(
                   bottom: 1,

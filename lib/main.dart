@@ -70,31 +70,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   var chatsDB = ChatsDB();
-
-  @override
-  void initState() {
-    _tabController = new TabController(length: 4, vsync: this);
-    _setUser();
-    _connectivity.initialise();
-    _connectivity.myStream.listen((source) {
-      setState(() => _source = source);
-      switch (source.keys.toList()[0]) {
-        case ConnectivityResult.none:
-          break;
-        default:
-          ChatRoom.shared.setStream();
-          _connect();
-          ChatRoom.shared.init();
-          break;
-      }
-    });
-    _getChats();
-
-    super.initState();
-  }
-
-  _setUser() async {
-    user.id = await SharedPreferencesHelper.getString('customerID');
+  setUser() async {
+    user.id = await SharedPreferencesHelper.getCustomerID();
     user.phone = await SharedPreferencesHelper.getString('phone');
     user.balance = await SharedPreferencesHelper.getString('balance');
     user.balanceInBlock =
@@ -103,18 +80,73 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     user.email = await SharedPreferencesHelper.getString('email');
     user.avatar = await SharedPreferencesHelper.getString('avatar');
     user.unique = await SharedPreferencesHelper.getString('unique');
+    return user.id;
+  }
+
+  @override
+  void initState() {
+    _tabController = new TabController(length: 4, vsync: this);
+
+    setUser().then((result) async{
+      ChatRoom.shared.userId = user.id;
+       print("result: $result");
+       print('user: ${user.id}');
+       print('user: ${user.name}');
+       print('user: ${user.balance}');
+
+      _connectivity.initialise();
+      _connectivity.myStream.listen((source) {
+        setState(() => _source = source);
+        print("Connectivity result $source");
+        switch (source.keys.toList()[0]) {
+          case ConnectivityResult.none:
+            print("NO INTERNET");
+            ChatRoom.shared.closeConnection();
+            ChatRoom.shared.closeStream();
+            setState(() {
+              initIsCalling = 1;
+            });
+            break;
+          default:
+            print("DEFAULT ");
+            _init();
+            // ChatRoom.shared.setStream();
+            // _connect();
+            // ChatRoom.shared.init();
+            break;
+        }
+      });
+
+      setState(() {});
+    });
+
+    super.initState();
+  }
+
+  var initIsCalling = 1;
+
+  _init() {
+    if (initIsCalling == 1) {
+      ChatRoom.shared.connect();
+      ChatRoom.shared.setStream();
+      _connect();
+      ChatRoom.shared.init();
+      setState(() {
+        initIsCalling += 1;
+      });
+    }
   }
 
   _connect() async {
-    ChatRoom.shared.listen();
+    // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
       print(e.json);
-       setState(() {
-          chatsPage += 1;
-          myList = e.json['data'].toList();
-          chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
-        });
+      setState(() {
+        // chatsPage += 1;
+        myList = e.json['data'].toList();
+        chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
+      });
       // if (chatsPage == 1) {
       //   setState(() {
       //     chatsPage += 1;

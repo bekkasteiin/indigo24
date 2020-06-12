@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/services/user.dart' as user;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -83,12 +84,19 @@ class _LoginPageState extends State<LoginPage> {
         print(result);
         if (result['success'] == true) {
           SharedPreferencesHelper.setString('customerID', '${result['ID']}');
-          SharedPreferencesHelper.setString(
-              'phone', '+$phonePrefix${loginController.text}');
+          SharedPreferencesHelper.setString('phone', '+$phonePrefix${loginController.text}');
           SharedPreferencesHelper.setString('name', '${result['name']}');
           SharedPreferencesHelper.setString('email', '${result['email']}');
           SharedPreferencesHelper.setString('avatar', '${result['avatar']}');
           SharedPreferencesHelper.setString('unique', '${result['unique']}');
+
+          user.id = '${result['ID']}';
+          user.phone = '+$phonePrefix${loginController.text}';
+          user.name = '${result['name']}';
+          user.email = '${result['email']}';
+          user.avatar = '${result['avatar']}';
+          user.unique = '${result['unique']}';
+
           return true;
         } else {
           _showError(context, result["message"]);
@@ -120,6 +128,10 @@ class _LoginPageState extends State<LoginPage> {
               'balance', '${result['result']['balance']}');
           SharedPreferencesHelper.setString(
               'balanceInBlock', '${result['result']['balanceInBlock']}');
+
+          user.balance = '${result['result']['balance']}'; 
+          user.balanceInBlock = '${result['result']['balanceInBlock']}';
+             
           return true;
         }
       } else {

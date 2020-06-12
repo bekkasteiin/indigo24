@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -374,7 +375,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             _buildCoverImage(screenSize),
             Column(
               children: <Widget>[
-                SizedBox(height: 5),
+                SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
@@ -382,9 +383,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
-                            SharedPreferences preferences =
-                                await SharedPreferences.getInstance();
-                            await preferences.clear();
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => IntroPage()),
@@ -392,7 +390,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           },
                           child: Ink(
                             child: Text("Выйти",
-                                style: TextStyle(color: Colors.white)),
+                                style: TextStyle(color: Colors.white, fontSize: 18)),
                           )),
                     ),
                     SizedBox(width: 10),

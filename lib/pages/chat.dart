@@ -104,10 +104,11 @@ class _ChatPageState extends State<ChatPage> {
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
       print("CABINET EVENT");
-      // print(e.json);
+      print(e.json);
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
+
           if (page == 1) {
             setState(() {
               page += 1;
@@ -213,7 +214,7 @@ class _ChatPageState extends State<ChatPage> {
                   : online == null
                       ? Container()
                       : Text(
-                          'был в сети $online',
+                          ('$online' == 'online' || '$online' == 'offline') ? '$online' : 'был в сети $online', 
                           style: TextStyle(
                               color: Color(0xFF001D52),
                               fontSize: 14,
@@ -462,6 +463,7 @@ class Sended extends StatelessWidget {
         child: SendedMessageWidget(
           content: '${m['text']}',
           time: time('${m['time']}'),
+          write: '${m['write']}',
         ));
   }
 

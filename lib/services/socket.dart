@@ -6,7 +6,7 @@ import 'package:indigo24/services/user.dart' as user;
 
 class ChatRoom {
   static var shared = ChatRoom();
-  final channel =
+  var channel =
       new IOWebSocketChannel.connect('wss://chat.indigo24.xyz:9502');
 
   var changeController;
@@ -63,6 +63,11 @@ class ChatRoom {
     changeController.close();
   }
 
+
+  closeConnection(){
+    channel.sink.close();
+  }
+
   init() {
     print("Init is called");
 
@@ -73,6 +78,7 @@ class ChatRoom {
         "userToken": "$userToken",
       }
     });
+    print("INIT DATA $data");
     channel.sink.add(data);
   }
 
@@ -193,7 +199,13 @@ class ChatRoom {
     channel.sink.add(jsonEncode(data));
   }
 
+  connect(){
+    channel = new IOWebSocketChannel.connect('wss://chat.indigo24.xyz:9502');
+    listen();
+  }
+
   listen() {
+    
     channel.stream.listen(
       (event) {
         var json = jsonDecode(event);
@@ -202,24 +214,28 @@ class ChatRoom {
         var data = json['data'];
         switch (cmd) {
           case "init":
+
             print(userId);
             print(data);
-            if (data['status'] == 'true') {
-              var data = {
-                "cmd": 'chats:get',
-                "data": {
-                  "user_id": "$userId",
-                  "userToken": "$userToken",
-                  "page": '1',
-                }
-              };
-              channel.sink.add(jsonEncode(data));
+            if (data['status'].toString() == 'true') {
+              print("INIT status is ${data['status']}");
+              forceGetChat();
+              // var obj = {
+              //   "cmd": 'chats:get',
+              //   "data": {
+              //     "user_id": "$userId",
+              //     "userToken": "$userToken",
+              //     "page": '1',
+              //   }
+              // };
+              // channel.sink.add(jsonEncode(obj));
             }
             break;
           case "chats:get":
             changeController.add(new MyEvent(json));
             break;
           case "chat:get":
+
             cabinetController.add(new MyCabinetEvent(json));
             break;
           case "message:create":
@@ -254,6 +270,8 @@ class ChatRoom {
         }
       },
       onDone: () {
+        print("ON DONE IS CALLED");
+        connect();
         init();
       },
     );

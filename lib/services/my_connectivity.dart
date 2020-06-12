@@ -18,15 +18,15 @@ class MyConnectivity {
   void initialise() async {
     ConnectivityResult result = await connectivity.checkConnectivity();
     _checkStatus(result);
-    // connectivity.onConnectivityChanged.listen((result) {
-    //   _checkStatus(result);
-    // });
+    connectivity.onConnectivityChanged.listen((result) {
+      _checkStatus(result);
+    });
   }
 
   void _checkStatus(ConnectivityResult result) async {
     bool isOnline = false;
     try {
-      final result = await InternetAddress.lookup('example.com');
+      final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         isOnline = true;
       } else

@@ -241,7 +241,12 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                 //     icon: Icons.share,
                                 //   ),
                                 // ],
-                                secondaryActions: <Widget>[
+                                secondaryActions: 
+                                
+                                "${membersList[i]["role"]}" == '0' ? 
+                                <Widget>[]
+                                :
+                                <Widget>[
                                   // IconSlideAction(
                                   //   caption: 'More',
                                   //   color: Colors.black45,
@@ -260,7 +265,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                       });
                                     },
                                   ),
-                                ],
+                                ]
+                                ,
                                 child: ListTile(
                                   onTap: () {
                                     // ChatRoom.shared.checkUserOnline(ids);
@@ -278,6 +284,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                           : CachedNetworkImageProvider(
                                               'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}')),
                                   title: Text("${membersList[i]["user_name"]}"),
+                                  subtitle: "${membersList[i]["role"]}" == '0' ? Text('Создатель') : Text('Участник'),
                                 ),
                               );
                             },

@@ -6,3 +6,14 @@ var unique = "";
 var phone = "";
 var balance = "";
 var balanceInBlock = "";
+
+void delete() {
+  id = "";
+  avatar = "";
+  email = "";
+  name = "";
+  unique = "";
+  phone = "";
+  balance = "";
+  balanceInBlock = "";
+}

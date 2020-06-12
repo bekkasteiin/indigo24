@@ -62,10 +62,12 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "user:check":
-          if (e.json['data']['chat_id'] != null &&
-              e.json['data']['status'] == 'true') {
+          if ("${e.json['data']['chat_id']}" != "null" &&
+              "${e.json['data']['status']}" == 'true') {
             print(tempIndex);
-            _saved.add(tempIndex);
+            setState(() {
+              _saved.add(tempIndex);
+            });
             print('${e.json['data']}');
             _userIds.add('${e.json['data']['user_id']}');
             // Navigator.push(
@@ -220,7 +222,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     return FutureBuilder(
       future: _future,
       builder: (context, snapshot) {
-        if (snapshot.hasData == true) {
+       
           return Scaffold(
               appBar: AppBar(
                 leading: IconButton(
@@ -250,13 +252,13 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                         if (_userIds.length > 1) {
                           if (_titleController.text.isNotEmpty) {
                             ChatRoom.shared.cabinetCreate(
-                              _userIds.join(', ') + '${user.id}',
+                              _userIds.join(','),
                               1,
                               title: _titleController.text,
                             );
                           } else {
                             print('chat name is empty');
-                            _showError(context, 'Название чата пуст');
+                            _showError(context, 'Отсутствует название чата');
                           }
                         } else {
                           print('member count less than 3');
@@ -349,9 +351,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       ],
                     )
                   : Center(child: CircularProgressIndicator()));
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
       },
     );
   }

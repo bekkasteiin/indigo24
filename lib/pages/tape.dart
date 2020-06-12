@@ -96,7 +96,6 @@ class _TapePageState extends State<TapePage>
                               shrinkWrap: true,
                               itemCount: com.length,
                               itemBuilder: (context, index) {
-                                print(tapeResult['comments'][index]);
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -220,6 +219,7 @@ class _TapePageState extends State<TapePage>
                                 setState(() {
                                   tapeResult.cast<String, dynamic>();
                                 });
+                                letterCount = 150;
                                 await api.addCommentToTape(
                                   '${_commentController.text}',
                                   '${widget.tape['id']}',
