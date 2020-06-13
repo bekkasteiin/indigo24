@@ -148,9 +148,13 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: Colors.black,
+        icon: Container(
+          padding: EdgeInsets.all(10),
+          child: Image(
+            image: AssetImage(
+              'assets/images/back.png',
+            ),
+          ),
         ),
         onPressed: () {
           Navigator.pop(context);
@@ -168,10 +172,14 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       ),
       actions: <Widget>[
         IconButton(
-          icon: Icon(
-            Icons.history,
-            color: Colors.black,
+          icon: Container(
+          padding: EdgeInsets.all(5),
+          child: Image(
+            image: AssetImage(
+              'assets/images/history.png',
+            ),
           ),
+        ),
           onPressed: () {
             // StudentDao().deleteAll();
             Navigator.push(

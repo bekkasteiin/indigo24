@@ -201,6 +201,19 @@ class _AddTapePageState extends State<AddTapePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        leading: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
+              ),
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         iconTheme: IconThemeData(
           color: Colors.black,
         ),

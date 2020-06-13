@@ -26,7 +26,6 @@ class _LoginPageState extends State<LoginPage> {
   var _countries;
   var phonePrefix = '77';
   List _titles = [];
-  List<DropdownMenuItem<String>> _dropDownMenuItems;
   String _currentCountry = "Казахстан";
 
   _getCountries() async {
@@ -40,8 +39,6 @@ class _LoginPageState extends State<LoginPage> {
           _titles.add(_countries[i]['title']);
         }
         country = _countries[countryId];
-        _dropDownMenuItems = getDropDownMenuItems(_titles);
-        _currentCountry = _titles[0];
       });
     });
   }
@@ -84,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
         print(result);
         if (result['success'] == true) {
           SharedPreferencesHelper.setString('customerID', '${result['ID']}');
-          SharedPreferencesHelper.setString('phone', '+$phonePrefix${loginController.text}');
+          SharedPreferencesHelper.setString(
+              'phone', '+$phonePrefix${loginController.text}');
           SharedPreferencesHelper.setString('name', '${result['name']}');
           SharedPreferencesHelper.setString('email', '${result['email']}');
           SharedPreferencesHelper.setString('avatar', '${result['avatar']}');
@@ -129,9 +127,9 @@ class _LoginPageState extends State<LoginPage> {
           SharedPreferencesHelper.setString(
               'balanceInBlock', '${result['result']['balanceInBlock']}');
 
-          user.balance = '${result['result']['balance']}'; 
+          user.balance = '${result['result']['balance']}';
           user.balanceInBlock = '${result['result']['balanceInBlock']}';
-             
+
           return true;
         }
       } else {
@@ -188,152 +186,186 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildForeground() {
-    return Container(
-      child: ListView(
-        children: <Widget>[
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _space(200),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  // height: MediaQuery.of(context).size.height*0.4,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(5.0),
-                      topLeft: Radius.circular(5.0),
-                      bottomRight: Radius.circular(5.0),
-                      bottomLeft: Radius.circular(5.0),
-                    ),
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                // height: MediaQuery.of(context).size.height*0.4,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(5.0),
+                    topLeft: Radius.circular(5.0),
+                    bottomRight: Radius.circular(5.0),
+                    bottomLeft: Radius.circular(5.0),
                   ),
-                  child: Column(
-                    children: <Widget>[
-                      _space(10),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: Row(
-                          children: <Widget>[
-                            DropdownButton(
-                              value: _currentCountry,
-                              items: _dropDownMenuItems,
-                              onChanged: changedDropDownItem,
+                ),
+                child: Column(
+                  children: <Widget>[
+                    _space(10),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+                      child: Row(
+                        children: <Widget>[
+                          InkWell(
+                            child: Ink(
+                              child: Text('$_currentCountry',
+                                  style: TextStyle(
+                                      color: Color(0xFF001D52), fontSize: 18)),
                             ),
-                          ],
-                        ),
+                            onTap: changeCountry,
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Text("Номер телефона",
-                                    style: TextStyle(
-                                        color: Color(0xff0543B8), fontSize: 16))
-                              ],
-                            ),
-                            TextField(
-                              controller: loginController,
-                              decoration: InputDecoration(
-                                  prefixText: "+" + phonePrefix,
-                                  hintText: "xx xxx xx xx"),
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Text("Пароль",
-                                    style: TextStyle(
-                                        color: Color(0xff0543B8), fontSize: 16))
-                              ],
-                            ),
-                            TextField(
-                              controller: passwordController,
-                              obscureText: _obscureText,
-                              decoration: InputDecoration(
-                                hintText: '•••••••',
-                                suffixIcon: GestureDetector(
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text("Номер телефона",
+                                  style: TextStyle(
+                                      color: Color(0xFF001D52), fontSize: 16))
+                            ],
+                          ),
+                          Stack(
+                            alignment: Alignment.centerLeft,
+                            children: <Widget>[
+                              Text(
+                                '+$phonePrefix',
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 15),
+                              ),
+                              TextField(
+                                controller: loginController,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black,
+                                  hoverColor: Colors.black,
+                                  prefixText: '1$phonePrefix ',
+                                  prefixStyle:
+                                      TextStyle(color: Colors.transparent),
+                                ),
+                              ),
+                            ],
+                          ),
+                          _space(30),
+                          Row(
+                            children: <Widget>[
+                              Text("Пароль",
+                                  style: TextStyle(
+                                      color: Color(0xFF001D52), fontSize: 16))
+                            ],
+                          ),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: _obscureText,
+                            decoration: InputDecoration(
+                              hintText: '•••••••',
+                              suffixIcon: GestureDetector(
                                   onTap: () {
                                     setState(() {
                                       _obscureText = !_obscureText;
                                     });
                                   },
-                                  child: Icon(
-                                    _obscureText
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    semanticLabel: _obscureText
-                                        ? 'show password'
-                                        : 'hide password',
-                                  ),
-                                ),
-                              ),
+                                  child: _obscureText
+                                      ? Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Image(
+                                            image: AssetImage(
+                                              'assets/images/back.png',
+                                            ),
+                                            height: 20,
+                                            width: 20,
+                                          ),
+                                        )
+                                      : Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Image(
+                                            image: AssetImage(
+                                              'assets/images/eyeOpen.png',
+                                            ),
+                                            height: 20,
+                                            width: 20,
+                                          ),
+                                        )),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      _space(70),
-                      Text(
-                        'ЗАБЫЛИ ПАРОЛЬ?',
-                        style: TextStyle(color: Color(0xff898DA5)),
+                    ),
+                    _space(30),
+                    Text(
+                      'ЗАБЫЛИ ПАРОЛЬ?',
+                      style: TextStyle(color: Color(0xFF444444)),
+                    ),
+                    _space(20),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      // decoration: BoxDecoration(
+                      //   color: Color(0xff0543B8),
+                      //   borderRadius: BorderRadius.only(
+                      //     topRight: Radius.circular(10.0),
+                      //     topLeft: Radius.circular(10.0),
+                      //     bottomRight: Radius.circular(10.0),
+                      //     bottomLeft: Radius.circular(10.0),
+                      //   ),
+                      // ),
+                      child: ProgressButton(
+                        defaultWidget: Text("Далее",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w300)),
+                        progressWidget: CircularProgressIndicator(),
+                        borderRadius: 10.0,
+                        color: Color(0xFF0543B8),
+                        onPressed: () async {
+                          if (await signIn() == true) {
+                            await getBalance();
+                            return () {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => Tabs()),
+                                  (r) => false);
+                            };
+                          }
+                        },
                       ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        // decoration: BoxDecoration(
-                        //   color: Color(0xff0543B8),
-                        //   borderRadius: BorderRadius.only(
-                        //     topRight: Radius.circular(10.0),
-                        //     topLeft: Radius.circular(10.0),
-                        //     bottomRight: Radius.circular(10.0),
-                        //     bottomLeft: Radius.circular(10.0),
-                        //   ),
-                        // ),
-                        child: ProgressButton(
-                          defaultWidget: Text("Далее",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 22)),
-                          progressWidget: CircularProgressIndicator(),
-                          borderRadius: 10.0,
-                          color: Color(0xff0543B8),
-                          onPressed: () async {
-                            if (await signIn() == true) {
-                              await getBalance();
-                              return () {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => Tabs()),
-                                    (r) => false);
-                              };
-                            }
-                          },
-                        ),
-                      ),
-                      _space(10),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
+                    ),
+                    _space(50),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 
-  void changedDropDownItem(String selectedCountry) {
-    print("Selected county $selectedCountry, we are going to refresh the UI");
-    print("TEST $_countries");
-    for (var i = 0; i < _countries.length; i++) {
-      if (_countries[i]['title'] == selectedCountry) {
-        countryId = i;
-        phonePrefix = _countries[countryId]['prefix'];
-      }
-    }
-    setState(() {
-      _currentCountry = selectedCountry;
-    });
-    print("Current country is $_currentCountry and prefix $phonePrefix");
+  var _selectedCountry;
+
+  Future<void> changeCountry() async {
+    _selectedCountry = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Countries(_countries)),
+    );
+
+    if (_selectedCountry != null)
+      setState(() {
+        _currentCountry = _selectedCountry['title'];
+        phonePrefix = _selectedCountry['prefix'];
+      });
   }
 
   _space(double h) {
@@ -359,6 +391,80 @@ class _LoginPageState extends State<LoginPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
             10.0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Countries extends StatelessWidget {
+  final countries;
+  Countries(this.countries);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
+              ),
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        brightness: Brightness.light,
+        title: Text(
+          "Страна",
+          style: TextStyle(
+            color: Color(0xFF001D52),
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.white,
+      ),
+      body: SafeArea(
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 10),
+          child: ListView.separated(
+            itemCount: countries.length,
+            itemBuilder: (BuildContext context, int index) {
+              return InkWell(
+                child: Container(
+                  height: 20,
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding: EdgeInsets.only(left: 5),
+                  child: Text(
+                    '${countries[index]['title']}',
+                    style: TextStyle(
+                      color: Color(0xFF001D52),
+                      fontWeight: FontWeight.w400,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  print('${countries[index]['title']}');
+                  Navigator.of(context).pop(countries[index]);
+                },
+              );
+            },
+            separatorBuilder: (context, index) {
+              return Container(
+                margin: EdgeInsets.only(left: 20),
+                height: 0.2,
+                color: Colors.black,
+              );
+            },
           ),
         ),
       ),

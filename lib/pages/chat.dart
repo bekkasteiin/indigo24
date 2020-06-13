@@ -190,6 +190,19 @@ class _ChatPageState extends State<ChatPage> {
         iconTheme: IconThemeData(
           color: Colors.black,
         ),
+        leading: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
+              ),
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: InkWell(
           child: Wrap(
             direction: Axis.vertical,

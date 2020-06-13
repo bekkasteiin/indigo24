@@ -50,9 +50,13 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: Colors.black,
+        icon: Container(
+          padding: EdgeInsets.all(10),
+          child: Image(
+            image: AssetImage(
+              'assets/images/back.png',
+            ),
+          ),
         ),
         onPressed: () {
           Navigator.pop(context);

@@ -9,6 +9,11 @@ import 'payments_category.dart';
 import 'transfer_list.dart';
 import 'package:indigo24/services/user.dart' as user;
 
+class MyBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) => ClampingScrollPhysics();
+}
+
 class WalletTab extends StatefulWidget {
   @override
   _WalletTabState createState() => _WalletTabState();
@@ -53,38 +58,52 @@ class _WalletTabState extends State<WalletTab> {
           ),
           preferredSize: Size.fromHeight(0.0),
         ),
-        body: Stack(
-          children: <Widget>[
-            Image.asset(
-              'assets/images/walletBackground.png',
-              fit: BoxFit.fill,
-            ),
-            SingleChildScrollView(
-              child: Column(
+        body: ScrollConfiguration(
+          behavior: MyBehavior(),
+          child: SingleChildScrollView(
+            child: Container(
+              child: Stack(
                 children: <Widget>[
-                  SizedBox(height: 10),
-                  Text('Кошелек', style: fS26(c: 'ffffff')),
-                  _devider(),
-                  _balance(),
-                  SizedBox(height: 10),
-                  _balanceAmount(),
-                  _exchangeButtons(),
-                  _blockedBalance(size),
-                  SizedBox(height: 20),
-                  _payInOut(size),
-                  SizedBox(height: 20),
-                  _payments(size),
-                  SizedBox(height: 20),
-                  _transfer(size),
-                  SizedBox(height: 20),
+                  Image.asset(
+                    'assets/images/walletBackground.png',
+                    fit: BoxFit.fill,
+                  ),
+                  Column(
+                    children: <Widget>[
+                      SizedBox(height: 10),
+                      Text('Кошелек', style: fS26(c: 'ffffff')),
+                      _devider(),
+                      _balance(),
+                      SizedBox(height: 10),
+                      _balanceAmount(),
+                      _exchangeButtons(),
+                      _blockedBalance(size),
+                      SizedBox(height: 20),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                        child: Column(
+                          children: <Widget>[
+                            _payInOut(size),
+                            SizedBox(height: 20),
+                            _payments(size),
+                            SizedBox(height: 20),
+                            _transfer(size),
+                            SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
+
+
 
   Container _transfer(Size size) {
     return Container(
@@ -106,7 +125,6 @@ class _WalletTabState extends State<WalletTab> {
             );
           },
           child: Container(
-            width: size.width * 0.72,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -150,7 +168,6 @@ class _WalletTabState extends State<WalletTab> {
             offset: Offset(0.0, 0.0))
       ]),
       child: ButtonTheme(
-        minWidth: size.width * 0.8,
         height: 70,
         child: RaisedButton(
           onPressed: () {
@@ -160,7 +177,6 @@ class _WalletTabState extends State<WalletTab> {
             );
           },
           child: Container(
-            width: size.width * 0.72,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -233,7 +249,7 @@ class _WalletTabState extends State<WalletTab> {
 
   Row _payInOut(Size size) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Container(
           decoration: BoxDecoration(boxShadow: [
@@ -244,7 +260,7 @@ class _WalletTabState extends State<WalletTab> {
                 offset: Offset(0.0, 0.0))
           ]),
           child: ButtonTheme(
-            minWidth: size.width * 0.35,
+            minWidth: size.width * 0.42,
             height: 50,
             child: RaisedButton(
               onPressed: () {
@@ -254,9 +270,12 @@ class _WalletTabState extends State<WalletTab> {
                   MaterialPageRoute(builder: (context) => RefillPage()),
                 );
               },
-              child: const Text(
-                'ПОПОЛНИТЬ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: FittedBox(
+                  fit:BoxFit.fitWidth, 
+                  child: const Text(
+                  'ПОПОЛНИТЬ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               color: Color(0xFFFFFFFF),
               textColor: Color(0xFF0543B8),
@@ -277,7 +296,7 @@ class _WalletTabState extends State<WalletTab> {
                 offset: Offset(0.0, 0.0))
           ]),
           child: ButtonTheme(
-            minWidth: size.width * 0.35,
+            minWidth: size.width * 0.42,
             height: 50,
             child: RaisedButton(
               onPressed: () {
@@ -287,9 +306,12 @@ class _WalletTabState extends State<WalletTab> {
                   MaterialPageRoute(builder: (context) => WithdrawPage()),
                 );
               },
-              child: Text(
-                'ВЫВЕСТИ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: FittedBox(
+                  fit:BoxFit.fitWidth, 
+                  child: const Text(
+                  'ВЫВЕСТИ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               color: Color(0xFFFFFFFF),
               textColor: Color(0xFF0543B8),

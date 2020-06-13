@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/user.dart' as user;
+
 class TapePage extends StatefulWidget {
   final tape;
   TapePage(this.tape);
@@ -53,8 +54,14 @@ class _TapePageState extends State<TapePage>
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          color: Colors.black,
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
+              ),
+            ),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -118,8 +125,7 @@ class _TapePageState extends State<TapePage>
                                           SizedBox(
                                             width: 10,
                                           ),
-                                          Text(
-                                              '${com[index]['name']}'),
+                                          Text('${com[index]['name']}'),
                                         ],
                                       ),
                                     ),
@@ -220,18 +226,20 @@ class _TapePageState extends State<TapePage>
                                   tapeResult.cast<String, dynamic>();
                                 });
                                 letterCount = 150;
-                                await api.addCommentToTape(
+                                await api
+                                    .addCommentToTape(
                                   '${_commentController.text}',
                                   '${widget.tape['id']}',
-                                ).then((v) {
+                                )
+                                    .then((v) {
                                   // tapeResult
                                   // {avatar: image4.png, comment: hahahahah, customerID: 113626, email: test@test.ru, name: test, phone: 77076562123}
                                   var result = {
-                                    "avatar" : "${user.avatar}",
-                                    "comment" : "${_commentController.text}",
+                                    "avatar": "${user.avatar}",
+                                    "comment": "${_commentController.text}",
                                     "name": "${user.name}",
                                   };
-                                  setState((){
+                                  setState(() {
                                     com.add(result);
                                   });
                                   print(v);

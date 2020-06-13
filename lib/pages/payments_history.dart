@@ -15,7 +15,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        SizedBox(height: 20),
         Row(
           children: <Widget>[
             SizedBox(width: 20),
@@ -26,8 +25,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           ],
         ),
         Container(
-          margin: EdgeInsets.only(top: 20, right: 20, left: 20),
-          height: 1,
+          margin: EdgeInsets.only(top: 5, right: 20, left: 20),
+          height: 0.2,
           color: Color(0xFF7D8E9B),
         ),
       ],
@@ -74,7 +73,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             "$title",
             style: TextStyle(
               fontSize: 16,
-              color: Color(0xFF001D52),
+              color: Color(0xFF636973),
               fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
@@ -84,7 +83,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             style: TextStyle(
               fontSize: 12,
               color: Color(0xFF001D52),
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -92,6 +91,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             "$date",
             style: TextStyle(
               fontSize: 10,
+              color: Color(0xFF001D52),
               fontWeight: FontWeight.w300,
             ),
             overflow: TextOverflow.ellipsis,
@@ -105,9 +105,13 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: Colors.black,
+        icon: Container(
+          padding: EdgeInsets.all(10),
+          child: Image(
+            image: AssetImage(
+              'assets/images/back.png',
+            ),
+          ),
         ),
         onPressed: () {
           Navigator.pop(context);
@@ -150,8 +154,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       child: ListView.builder(
         itemCount: snapshot['payments'].length,
         itemBuilder: (BuildContext context, int index) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 5),
+          return Container(
+            padding: const EdgeInsets.only(top: 10),
+            height: 96,
             child: _historyBuilder(
               context,
               "${snapshot['logoURL']}${snapshot['payments'][index]['logo']}",

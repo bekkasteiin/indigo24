@@ -12,9 +12,9 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
 import 'db/chats_model.dart';
-import 'pages/chat_group.dart';
 import 'pages/profile.dart';
 import 'pages/tapes.dart';
+import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 
@@ -22,22 +22,37 @@ import 'services/socket.dart';
 //   runApp(MyApp());
 // }
 
+ 
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var phone = prefs.getString('phone');
+  var unique = prefs.getString('unique');
+  var customerID = prefs.getString('customerID');
   print(phone);
+  print(unique);
+  print(customerID);
+  Api api = Api();
+  
+  // await api.checkUnique(unique,customerID).then((r) async {
+    
+  //   });
 
   runApp(MyApp(phone: phone));
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({
     Key key,
     @required this.phone,
   }) : super(key: key);
 
   final String phone;
+
+
+
 
   @override
   Widget build(BuildContext context) {

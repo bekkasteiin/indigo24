@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -61,12 +62,25 @@ class _TransferPageState extends State<TransferPage> {
                   Positioned(
                     child: AppBar(
                       title: Text("Клиенту Indigo24"),
+                      leading: IconButton(
+                        icon: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Image(
+                            image: AssetImage(
+                              'assets/images/backWhite.png',
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
                       backgroundColor: Colors.transparent,
                       elevation: 0,
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 45, left: 20, right: 20),
+                    margin: EdgeInsets.only(top: 45, left: 0, right: 20), 
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -77,7 +91,7 @@ class _TransferPageState extends State<TransferPage> {
                           color: Color(0xFFD1E1FF),
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 10, right: 10),
+                          margin: EdgeInsets.only(left: 30, right: 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -88,7 +102,7 @@ class _TransferPageState extends State<TransferPage> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '${user.balance}',
+                                '${user.balance} ₸',
                                 style: fS18(c: 'FFFFFF'),
                               ),
                             ],
@@ -112,9 +126,13 @@ class _TransferPageState extends State<TransferPage> {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: Colors.white,
+        icon: Container(
+          padding: EdgeInsets.all(10),
+          child: Image(
+            image: AssetImage(
+              'assets/images/back.png',
+            ),
+          ),
         ),
         onPressed: () {
           Navigator.pop(context);
@@ -137,13 +155,16 @@ class _TransferPageState extends State<TransferPage> {
     return Container(
       height: 50,
       width: 200,
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [
-        BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                spreadRadius: -2,
+                offset: Offset(0.0, 0.0))
+          ]),
       alignment: Alignment.center,
       margin: EdgeInsets.only(top: 20, bottom: 10),
       child: ButtonTheme(
@@ -154,8 +175,8 @@ class _TransferPageState extends State<TransferPage> {
             api.checkPhoneForSendMoney(receiverController.text).then((result) {
               print('to id ${result["toID"]}, ${sumController.text}');
               print('$result');
-              if(result["success"]){
-                api.doTransfer(result["toID"], sumController.text).then((res){
+              if (result["success"]) {
+                api.doTransfer(result["toID"], sumController.text).then((res) {
                   print("sending $res");
                 });
               }
@@ -165,7 +186,7 @@ class _TransferPageState extends State<TransferPage> {
           child: Text(
             'Перевести',
             style: TextStyle(
-                color: Color(0xFF0543B8), fontWeight: FontWeight.w600),
+                color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
           ),
         ),
       ),
@@ -201,11 +222,19 @@ class _TransferPageState extends State<TransferPage> {
                   ],
                 ),
               ),
-              Container(
-                width: 40,
-                child: Image.network(
-                    'https://media.indigo24.com/avatars/noAvatar.png',
-                    width: 40.0),
+              InkWell(
+                child: CircleAvatar(
+                  radius: 20,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          "https://media.indigo24.com/avatars/noAvatar.png",
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  print('transfer avatar is pressed');
+                },
               ),
             ],
           ),
@@ -250,52 +279,6 @@ class _TransferPageState extends State<TransferPage> {
 
   final amountController = TextEditingController();
 
-  Widget mainScreen(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 20,
-          ),
-          mainPaymentIndigoPurse(),
-          SizedBox(
-            height: 10,
-          ),
-          mainPaymentsDetailMobile(),
-          _transferButton(),
-        ],
-      ),
-    );
-  }
-
-  Container _transferButton() {
-    return Container(
-      height: 50,
-      width: 200,
-      decoration: BoxDecoration(
-        color: Colors.lightBlue,
-        //@BOXSHADOW
-        // boxShadow: const [
-        //   BoxShadow(blurRadius: 3),
-        // ],
-      ),
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(top: 20, bottom: 10),
-      child: ButtonTheme(
-        minWidth: double.infinity,
-        child: FlatButton(
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onPressed: () async {
-            api.checkPhoneForSendMoney(receiverController.text);
-          },
-          child: Text(
-            'Перевести',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
 
   Container mainPaymentIndigoPurse() {
     return Container(

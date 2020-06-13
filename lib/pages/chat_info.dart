@@ -183,7 +183,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
+                        icon: Container(
+                          padding: EdgeInsets.all(5),
+                          child: Image(
+                            image: AssetImage(
+                              'assets/images/backWhite.png',
+                            ),
+                          ),
+                        ),
                         color: Colors.white,
                         onPressed: () {
                           Navigator.pop(context);

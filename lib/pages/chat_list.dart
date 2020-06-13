@@ -101,7 +101,14 @@ class _ChatsListPageState extends State<ChatsListPage>
         brightness: Brightness.light,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.contact_phone),
+            icon: Container(
+              padding: EdgeInsets.symmetric(vertical: 10), 
+              child: Image(
+                image: AssetImage(
+                  'assets/images/eyeClose.png',
+                ),
+              ),
+            ),
             iconSize: 30,
             color: Color(0xFF001D52),
             onPressed: () {

@@ -50,6 +50,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   }
 
   Expanded _transferInfo(String name, String date, String phone) {
+    date = date.substring(0, date.length - 3);
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +128,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       child: ListView.builder(
         itemCount: snapshot['transactions'].length,
         itemBuilder: (BuildContext context, int index) {
-          return Padding(
+          return Container(
             padding: const EdgeInsets.only(top: 5),
             child: _historyBuilder(
               context,
@@ -179,9 +180,13 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: Colors.black,
+        icon: Container(
+          padding: EdgeInsets.all(10),
+          child: Image(
+            image: AssetImage(
+              'assets/images/back.png',
+            ),
+          ),
         ),
         onPressed: () {
           Navigator.pop(context);

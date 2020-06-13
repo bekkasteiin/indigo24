@@ -199,8 +199,14 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         return Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                color: Colors.black,
+                icon: Container(
+                  padding: EdgeInsets.all(10),
+                  child: Image(
+                    image: AssetImage(
+                      'assets/images/back.png',
+                    ),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
