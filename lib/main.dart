@@ -88,7 +88,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     _tabController = new TabController(length: 4, vsync: this);
 
     setUser().then((result) async{
-      ChatRoom.shared.userId = user.id;
        print("result: $result");
        print('user: ${user.id}');
        print('user: ${user.name}');
@@ -141,7 +140,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
-      print(e.json);
+      // print(e.json);
       setState(() {
         // chatsPage += 1;
         myList = e.json['data'].toList();
@@ -199,11 +198,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             preferredSize: Size.fromHeight(50.0),
             child: Container(
               padding: EdgeInsets.only(
-                top: 0,
+                top: 5,
                 left: 0,
                 right: 0,
               ),
-              height: 50,
+              height: 55,
               child: TabBar(
                   indicatorPadding: EdgeInsets.all(1),
                   labelPadding: EdgeInsets.all(0),

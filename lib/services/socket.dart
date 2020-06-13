@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:audioplayers/audio_cache.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/user.dart' as user;
 
@@ -20,8 +21,26 @@ class ChatRoom {
   Stream<MyChatInfoEvent> get onChatInfoChange => chatInfoController.stream;
 
   var lastMessage;
-  var userId = user.id;
-  var userToken = user.unique;
+
+  void outSound(){
+    print("msg out sound is called");
+    final player = AudioCache();
+    player.play("sound/msg_out.mp3");
+  }
+  void inSound1() async {
+    print("msg in sound is called");
+    final player = AudioCache();
+    await player.play("sound/messageIn.mp3");
+  }
+
+  void inSound() async {
+    print("msg in sound is called");
+    final player = AudioCache();
+    await player.play("sound/message_in.mp3");
+  }
+  
+  // var userId = user.id;
+  // var userToken = user.unique;
 
   setStream() {
     print("Setting StreamController for Events");
@@ -67,15 +86,15 @@ class ChatRoom {
   closeConnection(){
     channel.sink.close();
   }
-
+  
   init() {
     print("Init is called");
 
     var data = json.encode({
       "cmd": 'init',
       "data": {
-        "user_id": "$userId",
-        "userToken": "$userToken",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
       }
     });
     print("INIT DATA $data");
@@ -86,9 +105,9 @@ class ChatRoom {
     var data = json.encode({
       "cmd": 'user:check:online',
       "data": {
-        "user_id": '$userId',
+        "user_id": '${user.id}',
         "users_ids": '$ids',
-        "userToken": "$userToken",
+        "userToken": "${user.unique}",
       }
     });
     print('user:check:online ids $ids');
@@ -101,8 +120,8 @@ class ChatRoom {
       "cmd": 'chat:members:delete',
       "data": {
         "chat_id": "$chatID",
-        "user_id": "$userId",
-        "userToken": "$userToken",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
         "members": "$members",
       }
     });
@@ -115,8 +134,8 @@ class ChatRoom {
       "cmd": 'chat:get',
       "data": {
         "chat_id": "$chatID",
-        "user_id": "$userId",
-        "userToken": "$userToken",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
         "page": page == null ? 1 : page,
       }
     });
@@ -124,6 +143,8 @@ class ChatRoom {
   }
 
   sendMessage(String chatID, String message) {
+    outSound();
+
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
     message = message.trimLeft();
     message = message.trimRight();
@@ -131,8 +152,8 @@ class ChatRoom {
       var data = json.encode({
         "cmd": 'message:create',
         "data": {
-          "user_id": "$userId",
-          "userToken": "$userToken",
+          "user_id": "${user.id}",
+          "userToken": "${user.unique}",
           "chat_id": "$chatID",
           "text": '$message'
         }
@@ -148,10 +169,10 @@ class ChatRoom {
     var data = json.encode({
       "cmd": "chat:members",
       "data": {
-        "userToken": "$userToken",
+        "userToken": "${user.unique}",
         "users_ids": "$users_ids",
         "chat_id": chatId,
-        "user_id": userId,
+        "user_id": '${user.id}',
       }
     });
     print('checked members');
@@ -162,8 +183,8 @@ class ChatRoom {
     var data = json.encode({
       "cmd": "user:check",
       "data": {
-        "user_id": userId,
-        "userToken": "$userToken",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
         "phone": phone,
       }
     });
@@ -175,8 +196,8 @@ class ChatRoom {
     var data = json.encode({
       "cmd": "chat:create",
       "data": {
-        "user_id": userId,
-        "userToken": "$userToken",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
         "user_ids": ids,
         "type": type,
         "chat_name": title,
@@ -191,8 +212,8 @@ class ChatRoom {
     var data = {
       "cmd": 'chats:get',
       "data": {
-        "user_id": "$userId",
-        "userToken": "$userToken",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
         "page": '1',
       }
     };
@@ -215,7 +236,7 @@ class ChatRoom {
         switch (cmd) {
           case "init":
 
-            print(userId);
+            print(user.id);
             print(data);
             if (data['status'].toString() == 'true') {
               print("INIT status is ${data['status']}");
@@ -241,12 +262,15 @@ class ChatRoom {
           case "message:create":
             forceGetChat();
             if (cabinetController == null) {
+              inSound();
               print("new message in CHATS null page");
             } else {
               if (!cabinetController.isClosed) {
                 print("new message in CHAT page");
+                // inSound();
                 cabinetController.add(new MyCabinetEvent(json));
               } else {
+                inSound();
                 print("new message in CHATS page");
               }
             }

@@ -274,15 +274,15 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                     //     .getMessages(membersList[i]['id']);
                                   },
                                   leading: CircleAvatar(
-                                      backgroundImage: (membersList[i]
-                                                      ["avatar"] ==
-                                                  null ||
+                                      backgroundImage: (membersList[i]["avatar"] == null ||
                                               membersList[i]["avatar"] == '' ||
                                               membersList[i]["avatar"] == false)
                                           ? CachedNetworkImageProvider(
                                               "https://media.indigo24.com/avatars/noAvatar.png")
-                                          : CachedNetworkImageProvider(
-                                              'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}')),
+                                          : CachedNetworkImageProvider("https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
+                                          // CachedNetworkImageProvider(
+                                          //     'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}')
+                                  ),
                                   title: Text("${membersList[i]["user_name"]}"),
                                   subtitle: "${membersList[i]["role"]}" == '0' ? Text('Создатель') : Text('Участник'),
                                 ),

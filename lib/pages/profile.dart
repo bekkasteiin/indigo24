@@ -383,6 +383,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
+                            
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => IntroPage()),
@@ -413,3 +414,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 }
+
+
+
+// {id: 1, avatar: 0b8f520924a21d5c2bab.jpg, name: Aibek Q, type: 0, 
+// members_count: 2, unread_messages: 0, phone: 77077655990, another_user_id: 45069, 
+// last_message: {id: message:45069:25, avatar: , user_name: , text: ггг, time: 1592028962}}
