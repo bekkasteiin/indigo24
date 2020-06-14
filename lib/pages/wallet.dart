@@ -8,10 +8,12 @@ import '../style/fonts.dart';
 import 'payments_category.dart';
 import 'transfer_list.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class MyBehavior extends ScrollBehavior {
   @override
-  ScrollPhysics getScrollPhysics(BuildContext context) => ClampingScrollPhysics();
+  ScrollPhysics getScrollPhysics(BuildContext context) =>
+      ClampingScrollPhysics();
 }
 
 class WalletTab extends StatefulWidget {
@@ -71,7 +73,7 @@ class _WalletTabState extends State<WalletTab> {
                   Column(
                     children: <Widget>[
                       SizedBox(height: 10),
-                      Text('Кошелек', style: fS26(c: 'ffffff')),
+                      Text('${localization.wallet}', style: fS26(c: 'ffffff')),
                       _devider(),
                       _balance(),
                       SizedBox(height: 10),
@@ -80,7 +82,8 @@ class _WalletTabState extends State<WalletTab> {
                       _blockedBalance(size),
                       SizedBox(height: 20),
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+                        margin:
+                            EdgeInsets.symmetric(horizontal: size.width * 0.05),
                         child: Column(
                           children: <Widget>[
                             _payInOut(size),
@@ -102,8 +105,6 @@ class _WalletTabState extends State<WalletTab> {
       ),
     );
   }
-
-
 
   Container _transfer(Size size) {
     return Container(
@@ -133,7 +134,7 @@ class _WalletTabState extends State<WalletTab> {
                   height: 40,
                 ),
                 Text(
-                  'Переводы',
+                  '${localization.transfers}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
                 ),
                 Container(width: 10),
@@ -185,7 +186,7 @@ class _WalletTabState extends State<WalletTab> {
                   height: 40,
                 ),
                 Text(
-                  'Платежи',
+                  '${localization.payments}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
                 ),
                 Container(width: 10),
@@ -214,7 +215,7 @@ class _WalletTabState extends State<WalletTab> {
 
   Text _balance() {
     return Text(
-      'Баланс',
+      '${localization.balance}',
       style: fS18(c: 'ffffff'),
     );
   }
@@ -238,7 +239,7 @@ class _WalletTabState extends State<WalletTab> {
       width: size.width,
       child: Column(
         children: <Widget>[
-          Text('Баланс в обработке', style: fS18w200(c: 'ffffff')),
+          Text('${localization.balanceInBlock}', style: fS18w200(c: 'ffffff')),
           Container(height: 5),
           Text('${_blockedAmount.toStringAsFixed(2)} ₸',
               style: fS26w200(c: 'ffffff')),
@@ -271,9 +272,9 @@ class _WalletTabState extends State<WalletTab> {
                 );
               },
               child: FittedBox(
-                  fit:BoxFit.fitWidth, 
-                  child: const Text(
-                  'ПОПОЛНИТЬ',
+                fit: BoxFit.fitWidth,
+                child: Text(
+                  '${localization.refill}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -307,9 +308,9 @@ class _WalletTabState extends State<WalletTab> {
                 );
               },
               child: FittedBox(
-                  fit:BoxFit.fitWidth, 
-                  child: const Text(
-                  'ВЫВЕСТИ',
+                fit: BoxFit.fitWidth,
+                child: Text(
+                  '${localization.withdraw}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),

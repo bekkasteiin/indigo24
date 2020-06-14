@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../services/api.dart';
 import 'payments_history.dart';
 import 'payments_services.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class PaymentsCategoryPage extends StatefulWidget {
   @override
@@ -162,7 +163,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       ),
       brightness: Brightness.light,
       title: Text(
-        "Платежи",
+        "${localization.payments}",
         style: TextStyle(
           color: Color(0xFF001D52),
           fontSize: 22,

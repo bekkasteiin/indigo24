@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:audioplayers/audio_cache.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +12,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'chat_page_view_test.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 var parser = EmojiParser();
 
@@ -17,6 +20,7 @@ Image backgroundForChat = Image(
   image: AssetImage('assets/images/background_chat.png'),
   fit: BoxFit.fill,
 );
+
 
 class ChatPage extends StatefulWidget {
   final name;
@@ -42,6 +46,13 @@ class _ChatPageState extends State<ChatPage> {
   ScrollController _scrollController = ScrollController();
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+
+
+  void sendSound(){
+    print("Send sound is called");
+    final player = AudioCache();
+    player.play("sound/msg_out.mp3");
+  }
 
   void _onRefresh() async{
     // monitor network fetch
@@ -218,14 +229,14 @@ class _ChatPageState extends State<ChatPage> {
               ),
               (widget.memberCount > 2)
                   ? Text(
-                      'Участников ${widget.memberCount}',
+                      '${localization.members} ${widget.memberCount}',
                       style: TextStyle(
                           color: Color(0xFF001D52),
                           fontSize: 14,
                           fontWeight: FontWeight.w400),
                     )
                   : online == null
-                      ? Container()
+                      ? Container() 
                       : Text(
                           ('$online' == 'online' || '$online' == 'offline') ? '$online' : 'был в сети $online', 
                           style: TextStyle(
@@ -251,10 +262,19 @@ class _ChatPageState extends State<ChatPage> {
           },
         ),
         actions: <Widget>[
-          InkWell(
-            child: Image.network(
-                'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
-            onTap: () {
+          MaterialButton(
+            elevation: 0,
+            color: Colors.transparent,
+            textColor: Colors.white,
+            child: CircleAvatar(
+                radius: 25,
+                child: ClipOval(
+                    child: CachedNetworkImage(imageUrl: "https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
+                ),
+              ),
+            // padding: EdgeInsets.all(16),
+            shape: CircleBorder(),
+            onPressed: () {
               ChatRoom.shared.setChatInfoStream();
               Navigator.push(
                 context,
@@ -269,6 +289,32 @@ class _ChatPageState extends State<ChatPage> {
               ).whenComplete(() {});
             },
           ),
+          // InkWell(
+          //   // child: Image.network('https://indigo24.xyz/uploads/avatars/noAvatar.png'),
+          //   child: Container(
+          //     padding: EdgeInsets.only(right: 5),
+          //     child: CircleAvatar(
+          //       radius: 25,
+          //       child: ClipOval(
+          //           child: CachedNetworkImage(imageUrl: "https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
+          //       ),
+          //     ),
+          //   ),
+          //   onTap: () {
+          //     ChatRoom.shared.setChatInfoStream();
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ChatProfileInfo(
+          //           chatName: widget.name,
+          //           chatAvatar: 'noAvatar.png',
+          //           chatMembers: widget.memberCount,
+          //           chatId: widget.chatID,
+          //         ),
+          //       ),
+          //     ).whenComplete(() {});
+          //   },
+          // ),
           // IconButton(
           //   icon: Image.network(
           //       'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
@@ -374,10 +420,11 @@ class _ChatPageState extends State<ChatPage> {
                     child: TextField(
                       maxLines: 6,
                       minLines: 1,
+                      
                       controller: _text,
                       decoration: InputDecoration(
                         // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        
+                        hintText: "${localization.enterMessage}",  
                         suffixIcon: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {
@@ -386,6 +433,7 @@ class _ChatPageState extends State<ChatPage> {
                             
 // =======
 // >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
+                            // sendSound();
                             ChatRoom.shared
                                 .sendMessage('${widget.chatID}', _text.text);
                             setState(() {
@@ -445,7 +493,8 @@ class Received extends StatelessWidget {
           content: '${m['text']}',
           time: time('${m['time']}'),
           name: '${m['user_name']}',
-          image: 'https://indigo24.xyz/uploads/avatars/${m['avatar']}'),
+          // image: 'https://indigo24.xyz/uploads/avatars/${m['avatar']}'),
+          image: "https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
     );
   }
 

@@ -7,6 +7,7 @@ import 'package:indigo24/pages/add_tape.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 import 'tape.dart';
 
@@ -94,7 +95,7 @@ class _TapesPageState extends State<TapesPage>
         centerTitle: true,
         brightness: Brightness.light,
         title: Text(
-          "Лента",
+          "${localization.tape}",
           style: TextStyle(
             color: Colors.black,
             fontSize: 22,

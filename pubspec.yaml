@@ -50,6 +50,8 @@ dependencies:
   flutter_emoji: ^2.2.1+1
   pull_to_refresh: ^1.5.8
   url_launcher: ^5.4.10
+  audioplayers: ^0.15.1
+  
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +62,9 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/sound/messageIn.mp3
+    - assets/sound/msg_out.mp3
+    - assets/sound/message_in.mp3
     - assets/images/cover.png
     - assets/images/avatar.png
     - assets/images/tape.png

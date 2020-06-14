@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
-
+import 'package:indigo24/services/localization.dart' as localization;
 import 'phone_confirm.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -215,7 +215,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           children: <Widget>[
                             Row(
                               children: <Widget>[
-                                Text("Номер телефона",
+                                Text("${localization.phoneNumber}",
                                     style: TextStyle(
                                         color: Color(0xff0543B8), fontSize: 16))
                               ],

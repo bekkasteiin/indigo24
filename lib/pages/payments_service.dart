@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../services/api.dart';
 import '../style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class PaymentsServicePage extends StatefulWidget {
   String _logo;
@@ -98,7 +99,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                             children: <Widget>[
                               SizedBox(height: 15),
                               Text(
-                                'Баланс кошелька',
+                                '${localization.walletBalance}',
                                 style: fS14(c: 'FFFFFF'),
                               ),
                               SizedBox(height: 5),
@@ -122,36 +123,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       ),
     );
   }
-
-  AppBar buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/backWhite.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        "Клиенту Indigo24",
-        style: TextStyle(
-          color: Color(0xFF001D52),
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
   Container transferButton() {
     return Container(
       height: 50,
@@ -185,7 +156,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             });
           },
           child: Text(
-            'Оплатить',
+            '${localization.pay}',
             style: TextStyle(
                 color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
           ),
@@ -214,7 +185,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           LengthLimitingTextInputFormatter(25),
                         ],
                         decoration: InputDecoration.collapsed(
-                          hintText: 'Номер',
+                          hintText: '${localization.phoneNumber}',
                         ),
                         controller: receiverController,
                         style: TextStyle(fontSize: 20),
@@ -240,7 +211,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     controller: sumController,
-                    decoration: InputDecoration.collapsed(hintText: 'Сумма'),
+                    decoration: InputDecoration.collapsed(hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
                     validator: (value) {
                       if (value.isEmpty) {

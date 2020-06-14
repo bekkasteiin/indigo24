@@ -11,7 +11,7 @@ import 'package:indigo24/pages/chat.dart';
 import 'package:indigo24/pages/chat_contacts.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
+import 'package:indigo24/services/localization.dart' as localization;
 import 'chat_page_view_test.dart';
 
 class ChatsListPage extends StatefulWidget {
@@ -89,7 +89,7 @@ class _ChatsListPageState extends State<ChatsListPage>
 
   @override
   Widget build(BuildContext context) {
-    String string = 'Чаты';
+    String string = '${localization.chats}';
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -181,13 +181,13 @@ class _ChatsListPageState extends State<ChatsListPage>
 //                     title: Text("${myList[i]["name"]}"),
 // =======
                             radius: 25.0,
-                            backgroundImage: (myList[i]["avatar"] == null ||
-                                    myList[i]["avatar"] == '' ||
-                                    myList[i]["avatar"] == false)
-                                ? CachedNetworkImageProvider(
-                                    "https://media.indigo24.com/avatars/noAvatar.png")
-                                : CachedNetworkImageProvider(
-                                    'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}'),
+                            backgroundImage: //"https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png"
+                            CachedNetworkImageProvider("https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
+                            // (myList[i]["avatar"] == null || myList[i]["avatar"] == '' || myList[i]["avatar"] == false)
+                            //     ? CachedNetworkImageProvider(
+                            //         "https://media.indigo24.com/avatars/noAvatar.png")
+                            //     : CachedNetworkImageProvider(
+                            //         'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}'),
                           ),
                           title: Text(
                             myList[i]["name"].length != 0 ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}" : "",

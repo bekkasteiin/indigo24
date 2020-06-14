@@ -17,6 +17,7 @@ import 'pages/tapes.dart';
 import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 // void main() {
 //   runApp(MyApp());
@@ -103,7 +104,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     _tabController = new TabController(length: 4, vsync: this);
 
     setUser().then((result) async{
-      ChatRoom.shared.userId = user.id;
        print("result: $result");
        print('user: ${user.id}');
        print('user: ${user.name}');
@@ -156,7 +156,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
-      print(e.json);
+      // print(e.json);
       setState(() {
         // chatsPage += 1;
         myList = e.json['data'].toList();
@@ -214,11 +214,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             preferredSize: Size.fromHeight(50.0),
             child: Container(
               padding: EdgeInsets.only(
-                top: 0,
+                top: 5,
                 left: 0,
                 right: 0,
               ),
-              height: 50,
+              height: 55,
               child: TabBar(
                   indicatorPadding: EdgeInsets.all(1),
                   labelPadding: EdgeInsets.all(0),
@@ -232,28 +232,28 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                         image: AssetImage("assets/images/chat.png"),
                         width: 20,
                       ),
-                      child: Text("Чат", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.chat}", style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/profile.png"),
                         width: 20,
                       ),
-                      child: Text("Профиль", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.profile}", style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/tape.png"),
                         width: 20,
                       ),
-                      child: Text("Лента", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.tape}", style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/wallet.png"),
                         width: 20,
                       ),
-                      child: Text("Кошелек", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.wallet}", style: TextStyle(fontSize: 12)),
                     )
                   ]),
             ),

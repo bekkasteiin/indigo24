@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:http/http.dart' as http;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class WithdrawPage extends StatefulWidget {
   @override
@@ -43,7 +44,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       ),
         brightness: Brightness.light,
         title: Text(
-          "Вывод средств",
+          "${localization.withdraw}",
           style: TextStyle(
             color: Colors.black,
             fontSize: 22,
@@ -58,10 +59,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
           ),
-          Center(child: Text('Комиссия 2.8%')),
-          Center(child: Text('Минимальная сумма 1000 KZT')),
-          Center(child: Text('Минимальная комиссия 350 KZT')),
-          Center(child: Text('Максимальная сумма 1000000 KZT')),
+          Center(child: Text('${localization.commission} 2.8%')),
+          Center(child: Text('${localization.minAmount} 1000 KZT')),
+          Center(child: Text('${localization.minCommission} 350 KZT')),
+          Center(child: Text('${localization.maxAmount} 1000000 KZT')),
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 20),
@@ -70,7 +71,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
               textAlign: TextAlign.center,
               keyboardType: TextInputType.number,
               decoration: InputDecoration.collapsed(
-                hintText: 'Введите сумму',
+                hintText: '${localization.amount}',
               ),
               style: TextStyle(fontSize: 20),
               controller: amountController,
@@ -100,7 +101,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   api.withdraw(amountController.text);
                 },
                 child: Text(
-                  'Вывести',
+                  '${localization.withdraw}',
                   style: TextStyle(
                       color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
                 ),

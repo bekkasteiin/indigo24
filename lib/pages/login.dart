@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -229,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Номер телефона",
+                              Text("${localization.phoneNumber}",
                                   style: TextStyle(
                                       color: Color(0xFF001D52), fontSize: 16))
                             ],
@@ -259,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                           _space(30),
                           Row(
                             children: <Widget>[
-                              Text("Пароль",
+                              Text("${localization.password}",
                                   style: TextStyle(
                                       color: Color(0xFF001D52), fontSize: 16))
                             ],
@@ -305,7 +306,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     _space(30),
                     Text(
-                      'ЗАБЫЛИ ПАРОЛЬ?',
+                      '${localization.forgotPassword}',
                       style: TextStyle(color: Color(0xFF444444)),
                     ),
                     _space(20),
@@ -321,7 +322,7 @@ class _LoginPageState extends State<LoginPage> {
                       //   ),
                       // ),
                       child: ProgressButton(
-                        defaultWidget: Text("Далее",
+                        defaultWidget: Text("${localization.next}",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,

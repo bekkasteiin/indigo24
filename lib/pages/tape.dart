@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class TapePage extends StatefulWidget {
   final tape;
@@ -68,7 +69,7 @@ class _TapePageState extends State<TapePage>
         ),
         brightness: Brightness.light,
         title: Text(
-          "${widget.tape['title']}",
+          "${localization.comments}",
           style: TextStyle(
             color: Colors.black,
             fontSize: 22,
@@ -97,7 +98,6 @@ class _TapePageState extends State<TapePage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Комментарий:'),
                             ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
@@ -248,7 +248,7 @@ class _TapePageState extends State<TapePage>
                               },
                             ),
                             border: InputBorder.none,
-                            hintText: "enter your message",
+                            hintText: "${localization.enterMessage}",
                           ),
                         ),
                       ),
