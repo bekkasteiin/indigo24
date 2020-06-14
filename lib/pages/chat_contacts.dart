@@ -9,6 +9,7 @@ import 'package:indigo24/pages/chat_group_selection.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class ChatContactsPage extends StatefulWidget {
   @override
@@ -58,17 +59,22 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
       switch (cmd) {
         case "user:check":
-          if (e.json['data']['chat_id'] != false &&
+          if (e.json['data']['chat_id'].toString() != 'false' &&
               e.json['data']['status'].toString() == 'true') {
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
+
+            print("USER CHECK DATA: ${e.json['data']}");
             Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => ChatPage(
                       '${e.json['data']['name']}', e.json['data']['chat_id'],
-                      memberCount: 2, userIds: e.json['data']['user_id'])),
+                      memberCount: 2,
+                      userIds: e.json['data']['user_id'],
+                      avatar: '${e.json['data']['avatar']}',
+                      avatarUrl: '${e.json['data']['avatar_url']}')),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
@@ -79,7 +85,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
           }
           break;
         case "chat:create":
-          print("STATUS ${e.json["data"]["status"]}");
+          print("CHAT CREATE ${e.json['data']}");
           if (e.json["data"]["status"].toString() == "true") {
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
@@ -143,8 +149,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         phonebook.forEach((el) {
           if (el.displayName != null) {
             el.phones.forEach((phone) {
-              String contact = formatPhone(phone.value);
-              if (!_contacts.contains(contact)) {
+              if (!_contacts.contains(formatPhone(phone.value))) {
                 phone.value = formatPhone(phone.value);
                 _contacts.add({
                   'name': el.displayName,
@@ -214,7 +219,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               centerTitle: true,
               brightness: Brightness.light,
               title: Text(
-                "Контакты",
+                "${localization.contacts}",
                 style: TextStyle(
                   color: Color(0xFF001D52),
                   fontSize: 22,
@@ -252,7 +257,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                               Icons.search,
                               color: Color(0xFF001D52),
                             ),
-                            hintText: "Поиск",
+                            hintText: "${localization.search}",
                             fillColor: Color(0xFF001D52),
                           ),
                           onChanged: (value) {
@@ -315,7 +320,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                                             index -
                                                                                 1]
                                                                         ['name']
-                                                                ? '${actualList[index]['name']} [copy] '
+                                                                ? '${actualList[index]['name']} | Другой номер'
                                                                 : '${actualList[index]['name']}'
                                                             : '${actualList[index]['name']}',
                                                         overflow: TextOverflow

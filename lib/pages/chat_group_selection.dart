@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class ChatGroupSelection extends StatefulWidget {
   @override
@@ -241,7 +242,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 centerTitle: true,
                 brightness: Brightness.light,
                 title: Text(
-                  "Создать группу",
+                  "${localization.createGroup}",
                   style: TextStyle(
                     color: Color(0xFF001D52),
                     fontWeight: FontWeight.w400,
@@ -283,7 +284,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                               top: 10.0, left: 10.0, right: 10, bottom: 0),
                           child: TextField(
                             decoration: new InputDecoration(
-                              hintText: "Название чата",
+                              hintText: "${localization.chatName}",
                               fillColor: Colors.white,
                             ),
                             controller: _titleController,
@@ -300,7 +301,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                   Icons.search,
                                   color: Color(0xFF001D52),
                                 ),
-                                hintText: "Поиск",
+                                hintText: "${localization.search}",
                                 fillColor: Color(0xFF001D52),
                               ),
                               onChanged: (value) {

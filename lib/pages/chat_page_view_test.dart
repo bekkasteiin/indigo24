@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
@@ -322,6 +323,14 @@ class ReceivedMessageWidget extends StatelessWidget {
         SizedBox(width: 5),
         CircleAvatar(
           backgroundImage: NetworkImage(image),
+          child: ClipOval(
+            child: CachedNetworkImage(
+              imageUrl: image,
+              errorWidget: (context, url, error) => CachedNetworkImage(
+                imageUrl: "https://media.indigo24.com/avatars/noAvatar.png"
+              )
+            ),
+          ),
         ),
         Flexible(
           child: ConstrainedBox(

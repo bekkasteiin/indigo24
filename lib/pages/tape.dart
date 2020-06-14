@@ -28,7 +28,7 @@ class _TapePageState extends State<TapePage>
 
   Future setTape(result) async {
     setState(() {
-      print('this is result $result');
+      // print('this is result $result');
       tapeResult = result["result"];
       com = result["result"]["comments"].toList();
       _future = Future(foo);

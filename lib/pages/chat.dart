@@ -1,9 +1,13 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:audioplayers/audio_cache.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:path_provider/path_provider.dart';
+import 'package:record_mp3/record_mp3.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat_info.dart';
 import 'package:indigo24/services/api.dart';
@@ -21,13 +25,15 @@ Image backgroundForChat = Image(
   fit: BoxFit.fill,
 );
 
-
 class ChatPage extends StatefulWidget {
   final name;
   final chatID;
   final memberCount;
   final userIds;
-  ChatPage(this.name, this.chatID, {this.memberCount, this.userIds});
+  final avatar;
+  final avatarUrl;
+  ChatPage(this.name, this.chatID,
+      {this.memberCount, this.userIds, this.avatar, this.avatarUrl});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -39,6 +45,8 @@ class _ChatPageState extends State<ChatPage> {
   var online;
   ScrollController controller;
   bool isLoaded = false;
+  bool isTyping = false;
+  bool isRecording = false;
 
   Api api = Api();
   int page = 1;
@@ -47,14 +55,16 @@ class _ChatPageState extends State<ChatPage> {
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
+  String statusText = "";
+  bool isComplete = false;
 
-  void sendSound(){
+  void sendSound() {
     print("Send sound is called");
     final player = AudioCache();
     player.play("sound/msg_out.mp3");
   }
 
-  void _onRefresh() async{
+  void _onRefresh() async {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
@@ -64,7 +74,7 @@ class _ChatPageState extends State<ChatPage> {
     _refreshController.refreshCompleted();
   }
 
-  void _onLoading() async{
+  void _onLoading() async {
     // monitor network fetch
 
     // await Future.delayed(Duration(milliseconds: 1000));
@@ -73,11 +83,11 @@ class _ChatPageState extends State<ChatPage> {
     // items.add((items.length+1).toString());
     print("_onLoading ");
     // print("_onLoading ");
-    if(mounted)
-    setState(() {
-      print("mounted ");
-      // page += 1;
-    });
+    if (mounted)
+      setState(() {
+        print("mounted ");
+        // page += 1;
+      });
     _loadData();
     _refreshController.loadComplete();
   }
@@ -104,12 +114,12 @@ class _ChatPageState extends State<ChatPage> {
 
   int pageCounter = 1;
 
-  // [{id: message:27886:346, user_id: 27886, user_name: AdilTest, 
-  // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/, 
+  // [{id: message:27886:346, user_id: 27886, user_name: AdilTest,
+  // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
   // text: 40, time: 1591947445, type: 0, write: 0},
 
-// [{id: 145959, user_id: 27886, user_name: AdilTest, 
-// avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/, 
+// [{id: 145959, user_id: 27886, user_name: AdilTest,
+// avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
 // text: 20, time: 1591947417, type: 0, write: 0},
 
   listen() {
@@ -119,7 +129,6 @@ class _ChatPageState extends State<ChatPage> {
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
-
           if (page == 1) {
             setState(() {
               page += 1;
@@ -171,17 +180,16 @@ class _ChatPageState extends State<ChatPage> {
 
   Future _loadData() async {
     // perform fetching data delay
-    print("WTF?????? $isLoaded"); 
+    print("WTF?????? $isLoaded");
     setState(() {
       isLoaded = false;
       // if(page==1){
       //   ChatRoom.shared.getMessages(widget.chatID, page: 2);
       // } else {
-        ChatRoom.shared.getMessages(widget.chatID, page: page);
+      ChatRoom.shared.getMessages(widget.chatID, page: page);
       // }
-      
     });
-    
+
     print("load more with page $page");
     // update data and loading status
   }
@@ -192,6 +200,186 @@ class _ChatPageState extends State<ChatPage> {
     controller.removeListener(_scrollListener);
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.dispose();
+  }
+
+  showAttachmentBottomSheet(context) {
+    showModalBottomSheet(
+        barrierColor: Colors.white.withOpacity(0),
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext bc) {
+          return Theme(
+            data: ThemeData(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                padding: EdgeInsets.only(bottom: 80),
+                margin: EdgeInsets.only(
+                    right: MediaQuery.of(context).size.width * 0.5),
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.only(topRight: Radius.circular(15)),
+                  child: Container(
+                    color: Colors.white.withOpacity(0.9),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/camera.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Камера',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('Камера');
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                   Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/money.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Деньги',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('Деньги');
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                   Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/gallery.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Галерея',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('Галерея');
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                   Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/files.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Файлы',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('Файлы');
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   @override
@@ -236,9 +424,11 @@ class _ChatPageState extends State<ChatPage> {
                           fontWeight: FontWeight.w400),
                     )
                   : online == null
-                      ? Container() 
+                      ? Container()
                       : Text(
-                          ('$online' == 'online' || '$online' == 'offline') ? '$online' : 'был в сети $online', 
+                          ('$online' == 'online' || '$online' == 'offline')
+                              ? '$online'
+                              : 'был в сети $online',
                           style: TextStyle(
                               color: Color(0xFF001D52),
                               fontSize: 14,
@@ -253,7 +443,8 @@ class _ChatPageState extends State<ChatPage> {
               MaterialPageRoute(
                 builder: (context) => ChatProfileInfo(
                   chatName: widget.name,
-                  chatAvatar: 'noAvatar.png',
+                  chatAvatar:
+                      widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                   chatMembers: widget.memberCount,
                   chatId: widget.chatID,
                 ),
@@ -267,11 +458,19 @@ class _ChatPageState extends State<ChatPage> {
             color: Colors.transparent,
             textColor: Colors.white,
             child: CircleAvatar(
-                radius: 25,
-                child: ClipOval(
-                    child: CachedNetworkImage(imageUrl: "https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
-                ),
-              ),
+              radius: 25,
+              child: ClipOval(
+                  child: CachedNetworkImage(
+                      imageUrl: widget.avatar == null
+                          ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+                          : widget.avatarUrl == null
+                              ? "https://indigo24.xyz/uploads/avatars/" +
+                                  widget.avatar
+                              : widget.avatarUrl + widget.avatar,
+                      errorWidget: (context, url, error) => CachedNetworkImage(
+                          imageUrl:
+                              "https://media.indigo24.com/avatars/noAvatar.png"))),
+            ),
             // padding: EdgeInsets.all(16),
             shape: CircleBorder(),
             onPressed: () {
@@ -281,7 +480,8 @@ class _ChatPageState extends State<ChatPage> {
                 MaterialPageRoute(
                   builder: (context) => ChatProfileInfo(
                     chatName: widget.name,
-                    chatAvatar: 'noAvatar.png',
+                    chatAvatar:
+                        widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatMembers: widget.memberCount,
                     chatId: widget.chatID,
                   ),
@@ -339,7 +539,7 @@ class _ChatPageState extends State<ChatPage> {
         brightness: Brightness.light,
       ),
       body: SafeArea(
-      child: Container(
+          child: Container(
         child: Stack(
           fit: StackFit.loose,
           children: <Widget>[
@@ -351,10 +551,9 @@ class _ChatPageState extends State<ChatPage> {
             //   // colorFilter: ColorFilter.linearToSrgbGamma()
             // ),
             Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: backgroundForChat
-            ),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: backgroundForChat),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisAlignment: MainAxisAlignment.start,
@@ -381,32 +580,32 @@ class _ChatPageState extends State<ChatPage> {
                           ? Center(
                               child: Text("Loading"),
                             )
-                          :  
-                          SmartRefresher(
-                            enablePullDown: false,
-                            enablePullUp: true,
-                            // header: WaterDropHeader(),
-                            footer: CustomFooter(
-                              builder: (BuildContext context,LoadStatus mode){
-                                Widget body ;
-                                return Container(
-                                  height: 55.0,
-                                  child: Center(child:body),
-                                );
-                              },
+                          : SmartRefresher(
+                              enablePullDown: false,
+                              enablePullUp: true,
+                              // header: WaterDropHeader(),
+                              footer: CustomFooter(
+                                builder:
+                                    (BuildContext context, LoadStatus mode) {
+                                  Widget body;
+                                  return Container(
+                                    height: 55.0,
+                                    child: Center(child: body),
+                                  );
+                                },
+                              ),
+                              controller: _refreshController,
+                              onRefresh: _onRefresh,
+                              onLoading: _onLoading,
+                              child: ListView.builder(
+                                controller: controller,
+                                itemCount: myList.length,
+                                reverse: true,
+                                itemBuilder: (context, i) {
+                                  return message(myList[i]);
+                                },
+                              ),
                             ),
-                            controller: _refreshController,
-                            onRefresh: _onRefresh,
-                            onLoading: _onLoading,
-                            child: ListView.builder(
-                                  controller: controller,
-                                  itemCount: myList.length,
-                                  reverse: true,
-                                  itemBuilder: (context, i) {
-                                    return message(myList[i]);
-                                  },
-                                ),
-                          ),
                     ),
                   ),
                 ),
@@ -415,48 +614,197 @@ class _ChatPageState extends State<ChatPage> {
                 //   height: 50,
                 Container(
                   color: Colors.white,
+                  width: MediaQuery.of(context).size.width,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 5),
-                    child: TextField(
-                      maxLines: 6,
-                      minLines: 1,
-                      
-                      controller: _text,
-                      decoration: InputDecoration(
-                        // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        hintText: "${localization.enterMessage}",  
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.send),
-                          onPressed: () {
-// <<<<<<< HEAD
-//                             print('+++++++++++++++___________+++++++++++');
-                            
-// =======
-// >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
-                            // sendSound();
-                            ChatRoom.shared
-                                .sendMessage('${widget.chatID}', _text.text);
-                            setState(() {
-                              _text.text = '';
-                            });
-                          },
-                        ),
-                      ),
+                    padding: const EdgeInsets.only(left: 5, right: 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        isComplete
+                            ? GestureDetector(
+                                onTap: () {
+                                  play();
+                                },
+                                child: Center(
+                                  child: Icon(
+                                    Icons.play_arrow,
+                                    size: 30,
+                                  ),
+                                ),
+                              )
+                            : IconButton(
+                                icon: Icon(Icons.attach_file),
+                                onPressed: () {
+                                  print("Прикрепить");
+                                  showAttachmentBottomSheet(context);
+                                },
+                              ),
+                        !isRecording
+                            ? Flexible(
+                                child: TextField(
+                                  maxLines: 6,
+                                  minLines: 1,
+                                  controller: _text,
+                                  onChanged: (value) {
+                                    print("Typing: $value");
+                                    if (value == '') {
+                                      setState(() {
+                                        isTyping = false;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isTyping = true;
+                                      });
+                                    }
+                                  },
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  // startRecord();
+                                },
+                                child: Center(
+                                  child: Text(
+                                      "Нажмите 2 раза чтобы остановить запись"),
+                                ),
+                              ),
+                        !isTyping
+                            ? ClipOval(
+                                child: GestureDetector(
+                                  onLongPress: () {
+                                    print("long press");
+                                  },
+                                  onTap: () {
+                                    startRecord();
+                                  },
+                                  onDoubleTap: () {
+                                    stopRecord();
+                                  },
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.mic,
+                                      size: 30,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            // IconButton(
+                            //   icon: Icon(Icons.mic),
+                            //   onPressed: () {
+                            //     print("audio pressed");
+                            //   },
+                            // )
+                            : IconButton(
+                                icon: Icon(Icons.send),
+                                onPressed: () {
+                                  ChatRoom.shared.sendMessage(
+                                      '${widget.chatID}', _text.text);
+                                  setState(() {
+                                    isTyping = false;
+                                    _text.text = '';
+                                  });
+                                },
+                              ),
+                      ],
                     ),
                   ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )),
+                ),
+              ],
+            ),
+          ],
+        ),
+      )),
     );
   }
 
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
-    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7') return Devider(m);
+    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7')
+      return Devider(m);
     return '${m['user_id']}' == '${user.id}' ? Sended(m) : Received(m);
+  }
+
+  Future<bool> checkPermission() async {
+    if (!await Permission.microphone.isGranted) {
+      PermissionStatus status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void startRecord() async {
+    bool hasPermission = await checkPermission();
+    if (hasPermission) {
+      statusText = "Recording...";
+      recordFilePath = await getFilePath();
+      isComplete = false;
+      isRecording = true;
+
+      RecordMp3.instance.start(recordFilePath, (type) {
+        statusText = "Record error--->$type";
+        setState(() {});
+      });
+    } else {
+      statusText = "No microphone permission";
+    }
+    setState(() {});
+  }
+
+  void pauseRecord() {
+    if (RecordMp3.instance.status == RecordStatus.PAUSE) {
+      bool s = RecordMp3.instance.resume();
+      if (s) {
+        statusText = "Recording...";
+        setState(() {});
+      }
+    } else {
+      bool s = RecordMp3.instance.pause();
+      if (s) {
+        statusText = "Recording pause...";
+        setState(() {});
+      }
+    }
+  }
+
+  void stopRecord() {
+    bool s = RecordMp3.instance.stop();
+    if (s) {
+      statusText = "Record complete";
+      isComplete = true;
+      isRecording = false;
+      setState(() {});
+    }
+  }
+
+  void resumeRecord() {
+    bool s = RecordMp3.instance.resume();
+    if (s) {
+      statusText = "Recording...";
+      setState(() {});
+    }
+  }
+
+  String recordFilePath;
+
+  void play() {
+    if (recordFilePath != null && File(recordFilePath).existsSync()) {
+      AudioPlayer audioPlayer = AudioPlayer();
+      audioPlayer.play(recordFilePath, isLocal: true);
+    }
+  }
+
+  int i = 0;
+
+  Future<String> getFilePath() async {
+    Directory storageDirectory = await getApplicationDocumentsDirectory();
+    String sdPath = storageDirectory.path + "/record";
+    var d = Directory(sdPath);
+    if (!d.existsSync()) {
+      d.createSync(recursive: true);
+    }
+    return sdPath + "/test_${i++}.mp3";
   }
 }
 
@@ -488,14 +836,17 @@ class Received extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment(-1, 0),
-      child: ReceivedMessageWidget(
+        alignment: Alignment(-1, 0),
+        child: ReceivedMessageWidget(
           content: '${m['text']}',
           time: time('${m['time']}'),
           name: '${m['user_name']}',
-          // image: 'https://indigo24.xyz/uploads/avatars/${m['avatar']}'),
-          image: "https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
-    );
+          image: (m["avatar"] == null || m["avatar"] == "")
+              ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+              : m["avatar_url"] == null
+                  ? "https://indigo24.xyz/uploads/avatars/" + m["avatar"]
+                  : m["avatar_url"] + m["avatar"],
+        ));
   }
 
   String time(timestamp) {

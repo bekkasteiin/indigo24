@@ -282,7 +282,7 @@ class _LoginPageState extends State<LoginPage> {
                                               vertical: 10),
                                           child: Image(
                                             image: AssetImage(
-                                              'assets/images/back.png',
+                                              'assets/images/eyeClose.png',
                                             ),
                                             height: 20,
                                             width: 20,

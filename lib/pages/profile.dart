@@ -44,6 +44,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           setState(() {
             user.avatar = r["fileName"];
           });
+        } else {
+          print("error");
         }
       });
     }
@@ -428,6 +430,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
+                            SharedPreferences preferences = await SharedPreferences.getInstance();
+                            preferences.setString('phone', 'null');
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => IntroPage()),

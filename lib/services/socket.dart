@@ -37,6 +37,7 @@ class ChatRoom {
     print("msg in sound is called");
     final player = AudioCache();
     await player.play("sound/message_in.mp3");
+    
   }
   
   // var userId = user.id;
@@ -263,6 +264,7 @@ class ChatRoom {
             forceGetChat();
             if (cabinetController == null) {
               inSound();
+              changeController.add(new MyEvent(json));
               print("new message in CHATS null page");
             } else {
               if (!cabinetController.isClosed) {
@@ -271,6 +273,7 @@ class ChatRoom {
                 cabinetController.add(new MyCabinetEvent(json));
               } else {
                 inSound();
+                changeController.add(new MyEvent(json));
                 print("new message in CHATS page");
               }
             }
