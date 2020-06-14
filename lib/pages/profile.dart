@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
@@ -11,6 +12,7 @@ import 'package:platform_action_sheet/platform_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -163,7 +165,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("Email"),
+          Text("${localization.email}"),
           SizedBox(height: 5),
           Text('${user.email}'),
           // TextField(
@@ -182,7 +184,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("НОМЕР ТЕЛЕФОНА"),
+          Text("${localization.phoneNumber}"),
           SizedBox(height: 5),
           Text('${user.phone}',
               textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
@@ -361,25 +363,59 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       Material(
                         color: Colors.transparent,
                         child: InkWell(
-                            onTap: () async{
-                              if (await canLaunch('https://indigo24.userecho.com/')) {
+                            onTap: () async {
+                              if (await canLaunch(
+                                  'https://indigo24.userecho.com/')) {
                                 await launch(
                                   'https://indigo24.userecho.com/',
                                   forceSafariVC: false,
                                   forceWebView: false,
-                                  headers: <String, String>{'my_header_key': 'my_header_value'},
+                                  headers: <String, String>{
+                                    'my_header_key': 'my_header_value'
+                                  },
                                 );
                               } else {
                                 throw 'Could not launch https://indigo24.userecho.com/';
                               }
                             },
                             child: Ink(
-                              child: Text("СЛУЖБА ПОДДЕРЖКИ",
+                              child: Text("${localization.support}",
                                   style: TextStyle(color: Colors.grey)),
                             )),
                       ),
                       SizedBox(width: 10),
                     ],
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(16.0),
+                        )),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        hint: Text("${localization.currentLanguage}",
+                            style: TextStyle(color: Color(0xFF001D52))),
+                        // value: _valFriends,
+                        items: localization.languages.map((value) {
+                          return DropdownMenuItem(
+                            child: Text('${value['title']}',
+                                style: TextStyle(color: Color(0xFF001D52))),
+                            value: value,
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          // MyApp.tabPageKey.currentState.tabController.animateTo(0);
+                          MyApp.tabPageKey.currentState.setState(() {});
+                          print('${value['title']}');
+                          setState(() {
+                          });
+                          localization.setLanguage(value['code']);
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -403,8 +439,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 (r) => false);
                           },
                           child: Ink(
-                            child: Text("Выйти",
-                                style: TextStyle(color: Colors.white, fontSize: 18)),
+                            child: Text("${localization.exit}",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18)),
                           )),
                     ),
                     SizedBox(width: 10),
@@ -428,8 +465,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 }
 
-
-
-// {id: 1, avatar: 0b8f520924a21d5c2bab.jpg, name: Aibek Q, type: 0, 
-// members_count: 2, unread_messages: 0, phone: 77077655990, another_user_id: 45069, 
+// {id: 1, avatar: 0b8f520924a21d5c2bab.jpg, name: Aibek Q, type: 0,
+// members_count: 2, unread_messages: 0, phone: 77077655990, another_user_id: 45069,
 // last_message: {id: message:45069:25, avatar: , user_name: , text: ггг, time: 1592028962}}

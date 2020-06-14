@@ -13,6 +13,7 @@ import 'package:indigo24/style/fonts.dart';
 import 'package:platform_action_sheet/platform_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class ChatProfileInfo extends StatefulWidget {
   final chatName;
@@ -228,7 +229,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     Container(
                       margin: EdgeInsets.only(left: 20),
                       child: Text(
-                        'Участники',
+                        '${localization.members}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -272,7 +273,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                   //   icon: Icons.more_horiz,
                                   // ),
                                   IconSlideAction(
-                                    caption: 'Удалить',
+                                    // caption: 'Удалить',
                                     color: Colors.red,
                                     icon: Icons.delete,
                                     onTap: () {
@@ -316,7 +317,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                     ),
                                   ),
                                   title: Text("${membersList[i]["user_name"]}"),
-                                  subtitle: "${membersList[i]["role"]}" == '0' ? Text('Создатель') : Text('Участник'),
+                                  subtitle: "${membersList[i]["role"]}" == '0' ? Text('${localization.creator}') : Text('${localization.member}'),
                                 ),
                               );
                             },

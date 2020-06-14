@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class RefillPage extends StatefulWidget {
   @override
@@ -42,7 +43,7 @@ class _RefillPageState extends State<RefillPage> {
         ),
         brightness: Brightness.light,
         title: Text(
-          "Пополнение баланса",
+          "${localization.refill}",
           style: TextStyle(
             color: Colors.black,
             fontSize: 22,
@@ -58,16 +59,16 @@ class _RefillPageState extends State<RefillPage> {
             padding: const EdgeInsets.symmetric(vertical: 10),
           ),
           Center(
-            child: Text('Комиссия 2.7%'),
+            child: Text('${localization.commission} 2.7%'),
           ),
           Center(
-            child: Text('Минимальная сумма 1000 KZT'),
+            child: Text('${localization.minAmount} 1000 KZT'),
           ),
           Center(
-            child: Text('Минимальная комиссия 250 KZT'),
+            child: Text('${localization.minCommission} 250 KZT'),
           ),
           Center(
-            child: Text('Максимальная сумма 486000 KZT'),
+            child: Text('${localization.maxAmount} 486000 KZT'),
           ),
           Container(
             color: Colors.white,
@@ -77,7 +78,7 @@ class _RefillPageState extends State<RefillPage> {
               textAlign: TextAlign.center,
               keyboardType: TextInputType.number,
               decoration: InputDecoration.collapsed(
-                hintText: 'Введите сумму',
+                hintText: '${localization.amount}',
               ),
               style: TextStyle(fontSize: 20),
               controller: amountController,
@@ -107,7 +108,7 @@ class _RefillPageState extends State<RefillPage> {
                   api.refill(amountController.text);
                 },
                 child: Text(
-                  'Пополнить',
+                  '${localization.refill}',
                   style: TextStyle(
                       color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
                 ),

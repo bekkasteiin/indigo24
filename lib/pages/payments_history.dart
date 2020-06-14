@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class PaymentHistoryPage extends StatefulWidget {
   @override
@@ -79,7 +80,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            "Аккаунт $account",
+            "${localization.account} $account",
             style: TextStyle(
               fontSize: 12,
               color: Color(0xFF001D52),
@@ -119,7 +120,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       ),
       brightness: Brightness.light,
       title: Text(
-        "Платежи",
+        "${localization.payments}",
         style: TextStyle(
           color: Color(0xFF001D52),
           fontSize: 22,

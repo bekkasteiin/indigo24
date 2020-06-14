@@ -249,13 +249,16 @@ class SendedMessageWidget extends StatelessWidget {
               child: Stack(children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(
-                      right: 12.0, left: 23.0, top: 8.0, bottom: 15.0),
+                      right: 12.0, left: 8.0, top: 8.0, bottom: 15.0),
 // <<<<<<< HEAD
                   child: (a[0]==":" && a[l]==":" && content.length<9)?
                   Text(content, style: TextStyle(fontSize: 40))
                   :
                   (a[0]==":" && a[l]==":" && content.length>8)?
                   Text(content, style: TextStyle(fontSize: 24))
+                  :
+                  (content.contains('http'))?
+                  ImageMessage(content)
                   : 
                   Text(
                     content,
@@ -357,6 +360,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 5.0, bottom: 0.0),
                             child: Text(name, style: TextStyle(color: Colors.amber,fontWeight: FontWeight.w500)),
                           ),
+                          
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 0.0, bottom: 15.0),
 // <<<<<<< HEAD
@@ -365,7 +369,10 @@ class ReceivedMessageWidget extends StatelessWidget {
                             :
                             (a[0]==":" && a[l]==":" && content.length>8)?
                             Text(content, style: TextStyle(fontSize: 24))
-                            : 
+                            :
+                            (content.contains('http'))?
+                            ImageMessage(content)
+                            :
                             Text(
                               content,
 // =======
@@ -396,6 +403,71 @@ class ReceivedMessageWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ImageMessage extends StatelessWidget {
+  final imageUrl;
+  ImageMessage(this.imageUrl);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: FlatButton(
+        splashColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: Material(
+          color: Colors.transparent,
+          child: CachedNetworkImage(
+            placeholder: (context, url) => Container(
+              child: CircularProgressIndicator(
+                // valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+              ),
+              // width: 200.0,
+              // height: 200.0,
+              width: MediaQuery.of(context).size.width*0.7,
+              height: MediaQuery.of(context).size.width*0.7,
+              padding: EdgeInsets.all(70.0),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8.0),
+                ),
+              ),
+            ),
+            errorWidget: (context, url, error) => Material(
+              child: Image.asset(
+                'assets/loading.gif',
+                // width: 200.0,
+                // height: 200.0,
+                width: MediaQuery.of(context).size.width*0.7,
+                height: MediaQuery.of(context).size.width*0.7,
+                fit: BoxFit.cover,
+              ),
+              borderRadius: BorderRadius.all(
+                Radius.circular(8.0),
+              ),
+              clipBehavior: Clip.hardEdge,
+            ),
+            imageUrl: imageUrl,
+            width: MediaQuery.of(context).size.width*0.7,
+            height: MediaQuery.of(context).size.width*0.7,
+            // width: 200.0,
+            // height: 200.0,
+            fit: BoxFit.contain,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          clipBehavior: Clip.hardEdge,
+        ),
+        onPressed: () {
+          // Navigator.push(
+          //     context, MaterialPageRoute(builder: (context) => FullPhoto(url: document['content'])));
+        },
+        padding: EdgeInsets.all(0),
+      ),
+      // margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
     );
   }
 }

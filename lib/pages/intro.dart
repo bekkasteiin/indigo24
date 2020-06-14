@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/login.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 import 'registration.dart';
 
@@ -16,10 +17,12 @@ class _IntroPageState extends State<IntroPage> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
+  String _value = localization.currentLanguage; 
+ 
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
@@ -47,6 +50,34 @@ class _IntroPageState extends State<IntroPage> {
                     _space(10),
                     _signUpButton(size),
                     _space(size.height / 5),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(16.0),
+                          )
+                      ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                          hint: Text("$_value", style: TextStyle(color: Color(0xFF001D52))),
+                          // value: _valFriends,
+                          items: localization.languages.map((value) {
+                            return DropdownMenuItem(
+                              child: Text('${value['title']}',style: TextStyle(color: Color(0xFF001D52))),
+                              value: value,
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            print('${value['title']}');
+                            setState(() {
+                              _value = '${value['title']}';
+                            });
+                            localization.setLanguage(value['code']);
+                          },
+                      ),
+                        ),
+                    ),
                   ],
                 ),
               ),
@@ -73,8 +104,8 @@ class _IntroPageState extends State<IntroPage> {
             MaterialPageRoute(builder: (context) => LoginPage()),
           );
         },
-        child: const Text(
-          'Вход',
+        child: Text(
+          '${localization.login}',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
         ),
         color: Color(0xFFFFFFFF),
@@ -100,8 +131,8 @@ class _IntroPageState extends State<IntroPage> {
             MaterialPageRoute(builder: (context) => RegistrationPage()),
           );
         },
-        child: const Text(
-          'Регистрация',
+        child: Text(
+          '${localization.registration}',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
         ),
         color: Color(0xFFffffff).withOpacity(0.35),

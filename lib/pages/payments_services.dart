@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:indigo24/services/localization.dart' as localization;
 import '../services/api.dart';
 import 'payments_service.dart';
 
@@ -64,7 +64,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
       ),
       brightness: Brightness.light,
       title: Text(
-        "Платежи",
+        "${localization.payments}",
         style: TextStyle(
           color: Color(0xFF001D52),
           fontSize: 22,

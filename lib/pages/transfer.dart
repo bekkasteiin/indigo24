@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../services/api.dart';
 import '../style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/localization.dart' as localization;
 
 class TransferPage extends StatefulWidget {
   @override
@@ -61,7 +62,7 @@ class _TransferPageState extends State<TransferPage> {
                   ),
                   Positioned(
                     child: AppBar(
-                      title: Text("Клиенту Indigo24"),
+                      title: Text("${localization.toIndigo24Client}"),
                       leading: IconButton(
                         icon: Container(
                           padding: EdgeInsets.all(10),
@@ -97,7 +98,7 @@ class _TransferPageState extends State<TransferPage> {
                             children: <Widget>[
                               SizedBox(height: 15),
                               Text(
-                                'Баланс кошелька',
+                                '${localization.walletBalance}',
                                 style: fS14(c: 'FFFFFF'),
                               ),
                               SizedBox(height: 5),
@@ -184,7 +185,7 @@ class _TransferPageState extends State<TransferPage> {
             });
           },
           child: Text(
-            'Перевести',
+            '${localization.transfer}',
             style: TextStyle(
                 color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
           ),
@@ -213,7 +214,7 @@ class _TransferPageState extends State<TransferPage> {
                           LengthLimitingTextInputFormatter(25),
                         ],
                         decoration: InputDecoration.collapsed(
-                          hintText: 'Телефон получателя',
+                          hintText: '${localization.phoneNumber}',
                         ),
                         controller: receiverController,
                         style: TextStyle(fontSize: 20),
@@ -249,7 +250,7 @@ class _TransferPageState extends State<TransferPage> {
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     controller: sumController,
-                    decoration: InputDecoration.collapsed(hintText: 'Сумма'),
+                    decoration: InputDecoration.collapsed(hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
                     validator: (value) {
                       if (value.isEmpty) {
@@ -279,60 +280,4 @@ class _TransferPageState extends State<TransferPage> {
 
   final amountController = TextEditingController();
 
-
-  Container mainPaymentIndigoPurse() {
-    return Container(
-      height: 80,
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        width: 50,
-                        // child: Image.asset(
-                        //   'assets/logoPurple.png',
-                        //   width: 50.0,
-                        // ),
-                        margin: EdgeInsets.only(right: 10),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "Indigo кошелек",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      Container(
-                        child: Text(
-                          "$_balance ₸",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        //@BOXSHADOW
-        // boxShadow: const [
-        //   BoxShadow(
-        //     blurRadius: 3,
-        //     color: const Color.fromARGB(130, 140, 140, 140),
-        //   ),
-        // ],
-      ),
-      padding: EdgeInsets.only(left: 20, right: 20),
-      margin: EdgeInsets.only(left: 20, right: 20),
-    );
-  }
 }

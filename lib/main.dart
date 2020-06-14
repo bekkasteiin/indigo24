@@ -20,6 +20,7 @@ import 'pages/tapes.dart';
 import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 // void main() {
 //   runApp(MyApp());
@@ -38,6 +39,7 @@ Future<void> main() async {
   print(customerID);
   Api api = Api();
   
+
   // await api.checkUnique(unique,customerID).then((r) async {
     
   //   });
@@ -46,6 +48,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  static final tabPageKey = new GlobalKey<_TabsState>();
 
   const MyApp({
     Key key,
@@ -54,6 +57,8 @@ class MyApp extends StatelessWidget {
 
   final String phone;
 
+
+  
 
 
 
@@ -70,19 +75,21 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: phone == null ? IntroPage() : Tabs(),
+        home: phone == null ? IntroPage() : Tabs(key: tabPageKey),
       ),
     );
   }
 }
 
 class Tabs extends StatefulWidget {
+  const Tabs({Key key}) : super(key: key);
+
   @override
   _TabsState createState() => _TabsState();
 }
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
-  TabController _tabController;
+  TabController tabController;
 
   MyConnectivity _connectivity = MyConnectivity.instance;
   Map _source = {ConnectivityResult.none: false};
@@ -105,7 +112,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    _tabController = new TabController(length: 4, vsync: this);
+    tabController = new TabController(length: 4, vsync: this);
 
     setUser().then((result) async{
        print("result: $result");
@@ -274,7 +281,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             TapesPage(),
             WalletTab(),
           ],
-          controller: _tabController,
+          controller: tabController,
         ),
         bottomNavigationBar: SafeArea(
           child: PreferredSize(
@@ -290,7 +297,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   indicatorPadding: EdgeInsets.all(1),
                   labelPadding: EdgeInsets.all(0),
                   indicatorWeight: 0.0000000000001,
-                  controller: _tabController,
+                  controller: tabController,
                   unselectedLabelColor: Color(0xff001D52),
                   labelColor: Color(0xff0543B8),
                   tabs: [
@@ -299,28 +306,28 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                         image: AssetImage("assets/images/chat.png"),
                         width: 20,
                       ),
-                      child: Text("Чат", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.chat}", style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/profile.png"),
                         width: 20,
                       ),
-                      child: Text("Профиль", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.profile}", style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/tape.png"),
                         width: 20,
                       ),
-                      child: Text("Лента", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.tape}", style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/wallet.png"),
                         width: 20,
                       ),
-                      child: Text("Кошелек", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.wallet}", style: TextStyle(fontSize: 12)),
                     )
                   ]),
             ),

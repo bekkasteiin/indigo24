@@ -16,6 +16,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'chat_page_view_test.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 var parser = EmojiParser();
 
@@ -240,7 +241,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
               (widget.memberCount > 2)
                   ? Text(
-                      'Участников ${widget.memberCount}',
+                      '${localization.members} ${widget.memberCount}',
                       style: TextStyle(
                           color: Color(0xFF001D52),
                           fontSize: 14,
@@ -436,6 +437,7 @@ class _ChatPageState extends State<ChatPage> {
                   color: Colors.white,
                   width: MediaQuery.of(context).size.width,
                   child: Padding(
+// <<<<<<< HEAD
                     padding: const EdgeInsets.only(left: 5, right: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -454,6 +456,22 @@ class _ChatPageState extends State<ChatPage> {
                           icon: Icon(Icons.attach_file),
                           onPressed: (){
                             print("Прикрепить");
+// =======
+//                     padding: const EdgeInsets.only(left: 20, right: 5),
+//                     child: TextField(
+//                       maxLines: 6,
+//                       minLines: 1,
+                      
+//                       controller: _text,
+//                       decoration: InputDecoration(
+//                         // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
+//                         hintText: "${localization.enterMessage}",  
+//                         suffixIcon: IconButton(
+//                           icon: Icon(Icons.send),
+//                           onPressed: () {
+// // <<<<<<< HEAD
+// //                             print('+++++++++++++++___________+++++++++++');
+// >>>>>>> b6578fee599585a15cf792daf57f65de418dc543
                             
                           },
                         ),
@@ -463,6 +481,9 @@ class _ChatPageState extends State<ChatPage> {
                             maxLines: 6,
                             minLines: 1,
                             controller: _text,
+                            decoration: InputDecoration(
+                              hintText: "${localization.enterMessage}",
+                            ),
                             onChanged: (value) {
                               print("Typing: $value");
                               if(value == ''){

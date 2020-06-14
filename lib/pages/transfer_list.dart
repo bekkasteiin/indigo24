@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../services/api.dart';
 import 'transfer.dart';
 import 'transfer_history.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class TransferListPage extends StatefulWidget {
   @override
@@ -46,7 +47,7 @@ class _TransferListPageState extends State<TransferListPage> {
       ),
       brightness: Brightness.light,
       title: Text(
-        "Переводы",
+        "${localization.transfers}",
         style: TextStyle(
           color: Color(0xFF001D52),
           fontSize: 22,
@@ -103,7 +104,7 @@ class _TransferListPageState extends State<TransferListPage> {
             Container(
               margin: EdgeInsets.only(left: 20),
               child: Text(
-                "Клиенту Indigo24",
+                "${localization.toIndigo24Client}",
                 style: TextStyle(fontSize: 14),
               ),
             ),

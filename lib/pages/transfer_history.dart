@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../services/api.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class TransferHistoryPage extends StatefulWidget {
   @override
@@ -194,7 +195,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       ),
       brightness: Brightness.light,
       title: Text(
-        "Переводы",
+        "${localization.transfers}",
         style: TextStyle(
           color: Color(0xFF001D52),
           fontSize: 22,
