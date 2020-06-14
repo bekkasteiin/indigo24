@@ -10,6 +10,7 @@ import 'package:indigo24/services/helper.dart';
 import 'package:platform_action_sheet/platform_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:url_launcher/url_launcher.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -42,6 +43,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           setState(() {
             user.avatar = r["fileName"];
           });
+        } else {
+          print("error");
         }
       });
     }
@@ -358,11 +361,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       Material(
                         color: Colors.transparent,
                         child: InkWell(
-                            onTap: () {
-                              print("lol 12");
+                            onTap: () async{
+                              if (await canLaunch('https://indigo24.userecho.com/')) {
+                                await launch(
+                                  'https://indigo24.userecho.com/',
+                                  forceSafariVC: false,
+                                  forceWebView: false,
+                                  headers: <String, String>{'my_header_key': 'my_header_value'},
+                                );
+                              } else {
+                                throw 'Could not launch https://indigo24.userecho.com/';
+                              }
                             },
                             child: Ink(
-                              child: Text("Служба поддержки",
+                              child: Text("СЛУЖБА ПОДДЕРЖКИ",
                                   style: TextStyle(color: Colors.grey)),
                             )),
                       ),
@@ -383,7 +395,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
-                            
+                            SharedPreferences preferences = await SharedPreferences.getInstance();
+                            await preferences.clear();
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => IntroPage()),

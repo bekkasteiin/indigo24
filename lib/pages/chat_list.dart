@@ -73,14 +73,15 @@ class _ChatsListPageState extends State<ChatsListPage>
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  goToChat(name, chatID, {memberCount, userIds}) {
+  goToChat(name, chatID, {memberCount, userIds, avatar, avatarUrl}) {
     ChatRoom.shared.setCabinetStream();
     ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => ChatPage(name, chatID,
-              memberCount: memberCount, userIds: userIds)),
+              memberCount: memberCount, userIds: userIds,
+              avatar: avatar, avatarUrl: avatarUrl,)),
     ).whenComplete(() {
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
@@ -101,7 +102,14 @@ class _ChatsListPageState extends State<ChatsListPage>
         brightness: Brightness.light,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.contact_phone),
+            icon: Container(
+              padding: EdgeInsets.symmetric(vertical: 10), 
+              child: Image(
+                image: AssetImage(
+                  'assets/images/eyeClose.png',
+                ),
+              ),
+            ),
             iconSize: 30,
             color: Color(0xFF001D52),
             onPressed: () {
@@ -159,28 +167,24 @@ class _ChatsListPageState extends State<ChatsListPage>
                               myList[i]['id'],
                               memberCount: myList[i]['members_count'],
                               userIds: myList[i]['another_user_id'],
+                              avatar: myList[i]['avatar'],
+                              avatarUrl: myList[i]['avatar_url']
                             );
                           },
                           leading: CircleAvatar(
-// <<<<<<< HEAD
-
-//                         backgroundImage: (myList[i]["avatar"] == null ||
-//                                 myList[i]["avatar"] == '' ||
-//                                 myList[i]["avatar"] == false)
-//                             ? CachedNetworkImageProvider(
-//                                 "https://media.indigo24.com/avatars/noAvatar.png")
-//                             : CachedNetworkImageProvider(
-//                                 'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}')),
-//                     title: Text("${myList[i]["name"]}"),
-// =======
                             radius: 25.0,
-                            backgroundImage: //"https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png"
-                            CachedNetworkImageProvider("https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
-                            // (myList[i]["avatar"] == null || myList[i]["avatar"] == '' || myList[i]["avatar"] == false)
-                            //     ? CachedNetworkImageProvider(
-                            //         "https://media.indigo24.com/avatars/noAvatar.png")
-                            //     : CachedNetworkImageProvider(
-                            //         'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}'),
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: (myList[i]["avatar"] == null || 
+                                myList[i]["avatar"] == '' || myList[i]["avatar"] == false) ?
+                                "https://media.indigo24.com/avatars/noAvatar.png" :
+                                'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}',
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => CachedNetworkImage(
+                                  imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                                ),
+                              )
+                            ),
                           ),
                           title: Text(
                             myList[i]["name"].length != 0 ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}" : "",
@@ -188,7 +192,6 @@ class _ChatsListPageState extends State<ChatsListPage>
                                 color: Color(0xFF001D52),
                                 fontWeight: FontWeight.w400),
                           ),
-// >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
                           subtitle: Text(
                             myList[i]["last_message"].length != 0 ? myList[i]["last_message"]['text'].length != 0 ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"  : "" : "",
                             overflow: TextOverflow.ellipsis,

@@ -1,20 +1,23 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/pages/chat.dart';
 import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/pages/wallet.dart';
 import 'package:indigo24/services/helper.dart';
 
 import 'package:indigo24/services/user.dart' as user;
+import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
 import 'db/chats_model.dart';
-import 'pages/chat_group.dart';
 import 'pages/profile.dart';
 import 'pages/tapes.dart';
+import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 
@@ -22,16 +25,28 @@ import 'services/socket.dart';
 //   runApp(MyApp());
 // }
 
+ 
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var phone = prefs.getString('phone');
+  var unique = prefs.getString('unique');
+  var customerID = prefs.getString('customerID');
   print(phone);
+  print(unique);
+  print(customerID);
+  Api api = Api();
+  
+  // await api.checkUnique(unique,customerID).then((r) async {
+    
+  //   });
 
   runApp(MyApp(phone: phone));
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({
     Key key,
     @required this.phone,
@@ -39,19 +54,24 @@ class MyApp extends StatelessWidget {
 
   final String phone;
 
+
+
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return OverlaySupport(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: phone == null ? IntroPage() : Tabs(),
       ),
-      home: phone == null ? IntroPage() : Tabs(),
     );
   }
 }
@@ -140,12 +160,24 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
-      // print(e.json);
-      setState(() {
-        // chatsPage += 1;
-        myList = e.json['data'].toList();
-        chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
-      });
+      var cmd = e.json["cmd"];
+      switch (cmd) {
+        case 'message:create':
+          print(e.json);
+          inAppPush(e.json["data"]);
+          break;
+        case 'chats:get':
+          setState(() {
+            // chatsPage += 1;
+            myList = e.json['data'].toList();
+            chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
+          });
+          break;
+        default:
+          print("default in main");
+         break;
+      }
+      
       // if (chatsPage == 1) {
       //   setState(() {
       //     chatsPage += 1;
@@ -164,6 +196,57 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
+  inAppPush(m){
+    showOverlayNotification((context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: SafeArea(
+        child: ListTile(
+          onTap: (){
+            OverlaySupportEntry.of(context).dismiss();
+            ChatRoom.shared.getMessages(m['chat_id']);
+            goToChat(
+              "${m['user_name']}", 
+              "${m['chat_id']}", 
+              memberCount: "${m['type']}"=="0"?2:3, 
+              avatar: "${m['avatar']}", 
+              userIds: "${m['user_id']}");
+          },
+          leading: SizedBox.fromSize(
+              size: const Size(40, 40),
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                )
+              )),
+          title: Text("${m['user_name']}"),
+          subtitle: Text("${m["text"]}"),
+          trailing: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                OverlaySupportEntry.of(context).dismiss();
+              }),
+        ),
+      ),
+    );
+  }, duration: Duration(milliseconds: 4000));
+  }
+
+  goToChat(name, chatID, {memberCount, userIds, avatar, avatarUrl}) {
+    ChatRoom.shared.setCabinetStream();
+    ChatRoom.shared.checkUserOnline(userIds);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChatPage(name, chatID,
+              memberCount: memberCount, userIds: userIds,
+              avatar: avatar, avatarUrl: avatarUrl,)),
+    ).whenComplete(() {
+      ChatRoom.shared.forceGetChat();
+      ChatRoom.shared.closeCabinetStream();
+    });
+  }
+  
   Future _getChats() async {
     Future<List<ChatsModel>> chats = chatsDB.getAllChats();
     chats.then((value) {

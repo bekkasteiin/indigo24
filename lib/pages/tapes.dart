@@ -252,13 +252,15 @@ class _TapesPageState extends State<TapesPage>
                                   Row(
                                     children: <Widget>[
                                       IconButton(
-                                        icon: Icon(
-                                          Icons.favorite,
-                                          color: _saved
-                                                  .contains(result[index]['id'])
-                                              ? Colors.red
-                                              : Colors.grey,
-                                          size: 35,
+                                        icon: Container(
+                                          width: 35,
+                                          height: 35,
+                                          child: Image(
+                                            image: AssetImage(
+                                               _saved
+                                                  .contains(result[index]['id']) ? 'assets/images/tapeLiked.png' : 'assets/images/tapeUnliked.png',
+                                            ),
+                                          ),
                                         ),
                                         onPressed: () async {
                                           await api
@@ -291,10 +293,14 @@ class _TapesPageState extends State<TapesPage>
                                         ),
                                       ),
                                       IconButton(
-                                        icon: Icon(
-                                          Icons.comment,
-                                          size: 35,
-                                          color: Colors.grey,
+                                         icon: Container(
+                                          width: 35,
+                                          height: 35,
+                                          child: Image(
+                                            image: AssetImage(
+                                               'assets/images/tapeComment.png',
+                                            ),
+                                          ),
                                         ),
                                         onPressed: () {
                                           Navigator.push(

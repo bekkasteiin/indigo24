@@ -6,9 +6,6 @@ import 'package:indigo24/services/user.dart' as user;
 class Api {
   Response response;
 
-  var unique = user.unique;
-  var customerID = user.id;
-
   static BaseOptions options = new BaseOptions(
     baseUrl: "https://api.indigo24.xyz/api/v2.1",
     connectTimeout: 5000,
@@ -17,14 +14,34 @@ class Api {
 
   Dio dio = new Dio(options);
 
+  checkUnique(newUnique, newCustomerID) async {
+    try {
+      response = await dio.post("/check/token", data: {
+        "customerID": "$newUnique",
+        "unique": "$newCustomerID"
+      });
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('e response is ${e.response}');
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
   withdraw(amount) async {
     try {
       String _token = "1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2";
       response = await dio.post("/pay/out", data: {
         "&_token": "$_token",
         "amount": "$amount",
-        "customerID": "$customerID",
-        "unique": "$unique"
+        "customerID": "${user.id}",
+        "unique": "${user.unique}"
       });
       return response.data;
     } on DioError catch (e) {
@@ -42,8 +59,8 @@ class Api {
   doTransfer(toID, amount) async {
     try {
       var data = {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "toID": "$toID",
         "amount": "$amount",
       };
@@ -66,8 +83,8 @@ class Api {
   getTransactions(page) async {
     try {
       response = await dio.post("/get/transactions", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "page": "$page",
       });
       return response.data;
@@ -86,8 +103,8 @@ class Api {
   checkPhoneForSendMoney(phone) async {
     try {
       response = await dio.post("/check/send/money/phone", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "phone": "$phone",
       });
       return response.data;
@@ -106,8 +123,8 @@ class Api {
   payService(serviceID, account, amount) async {
     try {
       response = await dio.post("/service/pay", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "serviceID": "$serviceID",
         "amount": "$amount",
         "account": "$account",
@@ -129,8 +146,8 @@ class Api {
     try {
       print('tried to get services');
       response = await dio.post("/get/services", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "categoryID": "$categoryID"
       });
       return response.data;
@@ -149,7 +166,7 @@ class Api {
   getHistories() async {
     try {
       response = await dio.post("/get/histories",
-          data: {"customerID": "$customerID", "unique": "$unique"});
+          data: {"customerID": "${user.id}", "unique": "${user.unique}"});
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -169,8 +186,8 @@ class Api {
       response = await dio.post("/pay/in", data: {
         "&_token": "$_token",
         "amount": "$amount",
-        "customerID": "$customerID",
-        "unique": "$unique"
+        "customerID": "${user.id}",
+        "unique": "${user.unique}"
       });
       return response.data;
     } on DioError catch (e) {
@@ -189,7 +206,7 @@ class Api {
     try {
       print('attempt to get categories');
       response = await dio.post("/get/categories",
-          data: {"customerID": "$customerID", "unique": "$unique"});
+          data: {"customerID": "${user.id}", "unique": "${user.unique}"});
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -221,12 +238,12 @@ class Api {
   }
 
   getExchangeRate() async {
-    print("Getting exchanges for $customerID with $unique");
+    print("Getting exchanges for ${user.id} with ${user.unique}");
     try {
       response = await dio.post("/get/exchanges", data: {
         "_token": "#8kX1xtDr4qSY8_C9!N@cC9bvT0Pilk85DS32",
-        "customerID": "$customerID",
-        "unique": "$unique"
+        "customerID": "${user.id}",
+        "unique": "${user.unique}"
       });
       return response.data;
     } on DioError catch (e) {
@@ -244,8 +261,8 @@ class Api {
   likeTape(String tapeId) async {
     try {
       response = await dio.post("/tape/like", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "tapeID": "$tapeId",
       });
       print("LIKE TAPE ${response.data}");
@@ -266,8 +283,8 @@ class Api {
   getTapes(String page) async {
     try {
       response = await dio.post("/get/tapes", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "page": "$page",
       });
       return response.data;
@@ -281,8 +298,8 @@ class Api {
   getTape(tapeID) async {
     try {
       response = await dio.post("/get/tape", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "tapeID": "$tapeID",
       });
       return response.data;
@@ -301,8 +318,8 @@ class Api {
   addTape(_path, title, description) async {
     try {
       FormData formData = FormData.fromMap({
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "file": await MultipartFile.fromFile(_path),
         "title": title,
         "description": description
@@ -328,8 +345,8 @@ class Api {
   uploadAvatar(_path) async {
     try {
       FormData formData = FormData.fromMap({
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "file": await MultipartFile.fromFile(_path),
       });
 
@@ -354,8 +371,8 @@ class Api {
   addCommentToTape(String comment, String tapeID) async {
     try {
       response = await dio.post("/tape/comment/add", data: {
-        "customerID": "$customerID",
-        "unique": "$unique",
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
         "comment": "$comment",
         "tapeID": "$tapeID",
       });

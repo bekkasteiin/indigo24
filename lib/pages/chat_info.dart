@@ -136,15 +136,27 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           width: 100.0,
           height: 100.0,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(
-                  'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
-              fit: BoxFit.cover,
-            ),
+            // image: DecorationImage(
+            //   image: NetworkImage(
+                  // widget.chatAvatar==null?'https://indigo24.xyz/uploads/avatars/noAvatar.png':
+                  // 'https://indigo24.xyz/uploads/avatars/${widget.chatAvatar}'),
+            //   fit: BoxFit.cover,
+            // ),
             borderRadius: BorderRadius.circular(80.0),
             border: Border.all(
               color: Color(0xFF001D52),
               width: 5.0,
+            ),
+          ),
+          child: ClipOval(
+            child: CachedNetworkImage(
+              imageUrl: widget.chatAvatar==null?
+                'https://indigo24.xyz/uploads/avatars/noAvatar.png'
+                :
+                'https://indigo24.xyz/uploads/avatars/${widget.chatAvatar}',
+              errorWidget: (context, url, error) => CachedNetworkImage(
+                imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+              ),
             ),
           ),
         ),
@@ -183,7 +195,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
+                        icon: Container(
+                          padding: EdgeInsets.all(5),
+                          child: Image(
+                            image: AssetImage(
+                              'assets/images/backWhite.png',
+                            ),
+                          ),
+                        ),
                         color: Colors.white,
                         onPressed: () {
                           Navigator.pop(context);
@@ -279,9 +298,22 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                               membersList[i]["avatar"] == false)
                                           ? CachedNetworkImageProvider(
                                               "https://media.indigo24.com/avatars/noAvatar.png")
-                                          : CachedNetworkImageProvider("https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
-                                          // CachedNetworkImageProvider(
-                                          //     'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}')
+                                          : 
+                                          CachedNetworkImageProvider(
+                                              'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}'),
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: (membersList[i]["avatar"] == null ||
+                                              membersList[i]["avatar"] == '' ||
+                                              membersList[i]["avatar"] == false)?
+                                              "https://media.indigo24.com/avatars/noAvatar.png"
+                                              :
+                                              'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}',
+                                        errorWidget: (context, url, error) => CachedNetworkImage(
+                                          imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                   title: Text("${membersList[i]["user_name"]}"),
                                   subtitle: "${membersList[i]["role"]}" == '0' ? Text('Создатель') : Text('Участник'),

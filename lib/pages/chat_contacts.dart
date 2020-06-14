@@ -58,17 +58,22 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
       switch (cmd) {
         case "user:check":
-          if (e.json['data']['chat_id'] != false &&
+          if (e.json['data']['chat_id'].toString() != 'false' &&
               e.json['data']['status'].toString() == 'true') {
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
+
+            print("USER CHECK DATA: ${e.json['data']}");
             Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => ChatPage(
                       '${e.json['data']['name']}', e.json['data']['chat_id'],
-                      memberCount: 2, userIds: e.json['data']['user_id'])),
+                      memberCount: 2, userIds: e.json['data']['user_id'], 
+                      avatar: '${e.json['data']['avatar']}',
+                      avatarUrl: '${e.json['data']['avatar_url']}'
+                      )),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
@@ -79,7 +84,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
           }
           break;
         case "chat:create":
-          print("STATUS ${e.json["data"]["status"]}");
+          print("CHAT CREATE ${e.json['data']}");
           if (e.json["data"]["status"].toString() == "true") {
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
@@ -199,8 +204,14 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         return Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                color: Colors.black,
+                icon: Container(
+                  padding: EdgeInsets.all(10),
+                  child: Image(
+                    image: AssetImage(
+                      'assets/images/back.png',
+                    ),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },

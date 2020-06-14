@@ -11,13 +11,12 @@ class RefillPage extends StatefulWidget {
 }
 
 class _RefillPageState extends State<RefillPage> {
-
   @override
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
-  
+
   var client = new http.Client();
 
   final amountController = TextEditingController();
@@ -29,8 +28,14 @@ class _RefillPageState extends State<RefillPage> {
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          color: Colors.black,
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
+              ),
+            ),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },

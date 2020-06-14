@@ -17,7 +17,6 @@ class PaymentsServicePage extends StatefulWidget {
 }
 
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
-  
   Api api = Api();
   var _balance;
   String _logo;
@@ -64,12 +63,25 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   Positioned(
                     child: AppBar(
                       title: Text("${widget.title}"),
+                      leading: IconButton(
+                        icon: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Image(
+                            image: AssetImage(
+                              'assets/images/backWhite.png',
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
                       backgroundColor: Colors.transparent,
                       elevation: 0,
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 45, left: 20, right: 20),
+                    margin: EdgeInsets.only(top: 45, left: 0, right: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -80,7 +92,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           color: Color(0xFFD1E1FF),
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 10, right: 10),
+                          margin: EdgeInsets.only(left: 30, right: 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -91,7 +103,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '${user.balance}',
+                                '${user.balance} ₸',
                                 style: fS18(c: 'FFFFFF'),
                               ),
                             ],
@@ -115,9 +127,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: Colors.white,
+        icon: Container(
+          padding: EdgeInsets.all(10),
+          child: Image(
+            image: AssetImage(
+              'assets/images/backWhite.png',
+            ),
+          ),
         ),
         onPressed: () {
           Navigator.pop(context);
