@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/main.dart';
 
 import '../services/api.dart';
 import 'payments_history.dart';
@@ -118,14 +119,20 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: api.getCategories().then((categories) {
-        return categories;
+        print(categories);
+        if (categories['message'] == 'Not authenticated' && categories['success'].toString() == 'false') {
+          logOut(context);
+          return categories;
+        } else {
+          return categories;
+        }
       }),
       builder: (context, snapshot) {
         return Scaffold(
           appBar: buildAppBar(),
           body: snapshot.hasData == true
               ? ListView.builder(
-                  itemCount: snapshot.data["categories"].length,
+                  itemCount: snapshot.data["categories"] != null ? snapshot.data["categories"].length : 0,
                   itemBuilder: (BuildContext context, int index) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 10),
@@ -174,13 +181,13 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       actions: <Widget>[
         IconButton(
           icon: Container(
-          padding: EdgeInsets.all(5),
-          child: Image(
-            image: AssetImage(
-              'assets/images/history.png',
+            padding: EdgeInsets.all(5),
+            child: Image(
+              image: AssetImage(
+                'assets/images/history.png',
+              ),
             ),
           ),
-        ),
           onPressed: () {
             // StudentDao().deleteAll();
             Navigator.push(

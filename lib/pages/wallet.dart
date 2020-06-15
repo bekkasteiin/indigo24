@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/refill.dart';
 import 'package:indigo24/pages/withdraw.dart';
 import 'package:indigo24/services/api.dart';
@@ -40,10 +41,19 @@ class _WalletTabState extends State<WalletTab> {
     _blockedAmount = double.parse(user.balanceInBlock);
     _amount = _realAmount;
     api.getExchangeRate().then((v) {
-      var ex = v["exchangeRates"];
-      _euroCoef = double.parse(ex['EUR']);
-      _rubleCoef = double.parse(ex['RUB']);
-      _dollarCoef = double.parse(ex['USD']);
+      print(v);
+      if(v['message'] == 'Not authenticated' && v['success'].toString() == 'false')
+      {
+        logOut(context);
+        return true;
+      } else{
+         var ex = v["exchangeRates"];
+        _euroCoef = double.parse(ex['EUR']);
+        _rubleCoef = double.parse(ex['RUB']);
+        _dollarCoef = double.parse(ex['USD']);
+        return false;
+      }
+     
     });
     super.initState();
   }

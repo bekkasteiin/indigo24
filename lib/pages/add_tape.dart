@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
@@ -183,15 +184,17 @@ class _AddTapePageState extends State<AddTapePage> {
   }
 
   Future addTape() async {
-    api
-        .addTape(
-            _currentFile.path, titleController.text, descriptionController.text)
-        .then((r) {
-      print("MY response $r");
-      if (r["success"]) {
-        titleController.text = "";
-        descriptionController.text = "";
-        Navigator.pop(context);
+    api.addTape(_currentFile.path, titleController.text, descriptionController.text).then((r) {
+      if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
+        logOut(context);
+        return r;
+      } else {
+        if (r["success"]) {
+          titleController.text = "";
+          descriptionController.text = "";
+          Navigator.pop(context);
+        }
+      return r;
       }
     });
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
-import 'package:http/http.dart' as http;
 import 'package:indigo24/services/localization.dart' as localization;
 
 class WithdrawPage extends StatefulWidget {
@@ -10,7 +9,6 @@ class WithdrawPage extends StatefulWidget {
 }
 
 class _WithdrawPageState extends State<WithdrawPage> {
-  var client = new http.Client();
 
   final amountController = TextEditingController();
 

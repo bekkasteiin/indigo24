@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
@@ -39,13 +40,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
         _image = File(pickedFile.path);
       });
       api.uploadAvatar(_image.path).then((r) async {
-        if (r["success"]) {
-          await SharedPreferencesHelper.setString('avatar', '${r["fileName"]}');
-          setState(() {
-            user.avatar = r["fileName"];
-          });
+        if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
+          logOut(context);
+          return r;
         } else {
-          print("error");
+          if (r["success"]) {
+            await SharedPreferencesHelper.setString(
+                'avatar', '${r["fileName"]}');
+            setState(() {
+              user.avatar = r["fileName"];
+            });
+          } else {
+            print("error");
+          }
+          return r;
         }
       });
     }
@@ -430,7 +438,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
-                            SharedPreferences preferences = await SharedPreferences.getInstance();
+                            SharedPreferences preferences =
+                                await SharedPreferences.getInstance();
                             preferences.setString('phone', 'null');
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(

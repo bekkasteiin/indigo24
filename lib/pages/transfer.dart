@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/main.dart';
 
 import '../services/api.dart';
 import '../style/fonts.dart';
@@ -81,7 +82,7 @@ class _TransferPageState extends State<TransferPage> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 45, left: 0, right: 20), 
+                    margin: EdgeInsets.only(top: 45, left: 0, right: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -174,14 +175,17 @@ class _TransferPageState extends State<TransferPage> {
         child: FlatButton(
           onPressed: () async {
             api.checkPhoneForSendMoney(receiverController.text).then((result) {
-              print('to id ${result["toID"]}, ${sumController.text}');
-              print('$result');
-              if (result["success"]) {
-                api.doTransfer(result["toID"], sumController.text).then((res) {
-                  print("sending $res");
-                });
+              if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
+                logOut(context);
+                return result;
+              } else {
+                if (result["success"]) {
+                  api.doTransfer(result["toID"], sumController.text).then((res) {
+                    print("sending $res");
+                  });
+                }
+                return result;
               }
-              return result;
             });
           },
           child: Text(
@@ -250,7 +254,8 @@ class _TransferPageState extends State<TransferPage> {
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     controller: sumController,
-                    decoration: InputDecoration.collapsed(hintText: '${localization.amount}'),
+                    decoration: InputDecoration.collapsed(
+                        hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
                     validator: (value) {
                       if (value.isEmpty) {
@@ -279,5 +284,4 @@ class _TransferPageState extends State<TransferPage> {
   }
 
   final amountController = TextEditingController();
-
 }

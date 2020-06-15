@@ -26,8 +26,6 @@ import 'package:indigo24/services/localization.dart' as localization;
 //   runApp(MyApp());
 // }
 
- 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -42,25 +40,28 @@ Future<void> main() async {
   print(unique);
   print(customerID);
   Api api = Api();
-  
-  // await api.checkUnique(unique,customerID).then((r) async {
-    
-  //   });
+  bool authenticated = false;
 
-  runApp(MyApp(phone: phone));
+  await api.checkUnique(unique, customerID).then((r) async {
+    if (r['success'] != null) {
+      authenticated = r['success'].toString() == 'true';
+    } else if (r['result'] != null) {
+      print('this is else if ${r['result']}');
+      authenticated = r['result']['success'].toString() == 'true';
+    }
+  });
+
+  runApp(MyApp(phone: phone, authenticated: authenticated));
 }
 
 class MyApp extends StatelessWidget {
-
-  const MyApp({
+  MyApp({
     Key key,
     @required this.phone,
+    this.authenticated,
   }) : super(key: key);
-
-  final String phone;
-
-
-
+  bool authenticated;
+  String phone;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +76,8 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: phone == 'null' ? IntroPage() : Tabs(),
+        home:
+            (phone == 'null' || authenticated == false) ? IntroPage() : Tabs(),
       ),
     );
   }
@@ -112,11 +114,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   void initState() {
     _tabController = new TabController(length: 4, vsync: this);
 
-    setUser().then((result) async{
-       print("result: $result");
-       print('user: ${user.id}');
-       print('user: ${user.name}');
-       print('user: ${user.balance}');
+    setUser().then((result) async {
+      print("result: $result");
+      print('user: ${user.id}');
+      print('user: ${user.name}');
+      print('user: ${user.balance}');
 
       _connectivity.initialise();
       _connectivity.myStream.listen((source) {
@@ -180,9 +182,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           break;
         default:
           print("default in main");
-         break;
+          break;
       }
-      
+
       // if (chatsPage == 1) {
       //   setState(() {
       //     chatsPage += 1;
@@ -201,40 +203,37 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  inAppPush(m){
+  inAppPush(m) {
     showOverlayNotification((context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: SafeArea(
-        child: ListTile(
-          onTap: (){
-            OverlaySupportEntry.of(context).dismiss();
-            ChatRoom.shared.getMessages(m['chat_id']);
-            goToChat(
-              "${m['user_name']}", 
-              "${m['chat_id']}", 
-              memberCount: "${m['type']}"=="0"?2:3, 
-              avatar: "${m['avatar']}", 
-              userIds: "${m['user_id']}");
-          },
-          leading: SizedBox.fromSize(
-              size: const Size(40, 40),
-              child: ClipOval(
-                child: CachedNetworkImage(
+      return Card(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        child: SafeArea(
+          child: ListTile(
+            onTap: () {
+              OverlaySupportEntry.of(context).dismiss();
+              ChatRoom.shared.getMessages(m['chat_id']);
+              goToChat("${m['user_name']}", "${m['chat_id']}",
+                  memberCount: "${m['type']}" == "0" ? 2 : 3,
+                  avatar: "${m['avatar']}",
+                  userIds: "${m['user_id']}");
+            },
+            leading: SizedBox.fromSize(
+                size: const Size(40, 40),
+                child: ClipOval(
+                    child: CachedNetworkImage(
                   imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
-                )
-              )),
-          title: Text("${m['user_name']}"),
-          subtitle: Text("${m["text"]}"),
-          trailing: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                OverlaySupportEntry.of(context).dismiss();
-              }),
+                ))),
+            title: Text("${m['user_name']}"),
+            subtitle: Text("${m["text"]}"),
+            trailing: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  OverlaySupportEntry.of(context).dismiss();
+                }),
+          ),
         ),
-      ),
-    );
-  }, duration: Duration(milliseconds: 4000));
+      );
+    }, duration: Duration(milliseconds: 4000));
   }
 
   goToChat(name, chatID, {memberCount, userIds, avatar, avatarUrl}) {
@@ -243,15 +242,20 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ChatPage(name, chatID,
-              memberCount: memberCount, userIds: userIds,
-              avatar: avatar, avatarUrl: avatarUrl,)),
+          builder: (context) => ChatPage(
+                name,
+                chatID,
+                memberCount: memberCount,
+                userIds: userIds,
+                avatar: avatar,
+                avatarUrl: avatarUrl,
+              )),
     ).whenComplete(() {
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
   }
-  
+
   Future _getChats() async {
     Future<List<ChatsModel>> chats = chatsDB.getAllChats();
     chats.then((value) {
@@ -304,28 +308,32 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                         image: AssetImage("assets/images/chat.png"),
                         width: 20,
                       ),
-                      child: Text("${localization.chat}", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.chat}",
+                          style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/profile.png"),
                         width: 20,
                       ),
-                      child: Text("${localization.profile}", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.profile}",
+                          style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/tape.png"),
                         width: 20,
                       ),
-                      child: Text("${localization.tape}", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.tape}",
+                          style: TextStyle(fontSize: 12)),
                     ),
                     new Tab(
                       icon: new Image(
                         image: AssetImage("assets/images/wallet.png"),
                         width: 20,
                       ),
-                      child: Text("${localization.wallet}", style: TextStyle(fontSize: 12)),
+                      child: Text("${localization.wallet}",
+                          style: TextStyle(fontSize: 12)),
                     )
                   ]),
             ),
@@ -337,4 +345,35 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   void dispose() {
     super.dispose();
   }
+}
+
+
+logOut(BuildContext context) async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  preferences.setString('phone', 'null');
+  Widget okButton = FlatButton(
+    child: Text("OK"),
+    onPressed: () {
+      Navigator.pop(context);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => IntroPage(),
+        ),
+        (r) => false,
+    );
+    },
+  );
+  AlertDialog alert = AlertDialog(
+    title: Text("Ошибка"),
+    content: Text('test'),
+    actions: [
+      okButton,
+    ],
+  );
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }

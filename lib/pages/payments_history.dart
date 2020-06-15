@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import '../main.dart';
+
 class PaymentHistoryPage extends StatefulWidget {
   @override
   _PaymentHistoryPageState createState() => _PaymentHistoryPageState();
@@ -137,23 +139,36 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return Scaffold(
       appBar: buildAppBar(),
       body: FutureBuilder(
-          future: api.getHistories(),
+          future: api.getHistories().then((histories) {
+            print(histories);
+            if (histories['message'] == 'Not authenticated' &&
+                histories['success'].toString() == 'false') {
+              logOut(context);
+              return histories;
+            } else {
+              return histories;
+            }
+          }),
           builder: (context, snapshot) {
             print(snapshot.data);
-            if (snapshot.hasData)
-              return _paymentHistroyBody(snapshot.data);
-            else
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+            print(snapshot.data);
+            print(snapshot.data);
+            print(snapshot.data);
+            print(snapshot.data);
+            print(snapshot.data);
+            return snapshot.hasData == true
+                ? _paymentHistroyBody(snapshot.data)
+                : Center(child: CircularProgressIndicator());
           }),
     );
   }
 
   SafeArea _paymentHistroyBody(snapshot) {
+    print(snapshot);
     return SafeArea(
       child: ListView.builder(
-        itemCount: snapshot['payments'].length,
+        itemCount:
+            snapshot['payments'] != null ? snapshot['payments'].length : 0,
         itemBuilder: (BuildContext context, int index) {
           return Container(
             padding: const EdgeInsets.only(top: 10),

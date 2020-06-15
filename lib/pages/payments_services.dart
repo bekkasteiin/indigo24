@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import '../services/api.dart';
 import 'payments_service.dart';
@@ -21,14 +22,19 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: api.getServices(widget.categoryID).then((services) {
-          return services;
+          if (services['message'] == 'Not authenticated' && services['success'].toString() == 'false') {
+            logOut(context);
+            return services;
+          } else {
+            return services;
+          }
         }),
         builder: (context, snapshot) {
           return Scaffold(
             appBar: buildAppBar(),
             body: snapshot.hasData == true
                 ? ListView.builder(
-                    itemCount: snapshot.data["services"].length,
+                    itemCount: snapshot.data["services"] != null ? snapshot.data["services"].length : 0,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 10),

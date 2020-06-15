@@ -1,7 +1,10 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:indigo24/services/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
+
+import 'helper.dart';
 
 class Api {
   Response response;
@@ -13,24 +16,204 @@ class Api {
   );
 
   Dio dio = new Dio(options);
-
-  checkUnique(newUnique, newCustomerID) async {
+  static const sendSmsToken = "2MSldk_7!FUh3zB18XoEfIe#nY69@0tcP5Q4";
+  static const registrationToken = "BGkA2as4#h_J@5txId3fEq6e!F80UMj197ZC";
+  static const checkPhoneToken = "EG#201wR8Wk6ZbvMFf_e@39h7V!tI5gBTx4a";
+  var device = 'deviceName';
+  // @TODO change device NAME;
+  register(phone, name, password, email) async {
     try {
-      response = await dio.post("/check/token", data: {
-        "customerID": "$newUnique",
-        "unique": "$newCustomerID"
+      response = await dio.post("/registration", data: {
+        "name": "$name",
+        "password": "$password",
+        "email": "$email",
+        "phone": "$phone",
+        "_token": "$registrationToken",
+        "device": "$device",
       });
-      return response.data;
+      if (response.data['success'] == true) {
+        // CHECK PHONE
+        // @TODO
+        return true;
+      } else {
+        return response.data;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
+  checkPhone(phone) async {
+    try {
+      response = await dio.post("/check/registration", data: {
+        "phone": "$phone",
+        "_token": "$sendSmsToken",
+      });
+      if (response.data['success'] == true) {
+        // CHECK PHONE
+        // @TODO
+        return true;
+      } else {
+        return response.data;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
+  sendSms(phone) async {
+    try {
+      response = await dio.post("/sms/send", data: {
+        "phone": "$phone",
+        "_token": "$sendSmsToken",
+      });
+      if (response.data['success'] == true) {
+        // SMS
+        return true;
+      } else {
+        return response.data;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
+  checkSms(code) async {
+    try {
+      response = await dio.post("/check/sms",
+          data: {"phone": "${user.phone}", "code": "$code"});
+      if (response.data['success'] == true) {
+        // SMS
+        return true;
+      } else {
+        return response.data;
+      }
     } on DioError catch (e) {
       if (e.response != null) {
         print('e response is ${e.response}');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
       }
+      return e.response.data;
+    }
+  }
+
+  getBalance() async {
+    try {
+      response = await dio.post("/get/balance",
+          data: {"customerID": "${user.id}", "unique": "${user.unique}"});
+      if (response.data['success'] == true) {
+        SharedPreferencesHelper.setString(
+            'balance', '${response.data['result']['balance']}');
+        SharedPreferencesHelper.setString(
+            'balanceInBlock', '${response.data['result']['balanceInBlock']}');
+        user.balance = '${response.data['result']['balance']}';
+        user.balanceInBlock = '${response.data['result']['balanceInBlock']}';
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('e response is ${e.response}');
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+      return e.response.data;
+    }
+  }
+
+  signIn(phone, password) async {
+    try {
+      response = await dio.post("/check/authentication", data: {
+        "phone": "$phone",
+        "password": "$password",
+      });
+      if (response.data['success'] == true) {
+        SharedPreferencesHelper.setString(
+            'customerID', '${response.data['ID']}');
+        SharedPreferencesHelper.setString('phone', '+$phone');
+        SharedPreferencesHelper.setString('name', '${response.data['name']}');
+        SharedPreferencesHelper.setString('email', '${response.data['email']}');
+        SharedPreferencesHelper.setString(
+            'avatar', '${response.data['avatar']}');
+        SharedPreferencesHelper.setString(
+            'unique', '${response.data['unique']}');
+        user.id = '${response.data['ID']}';
+        user.phone = '+$phone}';
+        user.name = '${response.data['name']}';
+        user.email = '${response.data['email']}';
+        user.avatar = '${response.data['avatar']}';
+        user.unique = '${response.data['unique']}';
+        return true;
+      } else {
+        return response.data;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('e response is ${e.response}');
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+      return e.response.data;
+    }
+  }
+
+  checkUnique(newUnique, newCustomerID) async {
+    try {
+      response = await dio.post("/check/token",
+          data: {"customerID": "$newCustomerID", "unique": "$newUnique"});
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('e response is ${e.response}');
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request.data);
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+      return e.response.data;
     }
   }
 
@@ -49,6 +232,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -93,6 +277,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -113,6 +298,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -135,6 +321,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -156,6 +343,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -173,6 +361,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -195,6 +384,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -213,6 +403,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -231,6 +422,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         // print(e.response.statusCode);
       }
@@ -251,6 +443,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -273,6 +466,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -291,7 +485,13 @@ class Api {
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
-      } else {}
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
     }
   }
 
@@ -308,6 +508,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);
@@ -331,15 +532,14 @@ class Api {
       print("Getting response from TAPE upload ${response.data}");
 
       return response.data;
-      
-    } on DioError catch(e) {
-      if(e.response != null) {
+    } on DioError catch (e) {
+      if (e.response != null) {
         print(e.response.data);
-      } else{
+      } else {
         print(e.request);
         print(e.message);
       }
-    } 
+    }
   }
 
   uploadAvatar(_path) async {
@@ -356,17 +556,15 @@ class Api {
       print("Getting response from avatar upload ${response.data}");
 
       return response.data;
-      
-    } on DioError catch(e) {
-      if(e.response != null) {
+    } on DioError catch (e) {
+      if (e.response != null) {
         print(e.response.data);
-      } else{
+      } else {
         print(e.request);
         print(e.message);
       }
-    } 
+    }
   }
-
 
   addCommentToTape(String comment, String tapeID) async {
     try {
@@ -383,6 +581,7 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
+        return e.response.data;
       } else {
         print(response.statusCode);
         print(e.response.statusCode);

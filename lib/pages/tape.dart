@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
@@ -20,7 +21,12 @@ class _TapePageState extends State<TapePage>
   @override
   void initState() {
     api.getTape(widget.tape["id"]).then((result) {
-      return setTape(result);
+      if (result['message'] == 'Not authenticated' &&result['success'].toString() == 'false') {
+        logOut(context);
+        return true;
+      } else {
+        return setTape(result);
+      }
     });
 
     super.initState();
@@ -29,6 +35,7 @@ class _TapePageState extends State<TapePage>
   Future setTape(result) async {
     setState(() {
       // print('this is result $result');
+
       tapeResult = result["result"];
       com = result["result"]["comments"].toList();
       _future = Future(foo);

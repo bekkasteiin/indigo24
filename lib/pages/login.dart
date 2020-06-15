@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -19,8 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController loginController;
   TextEditingController passwordController;
   bool _obscureText = true;
-  var client = new http.Client();
-
+  var singInResult;
   var countryId = 0;
   var country;
   var countries = new List<Country>();
@@ -67,79 +65,8 @@ class _LoginPageState extends State<LoginPage> {
     _getCountries();
   }
 
-  signIn() async {
-    try {
-      var response = await client.post(
-        'https://api.indigo24.xyz/api/v2.1/check/authentication',
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-        body:
-            "phone=$phonePrefix${loginController.text}&password=${passwordController.text}",
-      );
-      if (response.statusCode == 200) {
-        var result = json.decode(response.body);
-        print(result);
-        if (result['success'] == true) {
-          SharedPreferencesHelper.setString('customerID', '${result['ID']}');
-          SharedPreferencesHelper.setString(
-              'phone', '+$phonePrefix${loginController.text}');
-          SharedPreferencesHelper.setString('name', '${result['name']}');
-          SharedPreferencesHelper.setString('email', '${result['email']}');
-          SharedPreferencesHelper.setString('avatar', '${result['avatar']}');
-          SharedPreferencesHelper.setString('unique', '${result['unique']}');
 
-          user.id = '${result['ID']}';
-          user.phone = '+$phonePrefix${loginController.text}';
-          user.name = '${result['name']}';
-          user.email = '${result['email']}';
-          user.avatar = '${result['avatar']}';
-          user.unique = '${result['unique']}';
-
-          return true;
-        } else {
-          _showError(context, result["message"]);
-        }
-      } else {
-        return false;
-      }
-    } catch (_) {
-      print(_);
-      return "disconnect";
-    }
-  }
-
-  getBalance() async {
-    String customerID = await SharedPreferencesHelper.getCustomerID();
-    String unique = await SharedPreferencesHelper.getUnique();
-    try {
-      var response = await client.post(
-        'https://api.indigo24.xyz/api/v2.1/get/balance',
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-        body: "customerID=${customerID}&unique=${unique}",
-      );
-      if (response.statusCode == 200) {
-        var result = json.decode(response.body);
-        if (result['success'] == true) {
-          SharedPreferencesHelper.setString(
-              'balance', '${result['result']['balance']}');
-          SharedPreferencesHelper.setString(
-              'balanceInBlock', '${result['result']['balanceInBlock']}');
-
-          user.balance = '${result['result']['balance']}';
-          user.balanceInBlock = '${result['result']['balanceInBlock']}';
-
-          return true;
-        }
-      } else {
-        return false;
-      }
-    } catch (_) {
-      return "disconnect";
-    }
-  }
+  
 
   Future<void> _showError(BuildContext context, m) {
     return showDialog<void>(
@@ -312,15 +239,6 @@ class _LoginPageState extends State<LoginPage> {
                     _space(20),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
-                      // decoration: BoxDecoration(
-                      //   color: Color(0xff0543B8),
-                      //   borderRadius: BorderRadius.only(
-                      //     topRight: Radius.circular(10.0),
-                      //     topLeft: Radius.circular(10.0),
-                      //     bottomRight: Radius.circular(10.0),
-                      //     bottomLeft: Radius.circular(10.0),
-                      //   ),
-                      // ),
                       child: ProgressButton(
                         defaultWidget: Text("${localization.next}",
                             style: TextStyle(
@@ -331,15 +249,19 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                          if (await signIn() == true) {
-                            await getBalance();
-                            return () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) => Tabs()),
-                                  (r) => false);
-                            };
-                          }
+                          await api.signIn("$phonePrefix${loginController.text}", passwordController.text).then((response) async {
+                              singInResult = response;
+                              if(response == true){
+                                  await api.getBalance();
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(builder: (context) => Tabs()),(r) => false,
+                                  );
+                              }
+                              else{
+                                print("this is else $singInResult");
+                                _showError(context, singInResult["message"]);
+                             }
+                            });
                         },
                       ),
                     ),
