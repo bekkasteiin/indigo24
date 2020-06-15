@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:indigo24/main.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'phone_confirm.dart';
 
@@ -89,8 +87,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),

@@ -471,6 +471,7 @@ class ImageMessage extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
         ),
         onPressed: () {
+          print('hi');
           // Navigator.push(
           //     context, MaterialPageRoute(builder: (context) => FullPhoto(url: document['content'])));
         },

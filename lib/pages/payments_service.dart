@@ -20,8 +20,6 @@ class PaymentsServicePage extends StatefulWidget {
 
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
   Api api = Api();
-  var _balance;
-  String _logo;
   showAlertDialog(BuildContext context, String message) {
     Widget okButton = FlatButton(
       child: Text("OK"),

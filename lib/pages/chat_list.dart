@@ -1,18 +1,14 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/db/Student_DAO.dart';
 import 'package:indigo24/db/chats_model.dart';
-import 'package:indigo24/db/student.dart';
 import 'package:indigo24/pages/chat.dart';
 import 'package:indigo24/pages/chat_contacts.dart';
+import 'package:indigo24/pages/chat_group_selection.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'chat_page_view_test.dart';
 
 class ChatsListPage extends StatefulWidget {
   ChatsListPage({Key key, this.title}) : super(key: key);
@@ -103,10 +99,9 @@ class _ChatsListPageState extends State<ChatsListPage>
         actions: <Widget>[
           IconButton(
             icon: Container(
-              padding: EdgeInsets.symmetric(vertical: 10), 
               child: Image(
                 image: AssetImage(
-                  'assets/images/eyeClose.png',
+                  'assets/images/group.png',
                 ),
               ),
             ),
@@ -126,7 +121,41 @@ class _ChatsListPageState extends State<ChatsListPage>
           )
         ],
       ),
-      body: Container(child: _listView(context, string)),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.all(10),
+            child: FlatButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                Text('${localization.createGroup}'),
+                SizedBox(width: 10,),
+                Container(
+                    height: 30,
+                    width: 20,
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/group.png',
+                      ),
+                  ),
+                )
+              ],),
+              onPressed: () {
+                Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChatGroupSelection()),
+                );
+              },
+            ),
+          ),
+          Expanded(child : _listView(context, string)),
+        ],
+      ),
     );
   }
 

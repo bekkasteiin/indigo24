@@ -8,6 +8,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class AddTapePage extends StatefulWidget {
   AddTapePage({Key key, this.title}) : super(key: key);
@@ -92,9 +93,23 @@ class _AddTapePageState extends State<AddTapePage> {
       return retrieveError;
     }
     if (_controller == null) {
-      return const Text(
-        'Вы еще не выбрали видео',
-        textAlign: TextAlign.center,
+      return ListView(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.all(10),
+            child: TextField(
+                controller: titleController,
+                decoration: InputDecoration(labelText: 'Название')),
+          ),
+          Container(
+            margin: EdgeInsets.all(10),
+            child: TextField(
+                minLines: 1,
+                maxLines: 4,
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Описание')),
+          ),
+        ],
       );
     }
     return Padding(
@@ -111,6 +126,7 @@ class _AddTapePageState extends State<AddTapePage> {
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
+                minLines: 1,
                 maxLines: 4,
                 controller: descriptionController,
                 decoration: InputDecoration(labelText: 'Описание')),
@@ -129,13 +145,6 @@ class _AddTapePageState extends State<AddTapePage> {
       return ListView(
         children: <Widget>[
           Container(
-            height: MediaQuery.of(context).size.width,
-            width: MediaQuery.of(context).size.width,
-            child: PhotoView(
-              imageProvider: FileImage(_imageFile),
-            ),
-          ),
-          Container(
             margin: EdgeInsets.all(10),
             child: TextField(
                 controller: titleController,
@@ -144,9 +153,17 @@ class _AddTapePageState extends State<AddTapePage> {
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
+                minLines: 1,
                 maxLines: 4,
                 controller: descriptionController,
                 decoration: InputDecoration(labelText: 'Описание')),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.width,
+            width: MediaQuery.of(context).size.width,
+            child: PhotoView(
+              imageProvider: FileImage(_imageFile),
+            ),
           ),
         ],
       );
@@ -156,9 +173,23 @@ class _AddTapePageState extends State<AddTapePage> {
         textAlign: TextAlign.center,
       );
     } else {
-      return const Text(
-        'Вы еще не выбрали фото',
-        textAlign: TextAlign.center,
+      return ListView(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.all(10),
+            child: TextField(
+                controller: titleController,
+                decoration: InputDecoration(labelText: 'Название')),
+          ),
+          Container(
+            margin: EdgeInsets.all(10),
+            child: TextField(
+                minLines: 1,
+                maxLines: 4,
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Описание')),
+          ),
+        ],
       );
     }
   }
@@ -196,6 +227,7 @@ class _AddTapePageState extends State<AddTapePage> {
         }
       return r;
       }
+      
     });
   }
 
@@ -221,7 +253,7 @@ class _AddTapePageState extends State<AddTapePage> {
           color: Colors.black,
         ),
         brightness: Brightness.light,
-        title: Text('Добавить',
+        title: Text('${localization.newTape}',
             style: TextStyle(
               color: Colors.black,
               fontSize: 22,
@@ -230,14 +262,19 @@ class _AddTapePageState extends State<AddTapePage> {
             textAlign: TextAlign.center),
         actions: <Widget>[
           IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Colors.black,
+          icon: Container(
+            padding: EdgeInsets.all(5),
+            child: Image(
+              image: AssetImage(
+                'assets/images/add.png',
+              ),
             ),
-            onPressed: () async {
+          ),
+           onPressed: () async {
               await addTape();
             },
-          )
+          ),
+          
         ],
         backgroundColor: Colors.white,
       ),

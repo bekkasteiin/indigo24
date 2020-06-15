@@ -41,7 +41,7 @@ var contacts = 'Contacts';
 var search = 'Search';
 var createGroup = 'Create group';
 var chatName = 'Chat name';
-
+var newTape = 'New tape';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russia", "code": "ru"},
@@ -93,6 +93,7 @@ setLanguage(code) {
       search = 'Search';
       createGroup = 'Create group';
       chatName = 'Chat name';
+      newTape = 'New tape';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russia", "code": "ru"},
@@ -140,6 +141,7 @@ setLanguage(code) {
       search = 'Поиск';
       createGroup = 'Создать группу';
       chatName = 'Название чата';
+      newTape = 'Новая запись';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -188,6 +190,7 @@ setLanguage(code) {
       search = 'Іздеу';
       createGroup = 'Топ құру';
       chatName = 'Чат атауы';
+      newTape = 'Жаңа жазба';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

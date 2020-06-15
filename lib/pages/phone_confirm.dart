@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:indigo24/main.dart';
-import 'dart:convert';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/services/helper.dart';
-
 import 'user_registration.dart';
 
 class PhoneConfirmPage extends StatefulWidget {
@@ -57,8 +53,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),

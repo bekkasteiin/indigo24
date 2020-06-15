@@ -15,7 +15,6 @@ class TransferPage extends StatefulWidget {
 
 class _TransferPageState extends State<TransferPage> {
   Api api = Api();
-  String _balance = "";
 
   showAlertDialog(BuildContext context, String message) {
     // set up the button

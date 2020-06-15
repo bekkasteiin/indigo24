@@ -1,14 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/socket.dart';
-import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 
 class ChatGroupSelection extends StatefulWidget {
@@ -20,6 +17,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   var arrays = [];
   final Set _saved = Set();
   final Set _userIds = Set();
+  var _savedList = List<dynamic>();
 
   showAlertDialog(BuildContext context, String message) {
     Widget okButton = FlatButton(
@@ -68,6 +66,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             print(tempIndex);
             setState(() {
               _saved.add(tempIndex);
+              _savedList.add(["${e.json}"]);
             });
             print('${e.json['data']}');
             _userIds.add('${e.json['data']['user_id']}');
@@ -102,8 +101,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
               ChatRoom.shared.closeCabinetStream();
             });
           } else {
-            var name = e.json["data"]["name"];
-            var chatID = e.json["data"]["chat_id"];
             print('++++++++++++++++++++');
 
             // Navigator.pop(context);
@@ -278,7 +275,29 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
               ),
               body: snapshot.hasData
                   ? Column(
+                    mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
+                          Container(
+                            height: 50,
+                            color: Colors.blue,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _savedList.length != null ? _savedList.length : 0,
+                              itemBuilder: (BuildContext context, int index) {
+                              // print(_savedList[index]);
+                              return Column(
+                                children: <Widget>[
+                                  Container(
+                                    color: Colors.deepOrangeAccent, 
+                                    child: Text('1'),
+                                  ),
+                                  // Text("${_savedList[index][0]}")
+                                ],
+                              );
+                             },
+                            ),
+                          ),
                         Padding(
                           padding: const EdgeInsets.only(
                               top: 10.0, left: 10.0, right: 10, bottom: 0),
@@ -340,6 +359,16 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                           tempIndex = index;
                                           ChatRoom.shared.userCheck(actualList[index]['phone']);
                                         } else {
+                                          _savedList.removeWhere((item) => item == _savedList[index][0][0]);
+                                          print(json.decode(json.encode(_savedList[index][0][0])));
+                                          print('REMOVED');
+                                          print('REMOVED');
+                                          print('REMOVED');
+                                          print('REMOVED');
+                                          print('REMOVED');
+                                          print('REMOVED');
+                                          print('REMOVED');
+                                          print('REMOVED');
                                           _saved.remove(index);
                                         }
                                       });

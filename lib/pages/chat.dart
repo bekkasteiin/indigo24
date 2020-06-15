@@ -367,6 +367,7 @@ class _ChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               onPressed: () {
+                                Navigator.pop(context);
                                 getImage(ImageSource.camera);
                                 print('Камера');
                               },
@@ -405,6 +406,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('Деньги');
+                                
                               },
                             ),
                           ),
@@ -441,6 +443,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('Галерея');
+                                Navigator.pop(context);
                                 getImage(ImageSource.gallery);
                               },
                             ),
@@ -478,6 +481,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('видео');
+                                Navigator.pop(context);
                                 getVideo(ImageSource.gallery);
                               },
                             ),
@@ -515,6 +519,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('Файлы');
+                                Navigator.pop(context);
                                 _openFileExplorer();
                               },
                             ),

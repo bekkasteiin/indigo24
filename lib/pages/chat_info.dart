@@ -5,13 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/fonts.dart';
-import 'package:platform_action_sheet/platform_action_sheet.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -162,20 +159,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildChatName() {
-    TextStyle _nameTextStyle = TextStyle(
-      fontFamily: 'Roboto',
-      color: Colors.black,
-      fontSize: 20.0,
-      fontWeight: FontWeight.w500,
-    );
-
-    return Text(
-      _chatTitle,
-      style: _nameTextStyle,
     );
   }
 
