@@ -9,6 +9,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import '../main.dart';
 import 'tape.dart';
 
 class TapesPage extends StatefulWidget {
@@ -33,8 +34,13 @@ class _TapesPageState extends State<TapesPage>
 
   getTapes() {
     api.getTapes('$tapePage').then((tapes) {
-      print(tapes);
-      return setTapes(tapes);
+      if(tapes['message'] == 'Not authenticated' && tapes['success'].toString() == 'false')
+      {
+        logOut(context);
+        return true;
+      } else{
+        return setTapes(tapes);
+      }
     });
   }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -23,41 +22,11 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
   var api = Api();
   TextEditingController smsController;
   TextEditingController passwordController;
-  var client = new http.Client();
-
   @override
   void initState() {
     super.initState();
     smsController = new TextEditingController();
     passwordController = new TextEditingController();
-  }
-
-  checkSms(code) async {
-    try {
-      var response = await client.post(
-        'https://api.indigo24.xyz/api/v2.1/check/sms',
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-        body: "phone=${widget.phone}&code=$code",
-      );
-      if (response.statusCode == 200) {
-        var result = json.decode(response.body);
-        print(result);
-        if (result['success'] == true) {
-          // smsCode
-          return true;
-        } else {
-          _showError(context, result['message']);
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } catch (_) {
-      print(_);
-      return "disconnect";
-    }
   }
 
   @override
@@ -165,15 +134,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                 SizedBox(height: 25),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.5,
-                  // decoration: BoxDecoration(
-                  //   color: Color(0xff0543B8),
-                  //   borderRadius: BorderRadius.only(
-                  //     topRight: Radius.circular(10.0),
-                  //     topLeft: Radius.circular(10.0),
-                  //     bottomRight: Radius.circular(10.0),
-                  //     bottomLeft: Radius.circular(10.0),
-                  //   ),
-                  // ),
                   child: ProgressButton(
                     defaultWidget: Text("Далее",
                         style: TextStyle(color: Colors.white, fontSize: 22)),
@@ -182,14 +142,19 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     color: Color(0xff0543B8),
                     onPressed: () async {
                       //@TODO REMOVE CONDITION
-                      if (!await checkSms(smsController.text)) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
+                      await api.checkSms(smsController.text).then((r) async {
+                        if (r == true) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
                               builder: (context) =>
-                                  UserRegistrationPage(widget.phone)),
-                        );
-                      }
+                                  UserRegistrationPage(widget.phone),
+                            ),
+                          );
+                        } else {
+                          _showError(context, r);
+                        }
+                      });
                     },
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/main.dart';
 
 import '../services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -17,7 +18,12 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       appBar: buildAppBar(),
       body: FutureBuilder(
         future: api.getTransactions(1).then((transactions) {
-          return transactions;
+          if (transactions['message'] == 'Not authenticated' && transactions['success'].toString() == 'false') {
+            logOut(context);
+            return transactions;
+          } else {
+            return transactions;
+          }
         }),
         builder: (context, snapshot) {
           if (snapshot.hasData)
@@ -127,7 +133,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     print(snapshot);
     return SafeArea(
       child: ListView.builder(
-        itemCount: snapshot['transactions'].length,
+        itemCount: snapshot['transactions'] != null ? snapshot['transactions'].length : 0,
         itemBuilder: (BuildContext context, int index) {
           return Container(
             padding: const EdgeInsets.only(top: 5),

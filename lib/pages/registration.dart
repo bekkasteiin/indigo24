@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -18,8 +17,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var api = Api();
   TextEditingController loginController;
   TextEditingController passwordController;
-  var client = new http.Client();
-
   var countryId = 0;
   var country;
   var countries = new List<Country>();
@@ -64,67 +61,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _getCountries();
   }
 
-  sendSms() async {
-    try {
-      var response = await client.post(
-        'https://api.indigo24.xyz/api/v2.1/sms/send',
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-        body:
-            "phone=$phonePrefix${loginController.text}&_token=2MSldk_7!FUh3zB18XoEfIe#nY69@0tcP5Q4",
-      );
-      if (response.statusCode == 200) {
-        var result = json.decode(response.body);
-        print(result);
-        if (result['success'] == true) {
-          // smsCode
-          return true;
-        } else {
-          _showError(context, result['message']);
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } catch (_) {
-      print(_);
-      return "disconnect";
-    }
-  }
-
   @override
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  checkPhone() async {
-    try {
-      var response = await client.post(
-        'https://api.indigo24.xyz/api/v2.1/check/registration',
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-        body:
-            "phone=$phonePrefix${loginController.text}&_token=EG#201wR8Wk6ZbvMFf_e@39h7V!tI5gBTx4a",
-      );
-      if (response.statusCode == 200) {
-        var result = json.decode(response.body);
-        print(result);
-        if (result['success'] == true) {
-          return true;
-        } else {
-          _showError(context, 'Неправильный номер');
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } catch (_) {
-      print(_);
-      return "disconnect";
-    }
   }
 
   Future<void> _showError(BuildContext context, m) {
@@ -249,18 +189,31 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           borderRadius: 10.0,
                           color: Color(0xff0543B8),
                           onPressed: () async {
-                            if (await checkPhone()) {
-                              if (await sendSms()) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PhoneConfirmPage(
-                                        smsCode,
-                                        phonePrefix + loginController.text),
-                                  ),
-                                );
+                            await api.checkPhone(phonePrefix + loginController.text).then((r) async {
+                              if (true) {
+                                await api.sendSms(phonePrefix + loginController.text).then((r) {
+                                  if (true) {
+                                    //@TODO
+                                    print('REGISTRATION TODO');
+                                    print('REGISTRATION TODO');
+                                    print('REGISTRATION TODO');
+                                    print('REGISTRATION TODO');
+                                    print('REGISTRATION TODO');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PhoneConfirmPage(
+                                          smsCode,
+                                          phonePrefix + loginController.text,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    _showError(context, r['message']);
+                                  }
+                                });
                               }
-                            }
+                            });
                           },
                         ),
                       ),

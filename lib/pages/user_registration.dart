@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
-import 'package:http/http.dart' as http;
 import 'package:indigo24/pages/login.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
@@ -22,7 +21,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
   TextEditingController emailController;
   TextEditingController passwordController;
   TextEditingController passwordController2;
-  var client = new http.Client();
 
   bool _obscureText = true;
   bool _obscureText2 = true;
@@ -37,33 +35,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
     passwordController2 = new TextEditingController();
   }
 
-  register() async {
-    try {
-      var response = await client.post(
-        'https://api.indigo24.xyz/api/v2.1/registration',
-        headers: <String, String>{
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-        body:
-            "_token=BGkA2as4#h_J@5txId3fEq6e!F80UMj197ZC&device=device&name=${nameController.text + ' ' + lastNameController.text}&phone=${widget.phone}&password=$password&email=${emailController.text}",
-      );
-      if (response.statusCode == 200) {
-        var result = json.decode(response.body);
-        print(result);
-        if (result['success'] == true) {
-          return true;
-        } else {
-          _showError(context, result['message']);
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } catch (_) {
-      print(_);
-      return "disconnect";
-    }
-  }
 
   @override
   void dispose() {
@@ -287,13 +258,15 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     onPressed: () async {
                       if (passwordController.text == passwordController2.text) {
                         password = passwordController.text;
-                        if (await register()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()),
-                          );
-                        }
+                        await api.register("${widget.phone}", "${nameController.text + ' ' + lastNameController.text}", "$password", "$emailController.text").then((r) {
+                          if(true) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginPage()),
+                            );
+                          }
+                        });
                       } else {
                         _showError(context, 'Пароль не совпадает');
                       }

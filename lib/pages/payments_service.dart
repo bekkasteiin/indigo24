@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/main.dart';
 
 import '../services/api.dart';
 import '../style/fonts.dart';
@@ -144,15 +145,18 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         height: 100.0,
         child: FlatButton(
           onPressed: () async {
-            api
-                .payService(
+            api.payService(
               widget.serviceID,
               receiverController.text,
               sumController.text,
-            )
-                .then((services) {
+            ).then((services) {
               print('ho $services');
-              return services;
+              if (services['message'] == 'Not authenticated' && services['success'].toString() == 'false') {
+                logOut(context);
+                return services;
+              } else {
+                return services;
+              }
             });
           },
           child: Text(

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -17,8 +16,6 @@ class _RefillPageState extends State<RefillPage> {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
-
-  var client = new http.Client();
 
   final amountController = TextEditingController();
   Api api = Api();

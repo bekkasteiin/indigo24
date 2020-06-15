@@ -41,17 +41,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
       });
       if(_image != null){
         api.uploadAvatar(_image.path).then((r) async {
-          if (r["success"]) {
-            await SharedPreferencesHelper.setString('avatar', '${r["fileName"]}');
-            setState(() {
-              user.avatar = r["fileName"];
-            });
+          if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
+            logOut(context);
+            return r;
           } else {
-            print("error");
+            if (r["success"]) {
+              await SharedPreferencesHelper.setString(
+                  'avatar', '${r["fileName"]}');
+              setState(() {
+                user.avatar = r["fileName"];
+              });
+            } else {
+              print("error");
+            }
+            return r;
           }
         });
       }
-      
     }
   }
 
@@ -411,7 +417,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         }).toList(),
                         onChanged: (value) {
                           // MyApp.tabPageKey.currentState.tabController.animateTo(0);
-                          MyApp.tabPageKey.currentState.setState(() {});
+                          tabPageKey.currentState.setState(() {});
                           print('${value['title']}');
                           setState(() {
                           });
@@ -434,7 +440,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
-                            SharedPreferences preferences = await SharedPreferences.getInstance();
+                            SharedPreferences preferences =
+                                await SharedPreferences.getInstance();
                             preferences.setString('phone', 'null');
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
