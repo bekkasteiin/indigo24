@@ -215,11 +215,15 @@ class SendedMessageWidget extends StatelessWidget {
   final String content;
   final String time;
   final String write;
+  final String photo;
+  final String photoUrl;
   const SendedMessageWidget({
     Key key,
     this.content,
     this.time,
     this.write,
+    this.photo,
+    this.photoUrl
   }) : super(key: key);
 
   
@@ -257,8 +261,8 @@ class SendedMessageWidget extends StatelessWidget {
                   (a[0]==":" && a[l]==":" && content.length>8)?
                   Text(content, style: TextStyle(fontSize: 24))
                   :
-                  (content.contains('http'))?
-                  ImageMessage(content)
+                  (photo!=null)?
+                  ImageMessage(photoUrl+photo)
                   : 
                   Text(
                     content,
@@ -307,12 +311,17 @@ class ReceivedMessageWidget extends StatelessWidget {
   final String time;
   final String image;
   final String name;
+  final String photo;
+  final String photoUrl;
+
   const ReceivedMessageWidget({
     Key key,
     this.content,
     this.time,
     this.image,
-    this.name
+    this.name,
+    this.photo,
+    this.photoUrl
   }) : super(key: key);
 
   @override
@@ -370,8 +379,8 @@ class ReceivedMessageWidget extends StatelessWidget {
                             (a[0]==":" && a[l]==":" && content.length>8)?
                             Text(content, style: TextStyle(fontSize: 24))
                             :
-                            (content.contains('http'))?
-                            ImageMessage(content)
+                            (photo!=null)?
+                            ImageMessage(photoUrl+photo)
                             :
                             Text(
                               content,
@@ -444,7 +453,7 @@ class ImageMessage extends StatelessWidget {
                 // height: 200.0,
                 width: MediaQuery.of(context).size.width*0.7,
                 height: MediaQuery.of(context).size.width*0.7,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
               ),
               borderRadius: BorderRadius.all(
                 Radius.circular(8.0),
@@ -456,7 +465,7 @@ class ImageMessage extends StatelessWidget {
             height: MediaQuery.of(context).size.width*0.7,
             // width: 200.0,
             // height: 200.0,
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
           clipBehavior: Clip.hardEdge,

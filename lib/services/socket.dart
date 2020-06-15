@@ -143,7 +143,7 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
-  sendMessage(String chatID, String message) {
+  sendMessage(String chatID, String message, {int type, attachments}) {
     outSound();
 
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
@@ -156,10 +156,13 @@ class ChatRoom {
           "user_id": "${user.id}",
           "userToken": "${user.unique}",
           "chat_id": "$chatID",
-          "text": '$message'
+          "text": '$message',
+          "message_type": type==null?0:type,
+          "attachments": attachments==null?null:attachments
         }
       });
       print('added message');
+      print("$data");
       channel.sink.add(data);
     } else {
       print('message is empty');

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:audioplayers/audio_cache.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:record_mp3/record_mp3.dart';
@@ -25,7 +27,6 @@ Image backgroundForChat = Image(
   fit: BoxFit.fill,
 );
 
-
 class ChatPage extends StatefulWidget {
   final name;
   final chatID;
@@ -33,7 +34,8 @@ class ChatPage extends StatefulWidget {
   final userIds;
   final avatar;
   final avatarUrl;
-  ChatPage(this.name, this.chatID, {this.memberCount, this.userIds, this.avatar, this.avatarUrl});
+  ChatPage(this.name, this.chatID,
+      {this.memberCount, this.userIds, this.avatar, this.avatarUrl});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -47,25 +49,34 @@ class _ChatPageState extends State<ChatPage> {
   bool isLoaded = false;
   bool isTyping = false;
   bool isRecording = false;
-
   Api api = Api();
   int page = 1;
   // RefreshController _refreshController = RefreshController();
   ScrollController _scrollController = ScrollController();
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-      
+
   String statusText = "";
   bool isComplete = false;
+  
 
-
-  void sendSound(){
+  String _fileName;
+  String _path;
+  Map<String, String> _paths;
+  String _extension;
+  bool _loadingPath = false;
+  bool _multiPick = false;
+  FileType _pickingType = FileType.any;
+  var myFileUrl;
+  bool haveFile = false;
+  
+  void sendSound() {
     print("Send sound is called");
     final player = AudioCache();
     player.play("sound/msg_out.mp3");
   }
 
-  void _onRefresh() async{
+  void _onRefresh() async {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
@@ -75,7 +86,7 @@ class _ChatPageState extends State<ChatPage> {
     _refreshController.refreshCompleted();
   }
 
-  void _onLoading() async{
+  void _onLoading() async {
     // monitor network fetch
 
     // await Future.delayed(Duration(milliseconds: 1000));
@@ -84,11 +95,11 @@ class _ChatPageState extends State<ChatPage> {
     // items.add((items.length+1).toString());
     print("_onLoading ");
     // print("_onLoading ");
-    if(mounted)
-    setState(() {
-      print("mounted ");
-      // page += 1;
-    });
+    if (mounted)
+      setState(() {
+        print("mounted ");
+        // page += 1;
+      });
     _loadData();
     _refreshController.loadComplete();
   }
@@ -115,12 +126,12 @@ class _ChatPageState extends State<ChatPage> {
 
   int pageCounter = 1;
 
-  // [{id: message:27886:346, user_id: 27886, user_name: AdilTest, 
-  // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/, 
+  // [{id: message:27886:346, user_id: 27886, user_name: AdilTest,
+  // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
   // text: 40, time: 1591947445, type: 0, write: 0},
 
-// [{id: 145959, user_id: 27886, user_name: AdilTest, 
-// avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/, 
+// [{id: 145959, user_id: 27886, user_name: AdilTest,
+// avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
 // text: 20, time: 1591947417, type: 0, write: 0},
 
   listen() {
@@ -130,7 +141,6 @@ class _ChatPageState extends State<ChatPage> {
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
-
           if (page == 1) {
             setState(() {
               page += 1;
@@ -182,21 +192,115 @@ class _ChatPageState extends State<ChatPage> {
 
   Future _loadData() async {
     // perform fetching data delay
-    print("WTF?????? $isLoaded"); 
+    print("WTF?????? $isLoaded");
     setState(() {
       isLoaded = false;
       // if(page==1){
       //   ChatRoom.shared.getMessages(widget.chatID, page: 2);
       // } else {
-        ChatRoom.shared.getMessages(widget.chatID, page: page);
+      ChatRoom.shared.getMessages(widget.chatID, page: page);
       // }
-      
     });
-    
+
     print("load more with page $page");
     // update data and loading status
   }
 
+  File _image;
+
+  final picker = ImagePicker();
+  
+  Future getImage(ImageSource imageSource) async {
+    final pickedFile = await picker.getImage(source: imageSource);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      print(_image);
+      api.uploadMedia(_image.path, 1).then((r) async {
+        print("RRR $r");
+        if (r["status"]) {
+          var a = [{
+            "filename": "${r["file_name"]}"
+          }];
+          ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
+        } else {
+          print("error");
+        }
+      });
+    }
+  }
+
+  Future getVideo(ImageSource imageSource) async {
+    final pickedFile = await picker.getVideo(source: imageSource);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      print(_image);
+      api.uploadMedia(_image.path, 4).then((r) async {
+        print("RRR $r");
+        if (r["status"]) {
+          var a = [{
+            "filename": "${r["file_name"]}"
+          }];
+          ChatRoom.shared.sendMessage('${widget.chatID}', "video", type: 4, attachments: jsonDecode(jsonEncode(a)));
+        } else {
+          print("error");
+        }
+      });
+    }
+  } 
+
+  void _openFileExplorer() async {
+    setState(() => _loadingPath = true);
+    try {
+      if (_multiPick) {
+        _path = null;
+        _paths = await FilePicker.getMultiFilePath(
+            type: _pickingType,
+            allowedExtensions: (_extension?.isNotEmpty ?? false)
+                ? _extension?.replaceAll(' ', '')?.split(',')
+                : null);
+      } else {
+        _paths = null;
+        _path = await FilePicker.getFilePath(
+            type: _pickingType,
+            allowedExtensions: (_extension?.isNotEmpty ?? false)
+                ? _extension?.replaceAll(' ', '')?.split(',')
+                : null);
+        
+                print(_path);
+      }
+    } on PlatformException catch (e) {
+      print("Unsupported operation" + e.toString());
+    }
+    if (!mounted) return;
+    setState(() {
+      _loadingPath = false;
+      _fileName = _path != null
+          ? _path.split('/').last
+          : _paths != null ? _paths.keys.toString() : '...';
+
+      print("path name $_path");
+    });
+
+    api.uploadMedia(_path, 2).then((r) async {
+      print("RRR $r");
+      if (r["status"]) {
+        var a = [{
+          "filename": "${r["file_name"]}"
+        }];
+        ChatRoom.shared.sendMessage('${widget.chatID}', "file", type: 2, attachments: jsonDecode(jsonEncode(a)));
+      } else {
+        print("error");
+      }
+    });
+
+    // doReguest();
+  }
+
+  
   @override
   void dispose() {
     ChatRoom.shared.cabinetController.close();
@@ -205,9 +309,229 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
+  showAttachmentBottomSheet(context) {
+    showModalBottomSheet(
+        barrierColor: Colors.white.withOpacity(0),
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext bc) {
+          return Theme(
+            data: ThemeData(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+            child: InkWell(
+              onTap: () {
+                SystemChannels.textInput.invokeMethod('TextInput.hide');
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                padding: EdgeInsets.only(bottom: 80),
+                margin: EdgeInsets.only(
+                    right: MediaQuery.of(context).size.width * 0.5),
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.only(topRight: Radius.circular(15)),
+                  child: Container(
+                    color: Colors.white.withOpacity(0.9),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/camera.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Камера',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                getImage(ImageSource.camera);
+                                print('Камера');
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                   Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/money.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Деньги',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('Деньги');
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                   Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/gallery.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Галерея',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('Галерея');
+                                getImage(ImageSource.gallery);
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                   Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/files.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Видео',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('видео');
+                                getVideo(ImageSource.gallery);
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          child: Theme(
+                            data: ThemeData(),
+                            child: FlatButton(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                   Container(
+                                    width: 40,
+                                    height: 40,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/files.png',
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text('Файлы',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52),
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                print('Файлы');
+                                _openFileExplorer();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
@@ -238,6 +562,8 @@ class _ChatPageState extends State<ChatPage> {
                     : "",
                 style: TextStyle(
                     color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               (widget.memberCount > 2)
                   ? Text(
@@ -248,9 +574,11 @@ class _ChatPageState extends State<ChatPage> {
                           fontWeight: FontWeight.w400),
                     )
                   : online == null
-                      ? Container() 
+                      ? Container()
                       : Text(
-                          ('$online' == 'online' || '$online' == 'offline') ? '$online' : 'был в сети $online', 
+                          ('$online' == 'online' || '$online' == 'offline')
+                              ? '$online'
+                              : 'был в сети $online',
                           style: TextStyle(
                               color: Color(0xFF001D52),
                               fontSize: 14,
@@ -265,7 +593,8 @@ class _ChatPageState extends State<ChatPage> {
               MaterialPageRoute(
                 builder: (context) => ChatProfileInfo(
                   chatName: widget.name,
-                  chatAvatar: widget.avatar==null?'noAvatar.png':widget.avatar,
+                  chatAvatar:
+                      widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                   chatMembers: widget.memberCount,
                   chatId: widget.chatID,
                 ),
@@ -279,19 +608,19 @@ class _ChatPageState extends State<ChatPage> {
             color: Colors.transparent,
             textColor: Colors.white,
             child: CircleAvatar(
-                radius: 25,
-                child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: 
-                        widget.avatar==null? "https://indigo24.xyz/uploads/avatars/noAvatar.png" :
-                        widget.avatarUrl==null? "https://indigo24.xyz/uploads/avatars/" + widget.avatar : 
-                        widget.avatarUrl+widget.avatar,
+              radius: 25,
+              child: ClipOval(
+                  child: CachedNetworkImage(
+                      imageUrl: widget.avatar == null
+                          ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+                          : widget.avatarUrl == null
+                              ? "https://indigo24.xyz/uploads/avatars/" +
+                                  widget.avatar
+                              : widget.avatarUrl + widget.avatar,
                       errorWidget: (context, url, error) => CachedNetworkImage(
-                        imageUrl: "https://media.indigo24.com/avatars/noAvatar.png"
-                      )
-                    )
-                ),
-              ),
+                          imageUrl:
+                              "https://media.indigo24.com/avatars/noAvatar.png"))),
+            ),
             // padding: EdgeInsets.all(16),
             shape: CircleBorder(),
             onPressed: () {
@@ -301,7 +630,8 @@ class _ChatPageState extends State<ChatPage> {
                 MaterialPageRoute(
                   builder: (context) => ChatProfileInfo(
                     chatName: widget.name,
-                    chatAvatar: widget.avatar==null?'noAvatar.png':widget.avatar,
+                    chatAvatar:
+                        widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatMembers: widget.memberCount,
                     chatId: widget.chatID,
                   ),
@@ -359,7 +689,7 @@ class _ChatPageState extends State<ChatPage> {
         brightness: Brightness.light,
       ),
       body: SafeArea(
-      child: Container(
+          child: Container(
         child: Stack(
           fit: StackFit.loose,
           children: <Widget>[
@@ -371,10 +701,9 @@ class _ChatPageState extends State<ChatPage> {
             //   // colorFilter: ColorFilter.linearToSrgbGamma()
             // ),
             Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: backgroundForChat
-            ),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: backgroundForChat),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisAlignment: MainAxisAlignment.start,
@@ -399,34 +728,34 @@ class _ChatPageState extends State<ChatPage> {
                     child: Container(
                       child: myList.isEmpty
                           ? Center(
-                              child: Text("Loading"),
+                              child: Image.asset("assets/empty.gif")
                             )
-                          :  
-                          SmartRefresher(
-                            enablePullDown: false,
-                            enablePullUp: true,
-                            // header: WaterDropHeader(),
-                            footer: CustomFooter(
-                              builder: (BuildContext context,LoadStatus mode){
-                                Widget body ;
-                                return Container(
-                                  height: 55.0,
-                                  child: Center(child:body),
-                                );
-                              },
+                          : SmartRefresher(
+                              enablePullDown: false,
+                              enablePullUp: true,
+                              // header: WaterDropHeader(),
+                              footer: CustomFooter(
+                                builder:
+                                    (BuildContext context, LoadStatus mode) {
+                                  Widget body;
+                                  return Container(
+                                    height: 55.0,
+                                    child: Center(child: body),
+                                  );
+                                },
+                              ),
+                              controller: _refreshController,
+                              onRefresh: _onRefresh,
+                              onLoading: _onLoading,
+                              child: ListView.builder(
+                                controller: controller,
+                                itemCount: myList.length,
+                                reverse: true,
+                                itemBuilder: (context, i) {
+                                  return message(myList[i]);
+                                },
+                              ),
                             ),
-                            controller: _refreshController,
-                            onRefresh: _onRefresh,
-                            onLoading: _onLoading,
-                            child: ListView.builder(
-                                  controller: controller,
-                                  itemCount: myList.length,
-                                  reverse: true,
-                                  itemBuilder: (context, i) {
-                                    return message(myList[i]);
-                                  },
-                                ),
-                          ),
                     ),
                   ),
                 ),
@@ -437,130 +766,114 @@ class _ChatPageState extends State<ChatPage> {
                   color: Colors.white,
                   width: MediaQuery.of(context).size.width,
                   child: Padding(
-// <<<<<<< HEAD
                     padding: const EdgeInsets.only(left: 5, right: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        isComplete?
-                        GestureDetector(
-                          onTap: () {
-                            play();
-                          },
-                          child: Center(
-                            child: Icon(Icons.play_arrow, size: 30,),
-                          ),
-                        )
-                        :
-                        IconButton(
-                          icon: Icon(Icons.attach_file),
-                          onPressed: (){
-                            print("Прикрепить");
-// =======
-//                     padding: const EdgeInsets.only(left: 20, right: 5),
-//                     child: TextField(
-//                       maxLines: 6,
-//                       minLines: 1,
-                      
-//                       controller: _text,
-//                       decoration: InputDecoration(
-//                         // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
-//                         hintText: "${localization.enterMessage}",  
-//                         suffixIcon: IconButton(
-//                           icon: Icon(Icons.send),
-//                           onPressed: () {
-// // <<<<<<< HEAD
-// //                             print('+++++++++++++++___________+++++++++++');
-// >>>>>>> b6578fee599585a15cf792daf57f65de418dc543
-                            
-                          },
-                        ),
-                      
-                        !isRecording?Flexible(
-                          child: TextField(
-                            maxLines: 6,
-                            minLines: 1,
-                            controller: _text,
-                            decoration: InputDecoration(
-                              hintText: "${localization.enterMessage}",
-                            ),
-                            onChanged: (value) {
-                              print("Typing: $value");
-                              if(value == ''){
-                                setState(() {
-                                  isTyping = false;
-                                });
-                              } else {
-                                setState(() {
-                                  isTyping = true;
-                                });
-                              }
-                            },
-                          ),
-                        )
-                        :
-                        GestureDetector(
-                          onTap: () {
-                            // startRecord();
-                          },
-                          child: Center(
-                            child: Text("Нажмите 2 раза чтобы остановить запись"),
-                          ),
-                        ),
-                        
-                        !isTyping?
-                            ClipOval(
-                              child: GestureDetector(
-                                onLongPress: (){
-                                  print("long press");
-                                },
+                        isComplete
+                            ? GestureDetector(
                                 onTap: () {
-                                  startRecord();
-                                },
-                                onDoubleTap: () {
-                                  stopRecord();
+                                  play();
                                 },
                                 child: Center(
-                                  child: Icon(Icons.mic, size: 30,),
+                                  child: Icon(
+                                    Icons.play_arrow,
+                                    size: 30,
+                                  ),
+                                ),
+                              )
+                            : IconButton(
+                                icon: Icon(Icons.attach_file),
+                                onPressed: () {
+                                  print("Прикрепить");
+                                  SystemChannels.textInput.invokeMethod('TextInput.hide');
+                                  showAttachmentBottomSheet(context);
+                                },
+                              ),
+                        !isRecording
+                            ? Flexible(
+                                child: TextField(
+                                  maxLines: 6,
+                                  minLines: 1,
+                                  controller: _text,
+                                  onChanged: (value) {
+                                    print("Typing: $value");
+                                    if (value == '') {
+                                      setState(() {
+                                        isTyping = false;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isTyping = true;
+                                      });
+                                    }
+                                  },
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  // startRecord();
+                                },
+                                child: Center(
+                                  child: Text(
+                                      "Нажмите 2 раза чтобы остановить запись"),
                                 ),
                               ),
-                            )
+                        !isTyping
+                            ? ClipOval(
+                                child: GestureDetector(
+                                  onLongPress: () {
+                                    print("long press");
+                                  },
+                                  // onTap: () {
+                                  //   startRecord();
+                                  // },
+                                  // onDoubleTap: () {
+                                  //   stopRecord();
+                                  // },
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.mic,
+                                      size: 30,
+                                    ),
+                                  ),
+                                ),
+                              )
                             // IconButton(
                             //   icon: Icon(Icons.mic),
                             //   onPressed: () {
                             //     print("audio pressed");
                             //   },
                             // )
-                            :
-                            IconButton(
-                              icon: Icon(Icons.send),
-                              onPressed: () {
-                                ChatRoom.shared
-                                    .sendMessage('${widget.chatID}', _text.text);
-                                setState(() {
-                                  isTyping = false;
-                                  _text.text = '';
-                                });
-                              },
-                            ),
+                            : IconButton(
+                                icon: Icon(Icons.send),
+                                onPressed: () {
+                                  ChatRoom.shared.sendMessage(
+                                      '${widget.chatID}', _text.text);
+                                  setState(() {
+                                    isTyping = false;
+                                    _text.text = '';
+                                  });
+                                },
+                              ),
                       ],
                     ),
                   ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )),
+                ),
+              ],
+            ),
+          ],
+        ),
+      )),
     );
   }
-  
+
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
-    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7') return Devider(m);
+    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7')
+      return Devider(m);
     return '${m['user_id']}' == '${user.id}' ? Sended(m) : Received(m);
   }
-
 
   Future<bool> checkPermission() async {
     if (!await Permission.microphone.isGranted) {
@@ -644,9 +957,6 @@ class _ChatPageState extends State<ChatPage> {
     }
     return sdPath + "/test_${i++}.mp3";
   }
-
-
-  
 }
 
 class Devider extends StatelessWidget {
@@ -675,18 +985,22 @@ class Received extends StatelessWidget {
   final m;
   Received(this.m);
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
+    var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
     return Align(
-      alignment: Alignment(-1, 0),
-      child: ReceivedMessageWidget(
+        alignment: Alignment(-1, 0),
+        child: ReceivedMessageWidget(
           content: '${m['text']}',
           time: time('${m['time']}'),
           name: '${m['user_name']}',
-          image: (m["avatar"]==null || m["avatar"]=="")? "https://indigo24.xyz/uploads/avatars/noAvatar.png" :
-                        m["avatar_url"]==null? "https://indigo24.xyz/uploads/avatars/" + m["avatar"] : 
-                        m["avatar_url"]+m["avatar"],
-      )
-    );
+          image: (m["avatar"] == null || m["avatar"] == "")
+              ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+              : m["avatar_url"] == null
+                  ? "https://indigo24.xyz/uploads/avatars/" + m["avatar"]
+                  : m["avatar_url"] + m["avatar"],
+          photo: (a==false || a==null)? null : a[0]['filename'],
+          photoUrl: (a==false || a==null)? null : m['attachment_url'],
+        ));
   }
 
   String time(timestamp) {
@@ -711,15 +1025,18 @@ class Sended extends StatelessWidget {
   Sended(this.m);
   @override
   Widget build(BuildContext context) {
+    var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
     return Align(
         alignment: Alignment(1, 0),
         child: SendedMessageWidget(
           content: '${m['text']}',
           time: time('${m['time']}'),
           write: '${m['write']}',
+          photo: (a==null || a==false)?null:a[0]['filename'],
+          photoUrl: (a==null || a==false)?null:m['attachment_url'],
         ));
   }
-  
+
   String time(timestamp) {
     var date = DateTime.fromMillisecondsSinceEpoch(
       int.parse(timestamp) * 1000,

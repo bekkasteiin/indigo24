@@ -32,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   _getCountries() async {
     await api.getCountries().then((response) {
       setState(() {
+        print("MY RESPONSE $response");
         Iterable list = response['countries'];
         List<dynamic> responseJson = response['countries'].toList();
         countries = list.map((model) => Country.fromJson(model)).toList();

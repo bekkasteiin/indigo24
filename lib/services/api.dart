@@ -367,6 +367,31 @@ class Api {
     } 
   }
 
+  uploadMedia(_path, type) async {
+    try {
+      FormData formData = FormData.fromMap({
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "file": await MultipartFile.fromFile(_path),
+        "type": type
+      });
+
+      print("Uploading media with data ${formData.fields}");
+
+      response = await dio.post("https://media.chat.indigo24.xyz/upload", data: formData);
+      print("Getting response from media upload ${response.data}");
+
+      return response.data;
+      
+    } on DioError catch(e) {
+      if(e.response != null) {
+        print(e.response.data);
+      } else{
+        print(e.request);
+        print(e.message);
+      }
+    } 
+  }
 
   addCommentToTape(String comment, String tapeID) async {
     try {

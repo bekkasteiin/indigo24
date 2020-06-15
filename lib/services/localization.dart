@@ -1,3 +1,5 @@
+import 'helper.dart';
+
 var title;
 var registration = 'Registration';
 var login = 'Login';
@@ -35,6 +37,11 @@ var enterMessage = 'Enter your message';
 var members = 'Members';
 var creator = 'Creator';
 var member = 'Member';
+var contacts = 'Contacts';
+var search = 'Search';
+var createGroup = 'Create group';
+var chatName = 'Chat name';
+
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russia", "code": "ru"},
@@ -42,6 +49,7 @@ var languages = [
 ];
 
 setLanguage(code) {
+  SharedPreferencesHelper.setString('languageCode', '$code');
   switch (code) {
     case 'en':
       print('en');
@@ -81,6 +89,10 @@ setLanguage(code) {
       members = 'Members';
       creator = 'Creator';
       member = 'Member';
+      contacts = 'Contacts';
+      search = 'Search';
+      createGroup = 'Create group';
+      chatName = 'Chat name';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russia", "code": "ru"},
@@ -124,6 +136,10 @@ setLanguage(code) {
       members = 'Участников';
       creator = 'Создатель';
       member = 'Участник';
+      contacts = 'Контакты';
+      search = 'Поиск';
+      createGroup = 'Создать группу';
+      chatName = 'Название чата';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -168,6 +184,10 @@ setLanguage(code) {
       members = 'Қатысушылар';
       creator = 'Құрушы';
       member = 'Қатысушы';
+      contacts = 'Байланыстар';
+      search = 'Іздеу';
+      createGroup = 'Топ құру';
+      chatName = 'Чат атауы';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

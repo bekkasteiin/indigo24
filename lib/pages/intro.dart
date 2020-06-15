@@ -15,10 +15,7 @@ class _IntroPageState extends State<IntroPage> {
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  String _value = localization.currentLanguage; 
- 
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +57,7 @@ class _IntroPageState extends State<IntroPage> {
                       ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
-                          hint: Text("$_value", style: TextStyle(color: Color(0xFF001D52))),
+                          hint: Text("${localization.currentLanguage}", style: TextStyle(color: Color(0xFF001D52))),
                           // value: _valFriends,
                           items: localization.languages.map((value) {
                             return DropdownMenuItem(
@@ -71,7 +68,7 @@ class _IntroPageState extends State<IntroPage> {
                           onChanged: (value) {
                             print('${value['title']}');
                             setState(() {
-                              _value = '${value['title']}';
+                               localization.currentLanguage = '${value['title']}';
                             });
                             localization.setLanguage(value['code']);
                           },

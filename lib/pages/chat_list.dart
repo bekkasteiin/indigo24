@@ -134,7 +134,35 @@ class _ChatsListPageState extends State<ChatsListPage>
     return myList.isEmpty
         // ? dbChats.isNotEmpty
         //     ? localChatBuilder(dbChats)
-            ? Center(child: CircularProgressIndicator())
+            ? InkWell(
+              onTap: (){
+                print("чат");
+                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatContactsPage()))
+                    .whenComplete(() {
+                  ChatRoom.shared.contactController.close();
+                  ChatRoom.shared.forceGetChat();
+                  ChatRoom.shared.closeContactsStream();
+                });
+
+              },
+              child: Container(
+                color: Colors.white,
+                child: Center(
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: <Widget>[
+                      Image.asset("assets/chat_animation.gif"),
+                      Container(child: Text("Нажмите чтобы начать чат", style: TextStyle( fontSize: 20),))
+                    ],
+                  ),
+                ),
+              ),
+            )
+            // Center(child: CircularProgressIndicator())
             : 
             SmartRefresher(
               enablePullDown: false,

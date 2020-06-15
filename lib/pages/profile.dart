@@ -39,16 +39,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
       setState(() {
         _image = File(pickedFile.path);
       });
-      api.uploadAvatar(_image.path).then((r) async {
-        if (r["success"]) {
-          await SharedPreferencesHelper.setString('avatar', '${r["fileName"]}');
-          setState(() {
-            user.avatar = r["fileName"];
-          });
-        } else {
-          print("error");
-        }
-      });
+      if(_image != null){
+        api.uploadAvatar(_image.path).then((r) async {
+          if (r["success"]) {
+            await SharedPreferencesHelper.setString('avatar', '${r["fileName"]}');
+            setState(() {
+              user.avatar = r["fileName"];
+            });
+          } else {
+            print("error");
+          }
+        });
+      }
+      
     }
   }
 
@@ -432,7 +435,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       child: InkWell(
                           onTap: () async {
                             SharedPreferences preferences = await SharedPreferences.getInstance();
-                            await preferences.clear();
+                            preferences.setString('phone', 'null');
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => IntroPage()),

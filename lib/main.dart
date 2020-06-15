@@ -30,10 +30,14 @@ import 'package:indigo24/services/localization.dart' as localization;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  var phone = prefs.getString('phone');
-  var unique = prefs.getString('unique');
-  var customerID = prefs.getString('customerID');
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  String languageCode = preferences.getString('languageCode');
+  localization.setLanguage(languageCode);
+  var phone = preferences.getString('phone');
+  var unique = preferences.getString('unique');
+
+  var customerID = preferences.getString('customerID');
+
   print(phone);
   print(unique);
   print(customerID);
@@ -75,7 +79,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: phone == null ? IntroPage() : Tabs(key: tabPageKey),
+        home: phone == "null" ? IntroPage() : Tabs(key: tabPageKey),
       ),
     );
   }
@@ -168,9 +172,10 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
       var cmd = e.json["cmd"];
+      print(e.json);
       switch (cmd) {
         case 'message:create':
-          print(e.json);
+          
           inAppPush(e.json["data"]);
           break;
         case 'chats:get':

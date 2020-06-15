@@ -42,6 +42,7 @@ dependencies:
   pull_to_refresh: ^1.5.8
   audioplayers: ^0.15.1
   url_launcher: ^5.4.10
+  file_picker: ^1.11.0+3
   
 
 dev_dependencies:
@@ -53,6 +54,8 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/empty.gif
+    - assets/chat_animation.gif
     - assets/sound/messageIn.mp3
     - assets/sound/msg_out.mp3
     - assets/sound/message_in.mp3
@@ -78,6 +81,10 @@ flutter:
     - assets/images/back.png
     - assets/images/backWhite.png
     - assets/images/history.png
+    - assets/images/money.png
+    - assets/images/camera.png
+    - assets/images/gallery.png
+    - assets/images/files.png
 
   fonts:
      - family: Spectral
@@ -92,4 +99,3 @@ flutter:
            weight: 200
          - asset: assets/fonts/Roboto-Bold.ttf
            weight: 700
-

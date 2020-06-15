@@ -209,7 +209,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                           Navigator.pop(context);
                         },
                       ),
-                      Text('$_chatTitle', style: fS26(c: 'ffffff')),
+                      Flexible(child: Text('$_chatTitle', style: fS26(c: 'ffffff'), maxLines: 1, overflow: TextOverflow.ellipsis,)),
                       IconButton(
                         icon: Icon(Icons.more_vert),
                         color: Colors.white,
@@ -225,6 +225,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     ],
                   ),
                   SizedBox(height: 10),
+                  membersList.length==2?
+                  Divider()
+                  :
                   Row(children: <Widget>[
                     Container(
                       margin: EdgeInsets.only(left: 20),
@@ -240,6 +243,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                   SizedBox(height: 10),
                   membersList.isEmpty
                       ? Center(child: CircularProgressIndicator())
+                      :
+                      membersList.length==2?
+                      Center(
+                        child: Text("Статус", style: TextStyle(
+                          fontSize: 24,
+                          // fontFamily: ""
+                        )),
+                      )
                       : Flexible(
                           child: ListView.builder(
                             itemCount: membersList.length,
