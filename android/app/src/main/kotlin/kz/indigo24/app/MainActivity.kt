@@ -1,4 +1,4 @@
-package kz.indigo24.app
+package com.example.indigo24
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -5,6 +5,7 @@ import 'package:indigo24/main.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/services/push.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -253,9 +254,10 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                          await api.signIn("$phonePrefix${loginController.text}", passwordController.text).then((response) async {
+                          PushNotificationsManager().init().then((value) async {
+                            await api.signIn("$phonePrefix${loginController.text}", passwordController.text, value).then((response) async {
                               singInResult = response;
-                              if(response == true){
+                              if(response){
                                   await api.getBalance();
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(builder: (context) => Tabs(key: tabPageKey,)),(r) => false,
@@ -266,6 +268,8 @@ class _LoginPageState extends State<LoginPage> {
                                 _showError(context, singInResult["message"]);
                              }
                             });
+                          });
+                          
                         },
                       ),
                     ),

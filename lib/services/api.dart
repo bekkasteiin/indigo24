@@ -51,6 +51,33 @@ class Api {
     }
   }
 
+  updateFCM(token, id, unique) async {
+    try {
+      response = await dio.post("/token/fcm/update", data: {
+        "customerID": "$id",
+        "token": "$token",
+        "unique": "$unique"
+      });
+      if (response.data['success'] == true) {
+        print("Token updated to $token");
+        return true;
+      } else {
+        return response.data;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+  
+
   checkPhone(phone) async {
     try {
       response = await dio.post("/check/registration", data: {
@@ -114,7 +141,7 @@ class Api {
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        print('e response is ${e.response}');
+        print('e response is sms ${e.response}');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
@@ -144,7 +171,7 @@ class Api {
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        print('e response is ${e.response}');
+        print('e response is get_balance ${e.response}');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
@@ -157,7 +184,7 @@ class Api {
     }
   }
 
-  signIn(phone, password) async {
+  signIn(phone, password, token) async {
     try {
       response = await dio.post("/check/authentication", data: {
         "phone": "$phone",
@@ -179,13 +206,15 @@ class Api {
         user.email = '${response.data['email']}';
         user.avatar = '${response.data['avatar']}';
         user.unique = '${response.data['unique']}';
+
+        await updateFCM(token, '${response.data['ID']}', '${response.data['unique']}');
         return true;
       } else {
         return response.data;
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        print('e response is ${e.response}');
+        print('e response is login ${e.response}');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
@@ -205,13 +234,13 @@ class Api {
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
-        print('e response is ${e.response}');
+        print('e response is unique ${e.response}');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request.data);
       } else {
-        print(response.statusCode);
-        print(e.response.statusCode);
+        // print(response.statusCode);
+        // print(e.response.statusCode);
       }
       return e.response.data;
     }

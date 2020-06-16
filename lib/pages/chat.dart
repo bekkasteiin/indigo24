@@ -4,6 +4,7 @@ import 'package:audioplayers/audio_cache.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/services/test_timer.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:record_mp3/record_mp3.dart';
@@ -16,9 +17,11 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:vibration/vibration.dart';
 import 'chat_page_view_test.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/player.dart';
 
 var parser = EmojiParser();
 
@@ -42,6 +45,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  Dependencies dependencies =  Dependencies();
   List myList = [];
   TextEditingController _text = new TextEditingController();
   var online;
@@ -221,7 +225,8 @@ class _ChatPageState extends State<ChatPage> {
         print("RRR $r");
         if (r["status"]) {
           var a = [{
-            "filename": "${r["file_name"]}"
+            "filename": "${r["file_name"]}",
+            "r_filename": "${r["resize_file_name"]}"
           }];
           ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
         } else {
@@ -286,7 +291,7 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     api.uploadMedia(_path, 2).then((r) async {
-      print("RRR $r");
+      print("RRR ${r["message"]}");
       if (r["status"]) {
         var a = [{
           "filename": "${r["file_name"]}"
@@ -639,57 +644,12 @@ class _ChatPageState extends State<ChatPage> {
               ).whenComplete(() {});
             },
           ),
-          // InkWell(
-          //   // child: Image.network('https://indigo24.xyz/uploads/avatars/noAvatar.png'),
-          //   child: Container(
-          //     padding: EdgeInsets.only(right: 5),
-          //     child: CircleAvatar(
-          //       radius: 25,
-          //       child: ClipOval(
-          //           child: CachedNetworkImage(imageUrl: "https://bizraise.pro/wp-content/uploads/2014/09/no-avatar-300x300.png")
-          //       ),
-          //     ),
-          //   ),
-          //   onTap: () {
-          //     ChatRoom.shared.setChatInfoStream();
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => ChatProfileInfo(
-          //           chatName: widget.name,
-          //           chatAvatar: 'noAvatar.png',
-          //           chatMembers: widget.memberCount,
-          //           chatId: widget.chatID,
-          //         ),
-          //       ),
-          //     ).whenComplete(() {});
-          //   },
-          // ),
-          // IconButton(
-          //   icon: Image.network(
-          //       'https://indigo24.xyz/uploads/avatars/noAvatar.png'),
-          //   color: Colors.black,
-          //   onPressed: () {
-          //     ChatRoom.shared.setChatInfoStream();
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => ChatProfileInfo(
-          //           chatName: widget.name,
-          //           chatAvatar: 'noAvatar.png',
-          //           chatMembers: widget.memberCount,
-          //           chatId: widget.chatID,
-          //         ),
-          //       ),
-          //     ).whenComplete(() {});
-          //   },
-          // )
         ],
         backgroundColor: Colors.white,
         brightness: Brightness.light,
       ),
       body: SafeArea(
-          child: Container(
+      child: Container(
         child: Stack(
           fit: StackFit.loose,
           children: <Widget>[
@@ -767,107 +727,146 @@ class _ChatPageState extends State<ChatPage> {
                   width: MediaQuery.of(context).size.width,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 5, right: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
                       children: <Widget>[
-                        isComplete
-                            ? GestureDetector(
-                                onTap: () {
-                                  play();
-                                },
-                                child: Center(
-                                  child: Icon(
-                                    Icons.play_arrow,
-                                    size: 30,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            // isComplete
+                            //     ? GestureDetector(
+                            //         onTap: () {
+                            //           play();
+                            //         },
+                            //         child: Center(
+                            //           child: Icon(
+                            //             Icons.play_arrow,
+                            //             size: 30,
+                            //           ),
+                            //         ),
+                            //       )
+                            //     : 
+                                IconButton(
+                                    icon: Icon(Icons.attach_file),
+                                    onPressed: () {
+                                      print("Прикрепить");
+                                      SystemChannels.textInput.invokeMethod('TextInput.hide');
+                                      showAttachmentBottomSheet(context);
+                                    },
                                   ),
+                            !isRecording
+                                ? Flexible(
+                                    child: TextField(
+                                      maxLines: 6,
+                                      minLines: 1,
+                                      controller: _text,
+                                      onChanged: (value) {
+                                        print("Typing: $value");
+                                        if (value == '') {
+                                          setState(() {
+                                            isTyping = false;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            isTyping = true;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  )
+                                : 
+                                Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Image.asset("assets/record.gif", width: 10, height: 10),
+                                      Container(width: 5),
+                                      TimerText(dependencies: dependencies),
+                                    ],
                                 ),
-                              )
-                            : IconButton(
-                                icon: Icon(Icons.attach_file),
-                                onPressed: () {
-                                  print("Прикрепить");
-                                  SystemChannels.textInput.invokeMethod('TextInput.hide');
-                                  showAttachmentBottomSheet(context);
-                                },
-                              ),
-                        !isRecording
-                            ? Flexible(
-                                child: TextField(
-                                  maxLines: 6,
-                                  minLines: 1,
-                                  controller: _text,
-                                  onChanged: (value) {
-                                    print("Typing: $value");
-                                    if (value == '') {
+                            !isTyping
+                                ? ClipOval(
+                                    child: GestureDetector(
+                                      onLongPress: () {
+                                        print("long press");
+                                        startRecord();
+                                      },
+                                      onLongPressUp: () {
+                                        print("long press UP");
+                                        stopRecord();
+                                      },
+                                      // onTap: () {
+                                      //   startRecord();
+                                      // },
+                                      // onDoubleTap: () {
+                                      //   stopRecord();
+                                      // },
+                                      child: Center(
+                                        child: !isRecording?
+                                        Icon(
+                                          Icons.mic,
+                                          size: 30,
+                                        )
+                                        : Container()
+                                      ),
+                                    ),
+                                  )
+
+                                // IconButton(
+                                //   icon: Icon(Icons.mic),
+                                //   onPressed: () {
+                                //     print("audio pressed");
+                                //   },
+                                // )
+                                : IconButton(
+                                    icon: Icon(Icons.send),
+                                    onPressed: () {
+                                      ChatRoom.shared.sendMessage(
+                                          '${widget.chatID}', _text.text);
                                       setState(() {
                                         isTyping = false;
+                                        _text.text = '';
                                       });
-                                    } else {
-                                      setState(() {
-                                        isTyping = true;
-                                      });
-                                    }
-                                  },
-                                ),
-                              )
-                            : GestureDetector(
-                                onTap: () {
-                                  // startRecord();
-                                },
-                                child: Center(
-                                  child: Text(
-                                      "Нажмите 2 раза чтобы остановить запись"),
-                                ),
-                              ),
-                        !isTyping
-                            ? ClipOval(
-                                child: GestureDetector(
-                                  onLongPress: () {
-                                    print("long press");
-                                  },
-                                  // onTap: () {
-                                  //   startRecord();
-                                  // },
-                                  // onDoubleTap: () {
-                                  //   stopRecord();
-                                  // },
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.mic,
-                                      size: 30,
-                                    ),
+                                    },
                                   ),
-                                ),
-                              )
-                            // IconButton(
-                            //   icon: Icon(Icons.mic),
-                            //   onPressed: () {
-                            //     print("audio pressed");
-                            //   },
-                            // )
-                            : IconButton(
-                                icon: Icon(Icons.send),
-                                onPressed: () {
-                                  ChatRoom.shared.sendMessage(
-                                      '${widget.chatID}', _text.text);
-                                  setState(() {
-                                    isTyping = false;
-                                    _text.text = '';
-                                  });
-                                },
-                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
+            isRecording?
+            Positioned.fill(
+              // top: 100,
+              left: MediaQuery.of(context).size.width*0.8,
+              child: Image.asset(
+                "assets/voice.gif",
+                // fit: BoxFit.fitWidth,
+                width: 100,
+                height: 100,
+                alignment: Alignment.bottomCenter,
+              ),
+            )
+            :
+            Container()
+            // Container(
+            //   width: 200,
+            //   height: 200,
+            //   margin: EdgeInsets.only(
+            //     left:MediaQuery.of(context).size.width*0.85,
+            //     top: MediaQuery.of(context).size.height*0.78
+            //   ),
+            //   // alignment: Alignment.bottomRight,
+            //   child: OverflowBox(child: Image.asset("assets/voice.gif", width: 200, height: 200,)),
+            // ),
           ],
         ),
       )),
     );
   }
 
+
+ 
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
     if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7')
@@ -888,10 +887,15 @@ class _ChatPageState extends State<ChatPage> {
   void startRecord() async {
     bool hasPermission = await checkPermission();
     if (hasPermission) {
+      Vibration.vibrate();
       statusText = "Recording...";
-      recordFilePath = await getFilePath();
+      recordFilePath = await getAudioFilePath();
       isComplete = false;
       isRecording = true;
+      
+      
+      print("RECORD FILE PATH $recordFilePath");
+      dependencies.stopwatch.start();
 
       RecordMp3.instance.start(recordFilePath, (type) {
         statusText = "Record error--->$type";
@@ -925,7 +929,30 @@ class _ChatPageState extends State<ChatPage> {
       statusText = "Record complete";
       isComplete = true;
       isRecording = false;
+      dependencies.stopwatch.stop();
+      dependencies = new Dependencies();
+
+      
+
+      api.uploadMedia(recordFilePath, 3).then((r) async {
+        print("RRRRR ${r["message"]}");
+        if (r["status"]) {
+          var a = [{
+            "filename": "${r["file_name"]}",
+          }];
+          ChatRoom.shared.sendMessage('${widget.chatID}', "voice", type: 3, attachments: jsonDecode(jsonEncode(a)));
+          
+          Directory storageDirectory = await getApplicationDocumentsDirectory();
+          String sdPath = storageDirectory.path + "/record";
+          var dir = Directory(sdPath);
+          dir.deleteSync(recursive: true);
+        } else {
+          print("error");
+        }
+      });
+
       setState(() {});
+
     }
   }
 
@@ -939,23 +966,28 @@ class _ChatPageState extends State<ChatPage> {
 
   String recordFilePath;
 
-  void play() {
+  void play() async {
     if (recordFilePath != null && File(recordFilePath).existsSync()) {
       AudioPlayer audioPlayer = AudioPlayer();
       audioPlayer.play(recordFilePath, isLocal: true);
+
+      Directory storageDirectory = await getApplicationDocumentsDirectory();
+      String sdPath = storageDirectory.path + "/record";
+      var dir = Directory(sdPath);
+      dir.deleteSync(recursive: true);
     }
   }
 
   int i = 0;
 
-  Future<String> getFilePath() async {
+  Future<String> getAudioFilePath() async {
     Directory storageDirectory = await getApplicationDocumentsDirectory();
     String sdPath = storageDirectory.path + "/record";
     var d = Directory(sdPath);
     if (!d.existsSync()) {
       d.createSync(recursive: true);
     }
-    return sdPath + "/test_${i++}.mp3";
+    return sdPath + "/temple.mp3";
   }
 }
 
@@ -986,7 +1018,9 @@ class Received extends StatelessWidget {
   Received(this.m);
   @override
   Widget build(BuildContext context) { 
+    
     var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
+
     return Align(
         alignment: Alignment(-1, 0),
         child: ReceivedMessageWidget(
@@ -996,10 +1030,12 @@ class Received extends StatelessWidget {
           image: (m["avatar"] == null || m["avatar"] == "")
               ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
               : m["avatar_url"] == null
-                  ? "https://indigo24.xyz/uploads/avatars/" + m["avatar"]
-                  : m["avatar_url"] + m["avatar"],
-          photo: (a==false || a==null)? null : a[0]['filename'],
-          photoUrl: (a==false || a==null)? null : m['attachment_url'],
+                  ? "https://indigo24.xyz/uploads/avatars/${m["avatar"]}"
+                  : "${m["avatar_url"]}${m["avatar"]}",
+          type: "${m["type"]}",
+          media: (a==false || a==null)? null : a[0]['filename'],
+          rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
+          mediaUrl: (a==false || a==null)? null : m['attachment_url'],
         ));
   }
 
@@ -1032,8 +1068,10 @@ class Sended extends StatelessWidget {
           content: '${m['text']}',
           time: time('${m['time']}'),
           write: '${m['write']}',
-          photo: (a==null || a==false)?null:a[0]['filename'],
-          photoUrl: (a==null || a==false)?null:m['attachment_url'],
+          type: "${m["type"]}",
+          media: (a==false || a==null)? null : a[0]['filename'],
+          rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
+          mediaUrl: (a==false || a==null)? null : m['attachment_url'],
         ));
   }
 
@@ -1053,3 +1091,8 @@ class Sended extends StatelessWidget {
     return '$hours:$minutes';
   }
 }
+
+
+
+
+

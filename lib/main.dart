@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
@@ -9,6 +10,7 @@ import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/pages/wallet.dart';
 import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/services/test_timer.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:overlay_support/overlay_support.dart';
@@ -41,6 +43,7 @@ Future<void> main() async {
   print(customerID);
   Api api = Api();
   bool authenticated = false;
+
 
   await api.checkUnique(unique, customerID).then((r) async {
     if (r['success'] != null) {
@@ -78,7 +81,7 @@ class MyApp extends StatelessWidget {
     return OverlaySupport(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Indigo24',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -98,7 +101,7 @@ class Tabs extends StatefulWidget {
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   TabController tabController;
-
+  var api = Api();
   MyConnectivity _connectivity = MyConnectivity.instance;
   Map _source = {ConnectivityResult.none: false};
 
@@ -118,8 +121,47 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     return user.id;
   }
 
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+  Future<void> _handleNotification (Map<dynamic, dynamic> message, bool dialog) async {
+    var m = message['data'] ?? message;
+
+    _init();
+
+    ChatRoom.shared.getMessages(m['chat_id']);
+    goToChat("${m['user_name']}", "${m['chat_id']}",
+        memberCount: "${m['type']}" == "0" ? 2 : 3,
+        avatar: "${m['avatar']}",
+        userIds: "${m['user_id']}");
+  }
+
+  
   @override
   void initState() {
+    _firebaseMessaging.getToken().then((value) async { 
+      print("MY FCM TOKEN $value");
+      await api.updateFCM(value, user.id, user.unique);
+    });
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        // _handleNotification(message, true);
+
+        // _showItemDialog(message);
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        _handleNotification(message, true);
+        // _navigateToItemDetail(message);
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        _handleNotification(message, true);
+        // _navigateToItemDetail(message);
+      },
+    );
+
     tabController = new TabController(length: 4, vsync: this);
 
     setUser().then((result) async {
@@ -176,7 +218,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
       var cmd = e.json["cmd"];
-      print(e.json);
+      // print(e.json);
       switch (cmd) {
         case 'message:create':
           

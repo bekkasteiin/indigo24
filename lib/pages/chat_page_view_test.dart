@@ -1,7 +1,14 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/widgets/player.dart';
+import 'package:native_pdf_view/native_pdf_view.dart';
+import 'package:video_player/video_player.dart';
+import 'package:path_provider/path_provider.dart';
 
 var parser = EmojiParser();
 
@@ -215,15 +222,19 @@ class SendedMessageWidget extends StatelessWidget {
   final String content;
   final String time;
   final String write;
-  final String photo;
-  final String photoUrl;
+  final String media;
+  final String mediaUrl;
+  final String rMedia;
+  final String type;
   const SendedMessageWidget({
     Key key,
     this.content,
     this.time,
     this.write,
-    this.photo,
-    this.photoUrl
+    this.media,
+    this.mediaUrl,
+    this.rMedia,
+    this.type
   }) : super(key: key);
 
   
@@ -249,28 +260,30 @@ class SendedMessageWidget extends StatelessWidget {
                 topRight: Radius.circular(15)),
             child: Container(
               color: Colors.white,
-              // margin: const EdgeInsets.only(left: 10.0),
               child: Stack(children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(
                       right: 12.0, left: 8.0, top: 8.0, bottom: 15.0),
-// <<<<<<< HEAD
                   child: (a[0]==":" && a[l]==":" && content.length<9)?
                   Text(content, style: TextStyle(fontSize: 40))
                   :
                   (a[0]==":" && a[l]==":" && content.length>8)?
                   Text(content, style: TextStyle(fontSize: 24))
                   :
-                  (photo!=null)?
-                  ImageMessage(photoUrl+photo)
-                  : 
+                  (type=="1")?
+                  ImageMessage(mediaUrl+rMedia)
+                  :
+                  (type=="2")?
+                  FileMessage(url:"$mediaUrl$media")
+                  :
+                  (type=="3")?
+                  new AudioMessage("$mediaUrl$media")
+                  :
+                  (type=="4")?
+                  new VideoMessage("$mediaUrl$media")
+                  :
                   Text(
                     content,
-// =======
-//                   child: Text(
-//                     "${content[0].toUpperCase() + content.substring(1)}",
-//                     style: TextStyle(fontWeight: FontWeight.w300),
-// >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
                   ),
                 ),
                 Positioned(
@@ -311,8 +324,10 @@ class ReceivedMessageWidget extends StatelessWidget {
   final String time;
   final String image;
   final String name;
-  final String photo;
-  final String photoUrl;
+  final String media;
+  final String mediaUrl;
+  final String rMedia;
+  final String type;
 
   const ReceivedMessageWidget({
     Key key,
@@ -320,8 +335,10 @@ class ReceivedMessageWidget extends StatelessWidget {
     this.time,
     this.image,
     this.name,
-    this.photo,
-    this.photoUrl
+    this.media,
+    this.mediaUrl,
+    this.rMedia,
+    this.type
   }) : super(key: key);
 
   @override
@@ -372,23 +389,26 @@ class ReceivedMessageWidget extends StatelessWidget {
                           
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 0.0, bottom: 15.0),
-// <<<<<<< HEAD
                             child: (a[0]==":" && a[l]==":" && content.length<9)?
                             Text(content, style: TextStyle(fontSize: 40))
                             :
                             (a[0]==":" && a[l]==":" && content.length>8)?
                             Text(content, style: TextStyle(fontSize: 24))
                             :
-                            (photo!=null)?
-                            ImageMessage(photoUrl+photo)
+                            (type=="1")?
+                            ImageMessage("$mediaUrl$rMedia")
+                            :
+                            (type=="2")?
+                            FileMessage(url:"$mediaUrl$media")
+                            :
+                            (type=="3")?
+                            new AudioMessage("$mediaUrl$media")
+                            :
+                            (type=="4")?
+                            new VideoMessage("$mediaUrl$media")
                             :
                             Text(
                               content,
-// =======
-//                         child: Text(
-//                           "${content[0].toUpperCase() + content.substring(1)}",
-//                           style: TextStyle(fontWeight: FontWeight.w300),
-// >>>>>>> 222314f78ca2c8bd1c63a5e2b9c9a1fbe7409c5f
                             ),
                           ),
                         ],
@@ -412,6 +432,19 @@ class ReceivedMessageWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+
+class AudioMessage extends StatelessWidget {
+  final url;
+  AudioMessage(this.url);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: PlayerWidget(url: url),
     );
   }
 }
@@ -479,4 +512,247 @@ class ImageMessage extends StatelessWidget {
       // margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
     );
   }
+}
+
+
+class VideoMessage extends StatefulWidget {
+  final url;
+  VideoMessage(this.url);
+
+  @override
+  _VideoMessageState createState() => _VideoMessageState();
+}
+
+class _VideoMessageState extends State<VideoMessage> {
+  VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(
+      widget.url
+    );
+
+    _controller.addListener(() {
+      setState(() {});
+    });
+    _controller.setLooping(true);
+    _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return _controller.value.initialized
+            ? AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: <Widget>[
+                  VideoPlayer(_controller),
+                  ClosedCaption(text: _controller.value.caption.text),
+                  _PlayPauseOverlay(controller: _controller),
+                  VideoProgressIndicator(_controller, allowScrubbing: true),
+                ],
+              ),
+            )
+            : Container();
+  }
+
+}
+
+class _PlayPauseOverlay extends StatelessWidget {
+  const _PlayPauseOverlay({Key key, this.controller}) : super(key: key);
+
+  final VideoPlayerController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        AnimatedSwitcher(
+          duration: Duration(milliseconds: 50),
+          reverseDuration: Duration(milliseconds: 200),
+          child: controller.value.isPlaying
+              ? SizedBox.shrink()
+              : Container(
+                  color: Colors.black26,
+                  child: Center(
+                    child: Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 100.0,
+                    ),
+                  ),
+                ),
+        ),
+        GestureDetector(
+          onTap: () {
+            controller.value.isPlaying ? controller.pause() : controller.play();
+          },
+        ),
+      ],
+    );
+  }
+}
+
+
+var dio = Dio();
+
+class FileMessage extends StatefulWidget {
+  FileMessage({Key key, this.url}) : super(key: key);
+
+  final String url;
+
+  @override
+  _FileMessageState createState() => _FileMessageState();
+}
+
+class _FileMessageState extends State<FileMessage> {
+  var percent = '';
+
+
+  Future download2(Dio dio, String url, String savePath) async {
+    try {
+      Response response = await dio.get(
+        url,
+        onReceiveProgress: showDownloadProgress,
+        //Received data with List<int>
+        options: Options(
+            responseType: ResponseType.bytes,
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 500;
+            }),
+      );
+      print(response.headers);
+      File file = File(savePath);
+      var raf = file.openSync(mode: FileMode.write);
+      // response.data is List<int> type
+      raf.writeFromSync(response.data);
+   
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
+      );
+      await raf.close();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void showDownloadProgress(received, total) {
+    if (total != -1) {
+      print((received / total * 100).toStringAsFixed(0) + "%");
+      setState(() {
+        percent = (received / total * 100).toStringAsFixed(0) + "%";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton.icon(
+      onPressed: () async {
+        var tempDir = await getTemporaryDirectory();
+        String fullPath = tempDir.path + "/boo2.pdf'";
+        print('full path ${fullPath}');
+        
+        download2(dio, widget.url, fullPath);
+      },
+      icon: Icon(
+        Icons.file_download,
+        color: Colors.white,
+      ),
+      color: Colors.green,
+      textColor: Colors.white,
+      label: Text('Dowload $percent')
+    );
+  }
+}
+
+
+class PDFViewer extends StatefulWidget {
+  final file;
+  PDFViewer(this.file);
+
+  @override
+  _PDFViewerState createState() => _PDFViewerState();
+}
+
+class _PDFViewerState extends State<PDFViewer> {
+  int _actualPageNumber = 1, _allPagesCount = 0;
+  PdfController _pdfController;
+
+  @override
+  void initState() {
+    _pdfController = PdfController(
+      document: PdfDocument.openFile(widget.file)
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pdfController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        theme: ThemeData(primaryColor: Colors.white),
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text('Файл'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.navigate_before),
+                onPressed: () {
+                  _pdfController.previousPage(
+                    curve: Curves.ease,
+                    duration: Duration(milliseconds: 100),
+                  );
+                },
+              ),
+              Container(
+                alignment: Alignment.center,
+                child: Text(
+                  '$_actualPageNumber/$_allPagesCount',
+                  style: TextStyle(fontSize: 22),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.navigate_next),
+                onPressed: () {
+                  _pdfController.nextPage(
+                    curve: Curves.ease,
+                    duration: Duration(milliseconds: 100),
+                  );
+                },
+              ),
+            ],
+          ),
+          body: PdfView(
+            documentLoader: Center(child: CircularProgressIndicator()),
+            pageLoader: Center(child: CircularProgressIndicator()),
+            controller: _pdfController,
+            onDocumentLoaded: (document) {
+              setState(() {
+                _allPagesCount = document.pagesCount;
+              });
+            },
+            onPageChanged: (page) {
+              setState(() {
+                _actualPageNumber = page;
+              });
+            },
+          ),
+        ),
+      );
 }

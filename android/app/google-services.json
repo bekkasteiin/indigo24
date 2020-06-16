@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "808547509613",
+    "firebase_url": "https://indigo24-fdf1b.firebaseio.com",
+    "project_id": "indigo24-fdf1b",
+    "storage_bucket": "indigo24-fdf1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808547509613:android:736da66bad4b415a86a664",
+        "android_client_info": {
+          "package_name": "kz.indigo24.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "808547509613-g0pm1ijbm4ificgs2pm2k0oup72g39sn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzsvtED5sDAMAQqI0KsBh_tNgqBSwZk0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "808547509613-g0pm1ijbm4ificgs2pm2k0oup72g39sn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "808547509613-kb8da1m4qep04jf3371e5ah2hkl6oqu2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kz.indigo24.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

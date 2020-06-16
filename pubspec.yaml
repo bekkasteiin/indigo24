@@ -14,7 +14,9 @@ dependencies:
 
 
   cupertino_icons: ^0.1.3
+  native_pdf_view: ^3.6.2
   file: any
+  vibration: ^1.4.0
   overlay_support: ^1.0.4
   record_mp3: ^2.0.0
   web_socket_channel: ^1.1.0
@@ -42,7 +44,7 @@ dependencies:
   audioplayers: ^0.15.1
   url_launcher: ^5.4.10
   file_picker: ^1.11.0+3
-  
+  firebase_messaging: ^6.0.16
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +55,9 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/voice.gif
+    - assets/record.gif
+    - assets/record_red.gif
     - assets/empty.gif
     - assets/chat_animation.gif
     - assets/sound/messageIn.mp3
