@@ -44,6 +44,8 @@ var chatName = 'Chat name';
 var newTape = 'New tape';
 var enterPin = 'Enter passcode';
 var createPin = 'Set passcode';
+var incorrectPin = 'Incorrect PIN';
+var error = 'Error';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russia", "code": "ru"},
@@ -98,6 +100,8 @@ setLanguage(code) {
       newTape = 'New tape';
       enterPin = 'Enter passcode';
       createPin = 'Set passcode';
+      incorrectPin = 'Incorrect PIN';
+      error = 'Error';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russia", "code": "ru"},
@@ -148,6 +152,8 @@ setLanguage(code) {
       newTape = 'Новая запись';
       enterPin = 'Введите PIN';
       createPin = 'Установите PIN'; 
+      incorrectPin = 'Неправильный PIN';
+      error = 'Ошибка';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -199,6 +205,8 @@ setLanguage(code) {
       newTape = 'Жаңа жазба';
       enterPin = 'PIN код енгізіңіз';
       createPin = 'Құпия код орнатыңыз';
+      incorrectPin = 'Қате PIN код';
+      error = 'Қате';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

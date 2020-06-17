@@ -1,16 +1,17 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/pages/pin_code.dart';
 import 'package:indigo24/pages/refill.dart';
 import 'package:indigo24/pages/withdraw.dart';
 import 'package:indigo24/services/api.dart';
-import 'package:passcode_screen/circle.dart';
-import 'package:passcode_screen/keyboard.dart';
-import 'package:passcode_screen/passcode_screen.dart';
 import 'package:polygon_clipper/polygon_border.dart';
 import '../style/fonts.dart';
+import 'circle.dart';
+import 'keyboard.dart';
 import 'payments_category.dart';
 import 'transfer_list.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -56,17 +57,17 @@ class _WalletTabState extends State<WalletTab> {
             title: Text(
               '$title',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 28),
+              style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
             ),
             passwordEnteredCallback: _onPasscodeEntered,
             cancelButton: cancelButton,
             deleteButton: Text(
               'Delete',
-              style: const TextStyle(fontSize: 16, color: Colors.black),
+              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
               semanticsLabel: 'Delete',
             ),
             shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: Colors.grey,
+            backgroundColor: Color(0xFFF7F7F7),
             cancelCallback: _onPasscodeCancelled,
             digits: digits,
           ),
@@ -88,6 +89,25 @@ class _WalletTabState extends State<WalletTab> {
       setState(() {
         this.isAuthenticated = isValid;
       });
+    }
+    if (!isValid){
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('${localization.error}'),
+          content: Text('${localization.incorrectPin}'),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
     }
   }
 
@@ -119,7 +139,7 @@ class _WalletTabState extends State<WalletTab> {
         opaque: false,
         cancelButton: Text(
           'Cancel',
-          style: const TextStyle(fontSize: 16, color: Colors.white),
+          style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
           semanticsLabel: 'Cancel',
         ),
       )
@@ -130,7 +150,7 @@ class _WalletTabState extends State<WalletTab> {
         opaque: false,
         cancelButton: Text(
           'Cancel',
-          style: const TextStyle(fontSize: 16, color: Colors.white),
+          style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
           semanticsLabel: 'Cancel',
         ),
       );
