@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -264,10 +265,13 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                          PushNotificationsManager().init().then((value) async {
-                            await api.signIn("$phonePrefix${loginController.text}", passwordController.text, value).then((response) async {
+                          FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+                          String token = await _firebaseMessaging.getToken();
+                            await api.signIn("$phonePrefix${loginController.text}", passwordController.text, token).then((response) async {
                               singInResult = response;
-                              if(response){
+                              print('Response of sing in $response');
+                              if('${response['success']}' == 'true'){
+                                print('Second response $response');
                                   await api.getBalance();
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(builder: (context) => Tabs(key: tabPageKey,)),(r) => false,
@@ -279,8 +283,10 @@ class _LoginPageState extends State<LoginPage> {
                                   loginError = singInResult["message"];
                                 });
                              }
+                             print('this is below if');
+
+
                             });
-                          });
                           
                         },
                       ),

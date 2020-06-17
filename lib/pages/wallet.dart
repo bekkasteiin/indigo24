@@ -90,25 +90,25 @@ class _WalletTabState extends State<WalletTab> {
         this.isAuthenticated = isValid;
       });
     }
-    if (!isValid){
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('${localization.error}'),
-          content: Text('${localization.incorrectPin}'),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-    }
+    // if (!isValid){
+    // return showDialog<void>(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return CupertinoAlertDialog(
+    //       title: Text('${localization.error}'),
+    //       content: Text('${localization.incorrectPin}'),
+    //       actions: <Widget>[
+    //         CupertinoDialogAction(
+    //           child: Text('Ok'),
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
+    // }
   }
 
   _onPasscodeCancelled() {

@@ -234,7 +234,7 @@ class Api {
 
         await updateFCM(token, '${response.data['ID']}', '${response.data['unique']}');
         user.pin = '${response.data['pin']}';
-        return true;
+        return response.data;
       } else {
         return response.data;
       }
