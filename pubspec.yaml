@@ -47,7 +47,6 @@ dependencies:
   file_picker: ^1.11.0+3
   firebase_messaging: ^6.0.16
   image_picker_flutter: ^1.4.4
-  passcode_screen: ^1.2.0
 
 dev_dependencies:
   flutter_test:

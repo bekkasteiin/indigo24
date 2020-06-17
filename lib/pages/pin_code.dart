@@ -1,12 +1,10 @@
-library passcode_screen;
-
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:passcode_screen/circle.dart';
-import 'package:passcode_screen/keyboard.dart';
-import 'package:passcode_screen/shake_curve.dart';
+
+import 'circle.dart';
+import 'keyboard.dart';
 
 typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();
@@ -65,8 +63,10 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
     super.initState();
     streamSubscription = widget.shouldTriggerVerification.listen((isValid) => _showValidation(isValid));
     controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    final Animation curve = CurvedAnimation(parent: controller, curve: ShakeCurve());
-    animation = Tween(begin: 0.0, end: 10.0).animate(curve)
+    animation = Tween(begin: 0.0, end: 10.0).animate(CurvedAnimation(
+                  parent: controller, 
+                  curve: Curves.bounceInOut
+                )
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           setState(() {
@@ -79,7 +79,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
         setState(() {
           // the animation object’s value is the changed state
         });
-      });
+      }));
   }
 
   @override
@@ -87,13 +87,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
     return Scaffold(
       backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
       body: SafeArea(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            return orientation == Orientation.portrait
-                ? _buildPortraitPasscodeScreen()
-                : _buildLandscapePasscodeScreen();
-          },
-        ),
+        child: _buildPortraitPasscodeScreen(),
       ),
     );
   }
