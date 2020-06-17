@@ -46,6 +46,11 @@ var enterPin = 'Enter passcode';
 var createPin = 'Set passcode';
 var incorrectPin = 'Incorrect PIN';
 var error = 'Error';
+var chatNotifications = 'Chat notifications';
+var notifications = 'Notifications';
+var showNotifications = 'Show notifications';
+var messagePreview = 'Message preview';
+var sound = 'Sound';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russia", "code": "ru"},
@@ -101,7 +106,12 @@ setLanguage(code) {
       enterPin = 'Enter passcode';
       createPin = 'Set passcode';
       incorrectPin = 'Incorrect PIN';
+      chatNotifications = 'Chat notifications';
       error = 'Error';
+      notifications = 'Notifications';
+      showNotifications = 'Show notifications';
+      messagePreview = 'Message preview';
+      sound = 'Sound';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russia", "code": "ru"},
@@ -153,7 +163,12 @@ setLanguage(code) {
       enterPin = 'Введите PIN';
       createPin = 'Установите PIN'; 
       incorrectPin = 'Неправильный PIN';
+      chatNotifications = 'Уведомления от чатов';
+      notifications = 'Уведомления';
+      showNotifications = 'Показывать уведомления';
       error = 'Ошибка';
+      messagePreview = 'Показывать текст';
+      sound = 'Звук';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -206,7 +221,12 @@ setLanguage(code) {
       enterPin = 'PIN код енгізіңіз';
       createPin = 'Құпия код орнатыңыз';
       incorrectPin = 'Қате PIN код';
+      chatNotifications = 'Чат хабарландырулары';
       error = 'Қате';
+      notifications = 'Хабарламалар';
+      showNotifications = 'Хабарландыруларды көрсету';
+      messagePreview = 'Мәтінді көрсету';
+      sound = 'Дыбыс';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},
