@@ -42,6 +42,8 @@ var search = 'Search';
 var createGroup = 'Create group';
 var chatName = 'Chat name';
 var newTape = 'New tape';
+var enterPin = 'Enter passcode';
+var createPin = 'Set passcode';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russia", "code": "ru"},
@@ -94,6 +96,8 @@ setLanguage(code) {
       createGroup = 'Create group';
       chatName = 'Chat name';
       newTape = 'New tape';
+      enterPin = 'Enter passcode';
+      createPin = 'Set passcode';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russia", "code": "ru"},
@@ -142,6 +146,8 @@ setLanguage(code) {
       createGroup = 'Создать группу';
       chatName = 'Название чата';
       newTape = 'Новая запись';
+      enterPin = 'Введите PIN';
+      createPin = 'Установите PIN'; 
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -191,6 +197,8 @@ setLanguage(code) {
       createGroup = 'Топ құру';
       chatName = 'Чат атауы';
       newTape = 'Жаңа жазба';
+      enterPin = 'PIN код енгізіңіз';
+      createPin = 'Құпия код орнатыңыз';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

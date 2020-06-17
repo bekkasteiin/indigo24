@@ -32,6 +32,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
             appBar: buildAppBar(),
             body: snapshot.hasData == true
                 ? ListView.builder(
+                    shrinkWrap: true,
                     itemCount: snapshot.data["services"] != null ? snapshot.data["services"].length : 0,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
@@ -83,48 +84,56 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
   Container _paymentsList(BuildContext context, String _serviceLogo,
       String _serviceTitle, int index) {
     return Container(
-      child: FlatButton(
-        child: Row(
-          children: <Widget>[
-            Container(
-              width: 35,
-              height: 40,
-              margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
-              child: Image.network(
-                '$_serviceLogo',
-                width: 30.0,
-              ),
-            ),
-            Expanded(
-              child: Text(
-                '$_serviceTitle',
-                style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
-              ),
-            ),
-          ],
-        ),
-        onPressed: () {
-          Navigator.push(
+      margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(0.0, 0.0))
+      ]),
+      child: ButtonTheme(
+        height: 40,
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) =>
                   PaymentsServicePage(index, _serviceLogo, _serviceTitle),
             ),
           );
-        },
+          },
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: 35,
+                  height: 40,
+                  margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
+                  child: Image.network(
+                    '$_serviceLogo',
+                    width: 30.0,
+                  ),
+                ),
+                Container(width: 10),
+                Text(
+                  '$_serviceTitle',
+                  style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                ),
+              ],
+            ),
+          ),
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
+          ),
+        ),
       ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26.withOpacity(0.2),
-            blurRadius: 10.0,
-            spreadRadius: -2,
-          )
-        ],
-        color: Colors.white,
-      ),
-      margin: EdgeInsets.only(left: 20, right: 20, top: 10),
     );
   }
 

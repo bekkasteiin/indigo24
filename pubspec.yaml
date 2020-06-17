@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^5.4.10
   file_picker: ^1.11.0+3
   image_picker_flutter: ^1.4.4
+  passcode_screen: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +88,9 @@ flutter:
     - assets/images/add.png
     - assets/images/group.png
     - assets/images/contacts.png
+    - assets/images/dropDown.png
+    - assets/images/refresh.png
+    - assets/images/newPost.png
 
   fonts:
      - family: Spectral

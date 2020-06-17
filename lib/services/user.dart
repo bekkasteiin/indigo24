@@ -6,7 +6,7 @@ var unique = "";
 var phone = "";
 var balance = "";
 var balanceInBlock = "";
-
+var pin = "";
 void delete() {
   id = "";
   avatar = "";
@@ -16,4 +16,5 @@ void delete() {
   phone = "";
   balance = "";
   balanceInBlock = "";
+  pin = "";
 }

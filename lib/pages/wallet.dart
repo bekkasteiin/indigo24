@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/refill.dart';
 import 'package:indigo24/pages/withdraw.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:passcode_screen/circle.dart';
+import 'package:passcode_screen/keyboard.dart';
+import 'package:passcode_screen/passcode_screen.dart';
 import 'package:polygon_clipper/polygon_border.dart';
 import '../style/fonts.dart';
 import 'payments_category.dart';
@@ -23,6 +28,10 @@ class WalletTab extends StatefulWidget {
 }
 
 class _WalletTabState extends State<WalletTab> {
+  final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
+  bool isAuthenticated = false;
+  
+  
   double _amount;
   double _blockedAmount = 0;
   String _symbol;
@@ -31,11 +40,102 @@ class _WalletTabState extends State<WalletTab> {
   double _euroCoef = 0;
   double _rubleCoef = 0;
   double _dollarCoef = 0;
-
+  var withPin;
   var api = Api();
+  _showLockScreen(BuildContext context, String title,
+      {bool opaque,
+      CircleUIConfig circleUIConfig,
+      KeyboardUIConfig keyboardUIConfig,
+      Widget cancelButton,
+      List<String> digits}) {
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+          opaque: opaque,
+          pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+            title: Text(
+              '$title',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: 28),
+            ),
+            passwordEnteredCallback: _onPasscodeEntered,
+            cancelButton: cancelButton,
+            deleteButton: Text(
+              'Delete',
+              style: const TextStyle(fontSize: 16, color: Colors.black),
+              semanticsLabel: 'Delete',
+            ),
+            shouldTriggerVerification: _verificationNotifier.stream,
+            backgroundColor: Colors.grey,
+            cancelCallback: _onPasscodeCancelled,
+            digits: digits,
+          ),
+        ));
+  }
+
+  _onPasscodeEntered(String enteredPasscode) {
+    print('user pin is ${user.pin}');
+    if('${user.pin}'.toString() == 'false'){
+      Navigator.maybePop(context);
+      Navigator.maybePop(context);
+      print('set pin');
+      api.createPin(enteredPasscode);
+    }
+
+    bool isValid = '${user.pin}' == enteredPasscode;
+    _verificationNotifier.add(isValid);
+    if (isValid) {
+      setState(() {
+        this.isAuthenticated = isValid;
+      });
+    }
+  }
+
+  _onPasscodeCancelled() {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => Tabs(),
+        ),
+        (r) => false, 
+    );
+  }
 
   @override
+  void dispose() {
+    _verificationNotifier.close();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    super.dispose();
+  }
+  @override
   void initState() {
+    if('${user.pin}'.toString() == 'false'){
+        withPin = false;
+    }
+        Timer.run(() {
+       withPin == false 
+       ? _showLockScreen(
+        context,
+        '${localization.createPin}',
+        opaque: false,
+        cancelButton: Text(
+          'Cancel',
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+          semanticsLabel: 'Cancel',
+        ),
+      )
+      :
+       _showLockScreen(
+        context,
+        '${localization.enterPin}',
+        opaque: false,
+        cancelButton: Text(
+          'Cancel',
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+          semanticsLabel: 'Cancel',
+        ),
+      );
+    });
+
     _symbol = '₸';
     _realAmount = double.parse(user.balance);
     _blockedAmount = double.parse(user.balanceInBlock);
@@ -63,6 +163,7 @@ class _WalletTabState extends State<WalletTab> {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
         appBar: PreferredSize(
           child: AppBar(
@@ -80,32 +181,33 @@ class _WalletTabState extends State<WalletTab> {
                     'assets/images/walletBackground.png',
                     fit: BoxFit.fill,
                   ),
-                  Column(
-                    children: <Widget>[
-                      SizedBox(height: 10),
-                      Text('${localization.wallet}', style: fS26(c: 'ffffff')),
-                      _devider(),
-                      _balance(),
-                      SizedBox(height: 10),
-                      _balanceAmount(),
-                      _exchangeButtons(),
-                      _blockedBalance(size),
-                      SizedBox(height: 20),
-                      Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: size.width * 0.05),
-                        child: Column(
-                          children: <Widget>[
-                            _payInOut(size),
-                            SizedBox(height: 20),
-                            _payments(size),
-                            SizedBox(height: 20),
-                            _transfer(size),
-                            SizedBox(height: 20),
-                          ],
+                  Container(
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(height: 10),
+                        Text('${localization.wallet}', style: fS26(c: 'ffffff')),
+                        _devider(),
+                        _balance(),
+                        SizedBox(height: 10),
+                        _balanceAmount(),
+                        _exchangeButtons(),
+                        _blockedBalance(size),
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.only(left: size.width * 0.05, right: size.width * 0.05, top: 20),
+                          child: Column(
+                            children: <Widget>[
+                              _payInOut(size),
+                              SizedBox(height: 20),
+                              _payments(size),
+                              SizedBox(height: 20),
+                              _transfer(size),
+                              SizedBox(height: 20),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -161,12 +263,6 @@ class _WalletTabState extends State<WalletTab> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   Container _payments(Size size) {

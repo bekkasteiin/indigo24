@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/pages/login.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/localization.dart';
 
 class UserRegistrationPage extends StatefulWidget {
   final phone;
@@ -43,11 +45,11 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text('Ошибка'),
           content: Text('$m'),
           actions: <Widget>[
-            FlatButton(
+            CupertinoDialogAction(
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -58,6 +60,18 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
       },
     );
   }
+  bool isNameValid = true;
+  bool isLastnameValid = true;
+  bool isEmailValid = true;
+  bool isFirstPasswordValid = true;
+  bool isSecondPasswordValid = true;
+
+  String globalError = "";
+  String nameError = "";
+  String lastnameError = "";
+  String emailError = "";
+  String firstPasswordError = "";
+  String secondPasswordError = "";
 
   @override
   Widget build(BuildContext context) {
@@ -83,199 +97,292 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
   }
 
   Widget _buildForeground() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            // height: MediaQuery.of(context).size.height*0.4,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(5.0),
-                topLeft: Radius.circular(5.0),
-                bottomRight: Radius.circular(5.0),
-                bottomLeft: Radius.circular(5.0),
-              ),
-            ),
-            child: Column(
-              children: <Widget>[
-                SizedBox(height: 30),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text("Имя",
-                              style: TextStyle(
-                                  color: Color(0xff0543B8), fontSize: 16))
-                        ],
-                      ),
-                      TextField(
-                        controller: nameController,
-                        decoration: InputDecoration(hintText: ""),
-                      ),
-                    ],
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                // height: MediaQuery.of(context).size.height*0.4,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(5.0),
+                    topLeft: Radius.circular(5.0),
+                    bottomRight: Radius.circular(5.0),
+                    bottomLeft: Radius.circular(5.0),
                   ),
                 ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text("Фамилия",
-                              style: TextStyle(
-                                  color: Color(0xff0543B8), fontSize: 16))
+                          Text('$globalError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 13), overflow: TextOverflow.ellipsis,),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Имя", style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(width: 20,),
+                              isNameValid == true ? Center()
+                              : Container(
+                                height: 15, 
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ), 
+                                width: 15, 
+                              ),
+                              
+                            ],
+                          ),
+                          TextField(
+                            controller: nameController,
+                            decoration: InputDecoration(hintText: ""),
+                          ),
+                          Text('$nameError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
                         ],
                       ),
-                      TextField(
-                        controller: lastNameController,
-                        decoration: InputDecoration(hintText: ""),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text("Email",
-                              style: TextStyle(
-                                  color: Color(0xff0543B8), fontSize: 16))
+                          Row(
+                            children: <Widget>[
+                              Text("Фамилия",style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(width: 20,),
+                              isLastnameValid == true ? Center()
+                              : Container(
+                                height: 15, 
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ), 
+                                width: 15, 
+                              ),
+                            ],
+                          ),
+                          TextField(
+                            controller: lastNameController,
+                            decoration: InputDecoration(hintText: ""),
+                          ),
+                           Text('$lastnameError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
                         ],
                       ),
-                      TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(hintText: ""),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text("Пароль",
-                              style: TextStyle(
-                                  color: Color(0xff0543B8), fontSize: 16))
+                          Row(
+                            children: <Widget>[
+                              Text("Email", style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(width: 20,),
+                              isEmailValid == true ? Center()
+                              : Container(
+                                height: 15, 
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ), 
+                                width: 15, 
+                              ),
+                            ],
+                          ),
+                          TextField(
+                            controller: emailController,
+                            decoration: InputDecoration(hintText: ""),
+                          ),
+                          Text('$emailError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
                         ],
                       ),
-                      TextField(
-                        controller: passwordController,
-                        obscureText: _obscureText,
-                        decoration: InputDecoration(
-                          hintText: '•••••••',
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _obscureText = !_obscureText;
-                              });
-                            },
-                            child: Icon(
-                              _obscureText
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              semanticLabel: _obscureText
-                                  ? 'show password'
-                                  : 'hide password',
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text("Пароль",style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(width: 20,),
+                              isFirstPasswordValid == true ? Center()
+                              : Container(
+                                height: 15, 
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ), 
+                                width: 15, 
+                              ),
+                             
+                            ],
+                          ),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: _obscureText,
+                            decoration: InputDecoration(
+                              hintText: '•••••••',
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                },
+                                child: Icon(
+                                  _obscureText
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  semanticLabel: _obscureText
+                                      ? 'show password'
+                                      : 'hide password',
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text("Пароль",
-                              style: TextStyle(
-                                  color: Color(0xff0543B8), fontSize: 16))
+                           Text('$firstPasswordError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
                         ],
                       ),
-                      TextField(
-                        controller: passwordController2,
-                        obscureText: _obscureText2,
-                        decoration: InputDecoration(
-                          hintText: '•••••••',
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _obscureText2 = !_obscureText2;
-                              });
-                            },
-                            child: Icon(
-                              _obscureText2
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              semanticLabel: _obscureText2
-                                  ? 'show password'
-                                  : 'hide password',
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text("Пароль",style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(width: 20,),
+                              isSecondPasswordValid == true ? Center()
+                              : Container(
+                                height: 15, 
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ), 
+                                width: 15, 
+                              ),
+                              
+                            ],
+                          ),
+                          TextField(
+                            controller: passwordController2,
+                            obscureText: _obscureText2,
+                            decoration: InputDecoration(
+                              hintText: '•••••••',
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _obscureText2 = !_obscureText2;
+                                  });
+                                },
+                                child: Icon(
+                                  _obscureText2
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  semanticLabel: _obscureText2
+                                      ? 'show password'
+                                      : 'hide password',
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          Text('$secondPasswordError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                _space(15),
-                SizedBox(height: 25),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  // decoration: BoxDecoration(
-                  //   color: Color(0xff0543B8),
-                  //   borderRadius: BorderRadius.only(
-                  //     topRight: Radius.circular(10.0),
-                  //     topLeft: Radius.circular(10.0),
-                  //     bottomRight: Radius.circular(10.0),
-                  //     bottomLeft: Radius.circular(10.0),
-                  //   ),
-                  // ),
-                  child: ProgressButton(
-                    defaultWidget: Text("Далее",
-                        style: TextStyle(color: Colors.white, fontSize: 22)),
-                    progressWidget: CircularProgressIndicator(),
-                    borderRadius: 10.0,
-                    color: Color(0xff0543B8),
-                    onPressed: () async {
-                      if (passwordController.text == passwordController2.text) {
-                        password = passwordController.text;
-                        await api.register("${widget.phone}", "${nameController.text + ' ' + lastNameController.text}", "$password", "$emailController.text").then((r) {
-                          if(true) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginPage()),
-                            );
+                    ),
+                    _space(15),
+                    SizedBox(height: 25),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      // decoration: BoxDecoration(
+                      //   color: Color(0xff0543B8),
+                      //   borderRadius: BorderRadius.only(
+                      //     topRight: Radius.circular(10.0),
+                      //     topLeft: Radius.circular(10.0),
+                      //     bottomRight: Radius.circular(10.0),
+                      //     bottomLeft: Radius.circular(10.0),
+                      //   ),
+                      // ),
+                      child: ProgressButton(
+                        defaultWidget: Text("Далее",
+                            style: TextStyle(color: Colors.white, fontSize: 22)),
+                        progressWidget: CircularProgressIndicator(),
+                        borderRadius: 10.0,
+                        color: Color(0xff0543B8),
+                        onPressed: () async {
+                          if(passwordController.text.isNotEmpty && passwordController2.text.isNotEmpty && nameController.text.isNotEmpty && lastNameController.text.isNotEmpty){
+                            setState((){
+                              globalError = '';
+                            });
+                            print('is not empty ');
+                            if (passwordController.text == passwordController2.text) {
+                              password = passwordController.text;
+                              setState(() {
+                                secondPasswordError = '';
+                                emailError = '';
+                                nameError = '';
+                                lastnameError =  '';
+                                firstPasswordError = '';
+                                emailError = '';
+                              });
+                              await api.register("${widget.phone}", "${nameController.text + ' ' + lastNameController.text}", "$password", "${emailController.text}").then((registerResponse) {
+                                print('this is register result $registerResponse');
+                                if(registerResponse['success'] == true){
+                                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => LoginPage()),(r) => false);
+                                  setState(() {
+                                    firstPasswordError = '';
+                                    emailError = ''; 
+                                  });
+                                } else if(registerResponse['message']['phone'] != null){
+                                  print('errror with phone ${registerResponse['message']['phone']} ');
+                                  _showError(context, registerResponse['message']['phone']);
+                                }
+                                else{
+                                  setState(() {
+                                    firstPasswordError = '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                    secondPasswordError = '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                    emailError =  '${registerResponse['message']['email'] == null ? '' : registerResponse['message']['email']}';
+                                  });
+                                }
+                              });
+                            } else {
+                                print('different passwords');
+                                setState(() {
+                                  firstPasswordError = 'Пароли должны быть идентичными';
+                                  secondPasswordError = 'Пароли должны быть идентичными';
+                                });
+                            }
+                          } else{
+                            print('empty');
+                            setState(() {
+                               globalError = 'Заполните все нужные поля';
+                            });
                           }
-                        });
-                      } else {
-                        _showError(context, 'Пароль не совпадает');
-                      }
-                    },
-                  ),
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 40),
+                  ],
                 ),
-                SizedBox(height: 30),
-              ],
-            ),
-          ),
-        )
-      ],
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 

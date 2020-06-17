@@ -1,3 +1,6 @@
+// home: TimerPage()
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,12 +11,12 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'login.dart';
 import 'phone_confirm.dart';
 
-class RegistrationPage extends StatefulWidget {
+class RestorePasswordPage extends StatefulWidget {
   @override
-  _RegistrationPageState createState() => _RegistrationPageState();
+  _RestorePasswordPageState createState() => _RestorePasswordPageState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> {
+class _RestorePasswordPageState extends State<RestorePasswordPage> {
   var api = Api();
   TextEditingController loginController;
   TextEditingController passwordController;
@@ -26,7 +29,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   List _titles = [];
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   String _currentCountry = "Казахстан";
-  String loginError = "";
+
   _getCountries() async {
     await api.getCountries().then((response) {
       setState(() {
@@ -67,18 +70,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  Future<void> _showError(BuildContext context, m) {
+  Future<void> _showError(BuildContext context, m, type) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Ошибка'),
+          title: type == 0 ? Text('Ошибка') : Text('Успешно'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(
               child: Text('Ok'),
               onPressed: () {
-                Navigator.of(context).pop();
+              Navigator.of(context).pop();
+               if(type == 1) Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => LoginPage()),(r) => false);
               },
             ),
           ],
@@ -93,8 +97,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
-            backgroundColor: Colors.white, // status bar color
-            brightness: Brightness.light, // status bar brightness
+            backgroundColor: Colors.white, 
+            brightness: Brightness.light,
           ),
         ),
         body: Stack(
@@ -177,7 +181,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
                             children: <Widget>[
@@ -211,7 +214,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               ),
                             ],
                           ),
-                          Text('$loginError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
                         ],
                       ),
                     ),
@@ -228,37 +230,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                        await api.checkRegistration(phonePrefix + loginController.text).then((checkPhoneResult) async {
+                        await api.restorePassword(phonePrefix + loginController.text).then((restorePasswordResponse) async {
                           // print('phone check result $checkPhoneResult');
-                          print('empty check Registration $checkPhoneResult');
-                           if(checkPhoneResult['success'] == true){
-                            await api.sendSms(phonePrefix + loginController.text).then((sendSmsResult) {
-                              print('empty sendSms');
-                              if(sendSmsResult['success'] == true){
-                              print('this is $sendSmsResult');
-                                setState(() {
-                                  loginError = "";
-                                });
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PhoneConfirmPage(
-                                      sendSmsResult['pin'],
-                                      phonePrefix + loginController.text,
-                                    ),
-                                  ),
-                                );
-                              } else{
-                                setState(() {
-                                  loginError = sendSmsResult['message'];
-                                });
-                                // _showError(context, sendSmsResult['message']);
-                              }
-                            });
+                          print('empty check Registration $restorePasswordResponse');
+                           if(restorePasswordResponse['success'] == true){
+                             _showError(context, restorePasswordResponse['message'], 1);
                           } else{
-                            setState(() {
-                              loginError = checkPhoneResult['message'];
-                            });
+                            _showError(context, restorePasswordResponse['message'], 0);
                           }
                         });
                       },

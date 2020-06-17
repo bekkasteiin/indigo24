@@ -11,6 +11,10 @@ class PaymentHistoryPage extends StatefulWidget {
 }
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
   Api api = Api();
 
   Widget _historyBuilder(BuildContext context, String logo, String account,
@@ -75,16 +79,16 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           Text(
             "$title",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14  ,
               color: Color(0xFF636973),
               fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            "${localization.account} $account",
+            "$account",
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               color: Color(0xFF001D52),
               fontWeight: FontWeight.w500,
             ),
@@ -150,12 +154,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             }
           }),
           builder: (context, snapshot) {
-            print(snapshot.data);
-            print(snapshot.data);
-            print(snapshot.data);
-            print(snapshot.data);
-            print(snapshot.data);
-            print(snapshot.data);
             return snapshot.hasData == true
                 ? _paymentHistroyBody(snapshot.data)
                 : Center(child: CircularProgressIndicator());

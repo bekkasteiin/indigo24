@@ -4,7 +4,7 @@ import 'package:indigo24/pages/add_tape.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../main.dart';
 import 'tape.dart';
 
@@ -13,8 +13,7 @@ class TapesPage extends StatefulWidget {
   _TapesPageState createState() => _TapesPageState();
 }
 
-class _TapesPageState extends State<TapesPage>
-    with AutomaticKeepAliveClientMixin {
+class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixin {
   Future<int> _listFuture;
   bool isLoaded = false;
   var api = Api();
@@ -106,9 +105,12 @@ class _TapesPageState extends State<TapesPage>
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(
-              Icons.add_photo_alternate,
-              color: Colors.black,
+            icon: Container(
+              child: Image(
+                image: AssetImage(
+                  'assets/images/newPost.png',
+                ),
+              ),
             ),
             onPressed: () {
               Navigator.push(
@@ -243,8 +245,8 @@ class _TapesPageState extends State<TapesPage>
                                     child: Container(
                                       height: MediaQuery.of(context).size.width,
                                       child: Center(
-                                        child: PhotoView(
-                                          imageProvider: NetworkImage(
+                                        child: Image(
+                                          image: NetworkImage(
                                             "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
                                           ),
                                         ),
@@ -380,7 +382,13 @@ class _TapesPageState extends State<TapesPage>
           ),
         ),
       ),
-    );
+      floatingActionButton: FloatingActionButton( 
+        child: Icon(Icons.golf_course),
+        onPressed: (){
+          controller.animateTo(0, duration: new Duration(seconds: 1), curve: Curves.ease);
+        }),
+      );
+         
   }
 
   @override
