@@ -10,7 +10,7 @@ var next = 'Next';
 var currentLanguage = 'English';
 var email = 'Email';
 var exit = 'Exit';
-var support = 'Support service';
+var support = 'SUPPORT SERVICE';
 var chats = 'Chats';
 var chat = 'Chat';
 var profile = 'Profile';
@@ -41,7 +41,7 @@ var contacts = 'Contacts';
 var search = 'Search';
 var createGroup = 'Create group';
 var chatName = 'Chat name';
-
+var newTape = 'New tape';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russia", "code": "ru"},
@@ -70,7 +70,7 @@ setLanguage(code) {
       comments = 'Comments';
       withdraw = 'Withdraw';
       refill = 'Refill';
-      support = 'Support service';
+      support = 'SUPPORT SERVICE';
       payments = 'Payments';
       transfers = 'Transfers';
       balanceInBlock = 'Balance in processing';
@@ -93,6 +93,7 @@ setLanguage(code) {
       search = 'Search';
       createGroup = 'Create group';
       chatName = 'Chat name';
+      newTape = 'New tape';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russia", "code": "ru"},
@@ -109,7 +110,7 @@ setLanguage(code) {
       currentLanguage = 'Русский';
       email = 'Почта';
       exit = 'Выйти';
-      support = 'Служба поддержки';
+      support = 'СЛУЖБА ПОДДЕРЖКИ';
       chats = 'Чаты';
       chat = 'Чат';
       profile = 'Профиль';
@@ -140,6 +141,7 @@ setLanguage(code) {
       search = 'Поиск';
       createGroup = 'Создать группу';
       chatName = 'Название чата';
+      newTape = 'Новая запись';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -157,7 +159,7 @@ setLanguage(code) {
       currentLanguage = 'Қазақша';
       email = 'Пошта';
       exit = 'Шығу';
-      support = 'Қолдау қызметі';
+      support = 'ҚОЛДАУ ҚЫЗМЕТІ';
       chats = 'Чаттар';
       chat = 'Чат';
       profile = 'Профиль';
@@ -188,6 +190,7 @@ setLanguage(code) {
       search = 'Іздеу';
       createGroup = 'Топ құру';
       chatName = 'Чат атауы';
+      newTape = 'Жаңа жазба';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

@@ -329,7 +329,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: [
-            ChatsListPage(),
+            // ChatsListPage(),
+            Developing(),
             UserProfilePage(),
             TapesPage(),
             WalletTab(),
@@ -427,4 +428,27 @@ logOut(BuildContext context) async {
       return alert;
     },
   );
+}
+
+
+class Developing extends StatelessWidget {
+  String string = '${localization.chats}';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        title: Text(
+          string,
+          style: TextStyle(color: Color(0xFF001D52)),
+        ),
+        brightness: Brightness.light,
+      ),
+      body: Center(
+        child: Image.asset('assets/developing.gif'),
+      ),
+    );
+  }
 }

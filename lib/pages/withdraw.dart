@@ -22,7 +22,6 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color(0xFFF7F7F7),
       appBar: AppBar(

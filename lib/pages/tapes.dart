@@ -1,12 +1,8 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/add_tape.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
 import '../main.dart';
@@ -92,7 +88,6 @@ class _TapesPageState extends State<TapesPage>
   }
 
   final Set _saved = Set();
-  VideoPlayerController _controller;
 
   @override
   Widget build(BuildContext context) {

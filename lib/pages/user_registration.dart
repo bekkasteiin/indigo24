@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/login.dart';
-import 'dart:convert';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/services/helper.dart';
 
 class UserRegistrationPage extends StatefulWidget {
   final phone;

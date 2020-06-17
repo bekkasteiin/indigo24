@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
 import 'package:indigo24/pages/chat_group_selection.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -229,17 +226,11 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               ),
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.group),
+                  icon: Icon(Icons.refresh),
                   iconSize: 30,
                   color: Color(0xFF001D52),
                   onPressed: () {
-                    print('add group');
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChatGroupSelection()),
-                    );
+                    print('update contacts');
                   },
                 )
               ],

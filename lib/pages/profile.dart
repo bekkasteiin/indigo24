@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -63,7 +62,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget _buildCoverImage(Size screenSize) {
     return Container(
-      height: 100,
+      height: 120,
       decoration: BoxDecoration(
         image: DecorationImage(
           image: AssetImage('assets/images/cover.png'),
@@ -136,34 +135,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildStatItem(String label, String count) {
-    TextStyle _statLabelTextStyle = TextStyle(
-      fontFamily: 'Roboto',
-      color: Colors.black,
-      fontSize: 16.0,
-      fontWeight: FontWeight.w200,
-    );
-
-    TextStyle _statCountTextStyle = TextStyle(
-      color: Colors.black54,
-      fontSize: 24.0,
-      fontWeight: FontWeight.bold,
-    );
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          count,
-          style: _statCountTextStyle,
-        ),
-        Text(
-          label,
-          style: _statLabelTextStyle,
-        ),
-      ],
-    );
-  }
 
   TextEditingController emailController =
       new TextEditingController(text: '${user.email}');
@@ -176,7 +147,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: <Widget>[
           Text("${localization.email}"),
           SizedBox(height: 5),
-          Text('${user.email}'),
+          InkWell(
+            onTap: (){},
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('${user.email}'),
+                InkWell(
+                  onTap: (){
+                    print("pencil");
+                  },
+                  child: Image.asset("assets/images/pencil.png", width:20)
+                )
+              ],
+            ),
+          ),
           // TextField(
           //   decoration: null,
           //   controller: emailController,
@@ -203,55 +188,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildCountySection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("СТРАНА"),
-          SizedBox(height: 5),
-          Text("Казахстан",
-              textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
-          SizedBox(height: 5),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCitySection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("ГОРОД"),
-          SizedBox(height: 5),
-          Text("Алматы",
-              textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
-          SizedBox(height: 5),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWhateverSection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("WHATEVER", style: TextStyle(color: Colors.grey)),
-          SizedBox(height: 5),
-          Text("Whatever",
-              textAlign: TextAlign.left,
-              style: TextStyle(fontSize: 18, color: Colors.grey)),
-          SizedBox(height: 5),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSeparator(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
@@ -261,178 +197,151 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildGetInTouch(BuildContext context) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: EdgeInsets.only(top: 8.0),
-      child: Text(
-        "Get in Touch with ${_fullName.split(" ")[0]},",
-        style: TextStyle(fontFamily: 'Roboto', fontSize: 16.0),
-      ),
-    );
-  }
-
-  Widget _buildButtons() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: InkWell(
-              onTap: () => print("followed"),
-              child: Container(
-                height: 40.0,
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  color: Color(0xFF404A5C),
-                ),
-                child: Center(
-                  child: Text(
-                    "FOLLOW",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 10.0),
-          Expanded(
-            child: InkWell(
-              onTap: () => print("Message"),
-              child: Container(
-                height: 40.0,
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(
-                      "MESSAGE",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
+    print(screenSize);
     return SafeArea(
       child: Scaffold(
         body: Stack(
           children: <Widget>[
             SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  SizedBox(height: 130),
-                  // _buildFullName(),
-                  // _buildStatus(context),
-                  // _buildStatContainer(),
-                  // _buildBio(context),
-                  // _buildSeparator(screenSize),
-                  // SizedBox(height: 10.0),
-                  // _buildGetInTouch(context),
-                  // SizedBox(height: 8.0),
-                  // _buildButtons(),
-
-                  SizedBox(height: 10),
-                  _buildPhoneSection(screenSize),
-                  _buildSeparator(screenSize),
-                  SizedBox(height: 10),
-                  _buildEmailSection(screenSize),
-                  _buildSeparator(screenSize),
-                  // SizedBox(height: 10),
-                  // _buildCountySection(screenSize),
-                  // _buildSeparator(screenSize),
-                  // SizedBox(height: 10),
-                  // _buildCitySection(screenSize),
-                  // _buildSeparator(screenSize),
-
-                  // SizedBox(height: 10),
-                  // _buildWhateverSection(screenSize),
-                  // _buildSeparator(screenSize),
-                  // SizedBox(height: 10),
-                  // _buildWhateverSection(screenSize),
-                  // _buildSeparator(screenSize),
-
-                  SizedBox(height: 100),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                            onTap: () async {
-                              if (await canLaunch(
-                                  'https://indigo24.userecho.com/')) {
-                                await launch(
-                                  'https://indigo24.userecho.com/',
-                                  forceSafariVC: false,
-                                  forceWebView: false,
-                                  headers: <String, String>{
-                                    'my_header_key': 'my_header_value'
-                                  },
-                                );
-                              } else {
-                                throw 'Could not launch https://indigo24.userecho.com/';
-                              }
-                            },
-                            child: Ink(
-                              child: Text("${localization.support}",
-                                  style: TextStyle(color: Colors.grey)),
-                            )),
-                      ),
-                      SizedBox(width: 10),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(16.0),
-                        )),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        hint: Text("${localization.currentLanguage}",
-                            style: TextStyle(color: Color(0xFF001D52))),
-                        // value: _valFriends,
-                        items: localization.languages.map((value) {
-                          return DropdownMenuItem(
-                            child: Text('${value['title']}',
-                                style: TextStyle(color: Color(0xFF001D52))),
-                            value: value,
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          // MyApp.tabPageKey.currentState.tabController.animateTo(0);
-                          tabPageKey.currentState.setState(() {});
-                          print('${value['title']}');
-                          setState(() {
-                          });
-                          localization.setLanguage(value['code']);
-                        },
-                      ),
+              child: Container(
+                height: screenSize.height * 0.82,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        SizedBox(height: 160),
+                        _buildPhoneSection(screenSize),
+                        _buildSeparator(screenSize),
+                        SizedBox(height: 10),
+                        _buildEmailSection(screenSize),
+                        _buildSeparator(screenSize),
+                      ],
                     ),
-                  ),
-                ],
+                    
+
+                    // SizedBox(height: screenSize.height*0.2),
+                    // SizedBox(height: 20),
+                    
+                    // LANGUAGE
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(horizontal: 10),
+                    //   decoration: BoxDecoration(
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.all(
+                    //         Radius.circular(16.0),
+                    //       )),
+                    //   child: DropdownButtonHideUnderline(
+                    //     child: DropdownButton(
+                    //       hint: Text("${localization.currentLanguage}",
+                    //           style: TextStyle(color: Color(0xFF001D52))),
+                    //       // value: _valFriends,
+                    //       items: localization.languages.map((value) {
+                    //         return DropdownMenuItem(
+                    //           child: Text('${value['title']}',
+                    //               style: TextStyle(color: Color(0xFF001D52))),
+                    //           value: value,
+                    //         );
+                    //       }).toList(),
+                    //       onChanged: (value) {
+                    //         // MyApp.tabPageKey.currentState.tabController.animateTo(0);
+                    //         tabPageKey.currentState.setState(() {});
+                    //         print('${value['title']}');
+                    //         setState(() {
+                    //         });
+                    //         localization.setLanguage(value['code']);
+                    //       },
+                    //     ),
+                    //   ),
+                    // ),
+
+                    Column(
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.only(bottom:10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                    onTap: () async {
+                                      if (await canLaunch(
+                                          'https://indigo24.userecho.com/')) {
+                                        await launch(
+                                          'https://indigo24.userecho.com/',
+                                          forceSafariVC: false,
+                                          forceWebView: false,
+                                          headers: <String, String>{
+                                            'my_header_key': 'my_header_value'
+                                          },
+                                        );
+                                      } else {
+                                        throw 'Could not launch https://indigo24.userecho.com/';
+                                      }
+                                    },
+                                    child: Ink(
+                                      child: Text("${localization.support}",
+                                          style: TextStyle(color: Colors.grey)),
+                                    )),
+                              ),
+                              SizedBox(width: 10),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 10.0,
+                                spreadRadius: -2,
+                                offset: Offset(0.0, 0.0))
+                          ]),
+                          child: ButtonTheme(
+                            minWidth: MediaQuery.of(context).size.width * 0.42,
+                            height: 50,
+                            child: RaisedButton(
+                              onPressed: () async {
+                                print('exit is pressed');
+                                SharedPreferences preferences =
+                                      await SharedPreferences.getInstance();
+                                  preferences.setString('phone', 'null');
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) => IntroPage()),
+                                      (r) => false);
+                              },
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Text(
+                                  '${localization.exit}',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              color: Color(0xFFFFFFFF),
+                              textColor: Color(0xFF0543B8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  10.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(height: 10)
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             _buildCoverImage(screenSize),
             Column(
               children: <Widget>[
-                SizedBox(height: 10),
+                SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
@@ -440,21 +349,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
-                            SharedPreferences preferences =
-                                await SharedPreferences.getInstance();
-                            preferences.setString('phone', 'null');
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => IntroPage()),
-                                (r) => false);
+                            
                           },
                           child: Ink(
-                            child: Text("${localization.exit}",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18)),
+                            child: Image.asset("assets/images/settings.png", width: 35,),
+                            // child: Text("${localization.exit}",
+                            //     style: TextStyle(
+                            //         color: Colors.white, fontSize: 18)),
                           )),
                     ),
-                    SizedBox(width: 10),
+                    SizedBox(width: 15),
                   ],
                 ),
                 Row(
@@ -474,7 +378,3 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 }
-
-// {id: 1, avatar: 0b8f520924a21d5c2bab.jpg, name: Aibek Q, type: 0,
-// members_count: 2, unread_messages: 0, phone: 77077655990, another_user_id: 45069,
-// last_message: {id: message:45069:25, avatar: , user_name: , text: ггг, time: 1592028962}}

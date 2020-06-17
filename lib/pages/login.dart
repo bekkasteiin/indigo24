@@ -208,29 +208,17 @@ class _LoginPageState extends State<LoginPage> {
                                       _obscureText = !_obscureText;
                                     });
                                   },
-                                  child: _obscureText
-                                      ? Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
+                                  child: Container(
+                                          padding: EdgeInsets.symmetric( horizontal: 10),
                                           child: Image(
                                             image: AssetImage(
-                                              'assets/images/eyeClose.png',
+                                              _obscureText ? 'assets/images/eyeClose.png' : 'assets/images/eyeOpen.png',
                                             ),
                                             height: 20,
                                             width: 20,
                                           ),
-                                        )
-                                      : Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          child: Image(
-                                            image: AssetImage(
-                                              'assets/images/eyeOpen.png',
-                                            ),
-                                            height: 20,
-                                            width: 20,
-                                          ),
-                                        )),
+                                        ),
+                                        ),
                             ),
                           ),
                         ],
@@ -305,28 +293,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _signInButton(Size size) {
-    return ButtonTheme(
-      minWidth: size.width * 0.45,
-      height: 60,
-      child: RaisedButton(
-        onPressed: () {
-          print('Login is pressed');
-        },
-        child: const Text(
-          'Далее',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
-        ),
-        color: Color(0xFFFFFFFF),
-        textColor: Color(0xFF001D52),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            10.0,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class Countries extends StatelessWidget {

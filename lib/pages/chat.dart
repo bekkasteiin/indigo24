@@ -24,6 +24,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/widgets/player.dart';
 
 var parser = EmojiParser();
+List listMessages = [];
 
 Image backgroundForChat = Image(
   image: AssetImage('assets/images/background_chat.png'),
@@ -149,6 +150,7 @@ class _ChatPageState extends State<ChatPage> {
             setState(() {
               page += 1;
               myList = e.json['data'].toList();
+              listMessages = e.json['data'].toList();
             });
           } else {
             print(
@@ -156,6 +158,7 @@ class _ChatPageState extends State<ChatPage> {
             setState(() {
               page += 1;
               myList.addAll(e.json['data'].toList());
+              listMessages.addAll(e.json['data'].toList());
             });
           }
           break;
@@ -165,6 +168,7 @@ class _ChatPageState extends State<ChatPage> {
             setState(() {
               ChatRoom.shared.lastMessage = message;
               myList.insert(0, message);
+              listMessages.insert(0, message);
             });
           }
           break;
@@ -372,6 +376,7 @@ class _ChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               onPressed: () {
+                                Navigator.pop(context);
                                 getImage(ImageSource.camera);
                                 print('Камера');
                               },
@@ -410,6 +415,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('Деньги');
+                                
                               },
                             ),
                           ),
@@ -446,6 +452,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('Галерея');
+                                Navigator.pop(context);
                                 getImage(ImageSource.gallery);
                               },
                             ),
@@ -483,6 +490,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('видео');
+                                Navigator.pop(context);
                                 getVideo(ImageSource.gallery);
                               },
                             ),
@@ -520,6 +528,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('Файлы');
+                                Navigator.pop(context);
                                 _openFileExplorer();
                               },
                             ),

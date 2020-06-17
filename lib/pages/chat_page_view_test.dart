@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/full_photo.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/widgets/player.dart';
@@ -271,7 +272,7 @@ class SendedMessageWidget extends StatelessWidget {
                   Text(content, style: TextStyle(fontSize: 24))
                   :
                   (type=="1")?
-                  ImageMessage(mediaUrl+rMedia)
+                  ImageMessage(mediaUrl+rMedia, "$mediaUrl$media")
                   :
                   (type=="2")?
                   FileMessage(url:"$mediaUrl$media")
@@ -396,7 +397,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                             Text(content, style: TextStyle(fontSize: 24))
                             :
                             (type=="1")?
-                            ImageMessage("$mediaUrl$rMedia")
+                            ImageMessage("$mediaUrl$rMedia", "$mediaUrl$media")
                             :
                             (type=="2")?
                             FileMessage(url:"$mediaUrl$media")
@@ -451,7 +452,8 @@ class AudioMessage extends StatelessWidget {
 
 class ImageMessage extends StatelessWidget {
   final imageUrl;
-  ImageMessage(this.imageUrl);
+  final fullImageUrl;
+  ImageMessage(this.imageUrl, this.fullImageUrl);
 
   @override
   Widget build(BuildContext context) {
@@ -504,8 +506,9 @@ class ImageMessage extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
         ),
         onPressed: () {
-          // Navigator.push(
-          //     context, MaterialPageRoute(builder: (context) => FullPhoto(url: document['content'])));
+          print('hi');
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => FullPhoto(url: imageUrl)));
         },
         padding: EdgeInsets.all(0),
       ),
