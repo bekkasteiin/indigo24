@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
@@ -18,15 +19,14 @@ class _TransferPageState extends State<TransferPage> {
 
   showAlertDialog(BuildContext context, String message) {
     // set up the button
-    Widget okButton = FlatButton(
+    Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Ошибка"),
       content: Text(message),
       actions: [
@@ -154,6 +154,55 @@ class _TransferPageState extends State<TransferPage> {
 
   Container transferButton() {
     return Container(
+      margin: EdgeInsets.only(left: 20, right: 20, top: 20),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(0.0, 0.0))
+      ]),
+      child: ButtonTheme(
+        height: 40,
+        child: RaisedButton(
+          onPressed: () async {
+            api.checkPhoneForSendMoney(receiverController.text).then((result) {
+              print('transfer result $result');
+              if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
+                logOut(context);
+                return result;
+              } else {
+                if (result["success"]) {
+                  api.doTransfer(result["toID"], sumController.text).then((res) {
+                    print("sending $res");
+                  });
+                }
+                return result;
+              }
+            });
+          },
+          child: Container(
+            height: 50,
+            width: 200,
+            child: Center(
+              child: Text(
+                '${localization.transfer}',
+                style: TextStyle(color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
+              ),
+            ),
+          ),
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    Container(
       height: 50,
       width: 200,
       decoration: BoxDecoration(

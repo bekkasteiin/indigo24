@@ -82,7 +82,7 @@ class _TransferListPageState extends State<TransferListPage> {
     return Column(
       children: <Widget>[
         SizedBox(
-          height: 20,
+          height: 10,
         ),
         transferlist(context),
         SizedBox(
@@ -94,41 +94,50 @@ class _TransferListPageState extends State<TransferListPage> {
 
   Container transferlist(BuildContext context) {
     return Container(
-      height: 60,
-      child: FlatButton(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Image.asset('assets/images/profile.png', width: 30.0),
-            Container(
-              margin: EdgeInsets.only(left: 20),
-              child: Text(
-                "${localization.toIndigo24Client}",
-                style: TextStyle(fontSize: 14),
-              ),
-            ),
-          ],
-        ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TransferPage()),
-          );
-        },
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26.withOpacity(0.2),
+      margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-          )
-        ],
+            offset: Offset(0.0, 0.0))
+      ]),
+      child: ButtonTheme(
+        height: 40,
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TransferPage()),
+            );
+          },
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: 35,
+                  height: 40,
+                  margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
+                  child: Image.asset('assets/images/profile.png', width: 30.0),
+                ),
+                Container(width: 10),
+                Text(
+                  '${localization.toIndigo24Client}',
+                  style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                ),
+              ],
+            ),
+          ),
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
+          ),
+        ),
       ),
-      margin: EdgeInsets.only(left: 20, right: 20),
     );
   }
 

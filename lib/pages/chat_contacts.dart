@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
@@ -17,13 +18,13 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   var arrays = [];
 
   showAlertDialog(BuildContext context, String message) {
-    Widget okButton = FlatButton(
+    Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    AlertDialog alert = AlertDialog(
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Ошибка"),
       content: Text(message),
       actions: [
@@ -226,7 +227,13 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               ),
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.refresh),
+                  icon: Container(
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/refresh.png',
+                      ),
+                    ),
+                  ),
                   iconSize: 30,
                   color: Color(0xFF001D52),
                   onPressed: () {

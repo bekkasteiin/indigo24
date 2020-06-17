@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -106,7 +107,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           height: 100.0,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: NetworkImage(
+              image: CachedNetworkImageProvider(
                   'https://indigo24.xyz/uploads/avatars/${user.avatar}'),
               fit: BoxFit.cover,
             ),
@@ -306,13 +307,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             child: RaisedButton(
                               onPressed: () async {
                                 print('exit is pressed');
-                                SharedPreferences preferences =
-                                      await SharedPreferences.getInstance();
-                                  preferences.setString('phone', 'null');
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => IntroPage()),
-                                      (r) => false);
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) => CustomDialog(
+                                        title: null,
+                                        description:
+                                            "Уверены, что хотите выйти?",
+                                        buttonText: "Okay",
+                                        image: CachedNetworkImage(imageUrl: 'https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+                                      ),
+                                );
+                                // SharedPreferences preferences =
+                                //       await SharedPreferences.getInstance();
+                                //   preferences.setString('phone', 'null');
+                                //   Navigator.of(context).pushAndRemoveUntil(
+                                //       MaterialPageRoute(
+                                //           builder: (context) => IntroPage()),
+                                //       (r) => false);
                               },
                               child: FittedBox(
                                 fit: BoxFit.fitWidth,
@@ -377,4 +388,149 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
+}
+
+
+
+
+class CustomDialog extends StatelessWidget {
+  final String title, description, buttonText;
+  final CachedNetworkImage image;
+
+  CustomDialog({
+    @required this.title,
+    @required this.description,
+    @required this.buttonText,
+    this.image,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Consts.padding),
+      ),      
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: dialogContent(context),
+    );
+  }
+
+  dialogContent(BuildContext context) {
+  return Stack(
+    children: <Widget>[
+        //...bottom card part,
+        Container(
+          margin: EdgeInsets.only(top: Consts.avatarRadius),
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(Consts.padding),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                offset: const Offset(0.0, 10.0),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(
+                  // top: Consts.avatarRadius + Consts.padding,
+                  top: Consts.padding+24,
+                  bottom: Consts.padding,
+                  left: Consts.padding,
+                  right: Consts.padding,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // To make the card compact
+                  children: <Widget>[
+                    title!=null?Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ):Container(),
+                    // SizedBox(height: 16.0),
+                    Text(
+                      description,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: Color(0xFF001D52)
+                      ),
+                    ),
+                    SizedBox(height: 24.0),
+                  ],
+                ),
+              ),
+
+              Container(
+                decoration: new BoxDecoration(
+                  color: Color(0xff001D52),
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(Consts.padding), bottomRight: Radius.circular(Consts.padding)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10.0,
+                      offset: const Offset(0.0, 10.0),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    FlatButton(
+                      onPressed: () async{
+                        Navigator.of(context).pop(); // To close the dialog
+
+                        var preferences =
+                                      await SharedPreferences.getInstance();
+                                  preferences.setString('phone', 'null');
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) => IntroPage()),
+                                      (r) => false);
+                      },
+                      child: Text("ДА", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)),
+                    ),
+                    Container(width: 1, height: 50, color: Colors.white),
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // To close the dialog
+                      },
+                      child: Text("НЕТ", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        //...top circlular image part,
+        // Positioned(
+        //   left: Consts.padding,
+        //   right: Consts.padding,
+        //   child: CircleAvatar(
+        //     backgroundColor: Colors.transparent,
+        //     radius: Consts.avatarRadius,
+        //     child: ClipOval(child: image),
+        //   ),
+        // ),
+      ],
+    );
+  }
+
+}
+
+class Consts {
+  Consts._();
+
+  static const double padding = 16.0;
+  static const double avatarRadius = 66.0;
 }

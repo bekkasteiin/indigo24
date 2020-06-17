@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
@@ -21,14 +22,14 @@ class PaymentsServicePage extends StatefulWidget {
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
   Api api = Api();
   showAlertDialog(BuildContext context, String message) {
-    Widget okButton = FlatButton(
+    Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
-    AlertDialog alert = AlertDialog(
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Внимание"),
       content: Text(message),
       actions: [
@@ -124,24 +125,17 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   }
   Container transferButton() {
     return Container(
-      height: 50,
-      width: 200,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10.0,
-                spreadRadius: -2,
-                offset: Offset(0.0, 0.0))
-          ]),
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(top: 20, bottom: 10),
+      margin: EdgeInsets.only(left: 20, right: 20, top: 20),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(0.0, 0.0))
+      ]),
       child: ButtonTheme(
-        minWidth: double.infinity,
-        height: 100.0,
-        child: FlatButton(
+        height: 40,
+        child: RaisedButton(
           onPressed: () async {
             api.payService(
               widget.serviceID,
@@ -157,10 +151,22 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               }
             });
           },
-          child: Text(
-            '${localization.pay}',
-            style: TextStyle(
-                color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
+          child: Container(
+            height: 50,
+            width: 200,
+            child: Center(
+              child: Text(
+                '${localization.pay}',
+                style: TextStyle(color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
+              ),
+            ),
+          ),
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
           ),
         ),
       ),

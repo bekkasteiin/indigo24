@@ -101,7 +101,7 @@ class _ChatsListPageState extends State<ChatsListPage>
             icon: Container(
               child: Image(
                 image: AssetImage(
-                  'assets/images/group.png',
+                  'assets/images/contacts.png',
                 ),
               ),
             ),
@@ -132,7 +132,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                Text('${localization.createGroup}'),
+                Text('${localization.createGroup}', style: TextStyle(color: Color(0xFF001D52)),),
                 SizedBox(width: 10,),
                 Container(
                     height: 30,
@@ -234,11 +234,11 @@ class _ChatsListPageState extends State<ChatsListPage>
                               child: CachedNetworkImage(
                                 imageUrl: (myList[i]["avatar"] == null || 
                                 myList[i]["avatar"] == '' || myList[i]["avatar"] == false) ?
-                                "https://media.indigo24.com/avatars/noAvatar.png" :
+                                "https://indigo24.xyz/uploads/avatars/noAvatar.png" :
                                 'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}',
                                 placeholder: (context, url) => const CircularProgressIndicator(),
                                 errorWidget: (context, url, error) => CachedNetworkImage(
-                                  imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                                  imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
                                 ),
                               )
                             ),

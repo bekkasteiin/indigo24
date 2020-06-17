@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
@@ -15,18 +16,17 @@ class ChatGroupSelection extends StatefulWidget {
 
 class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   var arrays = [];
-  final Set _saved = Set();
-  final Set _userIds = Set();
+  var _saved = List<dynamic>();
   var _savedList = List<dynamic>();
 
   showAlertDialog(BuildContext context, String message) {
-    Widget okButton = FlatButton(
+    Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    AlertDialog alert = AlertDialog(
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Ошибка"),
       content: Text(message),
       actions: [
@@ -56,20 +56,17 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
 
   listen() {
     ChatRoom.shared.onContactChange.listen((e) {
-      print("Contact EVENT");
+      print("GROUP SELECTION EVENT");
       print(e.json);
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "user:check":
-          if ("${e.json['data']['chat_id']}" != "null" &&
-              "${e.json['data']['status']}" == 'true') {
-            print(tempIndex);
+          if ("${e.json['data']['chat_id']}" != "null" && "${e.json['data']['status']}" == 'true') {
             setState(() {
-              _saved.add(tempIndex);
-              _savedList.add(["${e.json}"]);
-            });
-            print('${e.json['data']}');
-            _userIds.add('${e.json['data']['user_id']}');
+              _saved.add({"index" : tempIndex, "user_id": e.json['data']['user_id']});
+              _savedList.add({"data": e.json, "user_id": e.json['data']['user_id']});
+              });
+
             // Navigator.push(
             //   context,
             //   MaterialPageRoute(
@@ -81,6 +78,8 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             // });
           } else if (e.json['data']['status'] == 'true') {
             // ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
+          } else{
+            _showError(context, 'Данного пользователя нет в системе');
           }
           break;
         case "chat:create":
@@ -122,11 +121,11 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text('Ошибка'),
           content: Text(m),
           actions: <Widget>[
-            FlatButton(
+            CupertinoDialogAction(
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -253,13 +252,15 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       iconSize: 30,
                       color: Color(0xFF001D52),
                       onPressed: () {
-                        if (_userIds.length > 1) {
+                        if (_savedList.length > 1) {
                           if (_titleController.text.isNotEmpty) {
-                            ChatRoom.shared.cabinetCreate(
-                              _userIds.join(','),
-                              1,
-                              title: _titleController.text,
-                            );
+                            String user_ids = '';
+                            _savedList.forEach((element) {
+                              user_ids += element['user_id'] + ',';
+                              print(element);
+                            });
+                            print(user_ids);
+                            // ChatRoom.shared.cabinetCreate(_savedList['user_id'].join(','), 1, title: _titleController.text);
                           } else {
                             print('chat name is empty');
                             _showError(context, 'Отсутствует название чата');
@@ -276,23 +277,90 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
               body: snapshot.hasData
                   ? Column(
                     mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                          Container( padding: EdgeInsets.only(top: 10, left: 10),child: Text('${_savedList.length} ${localization.contacts}')),
                           Container(
-                            height: 50,
-                            color: Colors.blue,
+                            height: _savedList.length == 0  ? 0 : 82,
                             child: ListView.builder(
-                              shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
                               itemCount: _savedList.length != null ? _savedList.length : 0,
                               itemBuilder: (BuildContext context, int index) {
                               // print(_savedList[index]);
-                              return Column(
+                              return Stack(
                                 children: <Widget>[
                                   Container(
-                                    color: Colors.deepOrangeAccent, 
-                                    child: Text('1'),
+                                    width: 80,
+                                    padding: EdgeInsets.all(10),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        ClipRRect(
+                                          borderRadius:BorderRadius.circular(20.0),
+                                          child: Container(
+                                            color: Color(0xFF0543B8),
+                                            width: 35,
+                                            height: 35,
+                                            child: Center(
+                                              child: Text(
+                                                '${_savedList[index]['data']['data']['name'][0].toUpperCase()}',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.w500
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10,),
+                                        Container(
+                                          child: Text(
+                                            '${_savedList[index]['data']['data']['name']}',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        // Text("${_savedList[index][0]}")
+                                      ],
+                                    ),
                                   ),
-                                  // Text("${_savedList[index][0]}")
+                                  Positioned(
+                                    bottom: 30,
+                                    right: 20,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                             color: Color(0xFF0543B8),
+                                            ),
+                                            borderRadius: BorderRadius.circular(20.0),
+                                          ), 
+                                        width: 22, 
+                                        height: 22,
+                                        child: Center(
+                                          child: Center(
+                                            child: InkWell(
+                                              child: Icon(Icons.close, size: 14, color: Color(0xFF0543B8),),
+                                              onTap: (){
+                                                setState(() {
+                                                   _saved.removeWhere((item) {
+                                                    print(item['data']);
+                                                    return item['user_id'] == _savedList[index]['user_id'];
+                                                  });
+                                                  _savedList.removeWhere((item) {
+                                                    print(item['data']);
+                                                    return item['user_id'] == _savedList[index]['user_id'];
+                                                  });
+                                                });
+                                                
+                                              },
+                                            ),
+                                          ),
+                                        )
+                                      ),
+                                  ),
                                 ],
                               );
                              },
@@ -352,26 +420,26 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                       style: TextStyle(fontSize: 14.0),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    value: _saved.contains(index),
+                                    value: _savedList.length == 0  ? false : test(index),
                                     onChanged: (val) {
+                                     
+                                 
                                       setState(() {
                                         if (val == true) {
                                           tempIndex = index;
                                           ChatRoom.shared.userCheck(actualList[index]['phone']);
                                         } else {
-                                          _savedList.removeWhere((item) => item == _savedList[index][0][0]);
-                                          print(json.decode(json.encode(_savedList[index][0][0])));
-                                          print('REMOVED');
-                                          print('REMOVED');
-                                          print('REMOVED');
-                                          print('REMOVED');
-                                          print('REMOVED');
-                                          print('REMOVED');
-                                          print('REMOVED');
-                                          print('REMOVED');
-                                          _saved.remove(index);
+                                          _savedList.removeWhere((item) {
+                                            return item['data']['user_id'] == _savedList[index]['data']['user_id'];
+                                          });
                                         }
                                       });
+
+                                      _savedList.forEach((element) {
+                                        if(element['data']['data']['phone'] == actualList[index]['phone'])
+                                          print('this is if $element');
+                                        });
+
                                     },
                                   ),
                                   decoration: BoxDecoration(
@@ -389,5 +457,16 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                   : Center(child: CircularProgressIndicator()));
       },
     );
+  }
+  test(index){
+    _savedList.forEach((element) {
+      if(element['data']['data']['phone'] == actualList[index]['phone']){
+        print('this is if $element');
+        return true;
+      } else {
+        return false;
+      }
+    });
+    return false;
   }
 }

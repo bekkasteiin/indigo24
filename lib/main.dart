@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
@@ -118,6 +119,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     user.email = await SharedPreferencesHelper.getString('email');
     user.avatar = await SharedPreferencesHelper.getString('avatar');
     user.unique = await SharedPreferencesHelper.getString('unique');
+    user.pin = await SharedPreferencesHelper.getString('pin');
     return user.id;
   }
 
@@ -403,7 +405,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   preferences.setString('phone', 'null');
-  Widget okButton = FlatButton(
+  Widget okButton = CupertinoDialogAction(
     child: Text("OK"),
     onPressed: () {
       Navigator.pop(context);
@@ -415,7 +417,7 @@ logOut(BuildContext context) async {
     );
     },
   );
-  AlertDialog alert = AlertDialog(
+  CupertinoAlertDialog alert = CupertinoAlertDialog(
     title: Text("Ошибка"),
     content: Text('test'),
     actions: [

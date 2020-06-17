@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/pages/restore_password.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -27,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   var phonePrefix = '77';
   List _titles = [];
   String _currentCountry = "Казахстан";
-
+  String loginError = "";
   _getCountries() async {
     await api.getCountries().then((response) {
       setState(() {
@@ -74,11 +76,11 @@ class _LoginPageState extends State<LoginPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text('Ошибка'),
           content: Text(m),
           actions: <Widget>[
-            FlatButton(
+            CupertinoDialogAction(
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -144,9 +146,21 @@ class _LoginPageState extends State<LoginPage> {
                         children: <Widget>[
                           InkWell(
                             child: Ink(
-                              child: Text('$_currentCountry',
-                                  style: TextStyle(
-                                      color: Color(0xFF001D52), fontSize: 18)),
+                              child: Row(
+                                children: <Widget>[
+                                  Text('$_currentCountry ',style: TextStyle(color: Color(0xFF001D52), fontSize: 18)),
+                                  SizedBox(width: 10,),
+                                  Container(
+                                    child: Image(
+                                      width: 15,
+                                      height: 15,
+                                      image: AssetImage(
+                                        'assets/images/dropDown.png',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             onTap: changeCountry,
                           ),
@@ -156,6 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
                             children: <Widget>[
@@ -221,13 +236,20 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                             ),
                           ),
+                          _space(10),
+                          Text('$loginError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 12), overflow: TextOverflow.ellipsis,),
                         ],
                       ),
                     ),
-                    _space(30),
-                    Text(
-                      '${localization.forgotPassword}',
-                      style: TextStyle(color: Color(0xFF444444)),
+                    _space(15),
+                    FlatButton(
+                      child: Text(
+                        '${localization.forgotPassword}',
+                        style: TextStyle(color: Color(0xFF444444)),
+                      ),
+                      onPressed: (){
+                        Navigator.push(context,MaterialPageRoute(builder: (context) => RestorePasswordPage()));
+                      },
                     ),
                     _space(20),
                     Container(
@@ -253,7 +275,9 @@ class _LoginPageState extends State<LoginPage> {
                               }
                               else{
                                 print("this is else $singInResult");
-                                _showError(context, singInResult["message"]);
+                                setState(() {
+                                  loginError = singInResult["message"];
+                                });
                              }
                             });
                           });

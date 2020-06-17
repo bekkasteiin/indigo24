@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
@@ -18,6 +19,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
   var api = Api();
   TextEditingController smsController;
   TextEditingController passwordController;
+  String smsError = "";
   @override
   void initState() {
     super.initState();
@@ -35,11 +37,11 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text('Ошибка'),
           content: Text(m),
           actions: <Widget>[
-            FlatButton(
+            CupertinoDialogAction(
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -94,22 +96,24 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
             ),
             child: Column(
               children: <Widget>[
-                SizedBox(height: 30),
+                SizedBox(height: 50),
                 Padding(
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Row(
                         children: <Widget>[
                           Text("Код из SMS",
                               style: TextStyle(
-                                  color: Color(0xff0543B8), fontSize: 16))
+                                  color: Color(0xFF001D52), fontSize: 16))
                         ],
                       ),
                       TextField(
                         controller: smsController,
                         decoration: InputDecoration(hintText: ""),
                       ),
+                      Text('$smsError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
                     ],
                   ),
                 ),
@@ -136,8 +140,12 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     color: Color(0xff0543B8),
                     onPressed: () async {
                       //@TODO REMOVE CONDITION
-                      await api.checkSms(smsController.text).then((r) async {
-                        if (r == true) {
+                      await api.checkSms(widget.phone, smsController.text).then((checkSmsResponse) async {
+                        print('this is checkSmsResponse $checkSmsResponse');
+                        if(checkSmsResponse['success'] == true){
+                          setState(() {
+                            smsError = "";
+                          });
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -145,14 +153,27 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                                   UserRegistrationPage(widget.phone),
                             ),
                           );
-                        } else {
-                          _showError(context, r);
+                        } else{
+                          setState(() {
+                            smsError = checkSmsResponse['message'];
+                          });
                         }
+                        // if (r != true) {
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) =>
+                        //           UserRegistrationPage(widget.phone),
+                        //     ),
+                        //   );
+                        // } else {
+                        //   _showError(context, '$r');
+                        // }
                       });
                     },
                   ),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 50),
               ],
             ),
           ),

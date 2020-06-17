@@ -28,13 +28,7 @@ class Api {
         "_token": "$registrationToken",
         "device": "$device",
       });
-      if (response.data['success'] == true) {
-        // CHECK PHONE
-        // @TODO
-        return true;
-      } else {
-        return response.data;
-      }
+      return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
@@ -75,19 +69,13 @@ class Api {
   }
   
 
-  checkPhone(phone) async {
+  checkRegistration(phone) async {
     try {
       response = await dio.post("/check/registration", data: {
         "phone": "$phone",
-        "_token": "$sendSmsToken",
+        "_token": "$checkPhoneToken",
       });
-      if (response.data['success'] == true) {
-        // CHECK PHONE
-        // @TODO
-        return true;
-      } else {
-        return response.data;
-      }
+      return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
@@ -107,12 +95,7 @@ class Api {
         "phone": "$phone",
         "_token": "$sendSmsToken",
       });
-      if (response.data['success'] == true) {
-        // SMS
-        return true;
-      } else {
-        return response.data;
-      }
+      return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
@@ -126,16 +109,29 @@ class Api {
     }
   }
 
-  checkSms(code) async {
+  restorePassword(phone) async {
     try {
-      response = await dio.post("/check/sms",
-          data: {"phone": "${user.phone}", "code": "$code"});
-      if (response.data['success'] == true) {
-        // SMS
-        return true;
-      } else {
+      response = await dio.post("/restore", data: {"phone": "$phone"});
         return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('e response is ${e.response}');
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
       }
+      return e.response.data;
+    }
+  }
+
+  checkSms(phone, code) async {
+    try {
+      response = await dio.post("/check/sms", data: {"phone": "$phone", "code": "$code"});
+        return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print('e response is sms ${e.response}');
@@ -151,15 +147,49 @@ class Api {
     }
   }
 
+  createPin(pinCode) async {
+    try {
+      response = await dio.post("/create/pin", data: {"customerID": "${user.id}", "unique": "${user.unique}", "pinCode": "$pinCode"});
+      print(response.data);
+      print(response.data);
+      print('test');
+      if (response.data['success'] == true) {
+        SharedPreferencesHelper.setString('pin', '$pinCode');
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        print(pinCode);
+        user.pin = '$pinCode';
+      } 
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('e response is ${e.response}');
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+      return e.response.data;
+    }
+  }
+  
   getBalance() async {
     try {
       response = await dio.post("/get/balance",
           data: {"customerID": "${user.id}", "unique": "${user.unique}"});
       if (response.data['success'] == true) {
-        SharedPreferencesHelper.setString(
-            'balance', '${response.data['result']['balance']}');
-        SharedPreferencesHelper.setString(
-            'balanceInBlock', '${response.data['result']['balanceInBlock']}');
+        SharedPreferencesHelper.setString('balance', '${response.data['result']['balance']}');
+        SharedPreferencesHelper.setString('balanceInBlock', '${response.data['result']['balanceInBlock']}');
         user.balance = '${response.data['result']['balance']}';
         user.balanceInBlock = '${response.data['result']['balanceInBlock']}';
         return true;
@@ -188,15 +218,13 @@ class Api {
         "password": "$password",
       });
       if (response.data['success'] == true) {
-        SharedPreferencesHelper.setString(
-            'customerID', '${response.data['ID']}');
+        SharedPreferencesHelper.setString('customerID', '${response.data['ID']}');
         SharedPreferencesHelper.setString('phone', '+$phone');
         SharedPreferencesHelper.setString('name', '${response.data['name']}');
         SharedPreferencesHelper.setString('email', '${response.data['email']}');
-        SharedPreferencesHelper.setString(
-            'avatar', '${response.data['avatar']}');
-        SharedPreferencesHelper.setString(
-            'unique', '${response.data['unique']}');
+        SharedPreferencesHelper.setString('avatar', '${response.data['avatar']}');
+        SharedPreferencesHelper.setString('unique', '${response.data['unique']}');
+        SharedPreferencesHelper.setString('pin', '${response.data['pin']}');
         user.id = '${response.data['ID']}';
         user.phone = '+$phone}';
         user.name = '${response.data['name']}';
@@ -205,6 +233,7 @@ class Api {
         user.unique = '${response.data['unique']}';
 
         await updateFCM(token, '${response.data['ID']}', '${response.data['unique']}');
+        user.pin = '${response.data['pin']}';
         return true;
       } else {
         return response.data;
