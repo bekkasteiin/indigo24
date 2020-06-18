@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
+import 'package:indigo24/pages/settings/settings_notifications_main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:platform_action_sheet/platform_action_sheet.dart';

@@ -23,10 +23,10 @@ class _TapePageState extends State<TapePage>
         logOut(context);
         return true;
       } else {
+        commentCount = result['result']['comments'].length;
         return setTape(result);
       }
     });
-
     super.initState();
   }
 
@@ -51,11 +51,15 @@ class _TapePageState extends State<TapePage>
   int letterCount = 150;
   var api = Api();
   String tempCount = " ";
+  var commentCount;
 
   @override
   Widget build(BuildContext context) {
     bool keyboardIsOpened = MediaQuery.of(context).viewInsets.bottom != 0.0;
-
+    if(_commentController.text.isEmpty)
+      letterCount = 150;
+    if(_commentController.text.isNotEmpty)
+      letterCount = 151 - _commentController.text.length;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -103,6 +107,7 @@ class _TapePageState extends State<TapePage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text('${localization.comments} : $commentCount'),
                             ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
@@ -227,29 +232,27 @@ class _TapePageState extends State<TapePage>
                             suffixIcon: IconButton(
                               icon: Icon(Icons.send),
                               onPressed: () async {
-                                setState(() {
-                                  tapeResult.cast<String, dynamic>();
-                                });
-                                letterCount = 150;
-                                await api
-                                    .addCommentToTape(
-                                  '${_commentController.text}',
-                                  '${widget.tape['id']}',
-                                )
-                                    .then((v) {
-                                  // tapeResult
-                                  // {avatar: image4.png, comment: hahahahah, customerID: 113626, email: test@test.ru, name: test, phone: 77076562123}
-                                  var result = {
-                                    "avatar": "${user.avatar}",
-                                    "comment": "${_commentController.text}",
-                                    "name": "${user.name}",
-                                  };
+                                if(_commentController.text.isNotEmpty){
                                   setState(() {
-                                    com.add(result);
+                                    tapeResult.cast<String, dynamic>();
+                                    commentCount++;
                                   });
-                                  print(v);
-                                });
-                                _commentController.text = "";
+                                  letterCount = 150;
+                                  await api.addCommentToTape('${_commentController.text}','${widget.tape['id']}',).then((v) {
+                                    // tapeResult
+                                    // {avatar: image4.png, comment: hahahahah, customerID: 113626, email: test@test.ru, name: test, phone: 77076562123}
+                                    var result = {
+                                      "avatar": "${user.avatar}",
+                                      "comment": "${_commentController.text}",
+                                      "name": "${user.name}",
+                                    };
+                                    setState(() {
+                                      com.add(result);
+                                    });
+                                    print(v);
+                                  });
+                                  _commentController.text = "";
+                                  }
                               },
                             ),
                             border: InputBorder.none,

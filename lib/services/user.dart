@@ -7,6 +7,7 @@ var phone = "";
 var balance = "";
 var balanceInBlock = "";
 var pin = "";
+
 void delete() {
   id = "";
   avatar = "";

@@ -153,8 +153,7 @@ class _ChatPageState extends State<ChatPage> {
               listMessages = e.json['data'].toList();
             });
           } else {
-            print(
-                '____________________________________________________________$page');
+            print('____________________________________________________________$page');
             setState(() {
               page += 1;
               myList.addAll(e.json['data'].toList());

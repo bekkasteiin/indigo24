@@ -51,6 +51,12 @@ var notifications = 'Notifications';
 var showNotifications = 'Show notifications';
 var messagePreview = 'Message preview';
 var sound = 'Sound';
+var passcodeError = 'Incorrect pin code';
+var success = 'Success';
+var processing = 'Processing';
+var _new = 'New';
+var language = 'Language';
+var settings = 'Settings';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russia", "code": "ru"},
@@ -112,6 +118,9 @@ setLanguage(code) {
       showNotifications = 'Show notifications';
       messagePreview = 'Message preview';
       sound = 'Sound';
+      passcodeError = 'Incorrect pin code';
+      language = 'Language';
+      settings = 'Settings';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russia", "code": "ru"},
@@ -134,7 +143,7 @@ setLanguage(code) {
       profile = 'Профиль';
       tape = 'Лента';
       wallet = 'Кошелек';
-      comments = 'Комментарий';
+      comments = 'Комментарии';
       withdraw = 'Вывести';
       refill = 'Пополнить';
       payments = 'Платежи';
@@ -169,6 +178,9 @@ setLanguage(code) {
       error = 'Ошибка';
       messagePreview = 'Показывать текст';
       sound = 'Звук';
+      passcodeError = 'Неправильный PIN';
+      language = 'Язык';
+      settings = 'Настройки';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -227,6 +239,9 @@ setLanguage(code) {
       showNotifications = 'Хабарландыруларды көрсету';
       messagePreview = 'Мәтінді көрсету';
       sound = 'Дыбыс';
+      passcodeError = 'Қате PIN код';
+      language = 'Тіл';
+      settings = 'Параметрлер';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

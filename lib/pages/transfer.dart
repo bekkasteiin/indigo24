@@ -17,7 +17,7 @@ class TransferPage extends StatefulWidget {
 class _TransferPageState extends State<TransferPage> {
   Api api = Api();
 
-  showAlertDialog(BuildContext context, String message) {
+  showAlertDialog(BuildContext context, String type, String message) {
     // set up the button
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
@@ -27,7 +27,7 @@ class _TransferPageState extends State<TransferPage> {
     );
 
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text(type == '0' ? "Внимание" : type == '1' ? 'Успешно' : 'Ошибка' ),
       content: Text(message),
       actions: [
         okButton,
@@ -172,10 +172,20 @@ class _TransferPageState extends State<TransferPage> {
                 logOut(context);
                 return result;
               } else {
-                if (result["success"]) {
+                if (result["success"].toString() == 'true') {
                   api.doTransfer(result["toID"], sumController.text).then((res) {
-                    print("sending $res");
+                    if(res['success'].toString() == 'false') 
+                      showAlertDialog(context, '0', res['message']); 
+                    else{
+                      showAlertDialog(context, '1', res['message']);
+                      api.getBalance().then((result){
+                        setState(() {
+                        });
+                      });
+                    }
                   });
+                } else{
+                  showAlertDialog(context, '0', result['message']);
                 }
                 return result;
               }
@@ -197,49 +207,6 @@ class _TransferPageState extends State<TransferPage> {
             borderRadius: BorderRadius.circular(
               10.0,
             ),
-          ),
-        ),
-      ),
-    );
-    
-    Container(
-      height: 50,
-      width: 200,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10.0,
-                spreadRadius: -2,
-                offset: Offset(0.0, 0.0))
-          ]),
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(top: 20, bottom: 10),
-      child: ButtonTheme(
-        minWidth: double.infinity,
-        height: 100.0,
-        child: FlatButton(
-          onPressed: () async {
-            api.checkPhoneForSendMoney(receiverController.text).then((result) {
-              if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
-                logOut(context);
-                return result;
-              } else {
-                if (result["success"]) {
-                  api.doTransfer(result["toID"], sumController.text).then((res) {
-                    print("sending $res");
-                  });
-                }
-                return result;
-              }
-            });
-          },
-          child: Text(
-            '${localization.transfer}',
-            style: TextStyle(
-                color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
           ),
         ),
       ),

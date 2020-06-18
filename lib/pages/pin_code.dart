@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 
 import 'circle.dart';
 import 'keyboard.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();
 typedef CancelCallback = void Function();
 
 class PasscodeScreen extends StatefulWidget {
-  final Widget title;
+  Widget title;
   final int passwordDigits;
   final Color backgroundColor;
   final PasswordEnteredCallback passwordEnteredCallback;
@@ -28,10 +29,11 @@ class PasscodeScreen extends StatefulWidget {
   final CircleUIConfig circleUIConfig;
   final KeyboardUIConfig keyboardUIConfig;
   final List<String> digits;
-
+  bool withPin;
   PasscodeScreen({
     Key key,
     @required this.title,
+    this.withPin,
     this.passwordDigits = 4,
     @required this.passwordEnteredCallback,
     @required this.cancelButton,
@@ -57,7 +59,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
   String enteredPasscode = '';
   AnimationController controller;
   Animation<double> animation;
-
+  String passCodeError = '';
   @override
   initState() {
     super.initState();
@@ -68,6 +70,13 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                   curve: Curves.bounceInOut
                 )
       ..addStatusListener((status) {
+        passCodeError = widget.withPin == null ? '${localization.passcodeError}' : '';
+        Timer(Duration(seconds: 5), () {
+          setState(() {
+            passCodeError = '';
+          });
+        });
+         
         if (status == AnimationStatus.completed) {
           setState(() {
             enteredPasscode = '';
@@ -100,8 +109,10 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   widget.title,
+                  SizedBox(height: 10,),
+                  Text('$passCodeError', style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w400),),
                   Container(
-                    margin: const EdgeInsets.only(top: 20),
+                    margin: const EdgeInsets.only(top: 10),
                     height: 40,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

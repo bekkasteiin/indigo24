@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/configs.dart' as configs;
 
 class WithdrawPage extends StatefulWidget {
   @override
@@ -16,10 +19,56 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   @override
   void dispose() {
+    api.getBalance();
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
-
+  WillPopScope buildWebviewScaffold(url) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
+                ),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          brightness: Brightness.light,
+          title: Text(
+            "${localization.withdraw}",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+        ),
+        body: SafeArea(
+          child: WebviewScaffold(
+            url: '$url',
+            withZoom: true,
+            withLocalStorage: true,
+            hidden: false,
+            initialChild: Center(child: CircularProgressIndicator())
+          ),
+        ),
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,10 +105,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
           ),
-          Center(child: Text('${localization.commission} 2.8%')),
-          Center(child: Text('${localization.minAmount} 1000 KZT')),
-          Center(child: Text('${localization.minCommission} 350 KZT')),
-          Center(child: Text('${localization.maxAmount} 1000000 KZT')),
+          Center(child: Text('${localization.commission} ${configs.withdrawCommission}%')),
+          Center(child: Text('${localization.minAmount} ${configs.withdrawMin} KZT')),
+          Center(child: Text('${localization.minCommission} ${configs.withdrawMinCommission} KZT')),
+          Center(child: Text('${localization.maxAmount} ${configs.withdrawMax} KZT')),
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 20),
@@ -70,7 +119,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
               decoration: InputDecoration.collapsed(
                 hintText: '${localization.amount}',
               ),
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 20), 
               controller: amountController,
               onChanged: (String text) async {},
             ),
@@ -95,7 +144,32 @@ class _WithdrawPageState extends State<WithdrawPage> {
               height: 100.0,
               child: FlatButton(
                 onPressed: () async {
-                  api.withdraw(amountController.text);
+                  api.withdraw(amountController.text).then((withdrawResult){
+                    if(withdrawResult['success'].toString() == 'true'){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => buildWebviewScaffold(withdrawResult['redirectURL'])));
+                    } else{
+                      Widget okButton = CupertinoDialogAction(
+                        child: Text("OK"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      );
+                      CupertinoAlertDialog alert = CupertinoAlertDialog(
+                        title: Text("Внимание"),
+                        content: Text(withdrawResult['message']),
+                        actions: [
+                          okButton,
+                        ],
+                      );
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return alert;
+                        },
+                      );
+                    }
+                    print(withdrawResult);
+                  });
                 },
                 child: Text(
                   '${localization.withdraw}',

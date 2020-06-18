@@ -18,7 +18,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Api api = Api();
 
   Widget _historyBuilder(BuildContext context, String logo, String account,
-      String amount, String title, String date, int index) {
+      String amount, String title, String date, String status, int index) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -27,7 +27,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             SizedBox(width: 20),
             _paymentLogo(logo),
             _paymentInfo(title, account, date),
-            _paymentAmount(amount),
+            _paymentAmount(amount,status),
             SizedBox(width: 20),
           ],
         ),
@@ -51,15 +51,27 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     );
   }
 
-  Container _paymentAmount(String amount) {
+  Container _paymentAmount(String amount,String status) {
     return Container(
-      child: Text(
-        "$amount KZT",
-        style: TextStyle(
-          fontSize: 18,
-          color: Color(0xFF001D52),
-        ),
-        overflow: TextOverflow.ellipsis,
+      child: Row(
+        children: <Widget>[
+          Text(
+            "$amount KZT",
+            style: TextStyle(
+              fontSize: 18,
+              color: Color(0xFF001D52),
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(width: 10,),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(25),
+            child: Container(
+                height: 10,
+                width: 10,
+                color: status == '4' ?  Color(0xFF77E7B1) : status == '3' ?  Colors.orange :  status == '2' ? Color(0xFFEB818E) : (status == '1') || (status == '0') ? Colors.yellow : Colors.grey),
+          ),
+        ],
       ),
     );
   }
@@ -170,7 +182,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         itemBuilder: (BuildContext context, int index) {
           return Container(
             padding: const EdgeInsets.only(top: 10),
-            height: 96,
+            height: 65.2,
             child: _historyBuilder(
               context,
               "${snapshot['logoURL']}${snapshot['payments'][index]['logo']}",
@@ -178,6 +190,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               "${snapshot['payments'][index]['amount']}",
               "${snapshot['payments'][index]['title']}",
               "${snapshot['payments'][index]['data']}",
+              "${snapshot['payments'][index]['status']}",
               index,
             ),
           );
