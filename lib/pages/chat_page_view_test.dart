@@ -634,16 +634,18 @@ class _FileMessageState extends State<FileMessage> {
               return status < 500;
             }),
       );
+
       print(response.headers);
+
       File file = File(savePath);
       var raf = file.openSync(mode: FileMode.write);
       // response.data is List<int> type
       raf.writeFromSync(response.data);
    
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
+      // );
       await raf.close();
     } catch (e) {
       print(e);

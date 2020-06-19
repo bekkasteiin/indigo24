@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:indigo24/widgets/picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+
+var singleFile;
 
 class AddTapePage extends StatefulWidget {
   AddTapePage({Key key, this.title}) : super(key: key);
@@ -30,6 +33,8 @@ class _AddTapePageState extends State<AddTapePage> {
   TextEditingController titleController = new TextEditingController();
   TextEditingController descriptionController = new TextEditingController();
   var api = Api();
+  final picker = ImagePicker();
+  PickedFile _myFile;
 
   Future<void> _playVideo(File file) async {
     if (file != null && mounted) {
@@ -42,28 +47,70 @@ class _AddTapePageState extends State<AddTapePage> {
       setState(() {});
     }
   }
+  
 
   void _onImageButtonPressed(ImageSource source) async {
     if (_controller != null) {
       await _controller.setVolume(0.0);
     }
     if (isVideo) {
-      final File file = await ImagePicker.pickVideo(source: source);
-      _videoFile = file;
-      _currentFile = file;
-      print("video file from on image $_videoFile");
-      await _playVideo(file);
+      final pickedFile = await picker.getVideo(source: source);
+      
+      // final File file = await ImagePicker.pickVideo(source: source);
+      // _videoFile = file;
+      // _currentFile = file;
+      if (pickedFile != null) {
+        setState(() {
+          _videoFile = File(pickedFile.path);
+          _currentFile = File(pickedFile.path);
+        });
+
+        print("video file from $_videoFile");
+        await _playVideo(_videoFile);
+      }
+      
     } else {
       try {
-        _imageFile = await ImagePicker.pickImage(source: source);
-        _currentFile = _imageFile;
-        print("image file from on image $_imageFile");
-        setState(() {});
+        // _imageFile = await ImagePicker.pickImage(source: source);
+        // final pickedFile = await picker.getImage(source: source);
+        final pickedFile = await picker.getImage(source: source);
+        if (pickedFile != null) {
+          setState(() {
+            _imageFile = File(pickedFile.path);
+            _currentFile = File(pickedFile.path);
+          });
+          print("image file from $_imageFile");
+          setState(() {});
+        }
+        
       } catch (e) {
         _pickImageError = e;
       }
     }
+  } 
+
+  showAlertDialog(BuildContext context, String message) {
+    Widget okButton = CupertinoDialogAction(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("Ошибка"),
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
+  
 
   @override
   void deactivate() {
@@ -116,7 +163,6 @@ class _AddTapePageState extends State<AddTapePage> {
       padding: const EdgeInsets.all(10.0),
       child: ListView(
         children: <Widget>[
-          AspectRatioVideo(_controller),
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
@@ -131,6 +177,7 @@ class _AddTapePageState extends State<AddTapePage> {
                 controller: descriptionController,
                 decoration: InputDecoration(labelText: 'Описание')),
           ),
+          AspectRatioVideo(_controller),
         ],
       ),
     );
@@ -161,8 +208,8 @@ class _AddTapePageState extends State<AddTapePage> {
           Container(
             height: MediaQuery.of(context).size.width,
             width: MediaQuery.of(context).size.width,
-            child: PhotoView(
-              imageProvider: FileImage(_imageFile),
+            child: Image(
+              image: FileImage(_imageFile),
             ),
           ),
         ],
@@ -195,18 +242,18 @@ class _AddTapePageState extends State<AddTapePage> {
   }
 
   Future<void> retrieveLostData() async {
-    final LostDataResponse response = await ImagePicker.retrieveLostData();
+    final LostData response = await picker.getLostData();
     if (response.isEmpty) {
       return;
     }
     if (response.file != null) {
       if (response.type == RetrieveType.video) {
         isVideo = true;
-        await _playVideo(response.file);
+        await _playVideo(File(response.file.path));
       } else {
         isVideo = false;
         setState(() {
-          _imageFile = response.file;
+          _imageFile = File(response.file.path);
         });
       }
     } else {
@@ -214,7 +261,8 @@ class _AddTapePageState extends State<AddTapePage> {
     }
   }
 
-  Future addTape() async {
+  Future addTape(context) async {
+    print("MY current file ${_currentFile.path}");
     api.addTape(_currentFile.path, titleController.text, descriptionController.text).then((r) {
       if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
         logOut(context);
@@ -224,6 +272,9 @@ class _AddTapePageState extends State<AddTapePage> {
           titleController.text = "";
           descriptionController.text = "";
           Navigator.pop(context);
+        } else {
+          print("false false false ");
+          showAlertDialog(context, r["message"]?? "");
         }
       return r;
       }
@@ -234,6 +285,7 @@ class _AddTapePageState extends State<AddTapePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
@@ -271,14 +323,29 @@ class _AddTapePageState extends State<AddTapePage> {
             ),
           ),
            onPressed: () async {
-              await addTape();
+              if(descriptionController.text == '' || titleController.text == ''){
+                showAlertDialog(context, "Заполните все поля");
+              } else if(_currentFile == null){
+                showAlertDialog(context, "Выберите файл");
+              } else {
+                await addTape(context);
+              }
+              
             },
           ),
           
         ],
         backgroundColor: Colors.white,
       ),
-      body: Center(
+      body: 
+      // Center(
+      //   child: Container(
+      //     child: Center(
+      //       child: Text("test"),
+      //     ),
+      //   ),
+      // ),
+      Center(
         child: Platform.isAndroid
             ? FutureBuilder<void>(
                 future: retrieveLostData(),
@@ -310,60 +377,102 @@ class _AddTapePageState extends State<AddTapePage> {
               )
             : (isVideo ? _previewVideo() : _previewImage()),
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          FloatingActionButton(
-            onPressed: () {
-              isVideo = false;
-              _onImageButtonPressed(ImageSource.gallery);
-            },
-            heroTag: 'image0',
-            tooltip: 'Pick Image from gallery',
-            child: const Icon(Icons.photo_library),
-          ),
           Padding(
-            padding: const EdgeInsets.only(top: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             child: FloatingActionButton(
+              backgroundColor: Colors.white,
               onPressed: () {
                 isVideo = false;
+                _settingModalBottomSheet(context);
+                // MY COMMENT
+                // _onImageButtonPressed(ImageSource.camera);
+              },
+              heroTag: 'image',
+              tooltip: 'Pick Image from camera',
+              child: Image.asset("assets/images/camera.png", width: 30),
+            ),
+          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: FloatingActionButton(
+                backgroundColor: Colors.white,
+                onPressed: () {
+                  isVideo = true;
                 _onImageButtonPressed(ImageSource.camera);
-              },
-              heroTag: 'image1',
-              tooltip: 'Take a Photo',
-              child: const Icon(Icons.camera_alt),
+                },
+                heroTag: 'video',
+                tooltip: 'Pick Video from camera',
+                child: Image.asset("assets/images/video.png", width: 30),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: FloatingActionButton(
-              backgroundColor: Colors.red,
-              onPressed: () {
-                isVideo = true;
-                _onImageButtonPressed(ImageSource.gallery);
-              },
-              heroTag: 'video0',
-              tooltip: 'Pick Video from gallery',
-              child: const Icon(Icons.video_library),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: FloatingActionButton(
-              backgroundColor: Colors.red,
-              onPressed: () {
-                isVideo = true;
-                _onImageButtonPressed(ImageSource.camera);
-              },
-              heroTag: 'video1',
-              tooltip: 'Take a Video',
-              child: const Icon(Icons.videocam),
-            ),
-          ),
         ],
-      ),
+      )
+      // Column(
+      //   mainAxisAlignment: MainAxisAlignment.end,
+      //   children: <Widget>[
+          // FloatingActionButton(
+          //   onPressed: () {
+          //     isVideo = false;
+          //     _onImageButtonPressed(ImageSource.gallery);
+          //   },
+          //   heroTag: 'image0',
+          //   tooltip: 'Pick Image from gallery',
+          //   child: const Icon(Icons.photo_library),
+          // ),
+      //     Padding(
+      //       padding: const EdgeInsets.only(top: 16.0),
+      //       child: FloatingActionButton(
+      //         onPressed: () {
+      //           isVideo = false;
+      //           _onImageButtonPressed(ImageSource.camera);
+      //         },
+      //         heroTag: 'image1',
+      //         tooltip: 'Take a Photo',
+      //         child: const Icon(Icons.camera_alt),
+      //       ),
+      //     ),
+      //     Padding(
+      //       padding: const EdgeInsets.only(top: 16.0),
+      //       child: FloatingActionButton(
+      //         backgroundColor: Colors.red,
+      //         onPressed: () {
+      //           isVideo = true;
+      //           _onImageButtonPressed(ImageSource.gallery);
+      //         },
+      //         heroTag: 'video0',
+      //         tooltip: 'Pick Video from gallery',
+      //         child: const Icon(Icons.video_library),
+      //       ),
+      //     ),
+      //     Padding(
+      //       padding: const EdgeInsets.only(top: 16.0),
+      //       child: FloatingActionButton(
+      //         backgroundColor: Colors.red,
+      //         onPressed: () {
+                // isVideo = true;
+                // _onImageButtonPressed(ImageSource.camera);
+      //         },
+      //         heroTag: 'video1',
+      //         tooltip: 'Take a Video',
+      //         child: const Icon(Icons.videocam),
+      //       ),
+      //     ),
+      //   ],
+      // ),
     );
   }
+
+  void _settingModalBottomSheet(context){
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc){
+          return PickerPage();
+      }
+    );
+}
 
   Text _getRetrieveErrorWidget() {
     if (_retrieveDataError != null) {

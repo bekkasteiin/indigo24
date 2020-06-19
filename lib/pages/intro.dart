@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/login.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/custom_dropdown.dart';
 
 import 'registration.dart';
 
@@ -56,23 +57,26 @@ class _IntroPageState extends State<IntroPage> {
                           )
                       ),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                          hint: Text("${localization.currentLanguage}", style: TextStyle(color: Color(0xFF001D52))),
-                          // value: _valFriends,
-                          items: localization.languages.map((value) {
-                            return DropdownMenuItem(
-                              child: Text('${value['title']}',style: TextStyle(color: Color(0xFF001D52))),
-                              value: value,
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            print('${value['title']}');
-                            setState(() {
-                               localization.currentLanguage = '${value['title']}';
-                            });
-                            localization.setLanguage(value['code']);
-                          },
+                          child: Container(
+                            child: CustomDropdownButton(
+                            isExpanded: false,
+                            hint: Text("${localization.currentLanguage}", style: TextStyle(color: Color(0xFF001D52))),
+                            // value: _valFriends,
+                            items: localization.languages.map((value) {
+                              return DropdownMenuItem(
+                                child: Text('${value['title']}',style: TextStyle(color: Color(0xFF001D52))),
+                                value: value,
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              print('${value['title']}');
+                              setState(() {
+                                 localization.currentLanguage = '${value['title']}';
+                              });
+                              localization.setLanguage(value['code']);
+                            },
                       ),
+                          ),
                         ),
                     ),
                   ],
@@ -143,3 +147,6 @@ class _IntroPageState extends State<IntroPage> {
     );
   }
 }
+
+
+

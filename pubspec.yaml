@@ -24,6 +24,7 @@ dependencies:
   websocket_manager: ^0.2.2
   sembast: ^2.4.4+1
   path_provider: ^1.6.10
+  provider: any
   connectivity: ^0.4.8+6
   contacts_service: ^0.4.6
   shimmer: ^1.1.0
@@ -68,6 +69,8 @@ flutter:
     - assets/sound/msg_out.mp3
     - assets/sound/message_in.mp3
     - assets/images/send.png
+    - assets/images/camera.png
+    - assets/images/video.png
     - assets/images/pencil.png
     - assets/images/settings.png
     - assets/images/cover.png

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/services/test_timer.dart';
@@ -234,6 +235,7 @@ class _ChatPageState extends State<ChatPage> {
           }];
           ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
         } else {
+          showAlertDialog(context, r["message"]);
           print("error");
         }
       });
@@ -255,6 +257,7 @@ class _ChatPageState extends State<ChatPage> {
           }];
           ChatRoom.shared.sendMessage('${widget.chatID}', "video", type: 4, attachments: jsonDecode(jsonEncode(a)));
         } else {
+          showAlertDialog(context, r["message"]);
           print("error");
         }
       });
@@ -302,6 +305,7 @@ class _ChatPageState extends State<ChatPage> {
         }];
         ChatRoom.shared.sendMessage('${widget.chatID}', "file", type: 2, attachments: jsonDecode(jsonEncode(a)));
       } else {
+        showAlertDialog(context, r["message"]);
         print("error");
       }
     });
@@ -956,6 +960,7 @@ class _ChatPageState extends State<ChatPage> {
           var dir = Directory(sdPath);
           dir.deleteSync(recursive: true);
         } else {
+          showAlertDialog(context, r["message"]);
           print("error");
         }
       });
@@ -998,6 +1003,29 @@ class _ChatPageState extends State<ChatPage> {
     }
     return sdPath + "/temple.mp3";
   }
+
+  showAlertDialog(BuildContext context, String message) {
+    Widget okButton = CupertinoDialogAction(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("Ошибка"),
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  
 }
 
 class Devider extends StatelessWidget {
