@@ -59,8 +59,7 @@ class _ChatPageState extends State<ChatPage> {
   int page = 1;
   // RefreshController _refreshController = RefreshController();
   ScrollController _scrollController = ScrollController();
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   String statusText = "";
   bool isComplete = false;
@@ -154,8 +153,7 @@ class _ChatPageState extends State<ChatPage> {
               listMessages = e.json['data'].toList();
             });
           } else {
-            print(
-                '____________________________________________________________$page');
+            print('____________________________________________________________$page');
             setState(() {
               page += 1;
               myList.addAll(e.json['data'].toList());
@@ -184,15 +182,7 @@ class _ChatPageState extends State<ChatPage> {
           });
           break;
         default:
-          print('yes');
-          print('yes');
-          print('yes');
-          print('yes');
-          print('yes');
-          print('yes');
-          print('yes');
-          print('yes');
-          print('yes');
+          print('CABINET EVENT DEFAULT');
       }
     });
   }

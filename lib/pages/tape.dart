@@ -23,17 +23,16 @@ class _TapePageState extends State<TapePage>
         logOut(context);
         return true;
       } else {
+        commentCount = result['result']['comments'].length;
         return setTape(result);
       }
     });
-
     super.initState();
   }
 
   Future setTape(result) async {
     setState(() {
       // print('this is result $result');
-
       tapeResult = result["result"];
       com = result["result"]["comments"].toList();
       _future = Future(foo);
@@ -43,19 +42,24 @@ class _TapePageState extends State<TapePage>
   int foo() {
     return 1;
   }
+  var _saved = List<dynamic>();
 
   TextEditingController _commentController = TextEditingController();
   var commentResult;
   var tapeResult;
   List com = [];
-  int letterCount = 150;
+  int letterCount = 100;
   var api = Api();
   String tempCount = " ";
-
+  var commentCount;
+  int maxLine = 5;
   @override
   Widget build(BuildContext context) {
     bool keyboardIsOpened = MediaQuery.of(context).viewInsets.bottom != 0.0;
-
+    if(_commentController.text.isEmpty)
+      letterCount = 100;
+    if(_commentController.text.isNotEmpty)
+      letterCount = 100 - _commentController.text.length;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -76,7 +80,7 @@ class _TapePageState extends State<TapePage>
         title: Text(
           "${localization.comments}",
           style: TextStyle(
-            color: Colors.black,
+            color: Color(0xFF001D52),
             fontSize: 22,
             fontWeight: FontWeight.w400,
           ),
@@ -103,11 +107,15 @@ class _TapePageState extends State<TapePage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text('${localization.comments} : $commentCount',
+                            style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
+                            ),
                             ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: com.length,
                               itemBuilder: (context, index) {
+                                _saved.add({'index': index, 'maxLines' : 5});
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -117,41 +125,61 @@ class _TapePageState extends State<TapePage>
                                     Container(
                                       margin: EdgeInsets.only(bottom: 10),
                                       child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(45.0),
-                                            child: Image.network(
-                                              'https://indigo24.xyz/uploads/avatars/${com[index]['avatar']}',
-                                              width: 35.0,
-                                              height: 35.0,
-                                            ),
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: <Widget>[
+                                              CircleAvatar(
+                                                radius: 15.0,
+                                                backgroundImage: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                            ],
                                           ),
+                                          
                                           SizedBox(
                                             width: 10,
                                           ),
-                                          Text('${com[index]['name']}'),
+                                          Expanded(
+                                            child: RichText(
+                                              text: TextSpan(
+                                                text: '${com[index]['name']} ',
+                                                style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w600),
+                                                children: <TextSpan>[
+                                                  TextSpan(
+                                                    text: '${com[index]['comment']}',
+                                                    style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            // Text(
+                                            //   '${com[index]['comment']}',
+                                            //   overflow: TextOverflow.ellipsis,
+                                            //   maxLines: _saved[index]['maxLines'],
+                                            //   style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
+                                            // ),
+                                          ),
+                                          // SizedBox(
+                                            // width: 10,
+                                          // ),
+                                          // InkWell(
+                                          //   child: Text('еще'),
+                                          //   onTap: (){
+                                          //     setState(() {
+                                          //       maxLine = 10;
+                                          //       _saved[index]['maxLines'] = 1000;
+                                          //     });
+                                          //     print('eshe');
+                                          //   },
+                                          //   ),
                                         ],
                                       ),
                                     ),
-                                    Row(
-                                      children: <Widget>[
-                                        Flexible(
-                                          child: Text(
-                                            '${com[index]['comment']}',
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 5,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(vertical: 5),
-                                      height: 0.2,
-                                      width: MediaQuery.of(context).size.width,
-                                      color: Colors.black,
-                                      child: Text('1'),
-                                    )
                                   ],
                                 );
                               },
@@ -159,6 +187,7 @@ class _TapePageState extends State<TapePage>
                             SizedBox(
                               height: 100,
                             ),
+                            
                           ],
                         ),
                       ),
@@ -183,62 +212,71 @@ class _TapePageState extends State<TapePage>
           child: Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0, top: 10),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25.0),
-                    child: Image.network(
-                      // 'https://indigo24.xyz/uploads/avatars/${db.getItem('own_avatar')}',
-                      'https://indigo24.xyz/uploads/avatars/noAvatar.png',
-                      width: 35,
-                    ),
-                  ),
+                CircleAvatar(
+                  radius: 20.0,
+                  backgroundImage: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+                  backgroundColor: Colors.red,
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0, top: 10),
-                    child: Container(
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: TextField(
-                          maxLines: 6,
-                          minLines: 1,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(151),
-                          ],
-                          controller: _commentController,
-                          onChanged: (value) {
-                            if (value.length < tempCount.length) {
+                  child: Container(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: TextField(
+                        maxLines: 6,
+                        onSubmitted: (value) async {
+                          if(_commentController.text.isNotEmpty){
+                            setState(() {
+                              tapeResult.cast<String, dynamic>();
+                              commentCount++;
+                            });
+                            letterCount = 100;
+                            await api.addCommentToTape('${_commentController.text}','${widget.tape['id']}',).then((v) {
+                              var result = {
+                                "avatar": "${user.avatar}",
+                                "comment": "${_commentController.text}",
+                                "name": "${user.name}",
+                              };
                               setState(() {
-                                letterCount = letterCount + 1;
+                                com.add(result);
                               });
-                            }
-                            if (value.length > tempCount.length) {
-                              setState(() {
-                                letterCount = letterCount - 1;
-                              });
-                            }
-                            tempCount = value;
-                          },
-                          decoration: InputDecoration(
-                            // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
-                            suffixIcon: IconButton(
-                              icon: Icon(Icons.send),
-                              onPressed: () async {
+                            });
+                            _commentController.text = "";
+                          }
+                        },
+                        minLines: 1,
+                        textInputAction: TextInputAction.go,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(100),
+                        ],
+                        controller: _commentController,
+                        onChanged: (value) {
+                          if (value.length < tempCount.length) {
+                            setState(() {
+                              letterCount = letterCount + 1;
+                            });
+                          }
+                          if (value.length > tempCount.length) {
+                            setState(() {
+                              letterCount = letterCount - 1;
+                            });
+                          }
+                          tempCount = value;
+                        },
+                        decoration: InputDecoration(
+                          // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.send),
+                            onPressed: () async {
+                              if(_commentController.text.isNotEmpty){
                                 setState(() {
                                   tapeResult.cast<String, dynamic>();
+                                  commentCount++;
                                 });
-                                letterCount = 150;
-                                await api
-                                    .addCommentToTape(
-                                  '${_commentController.text}',
-                                  '${widget.tape['id']}',
-                                )
-                                    .then((v) {
-                                  // tapeResult
-                                  // {avatar: image4.png, comment: hahahahah, customerID: 113626, email: test@test.ru, name: test, phone: 77076562123}
+                                letterCount = 100;
+                                await api.addCommentToTape('${_commentController.text}','${widget.tape['id']}',).then((v) {
                                   var result = {
                                     "avatar": "${user.avatar}",
                                     "comment": "${_commentController.text}",
@@ -247,63 +285,16 @@ class _TapePageState extends State<TapePage>
                                   setState(() {
                                     com.add(result);
                                   });
-                                  print(v);
                                 });
                                 _commentController.text = "";
-                              },
-                            ),
-                            border: InputBorder.none,
-                            hintText: "${localization.enterMessage}",
+                                }
+                            },
                           ),
+                          border: InputBorder.none,
+                          hintText: "${localization.enterMessage}",
                         ),
                       ),
                     ),
-                    // Container(
-                    //   height: 35,
-                    //   child: TextFormField(
-                    //     inputFormatters: [
-                    //       LengthLimitingTextInputFormatter(151),
-                    //     ],
-                    //     maxLines: 3,
-                    //     controller: _commentController,
-                    //     onChanged: (value) {
-                    //       if (value.length < tempCount.length) {
-                    //         setState(() {
-                    //           letterCount = letterCount + 1;
-                    //         });
-                    //       }
-                    //       if (value.length > tempCount.length) {
-                    //         setState(() {
-                    //           letterCount = letterCount - 1;
-                    //         });
-                    //       }
-                    //       tempCount = value;
-                    //     },
-                    //     decoration: InputDecoration(
-                    //       hintText: 'Написать комментарий',
-                    //       contentPadding: EdgeInsets.symmetric(
-                    //           vertical: 0.0, horizontal: 15.0),
-                    //       border: OutlineInputBorder(
-                    //         borderRadius: BorderRadius.all(
-                    //           Radius.circular(25.0),
-                    //         ),
-                    //       ),
-                    //       suffixIcon: IconButton(
-                    //         icon: Icon(Icons.send),
-                    //         onPressed: () async {
-                    //           setState(() {
-                    //             tapeResult.cast<String, dynamic>();
-                    //           });
-                    //           await api.addCommentToTape(
-                    //             '${widget.tape['id']}',
-                    //             '${_commentController.text}',
-                    //           );
-                    //           _commentController.text = "";
-                    //         },
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
                   ),
                 ),
                 Padding(

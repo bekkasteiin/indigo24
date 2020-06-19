@@ -41,10 +41,10 @@ Future<void> main() async {
   Api api = Api();
   bool authenticated = false;
 
-
   await api.checkUnique(unique, customerID).then((r) async {
     if (r['success'] != null) {
       authenticated = r['success'].toString() == 'true';
+      await api.getConfig();
     } else if (r['result'] != null) {
       print('this is else if ${r['result']}');
       authenticated = r['result']['success'].toString() == 'true';

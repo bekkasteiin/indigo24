@@ -46,9 +46,23 @@ var enterPin = 'Enter passcode';
 var createPin = 'Set passcode';
 var incorrectPin = 'Incorrect PIN';
 var error = 'Error';
+var chatNotifications = 'Chat notifications';
+var notifications = 'Notifications';
+var showNotifications = 'Show notifications';
+var messagePreview = 'Message preview';
+var sound = 'Sound';
+var passcodeError = 'Incorrect pin code';
+var success = 'Success';
+var processing = 'Processing';
+var _new = 'New';
+var language = 'Language';
+var settings = 'Settings';
+var enterPhone = 'Enter phone';
+var enterSmsCode = 'Enter SMS code';
+var enterPassword = 'Enter password';
 var languages = [
   {"title": "English", "code": "en"},
-  {"title": "Russia", "code": "ru"},
+  {"title": "Russian", "code": "ru"},
   {"title": "Kazakh", "code": "kz"},
 ];
 
@@ -101,10 +115,21 @@ setLanguage(code) {
       enterPin = 'Enter passcode';
       createPin = 'Set passcode';
       incorrectPin = 'Incorrect PIN';
+      chatNotifications = 'Chat notifications';
       error = 'Error';
+      notifications = 'Notifications';
+      showNotifications = 'Show notifications';
+      messagePreview = 'Message preview';
+      sound = 'Sound';
+      passcodeError = 'Incorrect pin code';
+      language = 'Language';
+      settings = 'Settings';
+      enterPhone = 'Enter phone';
+      enterSmsCode = 'Enter SMS code';
+      enterPassword = 'Enter password';
       languages = [
         {"title": "English", "code": "en"},
-        {"title": "Russia", "code": "ru"},
+        {"title": "Russian", "code": "ru"},
         {"title": "Kazakh", "code": "kz"},
       ];
       break;
@@ -124,7 +149,7 @@ setLanguage(code) {
       profile = 'Профиль';
       tape = 'Лента';
       wallet = 'Кошелек';
-      comments = 'Комментарий';
+      comments = 'Комментарии';
       withdraw = 'Вывести';
       refill = 'Пополнить';
       payments = 'Платежи';
@@ -153,7 +178,18 @@ setLanguage(code) {
       enterPin = 'Введите PIN';
       createPin = 'Установите PIN'; 
       incorrectPin = 'Неправильный PIN';
+      chatNotifications = 'Уведомления от чатов';
+      notifications = 'Уведомления';
+      showNotifications = 'Показывать уведомления';
       error = 'Ошибка';
+      messagePreview = 'Показывать текст';
+      sound = 'Звук';
+      passcodeError = 'Неправильный PIN';
+      language = 'Язык';
+      settings = 'Настройки';
+      enterPhone = 'Введите номер телефона';
+      enterSmsCode = 'Введите SMS код';
+      enterPassword = 'Введите пароль';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -206,7 +242,18 @@ setLanguage(code) {
       enterPin = 'PIN код енгізіңіз';
       createPin = 'Құпия код орнатыңыз';
       incorrectPin = 'Қате PIN код';
+      chatNotifications = 'Чат хабарландырулары';
       error = 'Қате';
+      notifications = 'Хабарламалар';
+      showNotifications = 'Хабарландыруларды көрсету';
+      messagePreview = 'Мәтінді көрсету';
+      sound = 'Дыбыс';
+      passcodeError = 'Қате PIN код';
+      language = 'Тіл';
+      settings = 'Параметрлер';
+      enterPhone = 'Телефон нөмірін енгізіңіз';
+      enterSmsCode = 'SMS кодын енгізіңіз';
+      enterPassword = 'Құпия сөзді енгізіңіз';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

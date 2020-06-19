@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -12,26 +13,33 @@ class TransferHistoryPage extends StatefulWidget {
 
 class _TransferHistoryPageState extends State<TransferHistoryPage> {
   Api api = Api();
+  List transferHistories = [];
+  String avatarUrl = "";
+
+  @override
+  void initState() { 
+    super.initState();
+    api.getTransactions(page).then((transactions) {
+      if (transactions['message'] == 'Not authenticated' && transactions['success'].toString() == 'false') {
+        logOut(context);
+        return transactions;
+      } else {
+        setState(() {
+          avatarUrl = transactions['avatarURL'];
+          print(transactions);
+          if (page == 1) 
+            transferHistories = transactions['transactions'].toList();
+        });
+        return transactions;
+      }
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: FutureBuilder(
-        future: api.getTransactions(1).then((transactions) {
-          if (transactions['message'] == 'Not authenticated' && transactions['success'].toString() == 'false') {
-            logOut(context);
-            return transactions;
-          } else {
-            return transactions;
-          }
-        }),
-        builder: (context, snapshot) {
-          if (snapshot.hasData)
-            return _transferHistoryBody(snapshot.data);
-          else
-            return Center(child: CircularProgressIndicator());
-        },
-      ),
+      body: transferHistories.isNotEmpty ? _transferHistoryBody(transferHistories) : Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -128,55 +136,64 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       ),
     );
   }
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+
+  void _onLoading() async {
+    print("_onLoading ");
+    _loadData();
+    _refreshController.loadComplete();
+  }
+  bool isLoaded = false;
+  int page = 1;
+
+  Future _loadData() async {
+    api.getTransactions(page).then((histories){
+      List temp = histories['transactions'].toList();
+      setState((){
+        transferHistories.addAll(temp);
+      });
+      page++;
+    });
+  }
 
   SafeArea _transferHistoryBody(snapshot) {
-    print(snapshot);
     return SafeArea(
-      child: ListView.builder(
-        itemCount: snapshot['transactions'] != null ? snapshot['transactions'].length : 0,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            padding: const EdgeInsets.only(top: 5),
-            child: _historyBuilder(
-              context,
-              "${snapshot['avatarURL'] + snapshot['transactions'][index]['avatar']}",
-              // "https://lh3.googleusercontent.com/IeNJWoKYx1waOhfWF6TiuSiWBLfqLb18lmZYXSgsH1fvb8v1IYiZr5aYWe0Gxu-pVZX3",
-              "${snapshot['transactions'][index]['amount']}",
-              "${snapshot['transactions'][index]['name']}",
-              "${snapshot['transactions'][index]['phone']}",
-              // 'asdiads0oafskojasfkodfokfdsokfssfdfdsokfsdjfdsfds',
-              '${snapshot['transactions'][index]['type']}',
-              "${snapshot['transactions'][index]['data']}",
-              index,
-            ),
-          );
-        },
+      child: SmartRefresher(
+        enablePullDown: false,
+        enablePullUp: true,
+        footer: CustomFooter(
+          builder:(BuildContext context, LoadStatus mode) {
+            Widget body;
+            return Container(
+              height: 55.0,
+              child: Center(child: body),
+            );
+          },
+        ),
+        controller: _refreshController,
+        onLoading: _onLoading,
+        child: ListView.builder(
+          itemCount: snapshot != null ? snapshot.length : 0,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              padding: const EdgeInsets.only(top: 5),
+              child: _historyBuilder(
+                context,
+                "${avatarUrl + snapshot[index]['avatar']}",
+                "${snapshot[index]['amount']}",
+                "${snapshot[index]['name']}",
+                "${snapshot[index]['phone']}",
+                '${snapshot[index]['type']}',
+                "${snapshot[index]['data']}",
+                index,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
-  Future getTransactions() async {
-    // try {
-    //   var response = await client.post(
-    //     'https://api.indigo24.xyz/api/v2.1/get/transactions',
-    //     headers: <String, String>{
-    //       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    //     },
-    //     body: "customerID=${customerID}&unique=${unique}&page=1",
-    //   );
-    //   var result = json.decode(response.body);
-    //   if (response.statusCode == 200) {
-    //     // print(result['success'] + 'this si res');
-    //     transactions = await result['transactions'];
-    //     logoUrl = await result['avatarURL'];
-    //     return result;
-    //   } else {
-    //     return "error";
-    //   }
-    // } catch (_) {
-    //   return "disconnect";
-    // }
-  }
   @override
   void dispose() {
     super.dispose();

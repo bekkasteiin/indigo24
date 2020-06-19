@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/services/api.dart';
 import 'user_registration.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class PhoneConfirmPage extends StatefulWidget {
   final smsCode;
@@ -63,16 +64,24 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
             brightness: Brightness.light, // status bar brightness
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/background_login.png"),
-                  fit: BoxFit.cover),
-            )),
-            _buildForeground()
-          ],
+        body: GestureDetector(
+                onTap: () {
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus) {
+                    currentFocus.unfocus();
+                  }
+                },
+          child: Stack(
+            children: <Widget>[
+              Container(
+                  decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/background_login.png"),
+                    fit: BoxFit.cover),
+              )),
+              Center(child: _buildForeground())
+            ],
+          ),
         ));
   }
 
@@ -140,36 +149,43 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     color: Color(0xff0543B8),
                     onPressed: () async {
                       //@TODO REMOVE CONDITION
-                      await api.checkSms(widget.phone, smsController.text).then((checkSmsResponse) async {
-                        print('this is checkSmsResponse $checkSmsResponse');
-                        if(checkSmsResponse['success'] == true){
-                          setState(() {
-                            smsError = "";
+                      if(smsController.text.isNotEmpty){
+                        await api.checkSms(widget.phone, smsController.text).then((checkSmsResponse) async {
+                          print('this is checkSmsResponse $checkSmsResponse');
+                          if(checkSmsResponse['success'] == true){
+                            setState(() {
+                              smsError = "";
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    UserRegistrationPage(widget.phone),
+                              ),
+                            );
+                          } else{
+                            setState(() {
+                              smsError = checkSmsResponse['message'];
+                            });
+                          }
+                          // if (r != true) {
+                          //   Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           UserRegistrationPage(widget.phone),
+                          //     ),
+                          //   );
+                          // } else {
+                          //   _showError(context, '$r');
+                          // }
+                        });
+                      }
+                      else{
+                        setState(() {
+                            smsError = '${localization.enterSmsCode}';
                           });
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  UserRegistrationPage(widget.phone),
-                            ),
-                          );
-                        } else{
-                          setState(() {
-                            smsError = checkSmsResponse['message'];
-                          });
-                        }
-                        // if (r != true) {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) =>
-                        //           UserRegistrationPage(widget.phone),
-                        //     ),
-                        //   );
-                        // } else {
-                        //   _showError(context, '$r');
-                        // }
-                      });
+                      }
                     },
                   ),
                 ),

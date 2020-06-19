@@ -17,7 +17,7 @@ class TransferPage extends StatefulWidget {
 class _TransferPageState extends State<TransferPage> {
   Api api = Api();
 
-  showAlertDialog(BuildContext context, String message) {
+  showAlertDialog(BuildContext context, String type, String message) {
     // set up the button
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
@@ -27,7 +27,7 @@ class _TransferPageState extends State<TransferPage> {
     );
 
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text(type == '0' ? "Внимание" : type == '1' ? 'Успешно' : 'Ошибка' ),
       content: Text(message),
       actions: [
         okButton,
@@ -51,72 +51,83 @@ class _TransferPageState extends State<TransferPage> {
     return Container(
       color: Colors.white,
       child: SafeArea(
-        child: Scaffold(
-          body: Column(
-            children: <Widget>[
-              Stack(
+        child: GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
+          child: Scaffold(
+            body: SingleChildScrollView(
+              child: Column(
                 children: <Widget>[
-                  Image.asset(
-                    'assets/images/background_little.png',
-                    fit: BoxFit.fill,
-                  ),
-                  Positioned(
-                    child: AppBar(
-                      title: Text("${localization.toIndigo24Client}"),
-                      leading: IconButton(
-                        icon: Container(
-                          padding: EdgeInsets.all(10),
-                          child: Image(
-                            image: AssetImage(
-                              'assets/images/backWhite.png',
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                  Stack(
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/images/background_little.png',
+                        fit: BoxFit.fill,
                       ),
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 45, left: 0, right: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          height: 0.6,
-                          margin: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          color: Color(0xFFD1E1FF),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 30, right: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              SizedBox(height: 15),
-                              Text(
-                                '${localization.walletBalance}',
-                                style: fS14(c: 'FFFFFF'),
+                      Positioned(
+                        child: AppBar(
+                          title: Text("${localization.toIndigo24Client}"),
+                          leading: IconButton(
+                            icon: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Image(
+                                image: AssetImage(
+                                  'assets/images/backWhite.png',
+                                ),
                               ),
-                              SizedBox(height: 5),
-                              Text(
-                                '${user.balance} ₸',
-                                style: fS18(c: 'FFFFFF'),
-                              ),
-                            ],
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                           ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
                         ),
-                      ],
-                    ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 45, left: 0, right: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              height: 0.6,
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              color: Color(0xFFD1E1FF),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(left: 30, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  SizedBox(height: 15),
+                                  Text(
+                                    '${localization.walletBalance}',
+                                    style: fS14(c: 'FFFFFF'),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    '${user.balance} ₸',
+                                    style: fS18(c: 'FFFFFF'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                  mainPaymentsDetailMobile(),
+                  transferButton(),
+                  SizedBox(height: 10,),
                 ],
               ),
-              mainPaymentsDetailMobile(),
-              transferButton(),
-            ],
+            ),
           ),
         ),
       ),
@@ -166,20 +177,35 @@ class _TransferPageState extends State<TransferPage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
-            api.checkPhoneForSendMoney(receiverController.text).then((result) {
-              print('transfer result $result');
-              if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
-                logOut(context);
-                return result;
-              } else {
-                if (result["success"]) {
-                  api.doTransfer(result["toID"], sumController.text).then((res) {
-                    print("sending $res");
-                  });
-                }
-                return result;
-              }
-            });
+            if(receiverController.text.isNotEmpty && sumController.text.isNotEmpty){
+                api.checkPhoneForSendMoney(receiverController.text).then((result) {
+                  print('transfer result $result');
+                  if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
+                    logOut(context);
+                    return result;
+                  } else {
+                    if (result["success"].toString() == 'true') {
+                      api.doTransfer(result["toID"], sumController.text).then((res) {
+                        if(res['success'].toString() == 'false') 
+                          showAlertDialog(context, '0', res['message']); 
+                        else{
+                          showAlertDialog(context, '1', res['message']);
+                          api.getBalance().then((result){
+                            setState(() {
+                            });
+                          });
+                        }
+                      });
+                    } else{
+                      showAlertDialog(context, '0', result['message']);
+                    }
+                    return result;
+                  }
+                });
+            } else{
+              showAlertDialog(context, '0', 'Заполните все поля');
+            }
+            
           },
           child: Container(
             height: 50,
@@ -197,49 +223,6 @@ class _TransferPageState extends State<TransferPage> {
             borderRadius: BorderRadius.circular(
               10.0,
             ),
-          ),
-        ),
-      ),
-    );
-    
-    Container(
-      height: 50,
-      width: 200,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10.0,
-                spreadRadius: -2,
-                offset: Offset(0.0, 0.0))
-          ]),
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(top: 20, bottom: 10),
-      child: ButtonTheme(
-        minWidth: double.infinity,
-        height: 100.0,
-        child: FlatButton(
-          onPressed: () async {
-            api.checkPhoneForSendMoney(receiverController.text).then((result) {
-              if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
-                logOut(context);
-                return result;
-              } else {
-                if (result["success"]) {
-                  api.doTransfer(result["toID"], sumController.text).then((res) {
-                    print("sending $res");
-                  });
-                }
-                return result;
-              }
-            });
-          },
-          child: Text(
-            '${localization.transfer}',
-            style: TextStyle(
-                color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
           ),
         ),
       ),
@@ -305,6 +288,11 @@ class _TransferPageState extends State<TransferPage> {
                     decoration: InputDecoration.collapsed(
                         hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
+                    onChanged: (value){
+                      if(sumController.text[0] == '0'){
+                        sumController.text = '';
+                      }
+                    },
                     validator: (value) {
                       if (value.isEmpty) {
                         print('empty');

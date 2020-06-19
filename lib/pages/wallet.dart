@@ -43,8 +43,11 @@ class _WalletTabState extends State<WalletTab> {
   double _dollarCoef = 0;
   var withPin;
   var api = Api();
+  
   _showLockScreen(BuildContext context, String title,
-      {bool opaque,
+      {
+      bool withPin,
+      bool opaque,
       CircleUIConfig circleUIConfig,
       KeyboardUIConfig keyboardUIConfig,
       Widget cancelButton,
@@ -54,6 +57,7 @@ class _WalletTabState extends State<WalletTab> {
         PageRouteBuilder(
           opaque: opaque,
           pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+            withPin: withPin,
             title: Text(
               '$title',
               textAlign: TextAlign.center,
@@ -86,10 +90,12 @@ class _WalletTabState extends State<WalletTab> {
     bool isValid = '${user.pin}' == enteredPasscode;
     _verificationNotifier.add(isValid);
     if (isValid) {
+      print(' is really valid ');
       setState(() {
         this.isAuthenticated = isValid;
       });
     }
+    
     // if (!isValid){
     // return showDialog<void>(
     //   context: context,
@@ -122,39 +128,31 @@ class _WalletTabState extends State<WalletTab> {
 
   @override
   void dispose() {
+    api.getBalance();
     _verificationNotifier.close();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.dispose();
   }
   @override
   void initState() {
+    api.getBalance();
     if('${user.pin}'.toString() == 'false'){
         withPin = false;
     }
-        Timer.run(() {
-       withPin == false 
-       ? _showLockScreen(
+    Timer.run(() {
+      withPin == false 
+      ? _showLockScreen(
         context,
         '${localization.createPin}',
+        withPin : withPin,
         opaque: false,
-        cancelButton: Text(
-          'Cancel',
-          style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
-          semanticsLabel: 'Cancel',
-        ),
-      )
-      :
-       _showLockScreen(
+        cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'))
+    : _showLockScreen(
         context,
         '${localization.enterPin}',
         opaque: false,
-        cancelButton: Text(
-          'Cancel',
-          style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
-          semanticsLabel: 'Cancel',
-        ),
-      );
-    });
+        cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+      });
 
     _symbol = '₸';
     _realAmount = double.parse(user.balance);
@@ -254,8 +252,14 @@ class _WalletTabState extends State<WalletTab> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => TransferListPage()),
-            );
+              MaterialPageRoute(builder: (context) => TransferListPage())).whenComplete(() async {
+              await api.getBalance();
+              setState(() {
+                _amount = double.parse(user.balance);
+                _realAmount = double.parse(user.balance);
+                _blockedAmount = double.parse(user.balanceInBlock);
+                });
+            });
           },
           child: Container(
             child: Row(
@@ -298,10 +302,14 @@ class _WalletTabState extends State<WalletTab> {
         height: 70,
         child: RaisedButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => PaymentsCategoryPage()),
-            );
+            Navigator.push(context,MaterialPageRoute(builder: (context) => PaymentsCategoryPage())).whenComplete(() async {
+              await api.getBalance();
+              setState(() {
+                _amount = double.parse(user.balance);
+                _realAmount = double.parse(user.balance);
+                _blockedAmount = double.parse(user.balanceInBlock);
+                });
+            });
           },
           child: Container(
             child: Row(
@@ -394,8 +402,14 @@ class _WalletTabState extends State<WalletTab> {
                 print('пополнить is pressed');
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => RefillPage()),
-                );
+                  MaterialPageRoute(builder: (context) => RefillPage())).whenComplete(() async {
+                    await api.getBalance();
+                    setState(() {
+                      _amount = double.parse(user.balance);
+                      _realAmount = double.parse(user.balance);
+                      _blockedAmount = double.parse(user.balanceInBlock);
+                      });
+                  });
               },
               child: FittedBox(
                 fit: BoxFit.fitWidth,
@@ -430,8 +444,14 @@ class _WalletTabState extends State<WalletTab> {
                 print('вывести is pressed');
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => WithdrawPage()),
-                );
+                  MaterialPageRoute(builder: (context) => WithdrawPage())).whenComplete(() async {
+                    await api.getBalance();
+                    setState(() {
+                      _amount = double.parse(user.balance);
+                      _realAmount = double.parse(user.balance);
+                      _blockedAmount = double.parse(user.balanceInBlock);
+                      });
+                  });
               },
               child: FittedBox(
                 fit: BoxFit.fitWidth,

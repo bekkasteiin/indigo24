@@ -31,6 +31,8 @@ class _LoginPageState extends State<LoginPage> {
   List _titles = [];
   String _currentCountry = "Казахстан";
   String loginError = "";
+  String passwordError = "";
+  var length;
   _getCountries() async {
     await api.getCountries().then((response) {
       setState(() {
@@ -43,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
           _titles.add(_countries[i]['title']);
         }
         country = _countries[countryId];
+        length = country['length'];
       });
     });
   }
@@ -105,16 +108,24 @@ class _LoginPageState extends State<LoginPage> {
             brightness: Brightness.light, // status bar brightness
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/background_login.png"),
-                  fit: BoxFit.cover),
-            )),
-            _buildForeground()
-          ],
+        body: GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
+          child: Stack(
+            children: <Widget>[
+              Container(
+                  decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/background_login.png"),
+                    fit: BoxFit.cover),
+              )),
+              _buildForeground()
+            ],
+          ),
         ));
   }
 
@@ -190,6 +201,9 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               TextField(
                                 controller: loginController,
+                                inputFormatters: [
+                                  phonePrefix!= null ? length != null ? LengthLimitingTextInputFormatter(length - phonePrefix.length) : LengthLimitingTextInputFormatter(100) :  LengthLimitingTextInputFormatter(100),
+                                ],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
                                   color: Colors.black, fontSize: 15
@@ -205,6 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+                          Text('$loginError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 12), overflow: TextOverflow.ellipsis,),
                           _space(30),
                           Row(
                             children: <Widget>[
@@ -238,7 +253,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           _space(10),
-                          Text('$loginError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 12), overflow: TextOverflow.ellipsis,),
+                          Text('$passwordError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 12), overflow: TextOverflow.ellipsis,),
                         ],
                       ),
                     ),
@@ -265,29 +280,44 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                          FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-                          String token = await _firebaseMessaging.getToken();
-                            await api.signIn("$phonePrefix${loginController.text}", passwordController.text, token).then((response) async {
-                              singInResult = response;
-                              print('Response of sing in $response');
-                              if('${response['success']}' == 'true'){
-                                print('Second response $response');
-                                  await api.getBalance();
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(builder: (context) => Tabs(key: tabPageKey,)),(r) => false,
-                                  );
-                              }
-                              else{
-                                print("this is else $singInResult");
-                                setState(() {
-                                  loginError = singInResult["message"];
+                          if(passwordController.text.isNotEmpty){
+                            if('$phonePrefix${loginController.text}'.length == length){
+                              FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+                              String token = await _firebaseMessaging.getToken();
+                                await api.signIn("$phonePrefix${loginController.text}", passwordController.text, token).then((response) async {
+                                  singInResult = response;
+                                  print('Response of sing in $response');
+                                  if('${response['success']}' == 'true'){
+                                    print('Second response $response');
+                                      await api.getBalance();
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(builder: (context) => Tabs(key: tabPageKey,)),(r) => false,
+                                      );
+                                  }
+                                  else{
+                                    print("this is else $singInResult");
+                                    setState(() {
+                                      passwordError = singInResult["message"];
+                                    });
+                                }
+                                print('this is below if');
                                 });
-                             }
-                             print('this is below if');
-
-
+                            } else{
+                              setState(() {
+                                print('first else');  
+                                loginError = '${localization.enterPhone}';
+                              });
+                            }
+                          } else{
+                            if(passwordController.text.isEmpty){
+                              setState(() {
+                                passwordError = '${localization.enterPassword}';
+                              });
+                            }
+                            setState(() {
+                              loginError = '${localization.enterPhone}';
                             });
-                          
+                          }
                         },
                       ),
                     ),
@@ -314,6 +344,10 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _currentCountry = _selectedCountry['title'];
         phonePrefix = _selectedCountry['prefix'];
+        length = _selectedCountry['length']; 
+        passwordController.text = '';
+        loginController.text = '';
+
       });
   }
 

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/services/configs.dart' as configs;
 
 import 'helper.dart';
 
@@ -39,6 +40,39 @@ class Api {
         print(response.statusCode);
         print(e.response.statusCode);
       }
+    }
+  }
+  var _configToken = "D@Xo8b56r#7e1iZElhH39xK!WkB_42vYAG0p";
+
+  getConfig() async {
+    try {
+      response = await dio.post("/get/config", data: {
+        "customerID": "${user.id}", 
+        "unique": "${user.unique}",
+        "_token": "$_configToken",
+        });
+      var commission = response.data['commissions'];
+      var withdrawConfig = commission['withdraw'];
+      var refillConfig = commission['refill'];
+      configs.withdrawCommission = '${withdrawConfig['commission']}';
+      configs.withdrawMinCommission = '${withdrawConfig['minCommission']}';
+      configs.withdrawMin = '${withdrawConfig['min']}';
+      configs.withdrawMax = '${withdrawConfig['max']}';
+
+      configs.refillCommission = '${refillConfig['commission']}';
+      configs.refillMinCommission = '${refillConfig['minCommission']}';
+      configs.refillMin = '${refillConfig['min']}';
+      configs.refillMax = '${refillConfig['max']}';
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request.data);
+      } else {
+        print('get config error');
+      }
+      return e.response.data;
     }
   }
 
@@ -128,6 +162,30 @@ class Api {
     }
   }
 
+  getService(serviceID) async {
+    try {
+      response = await dio.post("/get/payments", 
+      data: {
+        "customerID": "${user.id}", 
+        "unique": "${user.unique}",
+        "serviceID" : "$serviceID"
+      });
+        return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('e response is sms ${e.response}');
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+      return e.response.data;
+    }
+  }
+
   checkSms(phone, code) async {
     try {
       response = await dio.post("/check/sms", data: {"phone": "$phone", "code": "$code"});
@@ -150,21 +208,8 @@ class Api {
   createPin(pinCode) async {
     try {
       response = await dio.post("/create/pin", data: {"customerID": "${user.id}", "unique": "${user.unique}", "pinCode": "$pinCode"});
-      print(response.data);
-      print(response.data);
-      print('test');
       if (response.data['success'] == true) {
         SharedPreferencesHelper.setString('pin', '$pinCode');
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
-        print(pinCode);
         user.pin = '$pinCode';
       } 
       return response.data;
@@ -185,16 +230,15 @@ class Api {
   
   getBalance() async {
     try {
-      response = await dio.post("/get/balance",
-          data: {"customerID": "${user.id}", "unique": "${user.unique}"});
+      response = await dio.post("/get/balance", data: {"customerID": "${user.id}", "unique": "${user.unique}"});
       if (response.data['success'] == true) {
         SharedPreferencesHelper.setString('balance', '${response.data['result']['balance']}');
         SharedPreferencesHelper.setString('balanceInBlock', '${response.data['result']['balanceInBlock']}');
         user.balance = '${response.data['result']['balance']}';
         user.balanceInBlock = '${response.data['result']['balanceInBlock']}';
-        return true;
+        return response.data;
       } else {
-        return false;
+        return response.data;
       }
     } on DioError catch (e) {
       if (e.response != null) {
@@ -278,7 +322,7 @@ class Api {
     try {
       String _token = "1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2";
       response = await dio.post("/pay/out", data: {
-        "&_token": "$_token",
+        "_token": "$_token",
         "amount": "$amount",
         "customerID": "${user.id}",
         "unique": "${user.unique}"
@@ -299,17 +343,14 @@ class Api {
 
   doTransfer(toID, amount) async {
     try {
-      var data = {
+      response = await dio.post("/check/send/money", data: {
         "customerID": "${user.id}",
         "unique": "${user.unique}",
         "toID": "$toID",
         "amount": "$amount",
-      };
-
-      response = await dio.post("/check/send/money'", data: data);
+      });
       return response.data;
     } on DioError catch (e) {
-      print("ERROR HERE");
       if (e.response != null) {
         print(e.response.data);
         print(e.response.headers);
@@ -372,6 +413,11 @@ class Api {
         "amount": "$amount",
         "account": "$account",
       });
+      print(response.request.data);
+      print(response.request.data);
+      print(response.request.data);
+      print(response.request.data);
+      print(response.request.data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -388,7 +434,6 @@ class Api {
 
   getServices(categoryID) async {
     try {
-      print('tried to get services');
       response = await dio.post("/get/services", data: {
         "customerID": "${user.id}",
         "unique": "${user.unique}",
@@ -408,10 +453,9 @@ class Api {
     }
   }
 
-  getHistories() async {
+  getHistories(page) async {
     try {
-      response = await dio.post("/get/histories",
-          data: {"customerID": "${user.id}", "unique": "${user.unique}"});
+      response = await dio.post("/get/histories", data: {"customerID": "${user.id}", "unique": "${user.unique}" , "page" : "$page"});
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -428,9 +472,9 @@ class Api {
 
   refill(amount) async {
     try {
-      String _token = "1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2";
+      String _token = "UGfbx#Du61zSNiXgjm4E!@M2OFJ98t3075_e";
       response = await dio.post("/pay/in", data: {
-        "&_token": "$_token",
+        "_token": "$_token",
         "amount": "$amount",
         "customerID": "${user.id}",
         "unique": "${user.unique}"
@@ -451,7 +495,6 @@ class Api {
 
   getCategories() async {
     try {
-      print('attempt to get categories');
       response = await dio.post("/get/categories",
           data: {"customerID": "${user.id}", "unique": "${user.unique}"});
       return response.data;

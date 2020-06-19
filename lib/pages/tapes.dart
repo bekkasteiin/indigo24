@@ -26,7 +26,17 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
     getTapes();
     super.initState();
   }
-
+  rebuildTage(){
+    api.getTapes('1').then((tapes) {
+      if(tapes['message'] == 'Not authenticated' && tapes['success'].toString() == 'false')
+      {
+        logOut(context);
+        return true;
+      } else{
+        return setTapes(tapes);
+      }
+    });
+  }
   getTapes() {
     api.getTapes('$tapePage').then((tapes) {
       if(tapes['message'] == 'Not authenticated' && tapes['success'].toString() == 'false')
@@ -97,7 +107,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
         title: Text(
           "${localization.tape}",
           style: TextStyle(
-            color: Colors.black,
+            color: Color(0xFF001D52),
             fontSize: 22,
             fontWeight: FontWeight.w400,
           ),
@@ -106,6 +116,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
         actions: <Widget>[
           IconButton(
             icon: Container(
+              padding: EdgeInsets.all(4),
               child: Image(
                 image: AssetImage(
                   'assets/images/newPost.png',
@@ -313,15 +324,17 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                                               builder: (context) =>
                                                   TapePage(result[index]),
                                             ),
-                                          );
+                                          ).whenComplete(() {
+
+                                          });
                                         },
                                       ),
-                                      Container(
-                                        width: 30,
-                                        child: Text(
-                                          '${result[index]['commentsCount']}',
-                                        ),
-                                      ),
+                                      // Container(
+                                      //   width: 30,
+                                      //   child: Text(
+                                      //     '${result[index]['commentsCount']}',
+                                      //   ),
+                                      // ),
                                       Expanded(
                                         child: Text(''),
                                       ),
