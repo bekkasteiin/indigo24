@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'login.dart';
 import 'phone_confirm.dart';
 
@@ -27,6 +29,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   String _currentCountry = "Казахстан";
   String loginError = "";
+
+  var _mask;
+  var loginFormatter;
+  String _prefix = '';
+  List _response = [];
+  String _hintText = '';
+  var length;
   _getCountries() async {
     await api.getCountries().then((response) {
       setState(() {
@@ -36,10 +45,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _countries = jsonDecode(jsonEncode(responseJson));
         for (var i = 0; i < _countries.length; i++) {
           _titles.add(_countries[i]['title']);
+          _response.add(_countries[i]);
         }
         country = _countries[countryId];
         _dropDownMenuItems = getDropDownMenuItems(_titles);
         _currentCountry = _titles[0];
+        loginFormatter = MaskTextInputFormatter(mask: '${_countries[0]['mask']}', filter: { "*" : RegExp(r'[0-9]') });
+        _prefix = _countries[0]['prefix'];
+        _hintText = _countries[0]['mask'];
+        length = _countries[0]['length'];
       });
     });
   }
@@ -97,16 +111,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
             brightness: Brightness.light, // status bar brightness
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/background_login.png"),
-                  fit: BoxFit.cover),
-            )),
-            _buildForeground()
-          ],
+        body: GestureDetector(
+                onTap: () {
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus) {
+                    currentFocus.unfocus();
+                  }
+                },
+          child: Stack(
+            children: <Widget>[
+              Container( decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/background_login.png"),
+                    fit: BoxFit.cover),
+              )),
+              _buildForeground()
+            ],
+          ),
         ));
   }
   var _selectedCountry;
@@ -118,9 +139,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
 
     if (_selectedCountry != null)
+
       setState(() {
         _currentCountry = _selectedCountry['title'];
         phonePrefix = _selectedCountry['prefix'];
+        _hintText = _selectedCountry['mask'];
+        _prefix = _selectedCountry['prefix'];
+        _hintText = _selectedCountry['mask'];
+        loginFormatter = MaskTextInputFormatter(mask: '${_selectedCountry['mask']}', filter: { "*" : RegExp(r'[0-9]') });
+        length = _selectedCountry['length'];
+        loginController.text = '';
       });
   }
     Widget _buildForeground() {
@@ -189,24 +217,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           Stack(
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
-                              Text(
-                                '+$phonePrefix',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
-                              ),
+
                               TextField(
                                 controller: loginController,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
                                   color: Colors.black, fontSize: 15
                                 ),
+                                inputFormatters: [
+                                    loginFormatter,  
+                                  ],
                                 decoration: InputDecoration(
+                                  hintText: '$_hintText',
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
                                   hoverColor: Colors.black,
-                                  prefixText: '1$phonePrefix ',
                                   prefixStyle:
-                                      TextStyle(color: Colors.transparent),
+                                      TextStyle(color: Colors.black),
                                 ),
                               ),
                             ],
@@ -228,39 +255,55 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                        await api.checkRegistration(phonePrefix + loginController.text).then((checkPhoneResult) async {
-                          // print('phone check result $checkPhoneResult');
-                          print('empty check Registration $checkPhoneResult');
-                           if(checkPhoneResult['success'] == true){
-                            await api.sendSms(phonePrefix + loginController.text).then((sendSmsResult) {
-                              print('empty sendSms');
-                              if(sendSmsResult['success'] == true){
-                              print('this is $sendSmsResult');
-                                setState(() {
-                                  loginError = "";
-                                });
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PhoneConfirmPage(
-                                      sendSmsResult['pin'],
-                                      phonePrefix + loginController.text,
-                                    ),
-                                  ),
-                                );
-                              } else{
-                                setState(() {
-                                  loginError = sendSmsResult['message'];
-                                });
-                                // _showError(context, sendSmsResult['message']);
-                              }
-                            });
-                          } else{
-                            setState(() {
-                              loginError = checkPhoneResult['message'];
-                            });
+                        if(loginController.text.isNotEmpty){
+                          var temp = loginController.text.replaceAll(' ','').replaceAll('+','');
+                          print(length);
+                          print(temp.length);
+                          if(temp.length == length){
+                            await api.checkRegistration(temp).then((checkPhoneResult) async {
+                                // print('phone check result $checkPhoneResult');
+                                print('empty check Registration $checkPhoneResult');
+                                if(checkPhoneResult['success'] == true){
+                                  await api.sendSms(temp).then((sendSmsResult) {
+                                    print('smsSendResult $sendSmsResult');
+                                    if(sendSmsResult['success'] == true){
+                                      setState(() {
+                                        // loginError = sendSmsResult['message'];
+                                      });
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PhoneConfirmPage(
+                                            sendSmsResult['pin'],
+                                            temp,
+                                          ),
+                                        ),
+                                      );
+                                    } else{
+                                      setState(() {
+                                        loginError = sendSmsResult['message'];
+                                      });
+                                      // _showError(context, sendSmsResult['message']);
+                                    }
+                                  });
+                                } else{
+                                  setState(() {
+                                    loginError = checkPhoneResult['message'];
+                                  });
+                                }
+                              });
                           }
-                        });
+                          else{
+                          setState(() {
+                            loginError = '${localization.enterPhone}';
+                          });
+                        }
+                        }
+                        else{
+                          setState(() {
+                            loginError = '${localization.enterPhone}';
+                          });
+                        }
                       },
                       ),
                     ),

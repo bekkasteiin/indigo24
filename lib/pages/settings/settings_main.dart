@@ -89,44 +89,44 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                         ),
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.only(left: 20),
-                      height: 0.5,
-                      color: Color(0xFF7D8E9B)
-                    ),
-                    Material(
-                      child: InkWell(
-                        // onTap: (){
-                          // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsSoundPage()));
-                        // },
-                        child: Container(
-                          padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
-                          height: 60,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text('${localization.notifications}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
-                                  Container(
-                                    margin: EdgeInsets.only(right: 15),
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/forward.png',
-                                      ),
-                                      width: 15,
-                                      height: 15,
-                                    ),
-                                  ),
-                                ]
-                              )
-                            ]
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   margin: EdgeInsets.only(left: 20),
+                    //   height: 0.5,
+                    //   color: Color(0xFF7D8E9B)
+                    // ),
+                    // Material(
+                    //   child: InkWell(
+                    //     // onTap: (){
+                    //       // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsSoundPage()));
+                    //     // },
+                    //     child: Container(
+                    //       padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
+                    //       height: 60,
+                    //       child: Row(
+                    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //         children: <Widget>[
+                    //           Text('${localization.notifications}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
+                    //           Row(
+                    //             mainAxisSize: MainAxisSize.min,
+                    //             children: [
+                    //               // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
+                    //               Container(
+                    //                 margin: EdgeInsets.only(right: 15),
+                    //                 child: Image(
+                    //                   image: AssetImage(
+                    //                     'assets/images/forward.png',
+                    //                   ),
+                    //                   width: 15,
+                    //                   height: 15,
+                    //                 ),
+                    //               ),
+                    //             ]
+                    //           )
+                    //         ]
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     Container(
                       margin: EdgeInsets.only(left: 20),
                       height: 0.5,

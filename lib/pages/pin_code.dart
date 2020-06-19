@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:vibration/vibration.dart';
 
 import 'circle.dart';
 import 'keyboard.dart';
@@ -71,15 +72,12 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                 )
       ..addStatusListener((status) {
         passCodeError = widget.withPin == null ? '${localization.passcodeError}' : '';
-        Timer(Duration(seconds: 5), () {
-          setState(() {
-            passCodeError = '';
-          });
-        });
-         
+        // widget.withPin == null ?? Vibration.vibrate();
+        Vibration.vibrate();
         if (status == AnimationStatus.completed) {
           setState(() {
             enteredPasscode = '';
+            passCodeError = '';
             controller.value = 0;
           });
         }
@@ -105,23 +103,25 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
         children: [
           Positioned(
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  widget.title,
-                  SizedBox(height: 10,),
-                  Text('$passCodeError', style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w400),),
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    height: 40,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: _buildCircles(),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    widget.title,
+                    SizedBox(height: 10,),
+                    Text('$passCodeError', style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w400),),
+                    Container(
+                      margin: const EdgeInsets.only(top: 10),
+                      height: 40,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: _buildCircles(),
+                      ),
                     ),
-                  ),
-                  _buildKeyboard(),
-                  widget.bottomWidget != null ? widget.bottomWidget : Container()
-                ],
+                    _buildKeyboard(),
+                    widget.bottomWidget != null ? widget.bottomWidget : Container()
+                  ],
+                ),
               ),
             ),
           ),

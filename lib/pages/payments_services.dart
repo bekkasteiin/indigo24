@@ -32,6 +32,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
             appBar: buildAppBar(),
             body: snapshot.hasData == true
                 ? ListView.builder(
+                    padding: EdgeInsets.only(bottom: 20),
                     shrinkWrap: true,
                     itemCount: snapshot.data["services"] != null ? snapshot.data["services"].length : 0,
                     itemBuilder: (BuildContext context, int index) {
@@ -118,9 +119,12 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                   ),
                 ),
                 Container(width: 10),
-                Text(
-                  '$_serviceTitle',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                Expanded(
+                  child: Text(
+                    '$_serviceTitle',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),

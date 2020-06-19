@@ -131,22 +131,25 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         return Scaffold(
           appBar: buildAppBar(),
           body: snapshot.hasData == true
-              ? ListView.builder(
-                shrinkWrap: true,
-                  itemCount: snapshot.data["categories"] != null ? snapshot.data["categories"].length : 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: _paymentsList(
-                        context,
-                        snapshot.data["logoURL"] +
-                            snapshot.data["categories"][index]['logo'],
-                        snapshot.data["categories"][index]['title'],
-                        snapshot.data["categories"][index]['ID'],
-                      ),
-                    );
-                  },
-                )
+              ? Container(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(bottom: 20),
+                  shrinkWrap: true,
+                    itemCount: snapshot.data["categories"] != null ? snapshot.data["categories"].length : 0,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: _paymentsList(
+                          context,
+                          snapshot.data["logoURL"] +
+                              snapshot.data["categories"][index]['logo'],
+                          snapshot.data["categories"][index]['title'],
+                          snapshot.data["categories"][index]['ID'],
+                        ),
+                      );
+                    },
+                  ),
+              )
               : Center(child: CircularProgressIndicator()),
         );
       },
@@ -241,9 +244,12 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                   ),
                 ),
                 Container(width: 10),
-                Text(
-                  '$name',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                Expanded(
+                  child: Text(
+                    '$name',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),

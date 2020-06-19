@@ -57,9 +57,12 @@ var processing = 'Processing';
 var _new = 'New';
 var language = 'Language';
 var settings = 'Settings';
+var enterPhone = 'Enter phone';
+var enterSmsCode = 'Enter SMS code';
+var enterPassword = 'Enter password';
 var languages = [
   {"title": "English", "code": "en"},
-  {"title": "Russia", "code": "ru"},
+  {"title": "Russian", "code": "ru"},
   {"title": "Kazakh", "code": "kz"},
 ];
 
@@ -121,9 +124,12 @@ setLanguage(code) {
       passcodeError = 'Incorrect pin code';
       language = 'Language';
       settings = 'Settings';
+      enterPhone = 'Enter phone';
+      enterSmsCode = 'Enter SMS code';
+      enterPassword = 'Enter password';
       languages = [
         {"title": "English", "code": "en"},
-        {"title": "Russia", "code": "ru"},
+        {"title": "Russian", "code": "ru"},
         {"title": "Kazakh", "code": "kz"},
       ];
       break;
@@ -181,6 +187,9 @@ setLanguage(code) {
       passcodeError = 'Неправильный PIN';
       language = 'Язык';
       settings = 'Настройки';
+      enterPhone = 'Введите номер телефона';
+      enterSmsCode = 'Введите SMS код';
+      enterPassword = 'Введите пароль';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -242,6 +251,9 @@ setLanguage(code) {
       passcodeError = 'Қате PIN код';
       language = 'Тіл';
       settings = 'Параметрлер';
+      enterPhone = 'Телефон нөмірін енгізіңіз';
+      enterSmsCode = 'SMS кодын енгізіңіз';
+      enterPassword = 'Құпия сөзді енгізіңіз';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

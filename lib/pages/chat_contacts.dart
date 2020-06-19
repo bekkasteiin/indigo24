@@ -14,8 +14,10 @@ class ChatContactsPage extends StatefulWidget {
   _ChatContactsPageState createState() => _ChatContactsPageState();
 }
 
+var _contacts = [];
+bool firstLoad = true;
+
 class _ChatContactsPageState extends State<ChatContactsPage> {
-  var arrays = [];
 
   showAlertDialog(BuildContext context, String message) {
     Widget okButton = CupertinoDialogAction(
@@ -39,11 +41,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     );
   }
 
-  Future _future;
-
   @override
   void initState() {
-    _future = getContacts();
     super.initState();
     ChatRoom.shared.setContactsStream();
     listen();
@@ -138,7 +137,13 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     return r;
   }
 
-  var _contacts = [];
+
+  Future getCashedContacts() async{
+    setState(() {
+      actualList.addAll(_contacts);
+    });
+    return _contacts;
+  }
   Future getContacts() async {
     try {
       _contacts.clear();
@@ -161,6 +166,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
       setState(() {
         actualList.addAll(_contacts);
       });
+      firstLoad = false;
       return _contacts;
     } catch (_) {
       print(_);
@@ -197,7 +203,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _future,
+      future: firstLoad ? getContacts() : getCashedContacts(),
       builder: (context, snapshot) {
         return Scaffold(
             appBar: AppBar(
@@ -238,136 +244,141 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   color: Color(0xFF001D52),
                   onPressed: () {
                     print('update contacts');
+                    setState((){
+                      getContacts();
+                    });
                   },
                 )
               ],
               backgroundColor: Colors.white,
             ),
             body: snapshot.hasData
-                ? Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 10.0, left: 10.0, right: 10, bottom: 0),
-                        child: TextField(
-                          decoration: new InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: Color(0xFF001D52),
+                ? SafeArea(
+                  child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10.0, left: 10.0, right: 10, bottom: 0),
+                          child: TextField(
+                            decoration: new InputDecoration(
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: Color(0xFF001D52),
+                              ),
+                              hintText: "${localization.search}",
+                              fillColor: Color(0xFF001D52),
                             ),
-                            hintText: "${localization.search}",
-                            fillColor: Color(0xFF001D52),
+                            onChanged: (value) {
+                              search(value);
+                            },
+                            controller: _searchController,
                           ),
-                          onChanged: (value) {
-                            search(value);
-                          },
-                          controller: _searchController,
                         ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: actualList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Container(
-                                child: FlatButton(
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          child: Row(
-                                            children: <Widget>[
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
-                                                child: Container(
-                                                  color: Colors.blue[400],
-                                                  width: 35,
-                                                  height: 35,
-                                                  child: Center(
-                                                    child: Text(
-                                                      '${actualList[index]['name'][0]}',
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16.0,
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: actualList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Container(
+                                  child: FlatButton(
+                                    child: Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            child: Row(
+                                              children: <Widget>[
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20.0),
+                                                  child: Container(
+                                                    color: Colors.blue[400],
+                                                    width: 35,
+                                                    height: 35,
+                                                    child: Center(
+                                                      child: Text(
+                                                        '${actualList[index]['name'][0]}',
+                                                        overflow:
+                                                            TextOverflow.ellipsis,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16.0,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Container(
-                                                child: Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: <Widget>[
-                                                      Text(
-                                                        index != 0
-                                                            ? actualList[index][
-                                                                        'name'] ==
-                                                                    actualList[
-                                                                            index -
-                                                                                1]
-                                                                        ['name']
-                                                                ? '${actualList[index]['name']} | Другой номер'
-                                                                : '${actualList[index]['name']}'
-                                                            : '${actualList[index]['name']}',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                            fontSize: 14),
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                      ),
-                                                      Text(
-                                                        '${actualList[index]['phone']}',
-                                                        style: TextStyle(
-                                                            fontSize: 10),
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 1,
-                                                      ),
-                                                    ],
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Container(
+                                                  child: Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Text(
+                                                          index != 0
+                                                              ? actualList[index][
+                                                                          'name'] ==
+                                                                      actualList[
+                                                                              index -
+                                                                                  1]
+                                                                          ['name']
+                                                                  ? '${actualList[index]['name']} | Другой номер'
+                                                                  : '${actualList[index]['name']}'
+                                                              : '${actualList[index]['name']}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                              fontSize: 14),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                        Text(
+                                                          '${actualList[index]['phone']}',
+                                                          style: TextStyle(
+                                                              fontSize: 10),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    onPressed: () {
+                                      print(
+                                          "${actualList[index]['name']} ${actualList[index]['phone']} pressed");
+                                      ChatRoom.shared
+                                          .userCheck(actualList[index]['phone']);
+                                    },
                                   ),
-                                  onPressed: () {
-                                    print(
-                                        "${actualList[index]['name']} ${actualList[index]['phone']} pressed");
-                                    ChatRoom.shared
-                                        .userCheck(actualList[index]['phone']);
-                                  },
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Colors.white,
+                                  ),
+                                  margin: EdgeInsets.only(left: 10, right: 10),
                                 ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Colors.white,
-                                ),
-                                margin: EdgeInsets.only(left: 10, right: 10),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-                : Center(child: CircularProgressIndicator()));
+                      ],
+                    ),
+                )
+                : SafeArea(child: Center(child: CircularProgressIndicator())));
       },
     );
   }

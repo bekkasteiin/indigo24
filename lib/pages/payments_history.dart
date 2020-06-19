@@ -1,7 +1,15 @@
+import 'dart:collection';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/pages/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:path_provider/path_provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../main.dart';
 
@@ -11,25 +19,83 @@ class PaymentHistoryPage extends StatefulWidget {
 }
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
+  String logoUrl = "";
   @override
   void initState() {
+    api.getHistories(page).then((histories) {
+      if (histories['message'] == 'Not authenticated' && histories['success'].toString() == 'false') {
+        logOut(context);
+      } else {
+        setState((){
+          logoUrl = histories['logoURL'];
+          if(page == 1) 
+            test = histories['payments'].toList();
+        });
+      }
+    });
     super.initState();
   }
   Api api = Api();
 
-  Widget _historyBuilder(BuildContext context, String logo, String account,
-      String amount, String title, String date, String status, int index) {
+
+  void showDownloadProgress(received, total) {
+    if (total != -1) {
+      print((received / total * 100).toStringAsFixed(0) + "%");
+    }
+  }
+
+    Future download2(Dio dio, String url, String savePath) async {
+    try {
+      Response response = await dio.get(
+        url,
+        onReceiveProgress: showDownloadProgress,
+        //Received data with List<int>
+        options: Options(
+            responseType: ResponseType.bytes,
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 500;
+            }),
+      );
+      print(response.headers);
+      File file = File(savePath);
+      var raf = file.openSync(mode: FileMode.write);
+      // response.data is List<int> type
+      raf.writeFromSync(response.data);
+   
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
+      );
+      await raf.close();
+    } catch (e) {
+      print(e);
+    }
+  }
+  
+  Dio dio = Dio();
+
+  Widget _historyBuilder(BuildContext context, String logo, String account, String amount, String title, String date, String status, int index, String url) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            SizedBox(width: 20),
-            _paymentLogo(logo),
-            _paymentInfo(title, account, date),
-            _paymentAmount(amount,status),
-            SizedBox(width: 20),
-          ],
+        InkWell(
+          child: Row(
+            children: <Widget>[
+              SizedBox(width: 20),
+              _paymentLogo(logo),
+              _paymentInfo(title, account, date),
+              _paymentAmount(amount,status),
+              SizedBox(width: 20),
+            ],
+          ),
+          // onTap: () async{
+          //   var tempDir = await getTemporaryDirectory();
+          //   String fullPath = tempDir.path + "/boo2.pdf'";
+          //   print('full path ${fullPath}');
+            
+          //   download2(dio, url, fullPath);
+          // },
         ),
         Container(
           margin: EdgeInsets.only(top: 5, right: 20, left: 20),
@@ -149,52 +215,93 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       backgroundColor: Colors.white,
     );
   }
-
+  List test = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: FutureBuilder(
-          future: api.getHistories().then((histories) {
-            print(histories);
-            if (histories['message'] == 'Not authenticated' &&
-                histories['success'].toString() == 'false') {
-              logOut(context);
-              return histories;
-            } else {
-              return histories;
-            }
-          }),
-          builder: (context, snapshot) {
-            return snapshot.hasData == true
-                ? _paymentHistroyBody(snapshot.data)
-                : Center(child: CircularProgressIndicator());
-          }),
+      body: test.isNotEmpty 
+        ? _paymentHistroyBody(test)
+        : Center(child: CircularProgressIndicator())
     );
   }
+    DateTime selectedDate = DateTime.now();
 
+   Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }
+
+  void _onRefresh(){
+    print("_onRefresh ");
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    print("_onLoading ");
+    _loadData();
+    _refreshController.loadComplete();
+  }
+  bool isLoaded = false;
+  int page = 1;
+
+  Future _loadData() async {
+    api.getHistories(page).then((histories){
+      List temp = histories['payments'].toList();
+      setState((){
+        test.addAll(temp);
+      });
+      page++;
+    });
+  }
+
+
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  
   SafeArea _paymentHistroyBody(snapshot) {
-    print(snapshot);
     return SafeArea(
-      child: ListView.builder(
-        itemCount:
-            snapshot['payments'] != null ? snapshot['payments'].length : 0,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            padding: const EdgeInsets.only(top: 10),
-            height: 65.2,
-            child: _historyBuilder(
-              context,
-              "${snapshot['logoURL']}${snapshot['payments'][index]['logo']}",
-              "${snapshot['payments'][index]['account']}",
-              "${snapshot['payments'][index]['amount']}",
-              "${snapshot['payments'][index]['title']}",
-              "${snapshot['payments'][index]['data']}",
-              "${snapshot['payments'][index]['status']}",
-              index,
-            ),
-          );
-        },
+      child: SmartRefresher(
+        enablePullDown: false,
+        enablePullUp: true,
+        footer: CustomFooter(
+          builder:(BuildContext context, LoadStatus mode) {
+            Widget body;
+            return Container(
+              height: 55.0,
+              child: Center(child: body),
+            );
+          },
+        ),
+        controller: _refreshController,
+        onLoading: _onLoading,
+        child: ListView.builder(
+          padding: const EdgeInsets.only(bottom: 10),
+          itemCount: snapshot != null ? snapshot.length : 0,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              padding: const EdgeInsets.only(top: 10),
+              height: 65.2,
+              child: _historyBuilder(
+                context,
+                "$logoUrl${snapshot[index]['logo']}",
+                "${snapshot[index]['account']}",
+                "${snapshot[index]['amount']}",
+                "${snapshot[index]['title']}",
+                "${snapshot[index]['data']}",
+                "${snapshot[index]['status']}",
+                index,
+                "${snapshot[index]['pdf']}"
+              ),
+            );
+          },
+        ),
       ),
     );
   }

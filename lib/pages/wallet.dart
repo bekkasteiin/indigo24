@@ -43,6 +43,7 @@ class _WalletTabState extends State<WalletTab> {
   double _dollarCoef = 0;
   var withPin;
   var api = Api();
+  
   _showLockScreen(BuildContext context, String title,
       {
       bool withPin,

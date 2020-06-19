@@ -83,16 +83,24 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
             brightness: Brightness.light, // status bar brightness
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/background_login.png"),
-                  fit: BoxFit.cover),
-            )),
-            _buildForeground()
-          ],
+        body: GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
+          child: Stack(
+            children: <Widget>[
+              Container(
+                  decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/background_login.png"),
+                    fit: BoxFit.cover),
+              )),
+              _buildForeground()
+            ],
+          ),
         ));
   }
 
@@ -324,7 +332,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         borderRadius: 10.0,
                         color: Color(0xff0543B8),
                         onPressed: () async {
-                          if(passwordController.text.isNotEmpty && passwordController2.text.isNotEmpty && nameController.text.isNotEmpty && lastNameController.text.isNotEmpty){
+                          if(passwordController.text.isNotEmpty && passwordController2.text.isNotEmpty && nameController.text.isNotEmpty && lastNameController.text.isNotEmpty && emailController.text.isNotEmpty){
                             setState((){
                               globalError = '';
                             });
@@ -347,9 +355,8 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                     firstPasswordError = '';
                                     emailError = ''; 
                                   });
-                                } else if(registerResponse['message']['phone'] != null){
-                                  print('errror with phone ${registerResponse['message']['phone']} ');
-                                  _showError(context, registerResponse['message']['phone']);
+                                } else if(registerResponse['message'] != null){
+                                  _showError(context, registerResponse['message']);
                                 }
                                 else{
                                   setState(() {

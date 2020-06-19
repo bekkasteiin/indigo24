@@ -331,8 +331,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: [
-            // ChatsListPage(),
-            Developing(),
+            ChatsListPage(),
+            // Developing(),
             UserProfilePage(),
             TapesPage(),
             WalletTab(),

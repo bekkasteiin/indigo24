@@ -107,7 +107,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
         title: Text(
           "${localization.tape}",
           style: TextStyle(
-            color: Colors.black,
+            color: Color(0xFF001D52),
             fontSize: 22,
             fontWeight: FontWeight.w400,
           ),
@@ -116,6 +116,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
         actions: <Widget>[
           IconButton(
             icon: Container(
+              padding: EdgeInsets.all(4),
               child: Image(
                 image: AssetImage(
                   'assets/images/newPost.png',

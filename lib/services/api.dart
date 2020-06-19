@@ -308,11 +308,12 @@ class Api {
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request.data);
+        return e.response.data;
       } else {
         // print(response.statusCode);
         // print(e.response.statusCode);
       }
-      return e.response.data;
+      
     }
   }
 
@@ -451,10 +452,9 @@ class Api {
     }
   }
 
-  getHistories() async {
+  getHistories(page) async {
     try {
-      response = await dio.post("/get/histories",
-          data: {"customerID": "${user.id}", "unique": "${user.unique}"});
+      response = await dio.post("/get/histories", data: {"customerID": "${user.id}", "unique": "${user.unique}" , "page" : "$page"});
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
