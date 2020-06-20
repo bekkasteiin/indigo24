@@ -72,8 +72,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                 )
       ..addStatusListener((status) {
         passCodeError = widget.withPin == null ? '${localization.passcodeError}' : '';
-        // widget.withPin == null ?? Vibration.vibrate();
-        Vibration.vibrate();
+        widget.withPin == null ? Vibration.vibrate() : '';
         if (status == AnimationStatus.completed) {
           setState(() {
             enteredPasscode = '';

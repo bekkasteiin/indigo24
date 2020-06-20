@@ -29,7 +29,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   Api api = Api();
   
   showAlertDialog(BuildContext context, String type, String message) {
-    Widget okButton = CupertinoDialogAction(
+    Widget okButton = FlatButton(
       child: Text("OK"),
       onPressed: () {
         // type == '1' 
@@ -42,19 +42,20 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         Navigator.pop(context);
       },
     );
-
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text(type == '0' ? "Внимание" : type == '1' ? 'Успешно' : 'Ошибка' ),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        print('showed dialog');
+        return ConstrainedBox( 
+          constraints: BoxConstraints(maxHeight: 1.0),
+          child: AlertDialog(
+            title: Text(type == '0' ? "Внимание" : type == '1' ? 'Успешно' : 'Ошибка' ),
+            content: Text(message),
+            actions: [
+              okButton,
+            ],
+          ),
+        );
       },
     );
   }

@@ -138,13 +138,15 @@ class _RefillPageState extends State<RefillPage> {
                     if(amountController.text.isNotEmpty){
                       if(amountController.text[0] == '0'){
                         amountController.text = '';
+                      } else{
+                        if(int.parse(amountController.text) < int.parse(configs.refillMax))
+                          setState(() {
+                            commission = (int.parse(text) * 2.2 / 100).toStringAsFixed(2);
+                            if(double.parse(commission) < 350.00 )
+                              commission = '350';
+                          });
                       }
-                      if(int.parse(amountController.text) < int.parse(configs.refillMax))
-                        setState(() {
-                          commission = (int.parse(text) * 2.2 / 100).toStringAsFixed(2);
-                          if(double.parse(commission) < 350.00 )
-                            commission = '350';
-                        });
+                     
                     } else{
                       setState(() {
                         commission = '0';

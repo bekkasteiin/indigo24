@@ -344,7 +344,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             ),
                           ),
                         ),
-                        Container(height: 10)
+                        Container(height: 20)
                       ],
                     ),
                   ],
@@ -428,13 +428,6 @@ class CustomDialog extends StatelessWidget {
             color: Colors.white,
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(Consts.padding),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10.0,
-                offset: const Offset(0.0, 10.0),
-              ),
-            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -472,41 +465,39 @@ class CustomDialog extends StatelessWidget {
               ),
 
               Container(
-                decoration: new BoxDecoration(
+                decoration:  BoxDecoration(
                   color: Color(0xff001D52),
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.only(bottomLeft: Radius.circular(Consts.padding), bottomRight: Radius.circular(Consts.padding)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10.0,
-                      offset: const Offset(0.0, 10.0),
-                    ),
-                  ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    FlatButton(
-                      onPressed: () async{
-                        Navigator.of(context).pop(); // To close the dialog
-
-                        var preferences =
-                                      await SharedPreferences.getInstance();
-                                  preferences.setString('phone', 'null');
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => IntroPage()),
-                                      (r) => false);
-                      },
-                      child: Text("ДА", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)),
+                    Expanded(
+                      child: FlatButton(
+                        onPressed: () async{
+                          Navigator.of(context).pop(); // To close the dialog
+                          var preferences =await SharedPreferences.getInstance();
+                          preferences.setString('phone', 'null');
+                          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => IntroPage()),(r) => false);
+                        },
+                        child: Container(
+                          height: 50,
+                          child: Center(child: Text("ДА", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
+                        ),
+                      ),
                     ),
                     Container(width: 1, height: 50, color: Colors.white),
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // To close the dialog
-                      },
-                      child: Text("НЕТ", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)),
+                    Expanded(
+                      child: FlatButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // To close the dialog
+                        },
+                        child: Container(
+                          height: 50,
+                          child: Center(child: Text("НЕТ", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
+                        ),
+                      ),
                     ),
                   ],
                 ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:indigo24/services/helper.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:overlay_support/overlay_support.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
 import 'db/chats_model.dart';
@@ -23,7 +25,45 @@ import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/pages/chat_contacts.dart';
 
+
+String formatPhone(String phone) {
+    String r = phone.replaceAll(" ", "");
+    r = r.replaceAll("(", "");
+    r = r.replaceAll(")", "");
+    r = r.replaceAll("+", "");
+    r = r.replaceAll("-", "");
+    if (r.startsWith("8")) {
+      r = r.replaceFirst("8", "7");
+    }
+    return r;
+  }
+  getContacts() async {
+    try {
+      contacts.clear();
+      if (await Permission.contacts.request().isGranted) {
+        Iterable<Contact> phonebook = await ContactsService.getContacts();
+        phonebook.forEach((el) {
+          if (el.displayName != null) {
+            el.phones.forEach((phone) {
+              if (!contacts.contains(formatPhone(phone.value))) {
+                phone.value = formatPhone(phone.value);
+                contacts.add({
+                  'name': el.displayName,
+                  'phone': phone.value,
+                });
+              }
+            });
+          }
+        });
+      }
+      return contacts;
+    } catch (_) {
+      print(_);
+      return "disconnect";
+    }
+  }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +90,10 @@ Future<void> main() async {
       authenticated = r['result']['success'].toString() == 'true';
     }
   });
+
+
+  getContacts();
+
 
   runApp(MyApp(phone: phone, authenticated: authenticated));
 }

@@ -272,51 +272,50 @@ class _LoginPageState extends State<LoginPage> {
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
                         defaultWidget: Text("${localization.next}",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w300)),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w300)),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                          if(passwordController.text.isNotEmpty){
-                            if('$phonePrefix${loginController.text}'.length == length){
-                              FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-                              String token = await _firebaseMessaging.getToken();
-                                await api.signIn("$phonePrefix${loginController.text}", passwordController.text, token).then((response) async {
-                                  singInResult = response;
-                                  print('Response of sing in $response');
-                                  if('${response['success']}' == 'true'){
-                                    print('Second response $response');
-                                      await api.getBalance();
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(builder: (context) => Tabs(key: tabPageKey,)),(r) => false,
-                                      );
-                                  }
-                                  else{
-                                    print("this is else $singInResult");
-                                    setState(() {
-                                      passwordError = singInResult["message"];
-                                    });
-                                }
-                                print('this is below if');
-                                });
-                            } else{
-                              setState(() {
-                                print('first else');  
-                                loginError = '${localization.enterPhone}';
-                              });
-                            }
+                          if(passwordController.text.isEmpty){
+                            setState(() {
+                              passwordError = '${localization.enterPassword}';
+                            });
                           } else{
-                            if(passwordController.text.isEmpty){
-                              setState(() {
-                                passwordError = '${localization.enterPassword}';
-                              });
-                            }
+                            setState(() {
+                              passwordError = '';
+                            });
+                          }
+                          if(loginController.text.isEmpty || '$phonePrefix${loginController.text}'.length != length){
                             setState(() {
                               loginError = '${localization.enterPhone}';
                             });
+                          } else{
+                            setState(() {
+                              loginError = '';
+                            });
+                          } 
+                          if(passwordController.text.isNotEmpty && '$phonePrefix${loginController.text}'.length == length){
+                            setState(() {
+                              loginError = '';
+                              passwordError = '';
+                            });
+                            FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+                            String token = await _firebaseMessaging.getToken();
+                              await api.signIn("$phonePrefix${loginController.text}", passwordController.text, token).then((response) async {
+                                singInResult = response;
+                                if('${response['success']}' == 'true'){
+                                  await api.getBalance();
+                                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs(key: tabPageKey,)),(r) => false);
+                                } else{
+                                  setState(() {
+                                    passwordError = singInResult["message"];
+                                  });
+                                }
+                              });
                           }
                         },
                       ),
