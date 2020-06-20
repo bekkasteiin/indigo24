@@ -290,8 +290,8 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
-        print(e.response.statusCode);
+        // print(response.statusCode);
+        // print(e.response.statusCode);
       }
       return e.response.data;
     }
@@ -312,6 +312,7 @@ class Api {
       } else {
         // print(response.statusCode);
         // print(e.response.statusCode);
+        return e.response.data;
       }
       
     }
@@ -625,9 +626,16 @@ class Api {
         "description": description
       });
 
-      print("Adding tape with data ${formData.fields}");
+      print("Adding tape with data ${formData.files[0].value.length}\n    FIEDLS ${formData.fields}");
 
-      response = await dio.post("/tape/add", data: formData);
+      response = await dio.post("/tape/add", 
+        data: formData,
+        onSendProgress: (int sent, int total) {
+          String percent = (sent/total*100).toStringAsFixed(2);
+          print("$percent%");
+        },
+      );
+
       print("Getting response from TAPE upload ${response.data}");
 
       return response.data;
@@ -638,6 +646,8 @@ class Api {
         print(e.request);
         print(e.message);
       }
+      print("Error when upload TAPE: ${e.response.data}");
+      return e.response.data;
     }
   }
 

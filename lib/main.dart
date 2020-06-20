@@ -11,7 +11,6 @@ import 'package:indigo24/pages/chat_list.dart';
 import 'package:indigo24/pages/intro.dart';
 import 'package:indigo24/pages/wallet.dart';
 import 'package:indigo24/services/helper.dart';
-import 'package:indigo24/services/test_timer.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:overlay_support/overlay_support.dart';
@@ -25,9 +24,6 @@ import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-// void main() {
-//   runApp(MyApp());
-// }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -309,18 +305,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  Future _getChats() async {
-    Future<List<ChatsModel>> chats = chatsDB.getAllChats();
-    chats.then((value) {
-      // print('       ');
-      // print(value);
-      // print('       ');
-      setState(() {
-        dbChats.addAll(value);
-      });
-      // print("DB CHATS IN GET $dbChats");
-    });
-  }
+  // Future _getChats() async {
+  //   Future<List<ChatsModel>> chats = chatsDB.getAllChats();
+  //   chats.then((value) {
+  //     setState(() {
+  //       dbChats.addAll(value);
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
