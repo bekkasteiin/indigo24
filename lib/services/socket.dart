@@ -209,6 +209,20 @@ class ChatRoom {
     print('message deleted from all $data');
     channel.sink.add(data);
   }
+  
+  typing(chatId){
+    var data = json.encode({
+      "cmd": "user:writing",
+      "data": {
+        "user_id": "${user.id}",
+        "chat_id": chatId,
+        "userToken": "${user.unique}"        
+      }
+    });
+    print('sending status with $data');
+    channel.sink.add(data);
+  }
+
 
   cabinetCreate(ids, type, {title}) {
     var data = json.encode({
@@ -308,6 +322,9 @@ class ChatRoom {
           case "chat:members":
             print('added to chatInfoController');
             chatInfoController.add(new MyChatInfoEvent(json));
+            break;
+          case "user:writing": 
+            cabinetController.add(new MyCabinetEvent(json));
             break;
           default:
             print('default print cmd: $cmd json: $json');

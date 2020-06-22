@@ -74,7 +74,8 @@ class _ChatPageState extends State<ChatPage> {
   FileType _pickingType = FileType.any;
   var myFileUrl;
   bool haveFile = false;
-  
+  bool isSomeoneTyping = false;
+
   void sendSound() {
     print("Send sound is called");
     final player = AudioCache();
@@ -181,12 +182,27 @@ class _ChatPageState extends State<ChatPage> {
             online = '${e.json['data'][0]['online']}';
           });
           break;
+        case "user:writing":
+          if(e.json['data'][0]['user_id'].toString() != user.id){
+            setState(() {
+              isSomeoneTyping = true;
+            });
+          }
+          deleteTyping();
+          
+          break;
         default:
           print('CABINET EVENT DEFAULT');
       }
     });
   }
 
+  deleteTyping() async {
+    await Future.delayed(Duration(seconds: 3));
+    setState(() {
+      isSomeoneTyping = false;
+    });
+  }
   // bool isLoading = false;
 
   Future _loadData() async {
@@ -693,32 +709,47 @@ class _ChatPageState extends State<ChatPage> {
                           ? Center(
                               child: Image.asset("assets/empty.gif")
                             )
-                          : SmartRefresher(
-                              enablePullDown: false,
-                              enablePullUp: true,
-                              // header: WaterDropHeader(),
-                              footer: CustomFooter(
-                                builder:
-                                    (BuildContext context, LoadStatus mode) {
-                                  Widget body;
-                                  return Container(
-                                    height: 55.0,
-                                    child: Center(child: body),
-                                  );
-                                },
+                          : Column(
+                            children: [
+                              Expanded(
+                                child: SmartRefresher(
+                                    enablePullDown: false,
+                                    enablePullUp: true,
+                                    // header: WaterDropHeader(),
+                                    footer: CustomFooter(
+                                      builder:
+                                          (BuildContext context, LoadStatus mode) {
+                                        Widget body;
+                                        return Container(
+                                          height: 55.0,
+                                          child: Center(child: body),
+                                        );
+                                      },
+                                    ),
+                                    controller: _refreshController,
+                                    onRefresh: _onRefresh,
+                                    onLoading: _onLoading,
+                                    child: ListView.builder(
+                                      controller: controller,
+                                      itemCount: myList.length,
+                                      reverse: true,
+                                      itemBuilder: (context, i) {
+                                        return message(myList[i]);
+                                      },
+                                    ),
+                                  ),
                               ),
-                              controller: _refreshController,
-                              onRefresh: _onRefresh,
-                              onLoading: _onLoading,
-                              child: ListView.builder(
-                                controller: controller,
-                                itemCount: myList.length,
-                                reverse: true,
-                                itemBuilder: (context, i) {
-                                  return message(myList[i]);
-                                },
-                              ),
-                            ),
+                              isSomeoneTyping?Container(
+                                padding: EdgeInsets.all(5),
+                                child: Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Image.asset("assets/typing.gif", width: MediaQuery.of(context).size.width*0.3),
+                                ),
+                              )
+                              :
+                              Container()
+                            ],
+                          ),
                     ),
                   ),
                 ),
@@ -769,6 +800,7 @@ class _ChatPageState extends State<ChatPage> {
                                             isTyping = false;
                                           });
                                         } else {
+                                          ChatRoom.shared.typing(widget.chatID);
                                           setState(() {
                                             isTyping = true;
                                           });

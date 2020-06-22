@@ -53,7 +53,7 @@ dependencies:
   datetime_picker_formfield: ^1.0.0
   flutter_image_compress: ^0.6.8
   heic_to_jpg: ^0.1.1
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -64,6 +64,7 @@ flutter:
 
   assets:
     - assets/dev.gif
+    - assets/typing.gif
     - assets/developing.gif 
     - assets/voice.gif
     - assets/record.gif
