@@ -63,7 +63,7 @@ class _ChatPageState extends State<ChatPage> {
 
   String statusText = "";
   bool isComplete = false;
-  
+  bool hasPermission = false;
 
   String _fileName;
   String _path;
@@ -788,9 +788,13 @@ class _ChatPageState extends State<ChatPage> {
                             !isTyping
                                 ? ClipOval(
                                     child: GestureDetector(
-                                      onLongPress: () {
+                                      onLongPress: () async {
                                         print("long press");
-                                        startRecord();
+                                        bool p = await checkPermission();
+                                        if(p){
+                                          startRecord();
+                                        }
+                                        
                                       },
                                       onLongPressUp: () {
                                         print("long press UP");
@@ -874,7 +878,9 @@ class _ChatPageState extends State<ChatPage> {
     // return DeviderMessageWidget(date: 'test');
     if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7')
       return Devider(m);
-    return '${m['user_id']}' == '${user.id}' ? Sended(m) : Received(m);
+    return '${m['user_id']}' == '${user.id}' ? Sended(m)
+    :
+    Received(m);
   }
 
   Future<bool> checkPermission() async {
@@ -1092,14 +1098,30 @@ class Sended extends StatelessWidget {
     var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
     return Align(
         alignment: Alignment(1, 0),
-        child: SendedMessageWidget(
-          content: '${m['text']}',
-          time: time('${m['time']}'),
-          write: '${m['write']}',
-          type: "${m["type"]}",
-          media: (a==false || a==null)? null : a[0]['filename'],
-          rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
-          mediaUrl: (a==false || a==null)? null : m['attachment_url'],
+        child: Container(
+          
+          child: CupertinoContextMenu(
+            actions: [
+              CupertinoContextMenuAction(
+                  child: const Text('Тест'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+            ],
+            child: Material(
+              color: Colors.transparent,
+              child: SendedMessageWidget(
+                content: '${m['text']}',
+                time: time('${m['time']}'),
+                write: '${m['write']}',
+                type: "${m["type"]}",
+                media: (a==false || a==null)? null : a[0]['filename'],
+                rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
+                mediaUrl: (a==false || a==null)? null : m['attachment_url'],
+              ),
+            ),
+          ),
         ));
   }
 

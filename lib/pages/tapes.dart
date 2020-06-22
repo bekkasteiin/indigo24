@@ -483,8 +483,10 @@ class _ChewieVideoState extends State<ChewieVideo> {
   void deactivate() {
     super.deactivate();
     print("deactive");
-    controller.dispose();
-    _chewieController.dispose();
+    if(controller!=null && _chewieController != null){
+      controller.dispose();
+      _chewieController.dispose();
+    }
   }
   @override
   void didChangeDependencies() {
@@ -496,8 +498,10 @@ class _ChewieVideoState extends State<ChewieVideo> {
   void dispose() {
     print("CHEWIE dispose");
     super.dispose();
-    controller.dispose();
-    _chewieController.dispose();
+    if(controller!=null && _chewieController != null){
+      controller.dispose();
+      _chewieController.dispose();
+    }
     // _chewieController.videoPlayerController.dispose();
   }
   

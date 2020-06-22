@@ -69,6 +69,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -112,7 +113,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             IconButton(
               key: Key('pause_button'),
               onPressed: _isPlaying ? () => _pause() : null,
-              iconSize: 40.0,
+              iconSize: 35.0,
               icon: Icon(Icons.pause),
               color: Colors.cyan,
             )
@@ -120,7 +121,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             IconButton(
               key: Key('play_button'),
               onPressed: _isPlaying ? null : () => _play(),
-              iconSize: 40.0,
+              iconSize: 35.0,
               icon: Icon(Icons.play_arrow),
               color: Colors.cyan,
             ),
@@ -183,8 +184,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             artist: 'Username',
             albumTitle: 'Голосовое сообщение',
             imageUrl: 'https://indigo24.xyz/uploads/avatars/noAvatar.png',
-            forwardSkipInterval: const Duration(seconds: 30), // default is 30s
-            backwardSkipInterval: const Duration(seconds: 30), // default is 30s
+            forwardSkipInterval: const Duration(seconds: 5), // default is 30s
+            backwardSkipInterval: const Duration(seconds: 5), // default is 30s
             duration: duration,
             elapsedTime: Duration(seconds: 0));
       }
