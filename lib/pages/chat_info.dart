@@ -12,6 +12,8 @@ import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'wallet.dart';
+
 class ChatProfileInfo extends StatefulWidget {
   final chatName;
   final chatAvatar;
@@ -168,158 +170,168 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     return Container(
       color: Colors.white,
       child: SafeArea(
-        child: Scaffold(
-          body: Stack(
-            children: <Widget>[
-              _buildCoverImage(screenSize),
-              Column(
-                children: <Widget>[
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Container(
-                          padding: EdgeInsets.all(5),
-                          child: Image(
-                            image: AssetImage(
-                              'assets/images/backWhite.png',
+        child: GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
+          child: Scaffold(
+            body: Stack(
+              children: <Widget>[
+                _buildCoverImage(screenSize),
+                Column(
+                  children: <Widget>[
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Container(
+                            padding: EdgeInsets.all(5),
+                            child: Image(
+                              image: AssetImage(
+                                'assets/images/backWhite.png',
+                              ),
                             ),
                           ),
+                          color: Colors.white,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                         ),
-                        color: Colors.white,
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Flexible(child: Text('$_chatTitle', style: fS26(c: 'ffffff'), maxLines: 1, overflow: TextOverflow.ellipsis,)),
-                      IconButton(
-                        icon: Icon(Icons.more_vert),
-                        color: Colors.white,
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      _buildProfileImage(),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  membersList.length==2?
-                  Divider()
-                  :
-                  Row(children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(left: 20),
-                      child: Text(
-                        '${localization.members}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                        Flexible(child: Text('$_chatTitle', style: fS26(c: 'ffffff'), maxLines: 1, overflow: TextOverflow.ellipsis,)),
+                        IconButton(
+                          icon: Icon(Icons.more_vert),
+                          color: Colors.white,
+                          onPressed: () {},
                         ),
-                      ),
+                      ],
                     ),
-                  ]),
-                  SizedBox(height: 10),
-                  membersList.isEmpty
-                      ? Center(child: CircularProgressIndicator())
-                      :
-                      membersList.length==2?
-                      Center(
-                        child: Text("Статус", style: TextStyle(
-                          fontSize: 24,
-                          // fontFamily: ""
-                        )),
-                      )
-                      : Flexible(
-                          child: ListView.builder(
-                            itemCount: membersList.length,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, i) {
-                              // print(membersList[i]);
-                              return Slidable(
-                                actionPane: SlidableDrawerActionPane(),
-                                actionExtentRatio: 0.25,
-                                // actions: <Widget>[
-                                //   IconSlideAction(
-                                //     caption: 'Archive',
-                                //     color: Colors.blue,
-                                //     icon: Icons.archive,
-                                //   ),
-                                //   IconSlideAction(
-                                //     caption: 'Share',
-                                //     color: Colors.indigo,
-                                //     icon: Icons.share,
-                                //   ),
-                                // ],
-                                secondaryActions: 
-                                
-                                "${membersList[i]["role"]}" == '0' ? 
-                                <Widget>[]
-                                :
-                                <Widget>[
-                                  // IconSlideAction(
-                                  //   caption: 'More',
-                                  //   color: Colors.black45,
-                                  //   icon: Icons.more_horiz,
-                                  // ),
-                                  IconSlideAction(
-                                    // caption: 'Удалить',
-                                    color: Colors.red,
-                                    icon: Icons.delete,
-                                    onTap: () {
-                                      ChatRoom.shared.deleteMembers(
-                                          '${widget.chatId}',
-                                          membersList[i]['user_id']);
-                                      setState(() {
-                                        membersList.remove(i);
-                                      });
-                                    },
-                                  ),
-                                ]
-                                ,
-                                child: ListTile(
-                                  onTap: () {
-                                    // ChatRoom.shared.checkUserOnline(ids);
-                                    // ChatRoom.shared
-                                    //     .getMessages(membersList[i]['id']);
-                                  },
-                                  leading: CircleAvatar(
-                                      backgroundImage: (membersList[i]["avatar"] == null ||
-                                              membersList[i]["avatar"] == '' ||
-                                              membersList[i]["avatar"] == false)
-                                          ? CachedNetworkImageProvider(
-                                              "https://media.indigo24.com/avatars/noAvatar.png")
-                                          : 
-                                          CachedNetworkImageProvider(
-                                              'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}'),
-                                    child: ClipOval(
-                                      child: CachedNetworkImage(
-                                        imageUrl: (membersList[i]["avatar"] == null ||
-                                              membersList[i]["avatar"] == '' ||
-                                              membersList[i]["avatar"] == false)?
-                                              "https://media.indigo24.com/avatars/noAvatar.png"
-                                              :
-                                              'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}',
-                                        errorWidget: (context, url, error) => CachedNetworkImage(
-                                          imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  title: Text("${membersList[i]["user_name"]}"),
-                                  subtitle: "${membersList[i]["role"]}" == '0' ? Text('${localization.creator}') : Text('${localization.member}'),
-                                ),
-                              );
-                            },
+                    SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        _buildProfileImage(),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    membersList.length==2?
+                    Divider()
+                    :
+                    Row(children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(left: 20),
+                        child: Text(
+                          '${localization.members}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                ],
-              ),
-            ],
+                      ),
+                    ]),
+                    SizedBox(height: 10),
+                    membersList.isEmpty
+                        ? Center(child: CircularProgressIndicator())
+                        :
+                        membersList.length==2?
+                        Center(
+                          child: Text("Статус", style: TextStyle(
+                            fontSize: 24,
+                            // fontFamily: ""
+                          )),
+                        )
+                        : Flexible(
+                            child: ScrollConfiguration(
+                              behavior: MyBehavior(),
+                              child: ListView.builder(
+                                itemCount: membersList.length,
+                                itemBuilder: (context, i) {
+                                  // print(membersList[i]);
+                                  return Slidable(
+                                    actionPane: SlidableDrawerActionPane(),
+                                    actionExtentRatio: 0.25,
+                                    // actions: <Widget>[
+                                    //   IconSlideAction(
+                                    //     caption: 'Archive',
+                                    //     color: Colors.blue,
+                                    //     icon: Icons.archive,
+                                    //   ),
+                                    //   IconSlideAction(
+                                    //     caption: 'Share',
+                                    //     color: Colors.indigo,
+                                    //     icon: Icons.share,
+                                    //   ),
+                                    // ],
+                                    secondaryActions: 
+                                    
+                                    "${membersList[i]["role"]}" == '0' ? 
+                                    <Widget>[]
+                                    :
+                                    <Widget>[
+                                      // IconSlideAction(
+                                      //   caption: 'More',
+                                      //   color: Colors.black45,
+                                      //   icon: Icons.more_horiz,
+                                      // ),
+                                      IconSlideAction(
+                                        // caption: 'Удалить',
+                                        color: Colors.red,
+                                        icon: Icons.delete,
+                                        onTap: () {
+                                          ChatRoom.shared.deleteMembers(
+                                              '${widget.chatId}',
+                                              membersList[i]['user_id']);
+                                          setState(() {
+                                            membersList.remove(i);
+                                          });
+                                        },
+                                      ),
+                                    ]
+                                    ,
+                                    child: ListTile(
+                                      onTap: () {
+                                        // ChatRoom.shared.checkUserOnline(ids);
+                                        // ChatRoom.shared
+                                        //     .getMessages(membersList[i]['id']);
+                                      },
+                                      leading: CircleAvatar(
+                                          backgroundImage: (membersList[i]["avatar"] == null ||
+                                                  membersList[i]["avatar"] == '' ||
+                                                  membersList[i]["avatar"] == false)
+                                              ? CachedNetworkImageProvider(
+                                                  "https://media.indigo24.com/avatars/noAvatar.png")
+                                              : 
+                                              CachedNetworkImageProvider(
+                                                  'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}'),
+                                        child: ClipOval(
+                                          child: CachedNetworkImage(
+                                            imageUrl: (membersList[i]["avatar"] == null ||
+                                                  membersList[i]["avatar"] == '' ||
+                                                  membersList[i]["avatar"] == false)?
+                                                  "https://media.indigo24.com/avatars/noAvatar.png"
+                                                  :
+                                                  'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}',
+                                            errorWidget: (context, url, error) => CachedNetworkImage(
+                                              imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      title: Text("${membersList[i]["user_name"]}"),
+                                      subtitle: "${membersList[i]["role"]}" == '0' ? Text('${localization.creator}') : Text('${localization.member}'),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

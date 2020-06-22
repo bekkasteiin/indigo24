@@ -8,6 +8,7 @@ import 'package:indigo24/pages/chat_group_selection.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/user.dart' as user;
 
 import '../main.dart';
 var contacts = [];
@@ -261,6 +262,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                             child: ListView.builder(
                               itemCount: actualList != null ? actualList.length : 0,
                               itemBuilder: (BuildContext context, int index) {
+                                if('${user.phone}' == '+${actualList[index]['phone']}')
+                                  return Center();
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 2),
                                   child: Container(

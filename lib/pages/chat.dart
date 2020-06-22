@@ -353,7 +353,7 @@ class _ChatPageState extends State<ChatPage> {
                                     height: 40,
                                     child: Image(
                                       image: AssetImage(
-                                        'assets/images/camera.png',
+                                        'assets/images/cameraPurple.png',
                                       ),
                                     ),
                                   ),
