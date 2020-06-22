@@ -131,9 +131,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   controller: amountController,
                   onChanged: (String text) async {
                     if(amountController.text.isNotEmpty){
-                      if(amountController.text[0] == '0'){
-                        amountController.text = '';
-                      }
+                      // if(amountController.text[0] == '0'){
+                      //   amountController.text = '';
+                      // }
                       if(int.parse(amountController.text) < int.parse(configs.refillMax))
                         setState(() {
                           commission = (int.parse(text) * 2.2 / 100).toStringAsFixed(2);

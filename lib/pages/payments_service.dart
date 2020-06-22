@@ -263,10 +263,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         child: RaisedButton(
           onPressed: () async {
             if(receiverController.text.isNotEmpty & sumController.text.isNotEmpty){
-
-              await _showLockScreen(context,'${localization.createPin}',opaque: false, cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'));
-            
-
+              await _showLockScreen(context,'${localization.enterPin}',opaque: false, cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'));
             }
           },
           child: Container(
@@ -342,9 +339,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     decoration: InputDecoration.collapsed(hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
                     onChanged: (value){
-                      if(sumController.text[0] == '0'){
-                        sumController.text = '';
-                      }
+                      // if(sumController.text[0] == '0'){
+                      //   sumController.clear();
+                      // }
                     },
                     validator: (value) {
                       if (value.isEmpty) {

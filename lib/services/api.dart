@@ -236,6 +236,8 @@ class Api {
         SharedPreferencesHelper.setString('balanceInBlock', '${response.data['result']['balanceInBlock']}');
         user.balance = '${response.data['result']['balance']}';
         user.balanceInBlock = '${response.data['result']['balanceInBlock']}';
+
+        print("Balance in block ${user.balanceInBlock}");
         return response.data;
       } else {
         return response.data;

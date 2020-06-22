@@ -289,9 +289,9 @@ class _TransferPageState extends State<TransferPage> {
                         hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
                     onChanged: (value){
-                      if(sumController.text[0] == '0'){
-                        sumController.text = '';
-                      }
+                      // if(sumController.text[0] == '0'){
+                      //   sumController.text = '';
+                      // }
                     },
                     validator: (value) {
                       if (value.isEmpty) {

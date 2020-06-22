@@ -120,6 +120,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                       ),
                       TextField(
                         controller: smsController,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(hintText: ""),
                       ),
                       Text('$smsError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),

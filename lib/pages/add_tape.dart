@@ -11,7 +11,6 @@ import 'package:indigo24/widgets/picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-var singleFile;
 
 class AddTapePage extends StatefulWidget {
   AddTapePage({Key key, this.title}) : super(key: key);
@@ -35,6 +34,7 @@ class _AddTapePageState extends State<AddTapePage> {
   var api = Api();
   final picker = ImagePicker();
   PickedFile _myFile;
+  bool isNotPicked = true;
 
   Future<void> _playVideo(File file) async {
     if (file != null && mounted) {
@@ -63,6 +63,7 @@ class _AddTapePageState extends State<AddTapePage> {
         setState(() {
           _videoFile = File(pickedFile.path);
           _currentFile = File(pickedFile.path);
+          isNotPicked = false;
         });
 
         print("video file from $_videoFile");
@@ -78,6 +79,7 @@ class _AddTapePageState extends State<AddTapePage> {
           setState(() {
             _imageFile = File(pickedFile.path);
             _currentFile = File(pickedFile.path);
+            isNotPicked = false;
           });
           print("image file from $_imageFile");
           setState(() {});
@@ -139,47 +141,9 @@ class _AddTapePageState extends State<AddTapePage> {
     if (retrieveError != null) {
       return retrieveError;
     }
-    if (_controller == null) {
-      return ListView(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                controller: titleController,
-                decoration: InputDecoration(labelText: 'Название')),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                minLines: 1,
-                maxLines: 4,
-                controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Описание')),
-          ),
-        ],
-      );
-    }
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: ListView(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                controller: titleController,
-                decoration: InputDecoration(labelText: 'Название')),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                minLines: 1,
-                maxLines: 4,
-                controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Описание')),
-          ),
-          AspectRatioVideo(_controller),
-        ],
-      ),
+      child: AspectRatioVideo(_controller),
     );
   }
 
@@ -188,55 +152,22 @@ class _AddTapePageState extends State<AddTapePage> {
     if (retrieveError != null) {
       return retrieveError;
     }
-    if (_imageFile != null) {
-      return ListView(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                controller: titleController,
-                decoration: InputDecoration(labelText: 'Название')),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                minLines: 1,
-                maxLines: 4,
-                controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Описание')),
-          ),
-          Container(
+    if (_currentFile != null) {
+      return Container(
             height: MediaQuery.of(context).size.width,
             width: MediaQuery.of(context).size.width,
             child: Image(
-              image: FileImage(_imageFile),
+              image: FileImage(_currentFile),
             ),
-          ),
-        ],
-      );
+          );
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
         textAlign: TextAlign.center,
       );
     } else {
-      return ListView(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                controller: titleController,
-                decoration: InputDecoration(labelText: 'Название')),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            child: TextField(
-                minLines: 1,
-                maxLines: 4,
-                controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Описание')),
-          ),
-        ],
+      return Container(
+        child: Text("Ошибка"),
       );
     }
   }
@@ -271,6 +202,7 @@ class _AddTapePageState extends State<AddTapePage> {
         if (r["success"]) {
           titleController.text = "";
           descriptionController.text = "";
+          isNotPicked = true;
           Navigator.pop(context);
         } else {
           print("false false false ");
@@ -323,6 +255,12 @@ class _AddTapePageState extends State<AddTapePage> {
             ),
           ),
            onPressed: () async {
+             var json = singleFile.toJson();
+             print(json['path']);
+             setState(() {
+               _currentFile = File(json['path']);
+               isNotPicked = false;
+             });
               if(descriptionController.text == '' || titleController.text == ''){
                 showAlertDialog(context, "Заполните все поля");
               } else if(_currentFile == null){
@@ -346,36 +284,43 @@ class _AddTapePageState extends State<AddTapePage> {
       //   ),
       // ),
       Center(
-        child: Platform.isAndroid
-            ? FutureBuilder<void>(
-                future: retrieveLostData(),
-                builder:
-                    (BuildContext context, AsyncSnapshot<void> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return const Text(
-                        'Вы не выбрали фото',
-                        textAlign: TextAlign.center,
-                      );
-                    case ConnectionState.done:
-                      return isVideo ? _previewVideo() : _previewImage();
-                    default:
-                      if (snapshot.hasError) {
-                        return Text(
-                          'Pick image/video error: ${snapshot.error}}',
-                          textAlign: TextAlign.center,
-                        );
-                      } else {
-                        return const Text(
-                          'Вы не выбрали фото',
-                          textAlign: TextAlign.center,
-                        );
-                      }
-                  }
-                },
-              )
-            : (isVideo ? _previewVideo() : _previewImage()),
+        child: ListView(
+          children: [
+ 
+            Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(labelText: 'Название')),
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: TextField(
+                      minLines: 1,
+                      maxLines: 4,
+                      controller: descriptionController,
+                      decoration: InputDecoration(labelText: 'Описание')),
+                ),
+              ],
+            ),
+          
+          isNotPicked?Container():isVideo? _previewVideo() : _previewImage(),
+            
+            // Image(
+            //   image: AssetDataImage(
+            //     singleFile,
+            //     targetWidth: Utils.width2px(context, ratio: 3),
+            //     targetHeight: Utils.width2px(context, ratio: 3),
+            //   ),
+            //   fit: BoxFit.cover,
+            //   width: double.infinity,
+            //   height: double.infinity,
+            // ),
+            
+          ],
+        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -469,7 +414,7 @@ class _AddTapePageState extends State<AddTapePage> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext bc){
-          return PickerPage();
+          return SingleImagePickerPage();
       }
     );
 }

@@ -450,7 +450,7 @@ class _WalletTabState extends State<WalletTab> {
                       _amount = double.parse(user.balance);
                       _realAmount = double.parse(user.balance);
                       _blockedAmount = double.parse(user.balanceInBlock);
-                      });
+                    });
                   });
               },
               child: FittedBox(
