@@ -76,16 +76,40 @@ class _WalletTabState extends State<WalletTab> {
             digits: digits,
           ),
         ));
-  }
+  } 
+  String temp = '';
 
   _onPasscodeEntered(String enteredPasscode) {
-    print('user pin is ${user.pin}');
-    if('${user.pin}'.toString() == 'false'){
-      Navigator.maybePop(context);
-      Navigator.maybePop(context);
-      print('set pin');
+    if(user.pin == 'waiting' && temp == enteredPasscode){
+      print('creating');
       api.createPin(enteredPasscode);
+      Navigator.maybePop(context);
+      Navigator.maybePop(context);
     }
+    if('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode){
+      return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('${localization.error}'),
+          content: Text('${localization.incorrectPin}'),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    }
+    if('${user.pin}'.toString() == 'false'){
+      user.pin = 'waiting';
+      temp = enteredPasscode;
+      print('first set pin $temp');
+    } 
 
     bool isValid = '${user.pin}' == enteredPasscode;
     _verificationNotifier.add(isValid);

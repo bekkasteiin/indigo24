@@ -1,13 +1,19 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/pages/circle.dart';
+import 'package:indigo24/pages/pin_code.dart';
 
 import '../services/api.dart';
 import '../style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+
+import 'keyboard.dart';
 
 class TransferPage extends StatefulWidget {
   @override
@@ -162,7 +168,90 @@ class _TransferPageState extends State<TransferPage> {
       ),
     );
   }
+  final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
+  bool checked = false;
+  _onPasscodeEntered(String enteredPasscode) {
 
+
+    bool isValid = '${user.pin}' == enteredPasscode;
+    _verificationNotifier.add(isValid);
+    if(enteredPasscode == user.pin){
+      Navigator.maybePop(context);
+      Navigator.maybePop(context);
+      if(receiverController.text.isNotEmpty && sumController.text.isNotEmpty){
+          api.checkPhoneForSendMoney(receiverController.text).then((result) {
+            print('transfer result $result');
+            if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
+              logOut(context);
+              return result;
+            } else {
+              if (result["success"].toString() == 'true') {
+                api.doTransfer(result["toID"], sumController.text).then((res) {
+                  if(res['success'].toString() == 'false') 
+                    showAlertDialog(context, '0', res['message']); 
+                  else{
+                    showAlertDialog(context, '1', res['message']);
+                    api.getBalance().then((result){
+                      setState(() {
+                      });
+                    });
+                  }
+                });
+              } else{
+                showAlertDialog(context, '0', result['message']);
+              }
+              return result;
+            }
+          });
+      } else{
+        showAlertDialog(context, '0', 'Заполните все поля');
+      }
+    }
+  }
+
+  _onPasscodeCancelled() {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => Tabs(),
+        ),
+        (r) => false, 
+    );
+  }
+
+  _showLockScreen(BuildContext context, String title,
+      {
+      bool withPin,
+      bool opaque,
+      CircleUIConfig circleUIConfig,
+      KeyboardUIConfig keyboardUIConfig,
+      Widget cancelButton,
+      List<String> digits}) {
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+          opaque: opaque,
+          pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+            withPin: withPin,
+            title: Text(
+              '$title',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
+            ),
+            passwordEnteredCallback: _onPasscodeEntered,
+            cancelButton: cancelButton,
+            deleteButton: Text(
+              'Delete',
+              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+              semanticsLabel: 'Delete',
+            ),
+            shouldTriggerVerification: _verificationNotifier.stream,
+            backgroundColor: Color(0xFFF7F7F7),
+            cancelCallback: _onPasscodeCancelled,
+            digits: digits,
+          ),
+        ));
+  } 
+  
   Container transferButton() {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -177,35 +266,11 @@ class _TransferPageState extends State<TransferPage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
-            if(receiverController.text.isNotEmpty && sumController.text.isNotEmpty){
-                api.checkPhoneForSendMoney(receiverController.text).then((result) {
-                  print('transfer result $result');
-                  if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
-                    logOut(context);
-                    return result;
-                  } else {
-                    if (result["success"].toString() == 'true') {
-                      api.doTransfer(result["toID"], sumController.text).then((res) {
-                        if(res['success'].toString() == 'false') 
-                          showAlertDialog(context, '0', res['message']); 
-                        else{
-                          showAlertDialog(context, '1', res['message']);
-                          api.getBalance().then((result){
-                            setState(() {
-                            });
-                          });
-                        }
-                      });
-                    } else{
-                      showAlertDialog(context, '0', result['message']);
-                    }
-                    return result;
-                  }
-                });
-            } else{
-              showAlertDialog(context, '0', 'Заполните все поля');
-            }
-            
+            _showLockScreen(
+              context,
+              '${localization.enterPin}',
+              opaque: false,
+              cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
           },
           child: Container(
             height: 50,

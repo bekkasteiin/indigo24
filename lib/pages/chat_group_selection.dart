@@ -5,9 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat.dart';
+import 'package:indigo24/pages/chat_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/user.dart' as user;
 
 class ChatGroupSelection extends StatefulWidget {
   @override
@@ -41,12 +43,11 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     );
   }
 
-  Future _future;
 
   @override
   void initState() {
-    _future = getContacts();
     super.initState();
+    actualList.addAll(contacts);
     ChatRoom.shared.setContactsStream();
     listen();
     print('listened');
@@ -156,36 +157,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     return r;
   }
 
-  var _contacts = [];
-  Future getContacts() async {
-    try {
-      _contacts.clear();
-      if (await Permission.contacts.request().isGranted) {
-        Iterable<Contact> phonebook = await ContactsService.getContacts();
-        phonebook.forEach((el) {
-          if (el.displayName != null) {
-            el.phones.forEach((phone) {
-              String contact = formatPhone(phone.value);
-              if (!_contacts.contains(contact)) {
-                phone.value = formatPhone(phone.value);
-                _contacts.add({
-                  'name': el.displayName,
-                  'phone': phone.value,
-                });
-              }
-            });
-          }
-        });
-      }
-      setState(() {
-        actualList.addAll(_contacts);
-      });
-      return _contacts;
-    } catch (_) {
-      print(_);
-      return "disconnect";
-    }
-  }
+
 
   TextEditingController _searchController = TextEditingController();
   TextEditingController _titleController = TextEditingController();
@@ -195,7 +167,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   void search(String query) {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
-      _contacts.forEach((item) {
+      contacts.forEach((item) {
         if (item['name'].toLowerCase().contains(query.toLowerCase()) ||
             item['phone'].toLowerCase().contains(query.toLowerCase())) {
           matches.add(item);
@@ -205,21 +177,17 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
         actualList.clear();
         actualList.addAll(matches);
       });
-      return;
     } else {
       setState(() {
         actualList.clear();
-        actualList.addAll(_contacts);
+        actualList.addAll(contacts);
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-          return Scaffold(
+    return Scaffold(
               appBar: AppBar(
                 leading: IconButton(
                 icon: Container(
@@ -274,7 +242,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 ],
                 backgroundColor: Colors.white,
               ),
-              body: snapshot.hasData
+              body: contacts.isNotEmpty
                   ? SafeArea(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -399,6 +367,8 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                             child: ListView.builder(
                               itemCount: actualList.length,
                               itemBuilder: (BuildContext context, int index) {
+                                if('${user.phone}' == '+${actualList[index]['phone']}')
+                                  return Center();
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 2),
                                   child: Container(
@@ -449,8 +419,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       ),
                   )
                   : Center(child: CircularProgressIndicator()));
-      },
-    );
+    
   }
   valu(index){
     bool tempo = false;

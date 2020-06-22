@@ -75,6 +75,7 @@ flutter:
     - assets/sound/message_in.mp3
     - assets/images/send.png
     - assets/images/camera.png
+    - assets/images/cameraPurple.png
     - assets/images/video.png
     - assets/images/pencil.png
     - assets/images/settings.png
