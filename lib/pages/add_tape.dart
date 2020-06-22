@@ -252,207 +252,215 @@ class _AddTapePageState extends State<AddTapePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
+    return GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
           },
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        brightness: Brightness.light,
-        title: Text('${localization.newTape}',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center),
-        actions: <Widget>[
-          IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(5),
-            child: Image(
-              image: AssetImage(
-                'assets/images/add.png',
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        appBar: AppBar(
+          centerTitle: true,
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
+                ),
               ),
             ),
-          ),
-           onPressed: () async {
-             print(singleFile);
-
-             if(singleFile != null){
-              // var json = singleFile.toJson();
-              // print(json['path']);
-              setState(() {
-                // _currentFile = File(json['path']);
-                _currentFile = File(singleFile);
-                singleFile = null;
-                isNotPicked = false;
-              });
-             }
-             print("Pressed with $_currentFile");
-              if(descriptionController.text == '' || titleController.text == ''){
-                showAlertDialog(context, "Заполните все поля");
-              } else if(_currentFile == null){
-                showAlertDialog(context, "Выберите файл");
-              } else {
-                print("Current file $_currentFile");
-                await addTape(context);
-              }
-              
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-          
-        ],
-        backgroundColor: Colors.white,
-      ),
-      body: 
-      // Center(
-      //   child: Container(
-      //     child: Center(
-      //       child: Text("test"),
-      //     ),
-      //   ),
-      // ),
-      Center(
-        child: ListView(
-          children: [
- 
-            Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.all(10),
-                  child: TextField(
-                      controller: titleController,
-                      decoration: InputDecoration(labelText: 'Название')),
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+          brightness: Brightness.light,
+          title: Text('${localization.newTape}',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 22,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center),
+          actions: <Widget>[
+            IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(5),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/add.png',
                 ),
-                Container(
-                  margin: EdgeInsets.all(10),
-                  child: TextField(
-                      minLines: 1,
-                      maxLines: 4,
-                      controller: descriptionController,
-                      decoration: InputDecoration(labelText: 'Описание')),
-                ),
-              ],
+              ),
             ),
-          
-          isNotPicked?Container():isVideo? _previewVideo() : _previewImage(),
-            
-            // Image(
-            //   image: AssetDataImage(
-            //     singleFile,
-            //     targetWidth: Utils.width2px(context, ratio: 3),
-            //     targetHeight: Utils.width2px(context, ratio: 3),
-            //   ),
-            //   fit: BoxFit.cover,
-            //   width: double.infinity,
-            //   height: double.infinity,
-            // ),
+             onPressed: () async {
+               print(singleFile);
+
+               if(singleFile != null){
+                // var json = singleFile.toJson();
+                // print(json['path']);
+                setState(() {
+                  // _currentFile = File(json['path']);
+                  _currentFile = File(singleFile);
+                  singleFile = null;
+                  isNotPicked = false;
+                });
+               }
+               print("Pressed with $_currentFile");
+                if(descriptionController.text == '' || titleController.text == ''){
+                  showAlertDialog(context, "Заполните все поля");
+                } else if(_currentFile == null){
+                  showAlertDialog(context, "Выберите файл");
+                } else {
+                  print("Current file $_currentFile");
+                  await addTape(context);
+                }
+                
+              },
+            ),
             
           ],
+          backgroundColor: Colors.white,
         ),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: FloatingActionButton(
-              backgroundColor: Colors.white,
-              onPressed: () {
-                isVideo = false;
-                action();
-                // _settingModalBottomSheet(context);
-                // MY COMMENT
-                // _onImageButtonPressed(ImageSource.camera);
-              },
-              heroTag: 'image',
-              tooltip: 'Pick Image from camera',
-              child: Image.asset("assets/images/camera.png", width: 30),
-            ),
+        body: 
+        // Center(
+        //   child: Container(
+        //     child: Center(
+        //       child: Text("test"),
+        //     ),
+        //   ),
+        // ),
+        Center(
+          child: ListView(
+            children: [
+ 
+              Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: TextField(
+                        controller: titleController,
+                        decoration: InputDecoration(labelText: 'Название')),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: TextField(
+                        minLines: 1,
+                        maxLines: 4,
+                        controller: descriptionController,
+                        decoration: InputDecoration(labelText: 'Описание')),
+                  ),
+                ],
+              ),
+            
+            isNotPicked?Container():isVideo? _previewVideo() : _previewImage(),
+              
+              // Image(
+              //   image: AssetDataImage(
+              //     singleFile,
+              //     targetWidth: Utils.width2px(context, ratio: 3),
+              //     targetHeight: Utils.width2px(context, ratio: 3),
+              //   ),
+              //   fit: BoxFit.cover,
+              //   width: double.infinity,
+              //   height: double.infinity,
+              // ),
+              
+            ],
           ),
+        ),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: FloatingActionButton(
                 backgroundColor: Colors.white,
                 onPressed: () {
-                  isVideo = true;
+                  isVideo = false;
                   action();
-                // _onImageButtonPressed(ImageSource.camera);
+                  // _settingModalBottomSheet(context);
+                  // MY COMMENT
+                  // _onImageButtonPressed(ImageSource.camera);
                 },
-                heroTag: 'video',
-                tooltip: 'Pick Video from camera',
-                child: Image.asset("assets/images/video.png", width: 30),
+                heroTag: 'image',
+                tooltip: 'Pick Image from camera',
+                child: Image.asset("assets/images/camera.png", width: 30),
               ),
             ),
-        ],
-      )
-      // Column(
-      //   mainAxisAlignment: MainAxisAlignment.end,
-      //   children: <Widget>[
-          // FloatingActionButton(
-          //   onPressed: () {
-          //     isVideo = false;
-          //     _onImageButtonPressed(ImageSource.gallery);
-          //   },
-          //   heroTag: 'image0',
-          //   tooltip: 'Pick Image from gallery',
-          //   child: const Icon(Icons.photo_library),
-          // ),
-      //     Padding(
-      //       padding: const EdgeInsets.only(top: 16.0),
-      //       child: FloatingActionButton(
-      //         onPressed: () {
-      //           isVideo = false;
-      //           _onImageButtonPressed(ImageSource.camera);
-      //         },
-      //         heroTag: 'image1',
-      //         tooltip: 'Take a Photo',
-      //         child: const Icon(Icons.camera_alt),
-      //       ),
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.only(top: 16.0),
-      //       child: FloatingActionButton(
-      //         backgroundColor: Colors.red,
-      //         onPressed: () {
-      //           isVideo = true;
-      //           _onImageButtonPressed(ImageSource.gallery);
-      //         },
-      //         heroTag: 'video0',
-      //         tooltip: 'Pick Video from gallery',
-      //         child: const Icon(Icons.video_library),
-      //       ),
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.only(top: 16.0),
-      //       child: FloatingActionButton(
-      //         backgroundColor: Colors.red,
-      //         onPressed: () {
-                // isVideo = true;
-                // _onImageButtonPressed(ImageSource.camera);
-      //         },
-      //         heroTag: 'video1',
-      //         tooltip: 'Take a Video',
-      //         child: const Icon(Icons.videocam),
-      //       ),
-      //     ),
-      //   ],
-      // ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  onPressed: () {
+                    isVideo = true;
+                    action();
+                  // _onImageButtonPressed(ImageSource.camera);
+                  },
+                  heroTag: 'video',
+                  tooltip: 'Pick Video from camera',
+                  child: Image.asset("assets/images/video.png", width: 30),
+                ),
+              ),
+          ],
+        )
+        // Column(
+        //   mainAxisAlignment: MainAxisAlignment.end,
+        //   children: <Widget>[
+            // FloatingActionButton(
+            //   onPressed: () {
+            //     isVideo = false;
+            //     _onImageButtonPressed(ImageSource.gallery);
+            //   },
+            //   heroTag: 'image0',
+            //   tooltip: 'Pick Image from gallery',
+            //   child: const Icon(Icons.photo_library),
+            // ),
+        //     Padding(
+        //       padding: const EdgeInsets.only(top: 16.0),
+        //       child: FloatingActionButton(
+        //         onPressed: () {
+        //           isVideo = false;
+        //           _onImageButtonPressed(ImageSource.camera);
+        //         },
+        //         heroTag: 'image1',
+        //         tooltip: 'Take a Photo',
+        //         child: const Icon(Icons.camera_alt),
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.only(top: 16.0),
+        //       child: FloatingActionButton(
+        //         backgroundColor: Colors.red,
+        //         onPressed: () {
+        //           isVideo = true;
+        //           _onImageButtonPressed(ImageSource.gallery);
+        //         },
+        //         heroTag: 'video0',
+        //         tooltip: 'Pick Video from gallery',
+        //         child: const Icon(Icons.video_library),
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.only(top: 16.0),
+        //       child: FloatingActionButton(
+        //         backgroundColor: Colors.red,
+        //         onPressed: () {
+                  // isVideo = true;
+                  // _onImageButtonPressed(ImageSource.camera);
+        //         },
+        //         heroTag: 'video1',
+        //         tooltip: 'Take a Video',
+        //         child: const Icon(Icons.videocam),
+        //       ),
+        //     ),
+        //   ],
+        // ),
+      ),
     );
   }
 
