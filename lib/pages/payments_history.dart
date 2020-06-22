@@ -119,7 +119,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
 
   Container _paymentAmount(String amount,String status) {
     return Container(
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Text(
             "$amount KZT",
@@ -129,14 +130,13 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(width: 10,),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: Container(
-                height: 10,
-                width: 10,
-                color: status == '4' ?  Color(0xFF77E7B1) : status == '3' ?  Colors.orange :  status == '2' ? Color(0xFFEB818E) : (status == '1') || (status == '0') ? Colors.yellow : Colors.grey),
-          ),
+             ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Container(
+                    height: 20,
+                    width: 20,
+                    color: status == '4' ?  Colors.green : status == '3' ?  Colors.orange :  status == '2' ? Colors.red : (status == '1') || (status == '0') ? Colors.yellow : Colors.grey),
+              ),
         ],
       ),
     );

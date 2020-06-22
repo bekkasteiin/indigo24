@@ -160,6 +160,10 @@ class _WalletTabState extends State<WalletTab> {
     _amount = _realAmount;
     api.getExchangeRate().then((v) {
       print(v);
+      print(v);
+      print(v);
+      print(v);
+      print(v);
       if(v['message'] == 'Not authenticated' && v['success'].toString() == 'false')
       {
         logOut(context);
@@ -375,7 +379,7 @@ class _WalletTabState extends State<WalletTab> {
         children: <Widget>[
           Text('${localization.balanceInBlock}', style: fS18w200(c: 'ffffff')),
           Container(height: 5),
-          Text('${_blockedAmount.toStringAsFixed(2)} ₸',
+          Text('${_blockedAmount.toStringAsFixed(2)} ${String.fromCharCodes(Runes('\u20B8'))}',
               style: fS26w200(c: 'ffffff')),
         ],
       ),
@@ -493,7 +497,7 @@ class _WalletTabState extends State<WalletTab> {
               ),
             ),
             child: Text(
-              '₸',
+              '${String.fromCharCodes(Runes('\u20B8'))}',
               style: fS20(c: 'FFFFFF'),
             ),
           ),
@@ -501,7 +505,7 @@ class _WalletTabState extends State<WalletTab> {
             setState(() {
               _amount = _realAmount / _tengeCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
-              _symbol = '₸';
+              _symbol = '${String.fromCharCodes(Runes('\u20B8'))}';
             });
           },
         ),
@@ -520,7 +524,7 @@ class _WalletTabState extends State<WalletTab> {
               ),
             ),
             child: Text(
-              '₽',
+              '${String.fromCharCodes(Runes('\u20BD'))}',
               style: fS20(c: 'FFFFFF'),
             ),
           ),
@@ -528,7 +532,7 @@ class _WalletTabState extends State<WalletTab> {
             setState(() {
               _amount = _realAmount / _rubleCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
-              _symbol = '₽';
+              _symbol = '${String.fromCharCodes(Runes('\u20BD'))}';
             });
           },
         ),
@@ -547,7 +551,7 @@ class _WalletTabState extends State<WalletTab> {
               ),
             ),
             child: Text(
-              '\$',
+              '${String.fromCharCodes(Runes('\u0024'))}',
               style: fS20(c: 'FFFFFF'),
             ),
           ),
@@ -555,7 +559,7 @@ class _WalletTabState extends State<WalletTab> {
             setState(() {
               _amount = _realAmount / _dollarCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
-              _symbol = '\$';
+              _symbol = '${String.fromCharCodes(Runes('\u0024'))}';
             });
           },
         ),
@@ -574,7 +578,7 @@ class _WalletTabState extends State<WalletTab> {
               ),
             ),
             child: Text(
-              '€',
+              '${String.fromCharCodes(Runes('\u20AC'))}',
               style: fS20(c: 'FFFFFF'),
             ),
           ),
@@ -582,7 +586,7 @@ class _WalletTabState extends State<WalletTab> {
             setState(() {
               _amount = _realAmount / _euroCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
-              _symbol = '€';
+              _symbol = '${String.fromCharCodes(Runes('\u20AC'))}';
             });
           },
         ),

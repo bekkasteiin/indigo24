@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/configs.dart' as configs;
+import 'package:indigo24/widgets/progress_bar.dart';
 
 import 'helper.dart';
 
@@ -617,8 +618,12 @@ class Api {
       }
     }
   }
+  ProgressBar _sendingMsgProgressBar;
 
-  addTape(_path, title, description) async {
+  addTape(_path, title, description, context) async {
+    _sendingMsgProgressBar = ProgressBar();
+    var p;
+
     try {
       FormData formData = FormData.fromMap({
         "customerID": "${user.id}",
@@ -629,17 +634,20 @@ class Api {
       });
 
       print("Adding tape with data ${formData.files[0].value.length}\n    FIEDLS ${formData.fields}");
+      
+      _sendingMsgProgressBar.show(context, "$p");
 
       response = await dio.post("/tape/add", 
         data: formData,
         onSendProgress: (int sent, int total) {
           String percent = (sent/total*100).toStringAsFixed(2);
           print("$percent%");
+
         },
       );
 
       print("Getting response from TAPE upload ${response.data}");
-
+      _sendingMsgProgressBar.hide();
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -649,10 +657,12 @@ class Api {
         print(e.message);
       }
       print("Error when upload TAPE: ${e.response.data}");
+      _sendingMsgProgressBar.hide();
       return e.response.data;
     }
   }
 
+  
   uploadAvatar(_path) async {
     try {
       FormData formData = FormData.fromMap({

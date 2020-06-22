@@ -905,6 +905,7 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {});
       });
     } else {
+      print("No microphone permission");
       statusText = "No microphone permission";
     }
     setState(() {});

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:heic_to_jpg/heic_to_jpg.dart';
 import 'package:image_picker_flutter/src/image/asset_data_image.dart';
 import 'package:image_picker_flutter/src/image_picker.dart';
 import 'package:image_picker_flutter/src/model/asset_data.dart';
@@ -136,7 +137,13 @@ class SingleImagePickerPageState extends State<SingleImagePickerPage> {
           onPressed: () {
             LoadingDialog.showLoadingDialog(context);
             Utils.convertSingleData(data).whenComplete(() {
-              singleFile = data;
+              initPlatformState(data.path).then(
+                (value) {
+                  singleFile = value;
+                }
+              );
+              
+              print("Single file picker: ${singleFile.toString()}");
               Navigator.of(context)..pop()..pop(data);
             });
           },
@@ -145,6 +152,11 @@ class SingleImagePickerPageState extends State<SingleImagePickerPage> {
         iconVideo(data),
       ],
     );
+  }
+
+  Future<String> initPlatformState(path) async {
+    String tmp  = await HeicToJpg.convert(path);
+    return tmp;
   }
 
   Widget iconVideo(AssetData data) {

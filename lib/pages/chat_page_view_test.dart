@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/full_photo.dart';
+import 'package:indigo24/pages/tapes.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/widgets/player.dart';
@@ -281,7 +282,12 @@ class SendedMessageWidget extends StatelessWidget {
                   new AudioMessage("$mediaUrl$media")
                   :
                   (type=="4")?
-                  new VideoMessage("$mediaUrl$media")
+                  Container(
+                    width: MediaQuery.of(context).size.width*0.7,
+                    height: MediaQuery.of(context).size.width*0.7,
+                    child: new ChewieVideo(controller: VideoPlayerController.network("$mediaUrl$media"), 
+                      size: MediaQuery.of(context).size.width*0.7,),
+                  )
                   :
                   Text(
                     content,

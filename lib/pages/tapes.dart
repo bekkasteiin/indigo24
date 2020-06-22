@@ -1,3 +1,4 @@
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/add_tape.dart';
@@ -5,6 +6,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:video_player/video_player.dart';
 import '../main.dart';
 import 'tape.dart';
 
@@ -20,6 +22,10 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
   List result;
   ScrollController controller;
   int tapePage = 1;
+
+  VideoPlayerController _videoPlayerController;
+  ChewieController _chewieController;
+  
   @override
   void initState() {
     controller = new ScrollController()..addListener(_scrollListener);
@@ -44,6 +50,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
         logOut(context);
         return true;
       } else{
+        print(tapes);
         return setTapes(tapes);
       }
     });
@@ -92,6 +99,9 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
   @override
   void dispose() {
     super.dispose();
+    print("dispose TAPES PAGES");
+    _videoPlayerController.dispose();
+    _chewieController.dispose();
     controller.removeListener(_scrollListener);
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
@@ -124,6 +134,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
               ),
             ),
             onPressed: () {
+              
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -256,7 +267,13 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                                     child: Container(
                                       height: MediaQuery.of(context).size.width,
                                       child: Center(
-                                        child: Image(
+                                        child: 
+                                        (result[index]['media'].toString().endsWith("MOV") || result[index]['media'].toString().endsWith("mp4") || result[index]['media'].toString().endsWith("mpeg"))? 
+                                        new ChewieVideo(
+                                          controller: VideoPlayerController.network("https://indigo24.xyz/uploads/tapes/${result[index]['media']}"),
+                                        )
+                                        :
+                                        Image(
                                           image: NetworkImage(
                                             "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
                                           ),
@@ -406,4 +423,102 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class ChewieVideo extends StatefulWidget {
+  final VideoPlayerController controller;
+  final size;
+  ChewieVideo({this.controller, this.size});
+
+  @override
+  _ChewieVideoState createState() => _ChewieVideoState();
+}
+
+class _ChewieVideoState extends State<ChewieVideo> {
+  VideoPlayerController controller;
+  ChewieController _chewieController;
+  
+  Future<void> _future;
+
+  Future<void> initVideoPlayer() async {
+    await controller.initialize();
+    setState(() {
+      print(controller.value.aspectRatio);
+      _chewieController = ChewieController(
+        videoPlayerController: controller,     
+        aspectRatio: controller.value.aspectRatio,
+        autoInitialize: true,
+        autoPlay: false,
+        looping: true,   
+        placeholder: buildPlaceholderImage(),   
+        errorBuilder: (context, errorMessage) {
+          return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                    errorMessage,
+                    style: TextStyle(color: Colors.white),
+                ),
+              ),
+          );
+        },
+      );
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // controller = VideoPlayerController.network(widget.videoUrl);
+    controller = widget.controller;
+    _future = initVideoPlayer();
+    // setController();
+  }
+  setController() async {
+    print(controller.value);
+  }
+
+  
+  @override
+  void deactivate() {
+    super.deactivate();
+    print("deactive");
+    controller.dispose();
+    _chewieController.dispose();
+  }
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    print("CHEWIE dispose");
+    super.dispose();
+    controller.dispose();
+    _chewieController.dispose();
+    // _chewieController.videoPlayerController.dispose();
+  }
+  
+  buildPlaceholderImage(){
+    return Center(
+       child: CircularProgressIndicator(),
+    );
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _future,
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.waiting) return buildPlaceholderImage();
+
+        return Chewie(
+          controller: _chewieController,
+        );
+      }
+      
+    );
+  }
 }

@@ -54,13 +54,30 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  Text _transferAmount(String type, String amount) {
-    return Text(
-      type == 'in' ? '+$amount KZT' : "-$amount KZT",
-      style: TextStyle(
-        fontSize: 18,
-        color: Color(0xFF001D52),
-      ),
+  Widget _transferAmount(String type, String amount) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(),
+        Text(
+          type == 'in' ? '+$amount KZT' : "-$amount KZT",
+          style: TextStyle(
+            fontSize: 18,
+            color: Color(0xFF001D52),
+          ),
+        ),
+        SizedBox(height: 5,),
+        Container(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(25),
+            child: Container(
+                height: 15,
+                width: 15,
+                color: type == 'in' ? Colors.green : Colors.red),
+          ),
+        ),
+      ],
     );
   }
 
@@ -104,28 +121,21 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   Widget _historyBuilder(BuildContext context, String logo, String amount,
       String title, String phone, String type, String date, int index) {
     return Container(
-      height: 90.6,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
-          SizedBox(height: 20),
-          Row(
-            children: <Widget>[
-              SizedBox(width: 20),
-              _transferLogo(logo),
-              _transferInfo(title, date, phone),
-              _transferAmount(type, amount),
-              SizedBox(width: 10),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: Container(
-                    height: 10,
-                    width: 10,
-                    color:
-                        type == 'in' ? Color(0xFF77E7B1) : Color(0xFFEB818E)),
-              ),
-              SizedBox(width: 20),
-            ],
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(width: 20),
+                _transferLogo(logo),
+                _transferInfo(title, date, phone),
+                _transferAmount(type, amount),
+                SizedBox(width: 20),
+              ],
+            ),
           ),
           Container(
             margin: EdgeInsets.only(top: 20, right: 20, left: 20),
@@ -174,6 +184,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         onLoading: _onLoading,
         child: ListView.builder(
           itemCount: snapshot != null ? snapshot.length : 0,
+          padding: EdgeInsets.only(top: 20),
           itemBuilder: (BuildContext context, int index) {
             return Container(
               padding: const EdgeInsets.only(top: 5),

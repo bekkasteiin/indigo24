@@ -35,7 +35,7 @@ class _AddTapePageState extends State<AddTapePage> {
   final picker = ImagePicker();
   PickedFile _myFile;
   bool isNotPicked = true;
-
+  
   Future<void> _playVideo(File file) async {
     if (file != null && mounted) {
       await _disposeVideoController();
@@ -47,8 +47,11 @@ class _AddTapePageState extends State<AddTapePage> {
       setState(() {});
     }
   }
-  
-
+    
+  @override
+  void initState() {
+    super.initState();
+  }
   void _onImageButtonPressed(ImageSource source) async {
     if (_controller != null) {
       await _controller.setVolume(0.0);
@@ -194,7 +197,8 @@ class _AddTapePageState extends State<AddTapePage> {
 
   Future addTape(context) async {
     print("MY current file ${_currentFile.path}");
-    api.addTape(_currentFile.path, titleController.text, descriptionController.text).then((r) {
+    api.addTape(_currentFile.path, titleController.text, descriptionController.text, context
+    ).then((r) {
       if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
         logOut(context);
         return r;
@@ -255,17 +259,25 @@ class _AddTapePageState extends State<AddTapePage> {
             ),
           ),
            onPressed: () async {
-             var json = singleFile.toJson();
-             print(json['path']);
-             setState(() {
-               _currentFile = File(json['path']);
-               isNotPicked = false;
-             });
+             print(singleFile);
+
+             if(singleFile != null){
+              // var json = singleFile.toJson();
+              // print(json['path']);
+              setState(() {
+                // _currentFile = File(json['path']);
+                _currentFile = File(singleFile);
+                singleFile = null;
+                isNotPicked = false;
+              });
+             }
+             print("Pressed with $_currentFile");
               if(descriptionController.text == '' || titleController.text == ''){
                 showAlertDialog(context, "Заполните все поля");
               } else if(_currentFile == null){
                 showAlertDialog(context, "Выберите файл");
               } else {
+                print("Current file $_currentFile");
                 await addTape(context);
               }
               
@@ -455,6 +467,7 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
   @override
   void initState() {
     super.initState();
+    
     controller.addListener(_onVideoControllerUpdate);
   }
 
