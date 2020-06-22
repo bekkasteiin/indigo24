@@ -27,6 +27,7 @@ import 'services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/pages/chat_contacts.dart';
 
+RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 String formatPhone(String phone) {
     String r = phone.replaceAll(" ", "");
@@ -123,6 +124,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Indigo24',
+        navigatorObservers: [routeObserver],
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -260,7 +262,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
       var cmd = e.json["cmd"];
-      // print(e.json);
+      print(e.json);
       switch (cmd) {
         case 'message:create':
           

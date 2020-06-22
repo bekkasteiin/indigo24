@@ -434,7 +434,7 @@ class ChewieVideo extends StatefulWidget {
   _ChewieVideoState createState() => _ChewieVideoState();
 }
 
-class _ChewieVideoState extends State<ChewieVideo> {
+class _ChewieVideoState extends State<ChewieVideo> with RouteAware {
   VideoPlayerController controller;
   ChewieController _chewieController;
   
@@ -469,15 +469,13 @@ class _ChewieVideoState extends State<ChewieVideo> {
   @override
   void initState() {
     super.initState();
-    // controller = VideoPlayerController.network(widget.videoUrl);
-    controller = widget.controller;
-    _future = initVideoPlayer();
-    // setController();
-  }
-  setController() async {
-    print(controller.value);
+    setControllers();
   }
 
+  setControllers(){
+    controller = widget.controller;
+    _future = initVideoPlayer();
+  }
   
   @override
   void deactivate() {
@@ -486,14 +484,16 @@ class _ChewieVideoState extends State<ChewieVideo> {
     if(controller!=null && _chewieController != null){
       controller.dispose();
       _chewieController.dispose();
+      _future = null;
     }
   }
+
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
+    routeObserver.subscribe(this, ModalRoute.of(context));
     super.didChangeDependencies();
   }
-
+  
   @override
   void dispose() {
     print("CHEWIE dispose");
@@ -505,6 +505,40 @@ class _ChewieVideoState extends State<ChewieVideo> {
     // _chewieController.videoPlayerController.dispose();
   }
   
+  @override
+  void didPop() {
+    print("didPop");
+    super.didPop();
+  }
+  @override
+  void didPopNext() {
+    print("didPopNext");
+    // if(controller!=null && _chewieController != null){
+    //   _future = null;
+    //   controller.dispose();
+    //   _chewieController.dispose();
+    // } else if(controller == null && _chewieController == null){
+    //   setControllers();
+    // } 
+    super.didPopNext();
+  }
+
+  @override
+  void didPush() { 
+    print("didPush");
+    super.didPush();
+  }
+
+  @override
+  void didPushNext() {
+    print("didPushNext");
+    if(controller!=null && _chewieController != null){
+      controller.pause();
+      // _chewieController.dispose();
+    }
+    super.didPushNext();
+  }
+
   buildPlaceholderImage(){
     return Center(
        child: CircularProgressIndicator(),
@@ -517,7 +551,7 @@ class _ChewieVideoState extends State<ChewieVideo> {
       future: _future,
       builder: (context, snapshot) {
         if(snapshot.connectionState == ConnectionState.waiting) return buildPlaceholderImage();
-
+        if(_chewieController==null) return buildPlaceholderImage();
         return Chewie(
           controller: _chewieController,
         );

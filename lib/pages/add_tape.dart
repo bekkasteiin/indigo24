@@ -52,6 +52,38 @@ class _AddTapePageState extends State<AddTapePage> {
   void initState() {
     super.initState();
   }
+
+  action(){
+    final act = CupertinoActionSheet(
+    title: Text('Выберите вариант'),
+    // message: Text('Which option?'),
+    actions: <Widget>[
+      CupertinoActionSheetAction(
+        child: Text('Камера'),
+        onPressed: () {
+          _onImageButtonPressed(ImageSource.camera);
+          Navigator.pop(context);
+        },
+      ),
+      CupertinoActionSheetAction(
+        child: Text('Галерея'),
+        onPressed: () {
+          _onImageButtonPressed(ImageSource.gallery);
+          Navigator.pop(context);
+        },
+      )
+    ],
+    cancelButton: CupertinoActionSheetAction(
+      child: Text('Назад'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ));
+    showCupertinoModalPopup(
+    context: context,
+    builder: (BuildContext context) => act);
+  }
+  
   void _onImageButtonPressed(ImageSource source) async {
     if (_controller != null) {
       await _controller.setVolume(0.0);
@@ -343,7 +375,8 @@ class _AddTapePageState extends State<AddTapePage> {
               backgroundColor: Colors.white,
               onPressed: () {
                 isVideo = false;
-                _settingModalBottomSheet(context);
+                action();
+                // _settingModalBottomSheet(context);
                 // MY COMMENT
                 // _onImageButtonPressed(ImageSource.camera);
               },
@@ -358,7 +391,8 @@ class _AddTapePageState extends State<AddTapePage> {
                 backgroundColor: Colors.white,
                 onPressed: () {
                   isVideo = true;
-                _onImageButtonPressed(ImageSource.camera);
+                  action();
+                // _onImageButtonPressed(ImageSource.camera);
                 },
                 heroTag: 'video',
                 tooltip: 'Pick Video from camera',

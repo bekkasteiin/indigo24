@@ -196,6 +196,20 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  deleteFromAll(chatId, messageId){
+    var data = json.encode({
+      "cmd": "message:deleted:all",
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "chat_id": chatId,
+        "message_id": messageId,
+      }
+    });
+    print('message deleted from all $data');
+    channel.sink.add(data);
+  }
+
   cabinetCreate(ids, type, {title}) {
     var data = json.encode({
       "cmd": "chat:create",

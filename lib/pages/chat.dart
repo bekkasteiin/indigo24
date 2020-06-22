@@ -880,7 +880,7 @@ class _ChatPageState extends State<ChatPage> {
       return Devider(m);
     return '${m['user_id']}' == '${user.id}' ? Sended(m)
     :
-    Received(m);
+    Received(m, chatId: widget.chatID,);
   }
 
   Future<bool> checkPermission() async {
@@ -1049,7 +1049,8 @@ class Devider extends StatelessWidget {
 
 class Received extends StatelessWidget {
   final m;
-  Received(this.m);
+  final chatId;
+  Received(this.m, {this.chatId});
   @override
   Widget build(BuildContext context) { 
     
@@ -1057,19 +1058,46 @@ class Received extends StatelessWidget {
 
     return Align(
         alignment: Alignment(-1, 0),
-        child: ReceivedMessageWidget(
-          content: '${m['text']}',
-          time: time('${m['time']}'),
-          name: '${m['user_name']}',
-          image: (m["avatar"] == null || m["avatar"] == "")
-              ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
-              : m["avatar_url"] == null
-                  ? "https://indigo24.xyz/uploads/avatars/${m["avatar"]}"
-                  : "${m["avatar_url"]}${m["avatar"]}",
-          type: "${m["type"]}",
-          media: (a==false || a==null)? null : a[0]['filename'],
-          rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
-          mediaUrl: (a==false || a==null)? null : m['attachment_url'],
+        child: Container(
+          child: CupertinoContextMenu(
+            actions: [
+                CupertinoContextMenuAction(
+                  child: const Text('Удалить', style: TextStyle(color:Colors.red),),
+                  onPressed: () {
+                    ChatRoom.shared.deleteFromAll(chatId, m['id']);
+                    Navigator.pop(context);
+                  },
+                ),
+                CupertinoContextMenuAction(
+                  child: const Text('Редактировать'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                CupertinoContextMenuAction(
+                  child: const Text('Ответить'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+              child: Material(
+                color: Colors.transparent,
+            child: ReceivedMessageWidget(
+              content: '${m['text']}',
+              time: time('${m['time']}'),
+              name: '${m['user_name']}',
+              image: (m["avatar"] == null || m["avatar"] == "")
+                  ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+                  : m["avatar_url"] == null
+                      ? "https://indigo24.xyz/uploads/avatars/${m["avatar"]}"
+                      : "${m["avatar_url"]}${m["avatar"]}",
+              type: "${m["type"]}",
+              media: (a==false || a==null)? null : a[0]['filename'],
+              rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
+              mediaUrl: (a==false || a==null)? null : m['attachment_url'],
+            ),
+          ),)
         ));
   }
 
@@ -1102,12 +1130,25 @@ class Sended extends StatelessWidget {
           
           child: CupertinoContextMenu(
             actions: [
-              CupertinoContextMenuAction(
-                  child: const Text('Тест'),
+                CupertinoContextMenuAction(
+                  child: const Text('Удалить', style: TextStyle(color:Colors.red),),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
+                CupertinoContextMenuAction(
+                  child: const Text('Редактировать'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                CupertinoContextMenuAction(
+                  child: const Text('Ответить'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                
             ],
             child: Material(
               color: Colors.transparent,

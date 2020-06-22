@@ -250,7 +250,11 @@ class _ChatsListPageState extends State<ChatsListPage>
                                 fontWeight: FontWeight.w400),
                           ),
                           subtitle: Text(
-                            myList[i]["last_message"].length != 0 ? myList[i]["last_message"]['text'].length != 0 ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"  : "" : "",
+                            myList[i]["last_message"].length != 0 ? 
+                            myList[i]["last_message"]['text'].length != 0 ? 
+                            "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"  
+                            : myList[i]["last_message"]['message_for_type']!=null?
+                            myList[i]["last_message"]['message_for_type']:  "" : "",
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(color: Color(0xFF5E5E5E)),

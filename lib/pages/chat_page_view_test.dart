@@ -387,6 +387,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                     color: Color(0xFFFFFFFF),
                     child: Stack(children: <Widget>[
                       Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
@@ -412,7 +413,12 @@ class ReceivedMessageWidget extends StatelessWidget {
                             new AudioMessage("$mediaUrl$media")
                             :
                             (type=="4")?
-                            new VideoMessage("$mediaUrl$media")
+                            Container(
+                              width: MediaQuery.of(context).size.width*0.7,
+                              height: MediaQuery.of(context).size.width*0.7,
+                              child: new ChewieVideo(controller: VideoPlayerController.network("$mediaUrl$media"), 
+                                size: MediaQuery.of(context).size.width*0.7,),
+                            )
                             :
                             Text(
                               content,
