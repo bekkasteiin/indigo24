@@ -60,6 +60,7 @@ var settings = 'Settings';
 var enterPhone = 'Enter phone';
 var enterSmsCode = 'Enter SMS code';
 var enterPassword = 'Enter password';
+var replyPin = 'Repeat pin';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russian", "code": "ru"},
@@ -127,6 +128,7 @@ setLanguage(code) {
       enterPhone = 'Enter phone';
       enterSmsCode = 'Enter SMS code';
       enterPassword = 'Enter password';
+      replyPin = 'Repeat pin';
       languages = [
         {"title": "English", "code": "en"},
         {"title": "Russian", "code": "ru"},
@@ -190,6 +192,7 @@ setLanguage(code) {
       enterPhone = 'Введите номер телефона';
       enterSmsCode = 'Введите SMS код';
       enterPassword = 'Введите пароль';
+      replyPin = 'Повторите PIN';
       languages = [
         {"title": "Английский", "code": "en"},
         {"title": "Русский", "code": "ru"},
@@ -254,6 +257,7 @@ setLanguage(code) {
       enterPhone = 'Телефон нөмірін енгізіңіз';
       enterSmsCode = 'SMS кодын енгізіңіз';
       enterPassword = 'Құпия сөзді енгізіңіз';
+      replyPin = 'PIN қайталаңыз';
       languages = [
         {"title": "Ағылшын тілі", "code": "en"},
         {"title": "Орыс тілі", "code": "ru"},

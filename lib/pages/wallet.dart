@@ -57,12 +57,8 @@ class _WalletTabState extends State<WalletTab> {
         PageRouteBuilder(
           opaque: opaque,
           pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+            title: title,
             withPin: withPin,
-            title: Text(
-              '$title',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
-            ),
             passwordEnteredCallback: _onPasscodeEntered,
             cancelButton: cancelButton,
             deleteButton: Text(

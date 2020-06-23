@@ -237,21 +237,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: <Widget>[
           Text("${localization.email}"),
           SizedBox(height: 5),
-          InkWell(
-            onTap: (){},
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('${user.email}'),
-                InkWell(
-                  onTap: (){
-                    print("pencil");
-                  },
-                  child: Image.asset("assets/images/pencil.png", width:20)
-                )
-              ],
-            ),
-          ),
+          Text('${user.email}'),
           // TextField(
           //   decoration: null,
           //   controller: emailController,

@@ -114,6 +114,9 @@ class _ChatPageState extends State<ChatPage> {
   initState() {
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
+    print('______________________________');
+    print('this is chats user online check ${widget.userIds}');
+    print('______________________________');
     ChatRoom.shared.checkUserOnline(widget.userIds);
     listen();
   }

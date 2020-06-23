@@ -457,7 +457,7 @@ logOut(BuildContext context) async {
   );
   CupertinoAlertDialog alert = CupertinoAlertDialog(
     title: Text("Ошибка"),
-    content: Text('test'),
+    content: Text('Сеанс завершен'),
     actions: [
       okButton,
     ],

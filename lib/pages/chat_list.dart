@@ -99,6 +99,8 @@ class _ChatsListPageState extends State<ChatsListPage>
         actions: <Widget>[
           IconButton(
             icon: Container(
+              height: 20,
+              width: 20,
               child: Image(
                 image: AssetImage(
                   'assets/images/contacts.png',
@@ -134,6 +136,15 @@ class _ChatsListPageState extends State<ChatsListPage>
                 children: <Widget>[
                 Text('${localization.createGroup}', style: TextStyle(color: Color(0xFF001D52)),),
                 SizedBox(width: 10,),
+                Container(
+                    height: 10,
+                    width: 10,
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/add.png',
+                      ),
+                  ),
+                ),
                 Container(
                     height: 30,
                     width: 20,
