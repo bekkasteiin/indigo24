@@ -908,11 +908,11 @@ class _ChatPageState extends State<ChatPage> {
  
   Widget message(m) {
     // return DeviderMessageWidget(date: 'test');
-    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7')
+    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7' || '${m['type']}' == '8')
       return Devider(m);
     return '${m['user_id']}' == '${user.id}' ? Sended(m)
     :
-    Received(m, chatId: widget.chatID,);
+    Received(m, chatId: widget.chatID);
   }
 
   Future<bool> checkPermission() async {

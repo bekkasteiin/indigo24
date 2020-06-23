@@ -273,7 +273,7 @@ class SendedMessageWidget extends StatelessWidget {
                   Text(content, style: TextStyle(fontSize: 24))
                   :
                   (type=="1")?
-                  ImageMessage(mediaUrl+rMedia, "$mediaUrl$media")
+                  ImageMessage("$mediaUrl$rMedia", "$mediaUrl$media")
                   :
                   (type=="2")?
                   FileMessage(url:"$mediaUrl$media")

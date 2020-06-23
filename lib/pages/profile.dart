@@ -1,15 +1,20 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/intro.dart';
+import 'package:indigo24/pages/photo.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/pages/settings/settings_notifications_main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:platform_action_sheet/platform_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -36,10 +41,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
   var api = Api();
 
   Future getImage(ImageSource imageSource) async {
-    final pickedFile = await picker.getImage(source: imageSource);
+    final pickedFile = await picker.getImage(
+      source: imageSource,  
+    );
+    final dir = await getTemporaryDirectory();
+
+
+    final targetPath = dir.absolute.path + "/temp.jpg";
+
     if (pickedFile != null) {
+      File compressedImage = await FlutterImageCompress.compressAndGetFile(
+        pickedFile.path, 
+        targetPath,
+      );
+      File test = File(pickedFile.path);
+      compressedImage.length().then((value) => print(value));
+      print("Picked file ${test.lengthSync()}");
       setState(() {
-        _image = File(pickedFile.path);
+        _image = compressedImage;
+        // _image = File(pickedFile.path);
       });
       if(_image != null){
         api.uploadAvatar(_image.path).then((r) async {
@@ -54,6 +74,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 user.avatar = r["fileName"];
               });
             } else {
+              showAlertDialog(context, "${r["message"]}");
               print("error");
             }
             return r;
@@ -61,6 +82,28 @@ class _UserProfilePageState extends State<UserProfilePage> {
         });
       }
     }
+  }
+
+  showAlertDialog(BuildContext context, String message) {
+    Widget okButton = CupertinoDialogAction(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("Ошибка"),
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   Widget _buildCoverImage(Size screenSize) {
@@ -77,32 +120,76 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget _buildProfileImage() {
     return InkWell(
-      onTap: () => PlatformActionSheet().displaySheet(
-          context: context,
-          message: Text("Выберите опцию"),
-          actions: [
-            ActionSheetAction(
-              text: "Сфотографировать",
-              onPressed: () {
-                getImage(ImageSource.camera);
-                Navigator.pop(context);
-              },
-              hasArrow: true,
-            ),
-            ActionSheetAction(
-              text: "Выбрать из галереи",
-              onPressed: () {
-                getImage(ImageSource.gallery);
-                Navigator.pop(context);
-              },
-            ),
-            ActionSheetAction(
-              text: "Назад",
-              onPressed: () => Navigator.pop(context),
-              isCancel: true,
-              defaultAction: true,
-            )
-          ]),
+      onTap: () {
+        final act = CupertinoActionSheet(
+    title: Text('Выберите опцию'),
+    // message: Text('Which option?'),
+    actions: <Widget>[
+      CupertinoActionSheetAction(
+        child: Text('Посмотреть'),
+        onPressed: () {
+          print("посмотреть");
+          Navigator.pop(context);
+          Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullScreenWrapper(
+                            imageProvider: CachedNetworkImageProvider("${user.avatarUrl}${user.avatar}"),
+                            minScale: PhotoViewComputedScale.contained,
+                          )));
+        },
+      ),
+      CupertinoActionSheetAction(
+        child: Text('Камера'),
+        onPressed: () {
+          getImage(ImageSource.camera);
+          Navigator.pop(context);
+        },
+      ),
+      CupertinoActionSheetAction(
+        child: Text('Галерея'),
+        onPressed: () {
+          getImage(ImageSource.gallery);
+          Navigator.pop(context);
+        },
+      )
+    ],
+    cancelButton: CupertinoActionSheetAction(
+      child: Text('Назад'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ));
+    showCupertinoModalPopup(
+    context: context,
+    builder: (BuildContext context) => act);
+      },
+      // PlatformActionSheet().displaySheet(
+      //     context: context,
+      //     message: Text("Выберите опцию"),
+      //     actions: [
+      //       ActionSheetAction(
+      //         text: "Сфотографировать",
+      //         onPressed: () {
+      //           getImage(ImageSource.camera);
+      //           Navigator.pop(context);
+      //         },
+      //         hasArrow: true,
+      //       ),
+      //       ActionSheetAction(
+      //         text: "Выбрать из галереи",
+      //         onPressed: () {
+      //           getImage(ImageSource.gallery);
+      //           Navigator.pop(context);
+      //         },
+      //       ),
+      //       ActionSheetAction(
+      //         text: "Назад",
+      //         onPressed: () => Navigator.pop(context),
+      //         isCancel: true,
+      //         defaultAction: true,
+      //       )
+      //     ]),
       child: Center(
         child: Container(
           width: 100.0,
@@ -110,7 +197,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           decoration: BoxDecoration(
             image: DecorationImage(
               image: CachedNetworkImageProvider(
-                  'https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+                  'https://indigo24.xyz/uploads/avatars/${user.avatar.toString().replaceAll("AxB", "200x200")}'),
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(80.0),
