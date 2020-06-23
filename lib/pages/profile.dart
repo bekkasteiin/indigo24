@@ -406,35 +406,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     Column(
                       children: <Widget>[
                         Container(
-                          padding: EdgeInsets.only(bottom:10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                    onTap: () async {
-                                      if (await canLaunch(
-                                          'https://indigo24.userecho.com/')) {
-                                        await launch(
-                                          'https://indigo24.userecho.com/',
-                                          forceSafariVC: false,
-                                          forceWebView: false,
-                                          headers: <String, String>{
-                                            'my_header_key': 'my_header_value'
-                                          },
-                                        );
-                                      } else {
-                                        throw 'Could not launch https://indigo24.userecho.com/';
-                                      }
-                                    },
-                                    child: Ink(
-                                      child: Text("${localization.support}",
-                                          style: TextStyle(color: Colors.grey)),
-                                    )),
-                              ),
-                              SizedBox(width: 10),
-                            ],
+                          padding: EdgeInsets.only(bottom: 30),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                                onTap: () async {
+                                  if (await canLaunch(
+                                      'https://indigo24.userecho.com/')) {
+                                    await launch(
+                                      'https://indigo24.userecho.com/',
+                                      forceSafariVC: false,
+                                      forceWebView: false,
+                                      headers: <String, String>{
+                                        'my_header_key': 'my_header_value'
+                                      },
+                                    );
+                                  } else {
+                                    throw 'Could not launch https://indigo24.userecho.com/';
+                                  }
+                                },
+                                child: Ink(
+                                  child: Container(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text("${localization.support}",
+                                        style: TextStyle(color: Colors.grey)),
+                                  ),
+                                )),
                           ),
                         ),
                         Container(

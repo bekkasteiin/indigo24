@@ -76,6 +76,7 @@ class _TransferPageState extends State<TransferPage> {
                       ),
                       Positioned(
                         child: AppBar(
+                          centerTitle: true,
                           title: Text("${localization.toIndigo24Client}"),
                           leading: IconButton(
                             icon: Container(

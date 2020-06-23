@@ -156,12 +156,14 @@ class _ChatPageState extends State<ChatPage> {
         case "chat:get":
           if (page == 1) {
             setState(() {
+              print(e.json['data']);
               page += 1;
               myList = e.json['data'].toList();
               listMessages = e.json['data'].toList();
             });
           } else {
             print('____________________________________________________________$page');
+            print(e.json['data']);
             setState(() {
               page += 1;
               myList.addAll(e.json['data'].toList());
@@ -622,6 +624,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         iconTheme: IconThemeData(
           color: Colors.black,
         ),
@@ -639,10 +642,7 @@ class _ChatPageState extends State<ChatPage> {
           },
         ),
         title: InkWell(
-          child: Wrap(
-            direction: Axis.vertical,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            alignment: WrapAlignment.center,
+          child: Column(
             children: <Widget>[
               Text(
                 widget.name.length != 0
@@ -650,7 +650,6 @@ class _ChatPageState extends State<ChatPage> {
                     : "",
                 style: TextStyle(
                     color: Color(0xFF001D52), fontWeight: FontWeight.w400),
-                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               isSomeoneTyping?
@@ -792,7 +791,7 @@ class _ChatPageState extends State<ChatPage> {
                     child: Container(
                       child: myList.isEmpty
                           ? Center(
-                              child: Image.asset("assets/empty.gif")
+                              child: Image.asset("assets/empty.gif", height: MediaQuery.of(context).size.width / 2,)
                             )
                           : Column(
                             children: [

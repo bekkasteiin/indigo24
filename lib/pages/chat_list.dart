@@ -89,6 +89,7 @@ class _ChatsListPageState extends State<ChatsListPage>
     String string = '${localization.chats}';
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
         title: Text(
@@ -229,6 +230,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                         ListTile(
                           onTap: () {
                             // ChatRoom.shared.checkUserOnline(ids);
+                            print('get message');
                             ChatRoom.shared.getMessages(myList[i]['id']);
                             goToChat(
                               myList[i]['name'],
@@ -294,7 +296,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 70),
+                          margin: EdgeInsets.only(left: 80, right: 20),
                           height: 1,
                           color: Colors.grey.shade300
                         )

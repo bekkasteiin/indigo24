@@ -209,6 +209,7 @@ class _WalletTabState extends State<WalletTab> {
         extendBodyBehindAppBar: true,
         appBar: PreferredSize(
           child: AppBar(
+            centerTitle: true,
             brightness: Brightness.dark,
           ),
           preferredSize: Size.fromHeight(0.0),

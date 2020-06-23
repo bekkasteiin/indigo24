@@ -28,7 +28,7 @@ class PaymentsServicePage extends StatefulWidget {
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
   Api api = Api();
   
-  showAlertDialog(BuildContext context, String type, String message) {
+  showAlertDialog(BuildContext context, String type, String message, {bool withPop})  {
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
@@ -36,10 +36,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         // ? Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => PaymentHistoryPage()),(r) => false) 
         // : 
         SystemChannels.textInput.invokeMethod('TextInput.hide');
-        // Navigator.pop(context);
-        Navigator.pop(context);
-        // Navigator.pop(context);
-        // Navigator.pop(context);
+        if(withPop){
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        }
+
       },
     );
     showDialog(
@@ -175,6 +178,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           ),
                           Positioned(
                             child: AppBar(
+                              centerTitle: true,
                               title: Text("${widget.title}"),
                               leading: IconButton(
                                 icon: Container(
