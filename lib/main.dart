@@ -42,6 +42,7 @@ String formatPhone(String phone) {
   }
   getContacts() async {
     try {
+      int test = 0;
       contacts.clear();
       if (await Permission.contacts.request().isGranted) {
         Iterable<Contact> phonebook = await ContactsService.getContacts();
@@ -50,10 +51,12 @@ String formatPhone(String phone) {
             el.phones.forEach((phone) {
               if (!contacts.contains(formatPhone(phone.value))) {
                 phone.value = formatPhone(phone.value);
+                print('name: ${el.displayName } phone:${phone.value} index: $test');
                 contacts.add({
                   'name': el.displayName,
                   'phone': phone.value,
                 });
+                test++;
               }
             });
           }
@@ -478,6 +481,7 @@ class Developing extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
         title: Text(

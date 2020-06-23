@@ -15,6 +15,7 @@ class _SettingsNotificationsMainPageState extends State<SettingsNotificationsMai
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         iconTheme: IconThemeData(
           color: Colors.black,
         ),

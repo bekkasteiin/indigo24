@@ -13,14 +13,38 @@ class FullPhoto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(
-          'Медиафайлы',
-          style: TextStyle(color: Colors.white  , fontWeight: FontWeight.bold),
-        ),
+      appBar: AppBar(
+        brightness: Brightness.light,
+        backgroundColor: Colors.white,
         centerTitle: true,
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        leading: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
+              ),
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: InkWell(
+          child: Column(
+            children: <Widget>[
+              Text('Медиафайлы',
+                style: TextStyle(
+                    color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ]),
+        ),
       ),
-      body: new FullPhotoScreen(url: url),
+body: SafeArea(child: FullPhotoScreen(url: url)),
     );
   }
 }
@@ -94,7 +118,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
             flex: 1,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: listMessages.length,
+              itemCount: itemCounter(),
               itemBuilder: (context, i){
                 if(tempList[i]['type'].toString()=='1'){
                   var a = jsonDecode(tempList[i]['attachments']);
@@ -110,9 +134,13 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                     child: Container(
                       padding: EdgeInsets.all(5),
                       child: Image(
-                        image: CachedNetworkImageProvider(url1),
-                        fit: BoxFit.fitHeight,
-                      ),
+                  image: CachedNetworkImageProvider(currentIndex==null?url:url1)
+                )
+                      // Text('hi'),
+                      // child: Image(
+                      //   image: CachedNetworkImageProvider(url1),
+                      //   fit: BoxFit.fitHeight,
+                      // ),
                     ),
                   );
                 }

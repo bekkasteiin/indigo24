@@ -79,6 +79,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
+            centerTitle: true,
             backgroundColor: Colors.white, // status bar color
             brightness: Brightness.light, // status bar brightness
           ),

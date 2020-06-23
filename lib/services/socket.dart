@@ -140,6 +140,7 @@ class ChatRoom {
         "page": page == null ? 1 : page,
       }
     });
+    print(data);
     channel.sink.add(data);
   }
 
@@ -324,7 +325,7 @@ class ChatRoom {
             chatInfoController.add(new MyChatInfoEvent(json));
             break;
           case "user:writing": 
-            cabinetController.add(new MyCabinetEvent(json));
+            if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
             break;
           default:
             print('default print cmd: $cmd json: $json');

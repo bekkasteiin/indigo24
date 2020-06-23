@@ -156,7 +156,7 @@ setLanguage(code) {
       refill = 'Пополнить';
       payments = 'Платежи';
       transfers = 'Переводы';
-      balanceInBlock = 'Баланс в обратоке';
+      balanceInBlock = 'Баланс в обработке';
       balance = 'Баланс';
       account = 'Аккаунт';
       walletBalance = 'Баланс кошелька';

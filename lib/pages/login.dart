@@ -104,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
+            centerTitle: true,
             backgroundColor: Colors.white, // status bar color
             brightness: Brightness.light, // status bar brightness
           ),
@@ -366,6 +367,7 @@ class Countries extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         leading: IconButton(
           icon: Container(
             padding: EdgeInsets.all(10),
@@ -379,7 +381,6 @@ class Countries extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        centerTitle: true,
         brightness: Brightness.light,
         title: Text(
           "Страна",

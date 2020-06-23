@@ -97,6 +97,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
+            centerTitle: true,
             backgroundColor: Colors.white, 
             brightness: Brightness.light,
           ),

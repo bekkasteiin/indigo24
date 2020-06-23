@@ -274,7 +274,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                             ),
                           ),
                           Expanded(
-                            child: ListView.builder(
+                            child: actualList.isNotEmpty ? ListView.builder(
                               itemCount: actualList != null ? actualList.length : 0,
                               itemBuilder: (BuildContext context, int index) {
                                 if('${user.phone}' == '+${actualList[index]['phone']}')
@@ -372,7 +372,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                   ),
                                 );
                               },
-                            ),
+                            ) : Center(child: CircularProgressIndicator(),),
                           ),
                         ],
                       ),

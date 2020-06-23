@@ -137,7 +137,8 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
         actions: <Widget>[
           IconButton(
             icon: Container(
-              padding: EdgeInsets.all(4),
+              height: 20,
+              width: 20,
               child: Image(
                 image: AssetImage(
                   'assets/images/newPost.png',

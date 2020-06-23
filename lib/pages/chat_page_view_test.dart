@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/chat.dart';
 import 'package:indigo24/pages/full_photo.dart';
 import 'package:indigo24/pages/tapes.dart';
 import 'package:indigo24/services/socket.dart';
@@ -212,7 +213,7 @@ class DeviderMessageWidget extends StatelessWidget {
             )),
         child: Center(
             child: Text(
-          date,
+          '$date',
           style: TextStyle(fontSize: 16, color: Color(0xFF5E5E5E)),
         )),
       ),
@@ -325,6 +326,9 @@ class SendedMessageWidget extends StatelessWidget {
     );
   }
 }
+                              List imageCount = [];
+                              var test;
+
 
 class ReceivedMessageWidget extends StatelessWidget {
   final String content;
@@ -347,6 +351,7 @@ class ReceivedMessageWidget extends StatelessWidget {
     this.rMedia,
     this.type
   }) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -403,8 +408,17 @@ class ReceivedMessageWidget extends StatelessWidget {
                             (a[0]==":" && a[l]==":" && content.length>8)?
                             Text(content, style: TextStyle(fontSize: 24))
                             :
-                            (type=="1")?
-                            ImageMessage("$mediaUrl$rMedia", "$mediaUrl$media")
+                            (type=="1")? 
+                            (() { 
+                              listMessages.forEach((element) {
+                                if ( element['type'].toString() == '1' ){
+                                  imageCount.add(element);
+                                  test = element;
+                                }
+                              });
+                              return ImageMessage("$mediaUrl$rMedia", "$mediaUrl$media", imageCount : imageCount.indexOf(test));
+
+                            }())
                             :
                             (type=="2")?
                             FileMessage(url:"$mediaUrl$media")
@@ -465,7 +479,8 @@ class AudioMessage extends StatelessWidget {
 class ImageMessage extends StatelessWidget {
   final imageUrl;
   final fullImageUrl;
-  ImageMessage(this.imageUrl, this.fullImageUrl);
+  final imageCount;
+  ImageMessage(this.imageUrl, this.fullImageUrl, {this.imageCount});
 
   @override
   Widget build(BuildContext context) {
@@ -518,9 +533,8 @@ class ImageMessage extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
         ),
         onPressed: () {
-          print('hi');
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => FullPhoto(url: imageUrl)));
+              context, MaterialPageRoute(builder: (context) => FullPhoto(url: fullImageUrl)));
         },
         padding: EdgeInsets.all(0),
       ),
@@ -726,6 +740,7 @@ class _PDFViewerState extends State<PDFViewer> {
         theme: ThemeData(primaryColor: Colors.white),
         home: Scaffold(
           appBar: AppBar(
+            centerTitle: true,
             title: Text('Файл'),
             actions: <Widget>[
               IconButton(
