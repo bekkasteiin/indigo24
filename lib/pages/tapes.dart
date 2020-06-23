@@ -181,7 +181,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                   controller: _refreshController,
                   onRefresh: _onRefresh,
                   onLoading: _onLoading,
-
+                  header: WaterDropHeader(),
                   child: ListView.builder(
                     reverse: false,
                     itemCount: result.length,
@@ -299,11 +299,31 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                                             controller: VideoPlayerController.network("https://indigo24.xyz/uploads/tapes/${result[index]['media']}"),
                                           )
                                           :
-                                          Image(
-                                            image: NetworkImage(
-                                              "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
+                                          AspectRatio(
+                                            aspectRatio: 1/1,
+                                            // Puts a "mask" on the child, so that it will keep its original, unzoomed size
+                                            // even while it's being zoomed in
+                                            child: ClipRect(
+                                              child: PhotoView(
+                                                imageProvider: NetworkImage(
+                                                  'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
+                                                ),
+                                                backgroundDecoration: BoxDecoration(color: Colors.transparent),
+                                                // Contained = the smallest possible size to fit one dimension of the screen
+                                                minScale: PhotoViewComputedScale.contained,
+                                                // Covered = the smallest possible size to fit the whole screen
+                                                maxScale: PhotoViewComputedScale.contained,
+                                                enableRotation: false,
+                                              ),
                                             ),
                                           ),
+                                            
+
+                                          // Image(
+                                          //   image: NetworkImage(
+                                          //     "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
+                                          //   ),
+                                          // ),
                                         ),
                                       ),
                                     ),

@@ -219,6 +219,7 @@ class DeviderMessageWidget extends StatelessWidget {
     );
   }
 }
+File uploadingImage;
 
 class SendedMessageWidget extends StatelessWidget {
   final String content;
@@ -287,6 +288,35 @@ class SendedMessageWidget extends StatelessWidget {
                     height: MediaQuery.of(context).size.width*0.7,
                     child: new ChewieVideo(controller: VideoPlayerController.network("$mediaUrl$media"), 
                       size: MediaQuery.of(context).size.width*0.7,),
+                  )
+                  :
+                  (type=="uploading")?
+                  Container(
+                    width: MediaQuery.of(context).size.width*0.7,
+                    height: MediaQuery.of(context).size.width*0.7,
+                    child: uploadingImage!=null?
+                    Stack(
+                      children: [
+                        
+                        Container(
+                          width: MediaQuery.of(context).size.width*0.7,
+                          height: MediaQuery.of(context).size.width*0.7,
+                          child: Image.file(uploadingImage, fit: BoxFit.fill,),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width*0.7,
+                          height: MediaQuery.of(context).size.width*0.7,
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                        Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ],
+                    )
+                    :
+                    Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   )
                   :
                   Text(

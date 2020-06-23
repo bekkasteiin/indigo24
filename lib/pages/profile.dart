@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +14,9 @@ import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/pages/settings/settings_notifications_main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:platform_action_sheet/platform_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,7 +65,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         // _image = File(pickedFile.path);
       });
       if(_image != null){
-        api.uploadAvatar(_image.path).then((r) async {
+        uploadAvatar(_image.path).then((r) async {
           if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
             logOut(context);
             return r;
@@ -80,6 +83,68 @@ class _UserProfilePageState extends State<UserProfilePage> {
             return r;
           }
         });
+      }
+    }
+  }
+  
+  Response response;
+  ProgressBar _sendingMsgProgressBar;
+  BaseOptions options = new BaseOptions(
+    baseUrl: "https://api.indigo24.xyz/api/v2.1",
+    connectTimeout: 5000,
+    receiveTimeout: 3000,
+  );
+
+  Dio dio;
+  var percent = "0 %";
+  double uploadPercent = 0.0;
+  bool isUploading = false;
+
+  uploadAvatar(_path) async {
+    _sendingMsgProgressBar = ProgressBar();
+    dio = new Dio(options);
+
+    try {
+      FormData formData = FormData.fromMap({
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
+        "file": await MultipartFile.fromFile(_path),
+      });
+
+      print("Uploading avatar with data ${formData.fields}");
+
+      // _sendingMsgProgressBar.show(context, "");
+
+      response = await dio.post("/avatar/upload", 
+        data: formData,
+        onSendProgress: (int sent, int total) {
+          String p = (sent/total*100).toStringAsFixed(2);
+          
+          setState(() {
+            isUploading = true;
+            uploadPercent = sent/total;
+            percent = "$p %";
+          });
+          print("$percent");
+        },
+        onReceiveProgress: (count, total) {
+          setState(() {
+            isUploading = false;
+            uploadPercent = 0.0;
+            percent = "0 %";
+          });
+        },
+      );
+      print("Getting response from avatar upload ${response.data}");
+      // _sendingMsgProgressBar.hide();
+
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+      } else {
+        print(e.request);
+        print(e.message);
       }
     }
   }
@@ -131,12 +196,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
           print("посмотреть");
           Navigator.pop(context);
           Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FullScreenWrapper(
-                            imageProvider: CachedNetworkImageProvider("${user.avatarUrl}${user.avatar}"),
-                            minScale: PhotoViewComputedScale.contained,
-                          )));
+            context,
+            MaterialPageRoute(
+                builder: (context) => FullScreenWrapper(
+                  imageProvider: CachedNetworkImageProvider("${user.avatarUrl}${user.avatar.replaceAll("AxB", "500x500")}"),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.contained*3,
+                  backgroundDecoration: BoxDecoration(
+                    color: Colors.transparent
+                  ),
+                )));
         },
       ),
       CupertinoActionSheetAction(
@@ -458,6 +527,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               ],
             ),
+
+            isUploading?
+            Container(
+              width: screenSize.width,
+              height: screenSize.height,
+              color: Color(0xff647087).withOpacity(0.6),
+              child: Center(
+                child: CircularPercentIndicator(
+                  radius: 120.0,
+                  lineWidth: 13.0,
+                  animation: false,
+                  percent: uploadPercent,
+                  progressColor: Color(0xFF0543B8),
+                  backgroundColor: Color(0xFFffffff),
+                  center: Text(
+                    percent,
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20.0),
+                  ),
+                  footer: Text(
+                    "Загрузка",
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 17.0),
+                  ),
+                  circularStrokeCap: CircularStrokeCap.round,
+                ),
+              ),
+            ):Container()
           ],
         ),
       ),

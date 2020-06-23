@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+String downloadPercent = "0 %";
+
 class ProgressBar {
 
   OverlayEntry _progressOverlayEntry;
+  String percent = '0 %';
 
   void show(BuildContext context, percent){
-      _progressOverlayEntry = _createdProgressEntry(context, percent);
+      _progressOverlayEntry = _createdProgressEntry(context);
       Overlay.of(context).insert(_progressOverlayEntry);
+  }
+
+  void change(p){
+    percent = p;
   }
 
   void hide(){
@@ -17,19 +24,18 @@ class ProgressBar {
       }
   }
 
-  OverlayEntry _createdProgressEntry(BuildContext context, String percent) =>
+  OverlayEntry _createdProgressEntry(BuildContext context) =>
       OverlayEntry(
           builder: (BuildContext context) =>
               Scaffold(
                 body: Stack(
                     children: <Widget>[
                     Container(
-                        color: Colors.lightBlue.withOpacity(0.5),
+                        color: Colors.lightBlue.withOpacity(0.3),
                     ),
                     Center(
                       child: LinearProgressIndicator(),
                     )
-
                     ],
 
                 ),

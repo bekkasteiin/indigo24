@@ -274,6 +274,7 @@ class FullScreenWrapper extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: Container(
+        color: Colors.white,
         constraints: BoxConstraints.expand(
           height: MediaQuery.of(context).size.height,
         ),

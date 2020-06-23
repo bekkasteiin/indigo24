@@ -75,6 +75,8 @@ class _ChatPageState extends State<ChatPage> {
   var myFileUrl;
   bool haveFile = false;
   bool isSomeoneTyping = false;
+  List typingMembers = [];
+  String typingName;
 
   void sendSound() {
     print("Send sound is called");
@@ -134,6 +136,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   int pageCounter = 1;
+  bool isUploading = false;
+  bool isUploaded = false;
 
   // [{id: message:27886:346, user_id: 27886, user_name: AdilTest,
   // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
@@ -168,11 +172,21 @@ class _ChatPageState extends State<ChatPage> {
         case "message:create":
           var message = e.json['data'];
           if ('${widget.chatID}' == '${e.json['data']['chat_id']}') {
-            setState(() {
-              ChatRoom.shared.lastMessage = message;
-              myList.insert(0, message);
-              listMessages.insert(0, message);
-            });
+            if(isUploaded){
+              setState(() {
+                isUploaded = false;
+                ChatRoom.shared.lastMessage = message;
+                myList.remove(uploadingMessage);
+                myList.insert(0, message);
+                listMessages.insert(0, message);
+              });
+            } else{
+              setState(() {
+                ChatRoom.shared.lastMessage = message;
+                myList.insert(0, message);
+                listMessages.insert(0, message);
+              });
+            }
           }
           break;
         case "chat:create":
@@ -186,12 +200,26 @@ class _ChatPageState extends State<ChatPage> {
           });
           break;
         case "user:writing":
-          if(e.json['data'][0]['user_id'].toString() != user.id){
+          if(e.json['data'][0]['chat_id'].toString() == widget.chatID.toString()){
             setState(() {
-              isSomeoneTyping = true;
+              typingName = e.json['data'][0]['name'];
+              typingMembers = e.json['data'].toList();
+              if(e.json['data'].toList().length>1){
+                typingMembers.forEach((element) {
+                  typingName = "$typingName, ${element['name']}";
+                });
+              }
+              
             });
+            if(!isSomeoneTyping){
+              setState(() {
+                isSomeoneTyping = true;
+
+                deleteTyping();
+              });
+            }
           }
-          deleteTyping();
+          
           
           break;
         default:
@@ -201,10 +229,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   deleteTyping() async {
-    await Future.delayed(Duration(seconds: 3));
-    setState(() {
-      isSomeoneTyping = false;
+    await Future.delayed(Duration(seconds: 3)).then((value) {
+      setState(() {
+        isSomeoneTyping = false;
+      });
     });
+    
   }
   // bool isLoading = false;
 
@@ -227,7 +257,13 @@ class _ChatPageState extends State<ChatPage> {
   File _image;
 
   final picker = ImagePicker();
-  
+
+  var uploadingMessage = json.decode(json.encode({
+    "type": "uploading",
+    "time": "1",
+    "user_id": user.id
+  }));
+
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(source: imageSource);
     if (pickedFile != null) {
@@ -235,6 +271,18 @@ class _ChatPageState extends State<ChatPage> {
         _image = File(pickedFile.path);
       });
       print(_image);
+
+      // {status: true, write: 0, chat_id: 101, message_id: message:27886:117, 
+      // user_id: 27886, time: 1592914094, avatar: 27886.20200623174222_200x200.jpg, 
+      // avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: AdilTest, text: tres, type: 0}
+      
+
+      setState(() {
+        isUploading = true;
+        uploadingImage = _image;
+        myList.insert(0, uploadingMessage);
+      });
+
       api.uploadMedia(_image.path, 1).then((r) async {
         print("RRR $r");
         if (r["status"]) {
@@ -242,6 +290,10 @@ class _ChatPageState extends State<ChatPage> {
             "filename": "${r["file_name"]}",
             "r_filename": "${r["resize_file_name"]}"
           }];
+          setState(() {
+            isUploaded = true;
+            uploadingImage = null;
+          });
           ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
         } else {
           showAlertDialog(context, r["message"]);
@@ -258,12 +310,21 @@ class _ChatPageState extends State<ChatPage> {
         _image = File(pickedFile.path);
       });
       print(_image);
+      
+      setState(() {
+        isUploading = true;
+        myList.insert(0, uploadingMessage);
+      });
+
       api.uploadMedia(_image.path, 4).then((r) async {
         print("RRR $r");
         if (r["status"]) {
           var a = [{
             "filename": "${r["file_name"]}"
           }];
+          setState(() {
+            isUploaded = true;
+          });
           ChatRoom.shared.sendMessage('${widget.chatID}', "video", type: 4, attachments: jsonDecode(jsonEncode(a)));
         } else {
           showAlertDialog(context, r["message"]);
@@ -592,6 +653,26 @@ class _ChatPageState extends State<ChatPage> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              isSomeoneTyping?
+                  Row(
+                    children: [
+                      (widget.memberCount > 2)?
+                      Text("$typingName ",
+                        style: TextStyle(
+                                  color: Color(0xFF001D52),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400)
+                        ):Container(),
+                      Text(typingMembers.length>1?"печатают ":"печатает ",
+                        style: TextStyle(
+                                color: Color(0xFF001D52),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400)
+                      ),
+                      Image.asset("assets/typing.gif", width: 20,)
+                    ],
+                  )
+                  :
               (widget.memberCount > 2)
                   ? Text(
                       '${localization.members} ${widget.memberCount}',
@@ -600,7 +681,8 @@ class _ChatPageState extends State<ChatPage> {
                           fontSize: 14,
                           fontWeight: FontWeight.w400),
                     )
-                  : online == null
+                  : 
+                  online == null
                       ? Container()
                       : Text(
                           ('$online' == 'online' || '$online' == 'offline')
@@ -742,15 +824,6 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                   ),
                               ),
-                              isSomeoneTyping?Container(
-                                padding: EdgeInsets.all(5),
-                                child: Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Image.asset("assets/typing.gif", width: MediaQuery.of(context).size.width*0.3),
-                                ),
-                              )
-                              :
-                              Container()
                             ],
                           ),
                     ),
@@ -913,7 +986,7 @@ class _ChatPageState extends State<ChatPage> {
     // return DeviderMessageWidget(date: 'test');
     if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7' || '${m['type']}' == '8')
       return Devider(m);
-    return '${m['user_id']}' == '${user.id}' ? Sended(m)
+    return '${m['user_id']}' == '${user.id}' ? Sended(m, chatId: widget.chatID)
     :
     Received(m, chatId: widget.chatID);
   }
@@ -1155,7 +1228,8 @@ class Received extends StatelessWidget {
 
 class Sended extends StatelessWidget {
   final m;
-  Sended(this.m);
+  final chatId;
+  Sended(this.m, {this.chatId});
   @override
   Widget build(BuildContext context) {
     var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
@@ -1168,6 +1242,7 @@ class Sended extends StatelessWidget {
                 CupertinoContextMenuAction(
                   child: const Text('Удалить', style: TextStyle(color:Colors.red),),
                   onPressed: () {
+                    ChatRoom.shared.deleteFromAll(chatId, m['id']);
                     Navigator.pop(context);
                   },
                 ),
