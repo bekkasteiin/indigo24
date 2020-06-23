@@ -130,6 +130,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   style: TextStyle(fontSize: 20), 
                   controller: amountController,
                   onChanged: (String text) async {
+                    if(amountController.text[0] == '0'){
+                      amountController.clear();
+                    }
                     if(amountController.text.isNotEmpty){
                       // if(amountController.text[0] == '0'){
                       //   amountController.text = '';

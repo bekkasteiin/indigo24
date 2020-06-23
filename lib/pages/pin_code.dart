@@ -13,7 +13,7 @@ typedef IsValidCallback = void Function();
 typedef CancelCallback = void Function();
 
 class PasscodeScreen extends StatefulWidget {
-  Widget title;
+  String title;
   final int passwordDigits;
   final Color backgroundColor;
   final PasswordEnteredCallback passwordEnteredCallback;
@@ -32,8 +32,8 @@ class PasscodeScreen extends StatefulWidget {
   final List<String> digits;
   bool withPin;
   PasscodeScreen({
+    this.title,
     Key key,
-    @required this.title,
     this.withPin,
     this.passwordDigits = 4,
     @required this.passwordEnteredCallback,
@@ -106,7 +106,11 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    widget.title,
+                    Text(
+                      '${widget.title}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
+                    ),
                     SizedBox(height: 10,),
                     Text('$passCodeError', style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w400),),
                     Container(
@@ -130,59 +134,6 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
               child: _buildDeleteButton(),
             ),
           ),
-        ],
-      );
-
-  _buildLandscapePasscodeScreen() => Stack(
-        children: [
-          Positioned(
-            child: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                widget.title,
-                                Container(
-                                  margin: const EdgeInsets.only(top: 20),
-                                  height: 40,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: _buildCircles(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        widget.bottomWidget != null
-                            ? Positioned(
-                                child: Align(alignment: Alignment.topCenter, child: widget.bottomWidget),
-                              )
-                            : Container()
-                      ],
-                    ),
-                  ),
-                  _buildKeyboard(),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: _buildDeleteButton(),
-            ),
-          )
         ],
       );
 
@@ -230,6 +181,9 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
       if (enteredPasscode.length < widget.passwordDigits) {
         enteredPasscode += text;
         if (enteredPasscode.length == widget.passwordDigits) {
+          if(widget.title == '${localization.createPin}'){
+            widget.title = '${localization.replyPin}';
+          }
           widget.passwordEnteredCallback(enteredPasscode);
         }
       }

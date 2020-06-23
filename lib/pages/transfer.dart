@@ -231,12 +231,8 @@ class _TransferPageState extends State<TransferPage> {
         PageRouteBuilder(
           opaque: opaque,
           pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+            title: '$title',
             withPin: withPin,
-            title: Text(
-              '$title',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
-            ),
             passwordEnteredCallback: _onPasscodeEntered,
             cancelButton: cancelButton,
             deleteButton: Text(
@@ -354,9 +350,9 @@ class _TransferPageState extends State<TransferPage> {
                         hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
                     onChanged: (value){
-                      // if(sumController.text[0] == '0'){
-                      //   sumController.text = '';
-                      // }
+                      if(sumController.text[0] == '0'){
+                        sumController.clear();
+                      }
                     },
                     validator: (value) {
                       if (value.isEmpty) {

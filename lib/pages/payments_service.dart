@@ -29,17 +29,17 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   Api api = Api();
   
   showAlertDialog(BuildContext context, String type, String message) {
-    Widget okButton = FlatButton(
+    Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
         // type == '1' 
         // ? Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => PaymentHistoryPage()),(r) => false) 
         // : 
         SystemChannels.textInput.invokeMethod('TextInput.hide');
+        // Navigator.pop(context);
         Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pop(context);
+        // Navigator.pop(context);
+        // Navigator.pop(context);
       },
     );
     showDialog(
@@ -48,7 +48,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         print('showed dialog');
         return ConstrainedBox( 
           constraints: BoxConstraints(maxHeight: 1.0),
-          child: AlertDialog(
+          child: CupertinoAlertDialog(
             title: Text(type == '0' ? "Внимание" : type == '1' ? 'Успешно' : 'Ошибка' ),
             content: Text(message),
             actions: [
@@ -80,11 +80,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           opaque: opaque,
           pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
             withPin: withPin,
-            title: Text(
-              '$title',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
-            ),
+            title: '$title',
             passwordEnteredCallback: _onPasscodeEntered,
             cancelButton: cancelButton,
             deleteButton: Text(
@@ -138,12 +134,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   }
 
   _onPasscodeCancelled() {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => Tabs(),
-        ),
-        (r) => false, 
-    );
+    Navigator.pop(context);
   }
 
   @override
@@ -163,6 +154,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               return getServiceResult;
             }),
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if(snapshot.hasData){
+                print(snapshot.data);
+              }
               return snapshot.hasData ? 
                 GestureDetector(
                 onTap: () {
@@ -199,37 +193,41 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                               elevation: 0,
                             ),
                           ),
-                          Container(
-                            margin: EdgeInsets.only(top: 45, left: 0, right: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  height: 0.6,
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  color: Color(0xFFD1E1FF),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 30, right: 10),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      SizedBox(height: 15),
-                                      Text(
-                                        '${localization.walletBalance}',
-                                        style: fS14(c: 'FFFFFF'),
+                          Column(
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(top: 45, left: 0, right: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      height: 0.6,
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      color: Color(0xFFD1E1FF),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 30, right: 10),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          SizedBox(height: 15),
+                                          Text(
+                                            '${localization.walletBalance}',
+                                            style: fS14(c: 'FFFFFF'),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            '${user.balance} ₸',
+                                            style: fS18(c: 'FFFFFF'),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '${user.balance} ₸',
-                                        style: fS18(c: 'FFFFFF'),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                           ],
                         ),
@@ -237,7 +235,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         Center(child: Text('${localization.minAmount} ${snapshot.data['service']['min']} KZT', style: TextStyle(color: Color(0xFF001D52)))),
                         Center(child: Text('${localization.maxAmount} ${snapshot.data['service']['max']} KZT', style: TextStyle(color: Color(0xFF001D52)))),
                         Center(child: Text('${localization.commission} ${snapshot.data['service']['commission']}%', style: TextStyle(color: Color(0xFF001D52)))),
-                        transferButton(),
+                        transferButton(snapshot),
                         SizedBox(height: 10,)
                     ],
                   ),
@@ -249,7 +247,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       ),
     );
   }
-  Container transferButton() {
+  Container transferButton(snapshot) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
       decoration: BoxDecoration(boxShadow: [
@@ -264,7 +262,24 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         child: RaisedButton(
           onPressed: () async {
             if(receiverController.text.isNotEmpty & sumController.text.isNotEmpty){
-              await _showLockScreen(context,'${localization.enterPin}',opaque: false, cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'));
+              RegExp exp = new RegExp(r"^7[0-9]{10}$");
+              String str = "${receiverController.text.replaceAll(' ','').replaceAll('+','')}";
+              bool matches = exp.hasMatch(str);
+              print(matches);
+              if(int.parse(sumController.text) >= snapshot.data['service']['min']){
+                if(int.parse(sumController.text) <= snapshot.data['service']['max']){
+                  if(matches){
+                    await _showLockScreen(context,'${localization.enterPin}',opaque: false, cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'));
+                  } else{
+                    showAlertDialog(context, '0', 'Введите корректный номер аккаунта');
+                  }
+                } else{
+                  showAlertDialog(context, '0', 'Введите сумму ниже максимальной отметки');
+                }
+              }
+              else{
+                showAlertDialog(context, '0', 'Введите сумму выше мнимальной отметки');
+              }
             }
           },
           child: Container(
@@ -339,10 +354,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     controller: sumController,
                     decoration: InputDecoration.collapsed(hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
+                    inputFormatters: [
+                          BlacklistingTextInputFormatter(new RegExp(r"^(?!(0))$")),
+                    ],
                     onChanged: (value){
-                      // if(sumController.text[0] == '0'){
-                      //   sumController.clear();
-                      // }
+                      if(sumController.text[0] == '0'){
+                        sumController.clear();
+                      }
                     },
                     validator: (value) {
                       if (value.isEmpty) {

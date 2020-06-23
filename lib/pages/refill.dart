@@ -135,6 +135,9 @@ class _RefillPageState extends State<RefillPage> {
                   style: TextStyle(fontSize: 20),
                   controller: amountController,
                   onChanged: (String text) async {
+                    if(amountController.text[0] == '0'){
+                      amountController.clear();
+                    }
                     if(amountController.text.isNotEmpty){
                       // if(amountController.text[0] == '0'){
                       //   amountController.text = '';

@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="indigo24"
+        android:label="Indigo24"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
