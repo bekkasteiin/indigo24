@@ -1,12 +1,15 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/services/user.dart' as user;
+
 
 class ChatUserProfilePage extends StatefulWidget {
   final member;
@@ -22,7 +25,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  final String _fullName = '${user.name}';
 
 
   
@@ -61,7 +63,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
             context,
             MaterialPageRoute(
                 builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider("${user.avatarUrl}${user.avatar.replaceAll("AxB", "500x500")}"),
+                  imageProvider: CachedNetworkImageProvider("${widget.member['avatar_url']}${widget.member['avatar']}"),
                   minScale: PhotoViewComputedScale.contained,
                   maxScale: PhotoViewComputedScale.contained*3,
                   backgroundDecoration: BoxDecoration(
@@ -70,16 +72,18 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
                 )));
         },
       ),
+      // CupertinoActionSheetAction(
+      //   child: Text('Перейти в чат с ${widget.member['user_name']}'),
+      //   onPressed: () {
+      //     // Navigator.pop(context);
+      //     // TODO check user online
+      //     // Navigator.push(context,MaterialPageRoute(builder: (context) => ChatPage(name, chatID, userIds: widget.member['user_id'], avatar: widget.member['avatar'], avatarUrl: widget.member['avatar_url'],)));
+      //   },
+      // ),
       CupertinoActionSheetAction(
-        child: Text('Камера'),
+        child: Text('Что-то еще'),
         onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      CupertinoActionSheetAction(
-        child: Text('Галерея'),
-        onPressed: () {
-          Navigator.pop(context);
+          // Navigator.pop(context);
         },
       )
     ],
@@ -100,7 +104,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
           decoration: BoxDecoration(
             image: DecorationImage(
               image: CachedNetworkImageProvider(
-                  'https://indigo24.xyz/uploads/avatars/${user.avatar.toString().replaceAll("AxB", "200x200")}'),
+                  '${widget.member['avatar_url']}${widget.member['avatar']}'),
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(80.0),
@@ -121,9 +125,8 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
       fontSize: 20.0,
       fontWeight: FontWeight.w500,
     );
-
     return Text(
-      _fullName,
+      '${widget.member['user_name']}',
       style: _nameTextStyle,
     );
   }
@@ -138,11 +141,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
         children: <Widget>[
           Text("${localization.email}"),
           SizedBox(height: 5),
-          Text('${user.email}'),
-          // TextField(
-          //   decoration: null,
-          //   controller: emailController,
-          // ),
+          Text('${widget.member['email']}'),
           SizedBox(height: 5)
         ],
       ),
@@ -157,7 +156,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
         children: <Widget>[
           Text("${localization.phoneNumber}"),
           SizedBox(height: 5),
-          Text('${user.phone}',
+          Text('${widget.member['phone']}',
               textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
           SizedBox(height: 5),
         ],
@@ -177,12 +176,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    print(widget.member);
-    print(widget.member);
-    print(widget.member);
-    print(widget.member);
-    print(widget.member);
-    print(widget.member);
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -217,25 +210,23 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
               _buildCoverImage(screenSize),
               Column(
                 children: <Widget>[
-                  SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                            onTap: () async {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsMainPage()));
-                            },
-                            child: Ink(
-                              child: Image.asset("assets/images/settings.png", width: 35,),
-                              // child: Text("${localization.exit}",
-                              //     style: TextStyle(
-                              //         color: Colors.white, fontSize: 18)),
-                            )),
+                  SizedBox(height: 10),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Container(
+                        padding: EdgeInsets.all(5),
+                        child: Image(
+                          image: AssetImage(
+                            'assets/images/backWhite.png',
+                          ),
+                        ),
                       ),
-                      SizedBox(width: 15),
-                    ],
+                      color: Colors.white,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,

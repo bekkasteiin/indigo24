@@ -242,51 +242,56 @@ class FullScreenWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            iconTheme: IconThemeData(
+              color: Colors.black,
+            ),
+            leading: IconButton(
+              icon: Container(
+                padding: EdgeInsets.all(10),
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/back.png',
+                  ),
+                ),
               ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            brightness: Brightness.light,
+            title: Text(
+              "Фотография",
+              style: TextStyle(
+                color: Color(0xFF001D52),
+                fontSize: 22,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            backgroundColor: Colors.white,
+          ),
+          body: Container(
+            color: Colors.white,
+            constraints: BoxConstraints.expand(
+              height: MediaQuery.of(context).size.height,
+            ),
+            child: PhotoView(
+              imageProvider: imageProvider,
+              loadingBuilder: loadingBuilder,
+              backgroundDecoration: backgroundDecoration,
+              minScale: minScale,
+              maxScale: maxScale,
+              initialScale: initialScale,
+              basePosition: basePosition,
+              filterQuality: filterQuality,
             ),
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        brightness: Brightness.light,
-        title: Text(
-          "Фотография",
-          style: TextStyle(
-            color: Color(0xFF001D52),
-            fontSize: 22,
-            fontWeight: FontWeight.w400,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.white,
-      ),
-      body: Container(
-        color: Colors.white,
-        constraints: BoxConstraints.expand(
-          height: MediaQuery.of(context).size.height,
-        ),
-        child: PhotoView(
-          imageProvider: imageProvider,
-          loadingBuilder: loadingBuilder,
-          backgroundDecoration: backgroundDecoration,
-          minScale: minScale,
-          maxScale: maxScale,
-          initialScale: initialScale,
-          basePosition: basePosition,
-          filterQuality: filterQuality,
         ),
       ),
     );
