@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -57,6 +56,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       switch (cmd) {
         case "chat:members":
           setState(() {
+            memberCount = 0;
             membersList = message;
             if(membersList.isNotEmpty){
               print(membersList);
@@ -182,7 +182,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ),
     );
   }
-  memberAction(){
+  memberAction(member){
     final act = CupertinoActionSheet(
     title: Text('Выберите вариант'),
     // message: Text('Which option?'),
@@ -192,6 +192,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         onPressed: () {
           // _onImageButtonPressed(ImageSource.camera);
           Navigator.pop(context);
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member)));
+
         },
       ),
     ],
@@ -216,7 +218,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         onPressed: () {
           // _onImageButtonPressed(ImageSource.camera);
           Navigator.pop(context);
-          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(jsonDecode(member))));
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member)));
         },
       ),
       CupertinoActionSheetAction(
@@ -228,14 +230,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           Navigator.pop(context);
         },
       ),
-      CupertinoActionSheetAction(
-        isDestructiveAction: true,
-        child: Text('Удалить'),
-        onPressed: () {
-          // _onImageButtonPressed(ImageSource.gallery);
-          Navigator.pop(context);
-        },
-      )
+      // CupertinoActionSheetAction(
+      //   isDestructiveAction: true,
+      //   child: Text('Удалить(не работает)'),
+      //   onPressed: () {
+      //     // _onImageButtonPressed(ImageSource.gallery);
+      //     Navigator.pop(context);
+      //   },
+      // )
     ],
     cancelButton: CupertinoActionSheetAction(
       child: Text('Назад'),
@@ -358,11 +360,11 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                       }
                                       else if(isImOwner){
                                         setState(() {
-                                          action(widget.chatId, '${membersList[i]}');
+                                          action(widget.chatId, membersList[i]);
                                         });
                                       }
                                       else
-                                        memberAction();
+                                        memberAction(membersList[i]);
                                       // ChatRoom.shared.checkUserOnline(ids);
                                       // ChatRoom.shared
                                       //     .getMessages(membersList[i]['id']);

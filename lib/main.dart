@@ -60,7 +60,7 @@ String formatPhone(String phone) {
             });
           }
         });
-        return true;
+        return contacts;
       } else{
         return false;
       }

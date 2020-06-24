@@ -269,8 +269,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                     onPressed: () {
                       print('update contacts');
                       setState((){
+                        actualList.clear();
                         getContacts(context).then((getContactsResult){
-                          if(!getContactsResult){
+                          if('$getContactsResult' == 'false'){
                             Widget okButton = CupertinoDialogAction(
                               child: Text("Открыть настройки"),
                               onPressed: () {
@@ -291,6 +292,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                 return alert;
                               },
                             );
+                          } else{
+                            actualList.addAll(getContactsResult);
                           }
                         });
                       });
