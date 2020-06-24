@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../services/api.dart';
+import 'package:indigo24/services/api.dart';
 import 'transfer.dart';
 import 'transfer_history.dart';
 import 'package:indigo24/services/localization.dart' as localization;

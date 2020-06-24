@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/services/api.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
-import '../services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
 class TransferHistoryPage extends StatefulWidget {

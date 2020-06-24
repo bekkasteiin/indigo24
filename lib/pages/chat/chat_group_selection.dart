@@ -4,12 +4,13 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/pages/chat.dart';
-import 'package:indigo24/pages/chat_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
+
+import 'chat.dart';
+import 'chat_contacts.dart';
 
 class ChatGroupSelection extends StatefulWidget {
   @override
@@ -49,6 +50,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     super.initState();
     actualList.addAll(contacts);
     ChatRoom.shared.setContactsStream();
+    _saved2.add({"phone": "${user.phone}", "user_id": "${user.id}", "name": "${user.name}"});
     listen();
     print('listened');
   }
@@ -296,7 +298,9 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                         ],
                                       ),
                                     ),
-                                    Positioned(
+                                    _saved2[index]['user_id'] == '${user.id}' 
+                                    ? Center()
+                                    : Positioned(
                                       bottom: 30,
                                       right: 20,
                                         child: Container(

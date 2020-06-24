@@ -14,11 +14,13 @@ class ChatRoom {
   var cabinetController;
   var contactController;
   var chatInfoController;
+  var cabinetInfoController;
 
   Stream<MyEvent> get onChange => changeController.stream;
   Stream<MyContactEvent> get onContactChange => contactController.stream;
   Stream<MyCabinetEvent> get onCabinetChange => cabinetController.stream;
   Stream<MyChatInfoEvent> get onChatInfoChange => chatInfoController.stream;
+  Stream<MyCabinetInfoEvent> get onCabinetInfoChange => cabinetInfoController.stream;
 
   var lastMessage;
 
@@ -52,6 +54,11 @@ class ChatRoom {
     print("Setting StreamController for Chat Info Events");
     chatInfoController = new StreamController<MyChatInfoEvent>();
   }
+  
+  setCabinetInfoStream() {
+    print("Setting StreamController for Chat Info Events");
+    cabinetInfoController = new StreamController<MyCabinetInfoEvent>();
+  }
 
   setContactsStream() {
     print("Setting StreamController for Contact Events");
@@ -73,6 +80,10 @@ class ChatRoom {
 
   closeCabinetStream() {
     cabinetController.close();
+  }
+
+  closeCabinetInfoStream() {
+    cabinetInfoController.close();
   }
 
   closeContactsStream() {
@@ -99,6 +110,20 @@ class ChatRoom {
       }
     });
     print("INIT DATA $data");
+    channel.sink.add(data);
+  }
+
+  makeAdmin(chatId,members) {
+    var data = json.encode({
+      "cmd": 'chat:members:privileges',
+      "data": {
+        "user_id": '${user.id}',
+        "chat_id": '$chatId',
+        "role": '2',
+        "userToken": "${user.unique}",
+        "members":"$members",
+      }
+    });
     channel.sink.add(data);
   }
 
@@ -324,6 +349,10 @@ class ChatRoom {
             print('added to chatInfoController');
             chatInfoController.add(new MyChatInfoEvent(json));
             break;
+          case "chat:members:privileges":
+            print('added to chatInfoController');
+            chatInfoController.add(new MyChatInfoEvent(json));
+            break;
           case "user:writing": 
             if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
             break;
@@ -371,3 +400,12 @@ class MyChatInfoEvent {
     this.json = json;
   }
 }
+
+class MyCabinetInfoEvent {
+  var json;
+
+  MyCabinetInfoEvent(var json) {
+    this.json = json;
+  }
+}
+

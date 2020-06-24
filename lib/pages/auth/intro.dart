@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/pages/login.dart';
+import 'package:indigo24/pages/auth/login/login.dart';
+import 'package:indigo24/pages/auth/registration/registration.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/widgets/custom_dropdown.dart';
 
-import 'registration.dart';
 
 class IntroPage extends StatefulWidget {
   @override
