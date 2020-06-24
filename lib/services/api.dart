@@ -10,7 +10,7 @@ class Api {
 
   static BaseOptions options = new BaseOptions(
     baseUrl: "https://api.indigo24.xyz/api/v2.1",
-    connectTimeout: 5000,
+    connectTimeout: 15000,
     receiveTimeout: 3000,
   );
 

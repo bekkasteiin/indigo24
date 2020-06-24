@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:indigo24/pages/chat.dart';
+import 'package:indigo24/pages/chat/chat.dart';
 
 class FullPhoto extends StatelessWidget {
   final String url;

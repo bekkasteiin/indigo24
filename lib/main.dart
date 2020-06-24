@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_settings/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:contacts_service/contacts_service.dart';
@@ -7,10 +8,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/pages/chat.dart';
-import 'package:indigo24/pages/chat_list.dart';
-import 'package:indigo24/pages/intro.dart';
-import 'package:indigo24/pages/wallet.dart';
+import 'package:indigo24/pages/auth/intro.dart';
+import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/pages/chat/chat_contacts.dart';
+import 'package:indigo24/pages/chat/chat_list.dart';
+import 'package:indigo24/pages/tapes/tapes.dart';
+import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/helper.dart';
 
 import 'package:indigo24/services/user.dart' as user;
@@ -20,12 +23,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
 import 'db/chats_model.dart';
 import 'pages/profile.dart';
-import 'pages/tapes.dart';
 import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/pages/chat_contacts.dart';
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -40,28 +41,29 @@ String formatPhone(String phone) {
     }
     return r;
   }
-  getContacts() async {
+  getContacts(context) async {
     try {
-      int test = 0;
       contacts.clear();
       if (await Permission.contacts.request().isGranted) {
-        Iterable<Contact> phonebook = await ContactsService.getContacts();
+        Iterable<Contact> phonebook = await ContactsService.getContacts(withThumbnails: false);
         phonebook.forEach((el) {
           if (el.displayName != null) {
             el.phones.forEach((phone) {
               if (!contacts.contains(formatPhone(phone.value))) {
                 phone.value = formatPhone(phone.value);
+                // print('name: ${el.displayName } phone:${phone.value}');
                 contacts.add({
                   'name': el.displayName,
                   'phone': phone.value,
                 });
-                test++;
               }
             });
           }
         });
+        return true;
+      } else{
+        return false;
       }
-      return contacts;
     } catch (_) {
       print(_);
       return "disconnect";
@@ -97,8 +99,8 @@ Future<void> main() async {
   });
 
 
-  getContacts();
   permissionForPush();
+
 
   runApp(MyApp(phone: phone, authenticated: authenticated));
 }
@@ -117,7 +119,6 @@ class MyApp extends StatelessWidget {
 
   bool authenticated;
   String phone;
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -147,6 +148,7 @@ class Tabs extends StatefulWidget {
 }
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
+
   TabController tabController;
   var api = Api();
   MyConnectivity _connectivity = MyConnectivity.instance;
@@ -186,6 +188,30 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   
   @override
   void initState() {
+    getContacts(context).then((getContactsResult){
+      if(!getContactsResult){
+        Widget okButton = CupertinoDialogAction(
+          child: Text("Открыть настройки"),
+          onPressed: () {
+            Navigator.pop(context);
+            AppSettings.openAppSettings();
+          },
+        );
+        CupertinoAlertDialog alert = CupertinoAlertDialog(
+          title: Text("Ошибка"),
+          content: Text('Разрешите доступ к контактам'),
+          actions: [
+            okButton,
+          ],
+        );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return alert;
+          },
+        );
+      }
+    });
     _firebaseMessaging.getToken().then((value) async { 
       print("MY FCM TOKEN $value");
       await api.updateFCM(value, user.id, user.unique);

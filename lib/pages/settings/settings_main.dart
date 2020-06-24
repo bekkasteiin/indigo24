@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/settings/settings_language.dart';
-import 'package:indigo24/pages/settings/settings_sound.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
 class SettingsMainPage extends StatefulWidget {

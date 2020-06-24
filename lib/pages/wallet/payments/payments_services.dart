@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import '../services/api.dart';
 import 'payments_service.dart';
 
 class PaymentsGroupPage extends StatefulWidget {

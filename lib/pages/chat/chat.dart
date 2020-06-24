@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/pages/chat/chat_info.dart';
 import 'package:indigo24/services/test_timer.dart';
 import 'package:indigo24/widgets/preview.dart';
 import 'dart:async';
@@ -14,7 +15,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/pages/chat_info.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -23,7 +23,6 @@ import 'package:vibration/vibration.dart';
 import 'chat_page_view_test.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/widgets/player.dart';
 
 var parser = EmojiParser();
 List listMessages = [];
@@ -59,7 +58,6 @@ class _ChatPageState extends State<ChatPage> {
   Api api = Api();
   int page = 1;
   // RefreshController _refreshController = RefreshController();
-  ScrollController _scrollController = ScrollController();
   RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   String statusText = "";
@@ -176,6 +174,11 @@ class _ChatPageState extends State<ChatPage> {
         case "message:create":
           var message = e.json['data'];
           print("Message created with data $message");
+          if(message['type'].toString() == '1'){
+            // setState(() {
+            //   uploadingImage = null;
+            // });
+          }
           if ('${widget.chatID}' == '${e.json['data']['chat_id']}') {
             if(isUploaded){
               setState(() {
@@ -193,6 +196,7 @@ class _ChatPageState extends State<ChatPage> {
               });
             }
           }
+
           break;
         case "chat:create":
           ChatRoom.shared.getMessages(widget.chatID);
@@ -207,8 +211,19 @@ class _ChatPageState extends State<ChatPage> {
         case "user:writing":
           if(e.json['data'][0]['chat_id'].toString() == widget.chatID.toString()){
             setState(() {
-              typingName = e.json['data'][0]['name'];
+              
               typingMembers = e.json['data'].toList();
+              for(var i=0; i<typingMembers.length; i++){
+                if(typingMembers.length==1){
+                  typingName = typingMembers[0]['name'];
+                } else {
+                  if(i==0){
+                    typingName = "${typingMembers[i]['name']}";
+                  } else {
+                    typingName = "$typingName, ${typingMembers[i]['name']}";
+                  }
+                }
+              }
               if(e.json['data'].toList().length>1){
                 typingMembers.forEach((element) {
                   typingName = "$typingName, ${element['name']}";
@@ -336,7 +351,6 @@ class _ChatPageState extends State<ChatPage> {
             }];
             setState(() {
               isUploaded = true;
-              uploadingImage = null;
             });
             ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
           } else {
@@ -667,117 +681,87 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
+                ),
               ),
             ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: InkWell(
-          child: Column(
-            children: <Widget>[
-              Text(
-                widget.name.length != 0
-                    ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}"
-                    : "",
-                style: TextStyle(
-                    color: Color(0xFF001D52), fontWeight: FontWeight.w400),
-                overflow: TextOverflow.ellipsis,
-              ),
-              isSomeoneTyping?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      (widget.memberCount > 2)?
-                      Text("$typingName ",
-                        style: TextStyle(
+          title: InkWell(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  widget.name.length != 0
+                      ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}"
+                      : "",
+                  style: TextStyle(
+                      color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                isSomeoneTyping?
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        (widget.memberCount > 2)?
+                        Text("$typingName ",
+                          style: TextStyle(
+                                    color: Color(0xFF001D52),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400)
+                          ):Container(),
+                        Text(typingMembers.length>1?"печатают ":"печатает ",
+                          style: TextStyle(
                                   color: Color(0xFF001D52),
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400)
-                        ):Container(),
-                      Text(typingMembers.length>1?"печатают ":"печатает ",
+                        ),
+                        Image.asset("assets/typing.gif", width: 20,)
+                      ],
+                    )
+                    :
+                (widget.memberCount > 2)
+                    ? Text(
+                        '${localization.members} ${widget.memberCount}',
                         style: TextStyle(
+                            color: Color(0xFF001D52),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400),
+                      )
+                    : 
+                    online == null
+                        ? Container()
+                        : Text(
+                            ('$online' == 'online' || '$online' == 'offline')
+                                ? '$online'
+                                : 'был в сети $online',
+                            style: TextStyle(
                                 color: Color(0xFF001D52),
                                 fontSize: 14,
-                                fontWeight: FontWeight.w400)
-                      ),
-                      Image.asset("assets/typing.gif", width: 20,)
-                    ],
-                  )
-                  :
-              (widget.memberCount > 2)
-                  ? Text(
-                      '${localization.members} ${widget.memberCount}',
-                      style: TextStyle(
-                          color: Color(0xFF001D52),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400),
-                    )
-                  : 
-                  online == null
-                      ? Container()
-                      : Text(
-                          ('$online' == 'online' || '$online' == 'offline')
-                              ? '$online'
-                              : 'был в сети $online',
-                          style: TextStyle(
-                              color: Color(0xFF001D52),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400),
-                        ),
-            ],
-          ),
-          onTap: () {
-            ChatRoom.shared.setChatInfoStream();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatProfileInfo(
-                  chatName: widget.name,
-                  chatAvatar:
-                      widget.avatar == null ? 'noAvatar.png' : widget.avatar,
-                  chatMembers: widget.memberCount,
-                  chatId: widget.chatID,
-                ),
-              ),
-            ).whenComplete(() {});
-          },
-        ),
-        actions: <Widget>[
-          MaterialButton(
-            elevation: 0,
-            color: Colors.transparent,
-            textColor: Colors.white,
-            child: CircleAvatar(
-              radius: 25,
-              child: ClipOval(
-                  child: CachedNetworkImage(
-                      imageUrl: widget.avatar == null
-                          ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
-                          : widget.avatarUrl == null
-                              ? "https://indigo24.xyz/uploads/avatars/" +
-                                  widget.avatar
-                              : widget.avatarUrl + widget.avatar,
-                      errorWidget: (context, url, error) => CachedNetworkImage(
-                          imageUrl:
-                              "https://media.indigo24.com/avatars/noAvatar.png"))),
+                                fontWeight: FontWeight.w400),
+                          ),
+              ],
             ),
-            // padding: EdgeInsets.all(16),
-            shape: CircleBorder(),
-            onPressed: () {
+            onTap: () {
               ChatRoom.shared.setChatInfoStream();
               Navigator.push(
                 context,
@@ -793,294 +777,332 @@ class _ChatPageState extends State<ChatPage> {
               ).whenComplete(() {});
             },
           ),
-        ],
-        backgroundColor: Colors.white,
-        brightness: Brightness.light,
-      ),
-      body: SafeArea(
-      child: Container(
-        child: Stack(
-          fit: StackFit.loose,
-          children: <Widget>[
-            // Image(
-            //   width: MediaQuery.of(context).size.width,
-            //   image:
-            //       ExactAssetImage('assets/images/background_chat.png'),
-            //   fit: BoxFit.cover,
-            //   // colorFilter: ColorFilter.linearToSrgbGamma()
-            // ),
-            Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: backgroundForChat),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisAlignment: MainAxisAlignment.start,
-              // mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Divider(
-                  height: 0,
-                  color: Colors.black54,
-                ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  // height: 500,
-                  child: Container(
-                    // width: MediaQuery.of(context).size.width,
-                    // decoration: BoxDecoration(
-                    //   image: DecorationImage(
-                    //       image:
-                    //           AssetImage('assets/images/background_chat.png'),
-                    //       fit: BoxFit.cover,
-                    //       colorFilter: ColorFilter.linearToSrgbGamma()),
-                    // ),
-                    child: Container(
-                      child: myList.isEmpty
-                          ? Center(
-                              child: Image.asset("assets/empty.gif", height: MediaQuery.of(context).size.width / 2,)
-                            )
-                          : Column(
-                            children: [
-                              Expanded(
-                                child: SmartRefresher(
-                                    enablePullDown: false,
-                                    enablePullUp: true,
-                                    // header: WaterDropHeader(),
-                                    footer: CustomFooter(
-                                      builder:
-                                          (BuildContext context, LoadStatus mode) {
-                                        Widget body;
-                                        return Container(
-                                          height: 55.0,
-                                          child: Center(child: body),
-                                        );
-                                      },
-                                    ),
-                                    controller: _refreshController,
-                                    onRefresh: _onRefresh,
-                                    onLoading: _onLoading,
-                                    child: ListView.builder(
-                                      controller: controller,
-                                      itemCount: myList.length,
-                                      reverse: true,
-                                      itemBuilder: (context, i) {
-                                        return message(myList[i]);
-                                      },
-                                    ),
-                                  ),
-                              ),
-
-                              isEditing?Container(
-                                height: 50,
-                                width: MediaQuery.of(context).size.width,
-                                color: Colors.white,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        // Container(
-                                        //   width: MediaQuery.of(context).size.width*0.07,
-                                        // ),
-                                        IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
-                                        Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
-                                        Container(width: 5),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text("Редактирование", style: TextStyle(color: Color(0xff0543B8))),
-                                            Text("${editMessage["text"]}")
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: IconButton(
-                                          icon: Icon(Icons.close),
-                                          onPressed: (){
-                                            setState(() {
-                                              isEditing = false;
-                                              editMessage = null;
-                                              _text.text = "";
-                                            });
-                                          },
-                                        ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                              :
-                              Container()
-                            ],
-                          ),
+          actions: <Widget>[
+            MaterialButton(
+              elevation: 0,
+              color: Colors.transparent,
+              textColor: Colors.white,
+              child: CircleAvatar(
+                radius: 25,
+                child: ClipOval(
+                    child: CachedNetworkImage(
+                        imageUrl: widget.avatar == null
+                            ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+                            : widget.avatarUrl == null
+                                ? "https://indigo24.xyz/uploads/avatars/" +
+                                    widget.avatar
+                                : widget.avatarUrl + widget.avatar,
+                        errorWidget: (context, url, error) => CachedNetworkImage(
+                            imageUrl:
+                                "https://media.indigo24.com/avatars/noAvatar.png"))),
+              ),
+              // padding: EdgeInsets.all(16),
+              shape: CircleBorder(),
+              onPressed: () {
+                ChatRoom.shared.setChatInfoStream();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatProfileInfo(
+                      chatName: widget.name,
+                      chatAvatar:
+                          widget.avatar == null ? 'noAvatar.png' : widget.avatar,
+                      chatMembers: widget.memberCount,
+                      chatId: widget.chatID,
                     ),
                   ),
-                ),
-                Divider(height: 0, color: Colors.black26),
-                // SizedBox(
-                //   height: 50,
-                Container(
-                  color: Colors.white,
+                ).whenComplete(() {});
+              },
+            ),
+          ],
+          backgroundColor: Colors.white,
+          brightness: Brightness.light,
+        ),
+        body: SafeArea(
+        child: Container(
+          child: Stack(
+            fit: StackFit.loose,
+            children: <Widget>[
+              // Image(
+              //   width: MediaQuery.of(context).size.width,
+              //   image:
+              //       ExactAssetImage('assets/images/background_chat.png'),
+              //   fit: BoxFit.cover,
+              //   // colorFilter: ColorFilter.linearToSrgbGamma()
+              // ),
+              Container(
                   width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            // isComplete
-                            //     ? GestureDetector(
-                            //         onTap: () {
-                            //           play();
-                            //         },
-                            //         child: Center(
-                            //           child: Icon(
-                            //             Icons.play_arrow,
-                            //             size: 30,
-                            //           ),
-                            //         ),
-                            //       )
-                            //     : 
-                                IconButton(
-                                    icon: Icon(Icons.attach_file),
-                                    onPressed: () {
-                                      print("Прикрепить");
-                                      SystemChannels.textInput.invokeMethod('TextInput.hide');
-                                      showAttachmentBottomSheet(context);
-                                    },
-                                  ),
-                            !isRecording
-                                ? Flexible(
-                                    child: TextField(
-                                      maxLines: 6,
-                                      minLines: 1,
-                                      controller: _text,
-                                      onChanged: (value) {
-                                        print("Typing: $value");
-                                        if (value == '') {
-                                          setState(() {
-                                            isTyping = false;
-                                          });
-                                        } else {
-                                          ChatRoom.shared.typing(widget.chatID);
-                                          setState(() {
-                                            isTyping = true;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  )
-                                : 
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Image.asset("assets/record.gif", width: 10, height: 10),
-                                      Container(width: 5),
-                                      TimerText(dependencies: dependencies),
-                                    ],
-                                ),
-                            !isTyping
-                                ? ClipOval(
-                                    child: GestureDetector(
-                                      onLongPress: () async {
-                                        print("long press");
-                                        bool p = await checkPermission();
-                                        if(p){
-                                          startRecord();
-                                        }
-                                        
-                                      },
-                                      onLongPressUp: () {
-                                        print("long press UP");
-                                        stopRecord();
-                                      },
-                                      // onTap: () {
-                                      //   startRecord();
-                                      // },
-                                      // onDoubleTap: () {
-                                      //   stopRecord();
-                                      // },
-                                      child: Center(
-                                        child: !isRecording?
-                                        Icon(
-                                          Icons.mic,
-                                          size: 30,
-                                        )
-                                        : Container()
+                  height: MediaQuery.of(context).size.height,
+                  child: backgroundForChat),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisAlignment: MainAxisAlignment.start,
+                // mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Divider(
+                    height: 0,
+                    color: Colors.black54,
+                  ),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    // height: 500,
+                    child: Container(
+                      // width: MediaQuery.of(context).size.width,
+                      // decoration: BoxDecoration(
+                      //   image: DecorationImage(
+                      //       image:
+                      //           AssetImage('assets/images/background_chat.png'),
+                      //       fit: BoxFit.cover,
+                      //       colorFilter: ColorFilter.linearToSrgbGamma()),
+                      // ),
+                      child: Container(
+                        child: myList.isEmpty
+                            ? Center(
+                                child: Image.asset("assets/empty.gif", height: MediaQuery.of(context).size.width / 2,)
+                              )
+                            : Column(
+                              children: [
+                                Expanded(
+                                  child: SmartRefresher(
+                                      enablePullDown: false,
+                                      enablePullUp: true,
+                                      // header: WaterDropHeader(),
+                                      footer: CustomFooter(
+                                        builder:
+                                            (BuildContext context, LoadStatus mode) {
+                                          Widget body;
+                                          return Container(
+                                            height: 55.0,
+                                            child: Center(child: body),
+                                          );
+                                        },
+                                      ),
+                                      controller: _refreshController,
+                                      onRefresh: _onRefresh,
+                                      onLoading: _onLoading,
+                                      child: ListView.builder(
+                                        controller: controller,
+                                        itemCount: myList.length,
+                                        reverse: true,
+                                        itemBuilder: (context, i) {
+                                          return message(myList[i]);
+                                        },
                                       ),
                                     ),
-                                  )
+                                ),
 
-                                // IconButton(
-                                //   icon: Icon(Icons.mic),
-                                //   onPressed: () {
-                                //     print("audio pressed");
-                                //   },
-                                // )
-                                : IconButton(
-                                    icon: Icon(Icons.send),
-                                    onPressed: () {
-                                      print("new message or editing? editing: $isEditing");
-                                      if(isEditing){
-                                        print("Edit message is called");
-                                        var mId = editMessage['id']==null?editMessage['message_id']:editMessage['id'];
-                                        var type = editMessage['type'];
-                                        var time = editMessage['time'];
-                                        ChatRoom.shared.editMessage(_text.text, widget.chatID, type, time, mId);
-                                        setState(() {
-                                            isTyping = false;
-                                            _text.text = '';
-                                            isEditing = false;
-                                            editMessage = null;
-                                        });
-                                      } else {
-                                        ChatRoom.shared.sendMessage(
-                                          '${widget.chatID}', _text.text);
-                                          setState(() {
-                                            isTyping = false;
-                                            _text.text = '';
-                                          });
-                                      }
-                                    },
+                                isEditing?Container(
+                                  height: 50,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.white,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          // Container(
+                                          //   width: MediaQuery.of(context).size.width*0.07,
+                                          // ),
+                                          IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
+                                          Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
+                                          Container(width: 5),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text("Редактирование", style: TextStyle(color: Color(0xff0543B8))),
+                                              Text("${editMessage["text"]}")
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: IconButton(
+                                            icon: Icon(Icons.close),
+                                            onPressed: (){
+                                              setState(() {
+                                                isEditing = false;
+                                                editMessage = null;
+                                                _text.text = "";
+                                              });
+                                            },
+                                          ),
+                                      ),
+                                    ],
                                   ),
-                          ],
-                        ),
-                      ],
+                                )
+                                :
+                                Container()
+                              ],
+                            ),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            isRecording?
-            Positioned.fill(
-              // top: 100,
-              left: MediaQuery.of(context).size.width*0.8,
-              child: Image.asset(
-                "assets/voice.gif",
-                // fit: BoxFit.fitWidth,
-                width: 100,
-                height: 100,
-                alignment: Alignment.bottomCenter,
+                  Divider(height: 0, color: Colors.black26),
+                  // SizedBox(
+                  //   height: 50,
+                  Container(
+                    color: Colors.white,
+                    width: MediaQuery.of(context).size.width,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 5, right: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              // isComplete
+                              //     ? GestureDetector(
+                              //         onTap: () {
+                              //           play();
+                              //         },
+                              //         child: Center(
+                              //           child: Icon(
+                              //             Icons.play_arrow,
+                              //             size: 30,
+                              //           ),
+                              //         ),
+                              //       )
+                              //     : 
+                                  IconButton(
+                                      icon: Icon(Icons.attach_file),
+                                      onPressed: () {
+                                        print("Прикрепить");
+                                        SystemChannels.textInput.invokeMethod('TextInput.hide');
+                                        showAttachmentBottomSheet(context);
+                                      },
+                                    ),
+                              !isRecording
+                                  ? Flexible(
+                                      child: TextField(
+                                        maxLines: 6,
+                                        minLines: 1,
+                                        controller: _text,
+                                        onChanged: (value) {
+                                          print("Typing: $value");
+                                          if (value == '') {
+                                            setState(() {
+                                              isTyping = false;
+                                            });
+                                          } else {
+                                            ChatRoom.shared.typing(widget.chatID);
+                                            setState(() {
+                                              isTyping = true;
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    )
+                                  : 
+                                  Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Image.asset("assets/record.gif", width: 10, height: 10),
+                                        Container(width: 5),
+                                        TimerText(dependencies: dependencies),
+                                      ],
+                                  ),
+                              !isTyping
+                                  ? ClipOval(
+                                      child: GestureDetector(
+                                        onLongPress: () async {
+                                          print("long press");
+                                          bool p = await checkPermission();
+                                          if(p){
+                                            startRecord();
+                                          }
+                                          
+                                        },
+                                        onLongPressUp: () {
+                                          print("long press UP");
+                                          stopRecord();
+                                        },
+                                        // onTap: () {
+                                        //   startRecord();
+                                        // },
+                                        // onDoubleTap: () {
+                                        //   stopRecord();
+                                        // },
+                                        child: Center(
+                                          child: !isRecording?
+                                          Icon(
+                                            Icons.mic,
+                                            size: 30,
+                                          )
+                                          : Container()
+                                        ),
+                                      ),
+                                    )
+
+                                  // IconButton(
+                                  //   icon: Icon(Icons.mic),
+                                  //   onPressed: () {
+                                  //     print("audio pressed");
+                                  //   },
+                                  // )
+                                  : IconButton(
+                                      icon: Icon(Icons.send),
+                                      onPressed: () {
+                                        print("new message or editing? editing: $isEditing");
+                                        if(isEditing){
+                                          print("Edit message is called");
+                                          var mId = editMessage['id']==null?editMessage['message_id']:editMessage['id'];
+                                          var type = editMessage['type'];
+                                          var time = editMessage['time'];
+                                          ChatRoom.shared.editMessage(_text.text, widget.chatID, type, time, mId);
+                                          setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                              isEditing = false;
+                                              editMessage = null;
+                                          });
+                                        } else {
+                                          ChatRoom.shared.sendMessage(
+                                            '${widget.chatID}', _text.text);
+                                            setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                            });
+                                        }
+                                      },
+                                    ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            )
-            :
-            Container(),
-            // Container(
-            //   width: 200,
-            //   height: 200,
-            //   margin: EdgeInsets.only(
-            //     left:MediaQuery.of(context).size.width*0.85,
-            //     top: MediaQuery.of(context).size.height*0.78
-            //   ),
-            //   // alignment: Alignment.bottomRight,
-            //   child: OverflowBox(child: Image.asset("assets/voice.gif", width: 200, height: 200,)),
-            // ),
-          ],
-        ),
-      )),
+              isRecording?
+              Positioned.fill(
+                // top: 100,
+                left: MediaQuery.of(context).size.width*0.8,
+                child: Image.asset(
+                  "assets/voice.gif",
+                  // fit: BoxFit.fitWidth,
+                  width: 100,
+                  height: 100,
+                  alignment: Alignment.bottomCenter,
+                ),
+              )
+              :
+              Container(),
+              // Container(
+              //   width: 200,
+              //   height: 200,
+              //   margin: EdgeInsets.only(
+              //     left:MediaQuery.of(context).size.width*0.85,
+              //     top: MediaQuery.of(context).size.height*0.78
+              //   ),
+              //   // alignment: Alignment.bottomRight,
+              //   child: OverflowBox(child: Image.asset("assets/voice.gif", width: 200, height: 200,)),
+              // ),
+            ],
+          ),
+        )),
+      ),
     );
   }
 
@@ -1447,8 +1469,3 @@ class Sended extends StatelessWidget {
     return '$hours:$minutes';
   }
 }
-
-
-
-
-

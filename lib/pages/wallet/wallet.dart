@@ -4,16 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/pin_code.dart';
-import 'package:indigo24/pages/refill.dart';
-import 'package:indigo24/pages/withdraw.dart';
+import 'package:indigo24/pages/wallet/payments/payments_category.dart';
+import 'package:indigo24/pages/wallet/refill/refill.dart';
+import 'package:indigo24/pages/wallet/transfers/transfer_list.dart';
+import 'package:indigo24/pages/wallet/withdraw/withdraw.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/style/fonts.dart';
+import 'package:indigo24/widgets/circle.dart';
+import 'package:indigo24/widgets/keyboard.dart';
+import 'package:indigo24/widgets/pin_code.dart';
 import 'package:polygon_clipper/polygon_border.dart';
-import '../style/fonts.dart';
-import 'circle.dart';
-import 'keyboard.dart';
-import 'payments_category.dart';
-import 'transfer_list.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -36,7 +36,9 @@ class _WalletTabState extends State<WalletTab> {
   double _amount;
   double _blockedAmount = 0;
   String _symbol;
+  String _tengeSymbol = '₸';
   double _realAmount = 0;
+  double _globalCoef = 0;
   double _tengeCoef = 1;
   double _euroCoef = 0;
   double _rubleCoef = 0;
@@ -179,11 +181,6 @@ class _WalletTabState extends State<WalletTab> {
     _blockedAmount = double.parse(user.balanceInBlock);
     _amount = _realAmount;
     api.getExchangeRate().then((v) {
-      print(v);
-      print(v);
-      print(v);
-      print(v);
-      print(v);
       if(v['message'] == 'Not authenticated' && v['success'].toString() == 'false')
       {
         logOut(context);
@@ -234,6 +231,9 @@ class _WalletTabState extends State<WalletTab> {
                         SizedBox(height: 10),
                         _balanceAmount(),
                         _exchangeButtons(),
+                        _symbol == _tengeSymbol  
+                        ? Text('')
+                        : _exchangeCurrency(size),
                         _blockedBalance(size),
                         Container(
                           color: Colors.white,
@@ -256,6 +256,26 @@ class _WalletTabState extends State<WalletTab> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Container _exchangeCurrency(size) { 
+    String tempSymbol = '$_symbol';
+    String tempExchangeRate = '$_globalCoef';
+    return Container(
+      width: size.width,
+      color: Color(0xFF033083),
+      alignment: Alignment.center,
+      padding: EdgeInsets.symmetric(vertical: 5),
+      child: Text(
+        tempSymbol == '\$' 
+        ? '$tempSymbol 1 = $tempExchangeRate $_tengeSymbol'
+        : '1 $tempSymbol = $tempExchangeRate $_tengeSymbol',
+        style: TextStyle(
+          color: Colors.white, 
+          fontWeight: FontWeight.w300
         ),
       ),
     );
@@ -527,6 +547,7 @@ class _WalletTabState extends State<WalletTab> {
               _amount = _realAmount / _tengeCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
               _symbol = '${String.fromCharCodes(Runes('\u20B8'))}';
+              _globalCoef = _tengeCoef;
             });
           },
         ),
@@ -554,6 +575,8 @@ class _WalletTabState extends State<WalletTab> {
               _amount = _realAmount / _rubleCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
               _symbol = '${String.fromCharCodes(Runes('\u20BD'))}';
+              _globalCoef = _rubleCoef;
+
             });
           },
         ),
@@ -581,6 +604,7 @@ class _WalletTabState extends State<WalletTab> {
               _amount = _realAmount / _dollarCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
               _symbol = '${String.fromCharCodes(Runes('\u0024'))}';
+              _globalCoef = _dollarCoef;
             });
           },
         ),
@@ -608,6 +632,7 @@ class _WalletTabState extends State<WalletTab> {
               _amount = _realAmount / _euroCoef;
               _amount = num.parse(_amount.toStringAsFixed(3));
               _symbol = '${String.fromCharCodes(Runes('\u20AC'))}';
+              _globalCoef = _euroCoef;
             });
           },
         ),

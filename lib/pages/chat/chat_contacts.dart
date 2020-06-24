@@ -1,16 +1,16 @@
 import 'dart:async';
+import 'package:app_settings/app_settings.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/pages/chat.dart';
-import 'package:indigo24/pages/chat_group_selection.dart';
+import 'package:indigo24/main.dart';
+import 'package:indigo24/pages/chat/chat.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 
-import '../main.dart';
 var contacts = [];
 
 class ChatContactsPage extends StatefulWidget {
@@ -51,6 +51,30 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     actualList.addAll(contacts);
     ChatRoom.shared.setContactsStream();
     listen();
+    getContacts(context).then((getContactsResult){
+      if(!getContactsResult){
+        Widget okButton = CupertinoDialogAction(
+          child: Text("Открыть настройки"),
+          onPressed: () {
+            Navigator.pop(context);
+            AppSettings.openAppSettings();
+          },
+        );
+        CupertinoAlertDialog alert = CupertinoAlertDialog(
+          title: Text("Ошибка"),
+          content: Text('Разрешите доступ к контактам'),
+          actions: [
+            okButton,
+          ],
+        );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return alert;
+          },
+        );
+      }
+    });
   }
 
   listen() {
@@ -245,7 +269,30 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                     onPressed: () {
                       print('update contacts');
                       setState((){
-                        getContacts();
+                        getContacts(context).then((getContactsResult){
+                          if(!getContactsResult){
+                            Widget okButton = CupertinoDialogAction(
+                              child: Text("Открыть настройки"),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                AppSettings.openAppSettings();
+                              },
+                            );
+                            CupertinoAlertDialog alert = CupertinoAlertDialog(
+                              title: Text("Ошибка"),
+                              content: Text('Разрешите доступ к контактам'),
+                              actions: [
+                                okButton,
+                              ],
+                            );
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return alert;
+                              },
+                            );
+                          }
+                        });
                       });
                     },
                   )
@@ -372,7 +419,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                   ),
                                 );
                               },
-                            ) : Center(child: CircularProgressIndicator(),),
+                            ) : Center(
+                              child: CircularProgressIndicator()),
                           ),
                         ],
                       ),

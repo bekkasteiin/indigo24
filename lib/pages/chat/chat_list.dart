@@ -3,9 +3,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/db/chats_model.dart';
-import 'package:indigo24/pages/chat.dart';
-import 'package:indigo24/pages/chat_contacts.dart';
-import 'package:indigo24/pages/chat_group_selection.dart';
+import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/pages/chat/chat_contacts.dart';
+import 'package:indigo24/pages/chat/chat_group_selection.dart';
+import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -27,8 +28,6 @@ int chatsPage = 1;
 class _ChatsListPageState extends State<ChatsListPage>
     with AutomaticKeepAliveClientMixin {
   bool isOffline = false;
-
-  int _counter = 0;
 
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
@@ -79,6 +78,9 @@ class _ChatsListPageState extends State<ChatsListPage>
               memberCount: memberCount, userIds: userIds,
               avatar: avatar, avatarUrl: avatarUrl,)),
     ).whenComplete(() {
+      setState(() {
+        uploadingImage = null;
+      });
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
@@ -285,9 +287,9 @@ class _ChatsListPageState extends State<ChatsListPage>
                               ),
                               myList[i]['unread_messages'] == 0
                                   ? Container()
-                                  :
-                                  myList[i]['unread_messages'].toString().startsWith('-')?
-                                  Container()
+                                  // :
+                                  // myList[i]['unread_messages'].toString().startsWith('-')?
+                                  // Container()
                                   : Container(
                                       // width: 20,
                                       decoration: BoxDecoration(

@@ -5,15 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/circle.dart';
-import 'package:indigo24/pages/pin_code.dart';
+import 'package:indigo24/services/api.dart';
 
-import '../services/api.dart';
-import '../style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/fonts.dart';
+import 'package:indigo24/widgets/circle.dart';
+import 'package:indigo24/widgets/keyboard.dart';
+import 'package:indigo24/widgets/pin_code.dart';
 
-import 'keyboard.dart';
 
 class TransferPage extends StatefulWidget {
   @override
@@ -353,11 +353,6 @@ class _TransferPageState extends State<TransferPage> {
                     onChanged: (value){
                       if(sumController.text[0] == '0'){
                         sumController.clear();
-                      }
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        print('empty');
                       }
                     },
                   ),

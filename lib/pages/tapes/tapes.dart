@@ -1,13 +1,13 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/pages/add_tape.dart';
+import 'package:indigo24/main.dart';
+import 'package:indigo24/pages/tapes/add_tape.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:video_player/video_player.dart';
-import '../main.dart';
 import 'tape.dart';
 
 class TapesPage extends StatefulWidget {

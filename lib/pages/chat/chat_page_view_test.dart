@@ -3,15 +3,15 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/chat.dart';
-import 'package:indigo24/pages/full_photo.dart';
-import 'package:indigo24/pages/tapes.dart';
-import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/widgets/full_photo.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'chat.dart';
 
 var parser = EmojiParser();
 
@@ -301,11 +301,10 @@ class SendedMessageWidget extends StatelessWidget {
                     child: uploadingImage!=null?
                     Stack(
                       children: [
-                        
                         Container(
                           width: MediaQuery.of(context).size.width*0.7,
                           height: MediaQuery.of(context).size.width*0.7,
-                          child: Image.file(uploadingImage, fit: BoxFit.fill,),
+                          child: Image.file(uploadingImage, fit: BoxFit.cover,),
                         ),
                         Container(
                           width: MediaQuery.of(context).size.width*0.7,
@@ -313,13 +312,13 @@ class SendedMessageWidget extends StatelessWidget {
                           color: Colors.grey.withOpacity(0.5),
                         ),
                         Center(
-                          child: Image.asset("assets/preloader.gif"),
+                          child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
                         ),
                       ],
                     )
                     :
                     Center(
-                      child: CircularProgressIndicator(),
+                      child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
                     ),
                   )
                   :
@@ -365,8 +364,8 @@ class SendedMessageWidget extends StatelessWidget {
     );
   }
 }
-                              List imageCount = [];
-                              var test;
+  List imageCount = [];
+  var test;
 
 
 class ReceivedMessageWidget extends StatelessWidget {
@@ -539,6 +538,39 @@ class ImageMessage extends StatelessWidget {
   final imageCount;
   ImageMessage(this.imageUrl, this.fullImageUrl, {this.imageCount});
 
+  Widget placeholder(context){
+    return Container(
+      child: uploadingImage!=null?
+            Stack(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width*0.7,
+                  height: MediaQuery.of(context).size.width*0.7,
+                  child: Image.file(uploadingImage, fit: BoxFit.cover),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width*0.7,
+                  height: MediaQuery.of(context).size.width*0.7,
+                  color: Colors.grey.withOpacity(0.5),
+                ),
+                Center(
+                  child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
+                ),
+              ],
+            ) : Center(
+          child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
+        ),
+      width: MediaQuery.of(context).size.width*0.7,
+      height: MediaQuery.of(context).size.width*0.7,
+      // padding: EdgeInsets.all(70.0),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.all(
+          Radius.circular(8.0),
+        ),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -549,27 +581,16 @@ class ImageMessage extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: CachedNetworkImage(
-            placeholder: (context, url) => Container(
-              child: CircularProgressIndicator(
-                // valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-              ),
-              // width: 200.0,
-              // height: 200.0,
-              width: MediaQuery.of(context).size.width*0.7,
-              height: MediaQuery.of(context).size.width*0.7,
-              padding: EdgeInsets.all(70.0),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(8.0),
-                ),
-              ),
-            ),
+            // progressIndicatorBuilder: (context, url, progress) {
+            //   if(progress.progress == 1){
+            //     uploadingImage = null;
+            //   }
+            //   return placeholder(context);
+            // },
+            placeholder: (context, url) => placeholder(context),
             errorWidget: (context, url, error) => Material(
               child: Image.asset(
-                'assets/loading.gif',
-                // width: 200.0,
-                // height: 200.0,
+                'assets/preloader.gif',
                 width: MediaQuery.of(context).size.width*0.7,
                 height: MediaQuery.of(context).size.width*0.7,
                 fit: BoxFit.contain,

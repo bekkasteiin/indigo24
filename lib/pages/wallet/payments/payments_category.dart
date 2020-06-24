@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/services/api.dart';
 
-import '../services/api.dart';
 import 'payments_history.dart';
 import 'payments_services.dart';
 import 'package:indigo24/services/localization.dart' as localization;
