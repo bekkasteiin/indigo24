@@ -258,6 +258,47 @@ class ChatRoom {
     listen();
   }
 
+  editingMessage(m){
+    print("EDITING IN SOCKET $m");
+    var object = {
+      "cmd": "editMessage",
+      "text": m['text'],
+      "message_id": m['id'],
+      "message": m
+    };
+    var json = jsonDecode(jsonEncode(object));
+
+    if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+  }
+
+  editMessage(message, chatID, type, time, mId){
+    outSound();
+
+    message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
+    message = message.trimLeft();
+    message = message.trimRight();
+    if (message.isNotEmpty) {
+      var data = json.encode({
+        "cmd": 'message:edit',
+        "data": {
+          "user_id": "${user.id}",
+          "userToken": "${user.unique}",
+          "chat_id": "$chatID",
+          "text": '$message',
+          "message_id": mId,
+          "message_type": type==null?0:type,
+          "time": time
+          // "attachments": attachments==null?null:attachments
+        }
+      });
+      print('added message');
+      print("$data");
+      channel.sink.add(data);
+    } else {
+      print('message is empty');
+    }
+  }
+
   listen() {
     
     channel.stream.listen(
@@ -266,6 +307,7 @@ class ChatRoom {
 
         var cmd = json['cmd'];
         var data = json['data'];
+
         switch (cmd) {
           case "init":
 
@@ -327,6 +369,13 @@ class ChatRoom {
           case "user:writing": 
             if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
             break;
+          case "message:deleted:all": 
+            if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+            break;
+          case "message:edit":
+            if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+            break;
+            
           default:
             print('default print cmd: $cmd json: $json');
         }

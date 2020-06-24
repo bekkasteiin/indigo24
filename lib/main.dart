@@ -51,7 +51,6 @@ String formatPhone(String phone) {
             el.phones.forEach((phone) {
               if (!contacts.contains(formatPhone(phone.value))) {
                 phone.value = formatPhone(phone.value);
-                print('name: ${el.displayName } phone:${phone.value} index: $test');
                 contacts.add({
                   'name': el.displayName,
                   'phone': phone.value,
@@ -68,7 +67,9 @@ String formatPhone(String phone) {
       return "disconnect";
     }
   }
-
+  permissionForPush() async {
+    await Permission.notification.request();
+  }
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -97,7 +98,7 @@ Future<void> main() async {
 
 
   getContacts();
-
+  permissionForPush();
 
   runApp(MyApp(phone: phone, authenticated: authenticated));
 }
@@ -265,7 +266,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.onChange.listen((e) async {
       print("LISTENING EVENT");
       var cmd = e.json["cmd"];
-      print(e.json);
+      // print(e.json);
       switch (cmd) {
         case 'message:create':
           

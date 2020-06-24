@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/services/test_timer.dart';
+import 'package:indigo24/widgets/preview.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:record_mp3/record_mp3.dart';
@@ -64,7 +65,9 @@ class _ChatPageState extends State<ChatPage> {
   String statusText = "";
   bool isComplete = false;
   bool hasPermission = false;
-
+  bool isEditing = false;
+  var editMessage;
+  
   String _fileName;
   String _path;
   Map<String, String> _paths;
@@ -150,7 +153,6 @@ class _ChatPageState extends State<ChatPage> {
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
       print("CABINET EVENT");
-      print(e.json);
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
@@ -173,6 +175,7 @@ class _ChatPageState extends State<ChatPage> {
           break;
         case "message:create":
           var message = e.json['data'];
+          print("Message created with data $message");
           if ('${widget.chatID}' == '${e.json['data']['chat_id']}') {
             if(isUploaded){
               setState(() {
@@ -221,8 +224,36 @@ class _ChatPageState extends State<ChatPage> {
               });
             }
           }
-          
-          
+          break;
+        case "message:deleted:all": 
+          var mId = e.json['data']['message_id'];
+          print("deleting $mId");
+          var i = myList.indexWhere((element) => 
+            (element['id']==null?element['message_id']:element['id']) == mId
+          );
+          print("deleting ${e.json}");
+          setState(() {
+            myList.removeAt(i);
+            listMessages.removeAt(i);
+          });
+          break;
+        case "message:edit":
+          var mId = e.json['data']['message_id'];
+          var i = myList.indexWhere((element) => 
+            (element['id']==null?element['message_id']:element['id']) == mId
+          );
+          print("editing ${e.json}");
+          setState(() {
+            myList[i] = e.json['data'];
+            listMessages[i] = e.json['data'];
+          });
+          break;
+        case "editMessage":
+          _text.text = e.json['text'];
+          setState(() {
+            isEditing = true;
+            editMessage = e.json['message'];
+          });
           break;
         default:
           print('CABINET EVENT DEFAULT');
@@ -279,29 +310,42 @@ class _ChatPageState extends State<ChatPage> {
       // avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: AdilTest, text: tres, type: 0}
       
 
-      setState(() {
-        isUploading = true;
-        uploadingImage = _image;
-        myList.insert(0, uploadingMessage);
+      final popResult = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PreviewMedia(
+            filePath: pickedFile.path,
+          ),
+        ),
+      ).whenComplete(() {
       });
 
-      api.uploadMedia(_image.path, 1).then((r) async {
-        print("RRR $r");
-        if (r["status"]) {
-          var a = [{
-            "filename": "${r["file_name"]}",
-            "r_filename": "${r["resize_file_name"]}"
-          }];
-          setState(() {
-            isUploaded = true;
-            uploadingImage = null;
-          });
-          ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
-        } else {
-          showAlertDialog(context, r["message"]);
-          print("error");
-        }
-      });
+      if(popResult=="sending"){
+        setState(() {
+          isUploading = true;
+          uploadingImage = _image;
+          myList.insert(0, uploadingMessage);
+        });
+
+        api.uploadMedia(_image.path, 1).then((r) async {
+          print("RRR $r");
+          if (r["status"]) {
+            var a = [{
+              "filename": "${r["file_name"]}",
+              "r_filename": "${r["resize_file_name"]}"
+            }];
+            setState(() {
+              isUploaded = true;
+              uploadingImage = null;
+            });
+            ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
+          } else {
+            showAlertDialog(context, r["message"]);
+            print("error");
+          }
+        });
+      }
+      
     }
   }
 
@@ -622,6 +666,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -654,6 +699,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
               isSomeoneTyping?
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       (widget.memberCount > 2)?
                       Text("$typingName ",
@@ -823,6 +869,50 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                   ),
                               ),
+
+                              isEditing?Container(
+                                height: 50,
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.white,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        // Container(
+                                        //   width: MediaQuery.of(context).size.width*0.07,
+                                        // ),
+                                        IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
+                                        Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
+                                        Container(width: 5),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text("Редактирование", style: TextStyle(color: Color(0xff0543B8))),
+                                            Text("${editMessage["text"]}")
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: (){
+                                            setState(() {
+                                              isEditing = false;
+                                              editMessage = null;
+                                              _text.text = "";
+                                            });
+                                          },
+                                        ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              :
+                              Container()
                             ],
                           ),
                     ),
@@ -933,12 +1023,27 @@ class _ChatPageState extends State<ChatPage> {
                                 : IconButton(
                                     icon: Icon(Icons.send),
                                     onPressed: () {
-                                      ChatRoom.shared.sendMessage(
+                                      print("new message or editing? editing: $isEditing");
+                                      if(isEditing){
+                                        print("Edit message is called");
+                                        var mId = editMessage['id']==null?editMessage['message_id']:editMessage['id'];
+                                        var type = editMessage['type'];
+                                        var time = editMessage['time'];
+                                        ChatRoom.shared.editMessage(_text.text, widget.chatID, type, time, mId);
+                                        setState(() {
+                                            isTyping = false;
+                                            _text.text = '';
+                                            isEditing = false;
+                                            editMessage = null;
+                                        });
+                                      } else {
+                                        ChatRoom.shared.sendMessage(
                                           '${widget.chatID}', _text.text);
-                                      setState(() {
-                                        isTyping = false;
-                                        _text.text = '';
-                                      });
+                                          setState(() {
+                                            isTyping = false;
+                                            _text.text = '';
+                                          });
+                                      }
                                     },
                                   ),
                           ],
@@ -962,7 +1067,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
             )
             :
-            Container()
+            Container(),
             // Container(
             //   width: 200,
             //   height: 200,
@@ -982,12 +1087,13 @@ class _ChatPageState extends State<ChatPage> {
 
  
   Widget message(m) {
+    bool isGroup = int.parse("${widget.memberCount}")>2?true:false;
     // return DeviderMessageWidget(date: 'test');
     if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7' || '${m['type']}' == '8')
       return Devider(m);
     return '${m['user_id']}' == '${user.id}' ? Sended(m, chatId: widget.chatID)
     :
-    Received(m, chatId: widget.chatID);
+    Received(m, chatId: widget.chatID, isGroup: isGroup);
   }
 
   Future<bool> checkPermission() async {
@@ -1157,7 +1263,8 @@ class Devider extends StatelessWidget {
 class Received extends StatelessWidget {
   final m;
   final chatId;
-  Received(this.m, {this.chatId});
+  final bool isGroup;
+  Received(this.m, {this.chatId, this.isGroup});
   @override
   Widget build(BuildContext context) { 
     
@@ -1168,21 +1275,44 @@ class Received extends StatelessWidget {
         child: Container(
           child: CupertinoContextMenu(
             actions: [
+                // CupertinoContextMenuAction(
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //     children: [
+                //       const Text('Удалить', style: TextStyle(color:Colors.red, fontSize: 14),),
+                //       const Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
+                //     ],
+                //   ),
+                //   onPressed: () {
+                //     ChatRoom.shared.deleteFromAll(chatId, m['id']==null?m['message_id']:m['id']);
+                //     Navigator.pop(context);
+                //   },
+                // ),
+                // CupertinoContextMenuAction(
+                //   child: Container(
+                //     child: Row(
+                //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //       crossAxisAlignment: CrossAxisAlignment.center,
+                //       children: [
+                //         const Text('Редактировать', style: TextStyle(fontSize: 14)),
+                //         const Icon(CupertinoIcons.pen, size: 20,)
+                //       ],
+                //     ),
+                //   ),
+                //   onPressed: () {
+                //     Navigator.pop(context);
+                //   },
+                // ),
                 CupertinoContextMenuAction(
-                  child: const Text('Удалить', style: TextStyle(color:Colors.red),),
-                  onPressed: () {
-                    ChatRoom.shared.deleteFromAll(chatId, m['id']);
-                    Navigator.pop(context);
-                  },
-                ),
-                CupertinoContextMenuAction(
-                  child: const Text('Редактировать'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                CupertinoContextMenuAction(
-                  child: const Text('Ответить'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text('Ответить', style: TextStyle(fontSize: 14)),
+                      const Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                    ],
+                  ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -1203,6 +1333,8 @@ class Received extends StatelessWidget {
               media: (a==false || a==null)? null : a[0]['filename'],
               rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
               mediaUrl: (a==false || a==null)? null : m['attachment_url'],
+              edit: "${m["edit"]}",
+              isGroup: isGroup,
             ),
           ),)
         ));
@@ -1235,24 +1367,47 @@ class Sended extends StatelessWidget {
     return Align(
         alignment: Alignment(1, 0),
         child: Container(
-          
           child: CupertinoContextMenu(
             actions: [
                 CupertinoContextMenuAction(
-                  child: const Text('Удалить', style: TextStyle(color:Colors.red),),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text('Удалить', style: TextStyle(color:Colors.red, fontSize: 14),),
+                      const Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
+                    ],
+                  ),
                   onPressed: () {
-                    ChatRoom.shared.deleteFromAll(chatId, m['id']);
+                    ChatRoom.shared.deleteFromAll(chatId, m['id']==null?m['message_id']:m['id']);
                     Navigator.pop(context);
                   },
                 ),
                 CupertinoContextMenuAction(
-                  child: const Text('Редактировать'),
+                  child: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text('Редактировать', style: TextStyle(fontSize: 14)),
+                        const Icon(CupertinoIcons.pen, size: 20,)
+                      ],
+                    ),
+                  ),
                   onPressed: () {
+                    ChatRoom.shared.editingMessage(m);
                     Navigator.pop(context);
                   },
                 ),
                 CupertinoContextMenuAction(
-                  child: const Text('Ответить'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text('Ответить', style: TextStyle(fontSize: 14)),
+                      const Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                    ],
+                  ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -1269,6 +1424,7 @@ class Sended extends StatelessWidget {
                 media: (a==false || a==null)? null : a[0]['filename'],
                 rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
                 mediaUrl: (a==false || a==null)? null : m['attachment_url'],
+                edit: "${m["edit"]}"
               ),
             ),
           ),

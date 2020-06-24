@@ -475,7 +475,7 @@ class ChewieVideo extends StatefulWidget {
   _ChewieVideoState createState() => _ChewieVideoState();
 }
 
-class _ChewieVideoState extends State<ChewieVideo> with RouteAware {
+class _ChewieVideoState extends State<ChewieVideo> {
   VideoPlayerController controller;
   ChewieController _chewieController;
   
@@ -488,6 +488,12 @@ class _ChewieVideoState extends State<ChewieVideo> with RouteAware {
       _chewieController = ChewieController(
         videoPlayerController: controller,     
         aspectRatio: controller.value.aspectRatio,
+        deviceOrientationsAfterFullScreen: [
+          DeviceOrientation.landscapeRight,
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ],
         autoInitialize: true,
         autoPlay: false,
         looping: true,   
@@ -531,7 +537,7 @@ class _ChewieVideoState extends State<ChewieVideo> with RouteAware {
 
   @override
   void didChangeDependencies() {
-    routeObserver.subscribe(this, ModalRoute.of(context));
+    // routeObserver.subscribe(this, ModalRoute.of(context));
     super.didChangeDependencies();
   }
   
@@ -545,39 +551,7 @@ class _ChewieVideoState extends State<ChewieVideo> with RouteAware {
     // _chewieController.videoPlayerController.dispose();
   }
   
-  @override
-  void didPop() {
-    print("didPop");
-    super.didPop();
-  }
-  @override
-  void didPopNext() {
-    print("didPopNext");
-    // if(controller!=null && _chewieController != null){
-    //   _future = null;
-    //   controller.dispose();
-    //   _chewieController.dispose();
-    // } else if(controller == null && _chewieController == null){
-    //   setControllers();
-    // } 
-    super.didPopNext();
-  }
-
-  @override
-  void didPush() { 
-    print("didPush");
-    super.didPush();
-  }
-
-  @override
-  void didPushNext() {
-    print("didPushNext");
-    if(controller!=null && _chewieController != null){
-      controller.pause();
-      // _chewieController.dispose();
-    }
-    super.didPushNext();
-  }
+  //  
 
   buildPlaceholderImage(){
     return Center(
@@ -587,16 +561,20 @@ class _ChewieVideoState extends State<ChewieVideo> with RouteAware {
   
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        if(snapshot.connectionState == ConnectionState.waiting) return buildPlaceholderImage();
-        if(_chewieController==null) return buildPlaceholderImage();
-        return Chewie(
-          controller: _chewieController,
-        );
-      }
-      
+    return Scaffold(
+      body: SafeArea(
+        child: FutureBuilder(
+          future: _future,
+          builder: (context, snapshot) {
+            if(snapshot.connectionState == ConnectionState.waiting) return buildPlaceholderImage();
+            if(_chewieController==null) return buildPlaceholderImage();
+            return Chewie(
+              controller: _chewieController,
+            );
+          }
+          
+        ),
+      ),
     );
   }
 }

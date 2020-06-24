@@ -412,9 +412,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             child: InkWell(
                                 onTap: () async {
                                   if (await canLaunch(
-                                      'https://indigo24.userecho.com/')) {
+                                      'https://indigo24.com/contacts.html')) {
                                     await launch(
-                                      'https://indigo24.userecho.com/',
+                                      'https://indigo24.com/contacts.html',
                                       forceSafariVC: false,
                                       forceWebView: false,
                                       headers: <String, String>{
@@ -422,7 +422,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                       },
                                     );
                                   } else {
-                                    throw 'Could not launch https://indigo24.userecho.com/';
+                                    throw 'Could not launch https://indigo24.com/contacts.html';
                                   }
                                 },
                                 child: Ink(

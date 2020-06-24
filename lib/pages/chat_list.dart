@@ -285,6 +285,9 @@ class _ChatsListPageState extends State<ChatsListPage>
                               ),
                               myList[i]['unread_messages'] == 0
                                   ? Container()
+                                  :
+                                  myList[i]['unread_messages'].toString().startsWith('-')?
+                                  Container()
                                   : Container(
                                       // width: 20,
                                       decoration: BoxDecoration(

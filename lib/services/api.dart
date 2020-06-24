@@ -706,10 +706,13 @@ class Api {
     } on DioError catch(e) {
       if(e.response != null) {
         print(e.response.data);
+        print(e.response);
       } else{
-        print(e.request);
+        print("ERROR $e");
+        print(e.request.data);
         print(e.message);
       }
+      return e.response.data;
     } 
   }
 

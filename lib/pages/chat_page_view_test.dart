@@ -230,6 +230,8 @@ class SendedMessageWidget extends StatelessWidget {
   final String mediaUrl;
   final String rMedia;
   final String type;
+  final String edit;
+
   const SendedMessageWidget({
     Key key,
     this.content,
@@ -238,7 +240,8 @@ class SendedMessageWidget extends StatelessWidget {
     this.media,
     this.mediaUrl,
     this.rMedia,
-    this.type
+    this.type,
+    this.edit
   }) : super(key: key);
 
   
@@ -250,7 +253,7 @@ class SendedMessageWidget extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        minWidth: 120.0,
+        minWidth: edit=='1'?140.0:120.0,
       ),
       child: Container(
         child: Padding(
@@ -310,7 +313,7 @@ class SendedMessageWidget extends StatelessWidget {
                           color: Colors.grey.withOpacity(0.5),
                         ),
                         Center(
-                          child: CircularProgressIndicator(),
+                          child: Image.asset("assets/preloader.gif"),
                         ),
                       ],
                     )
@@ -342,11 +345,17 @@ class SendedMessageWidget extends StatelessWidget {
                 Positioned(
                   bottom: 1,
                   left: 10,
-                  child: Text(
-                    time,
-                    style: TextStyle(
-                        fontSize: 10, color: Colors.black.withOpacity(0.6)),
-                  ),
+                  child: Row(children: [
+                    Text(
+                      time,
+                      style: TextStyle(
+                          fontSize: 10, color: Colors.black.withOpacity(0.6)),
+                    ), 
+                    edit=='1'?
+                    Text(" ред.", style:TextStyle(fontSize: 10, color: Colors.black.withOpacity(0.6)))
+                    :
+                    Container()
+                  ],),
                 )
               ]),
             ),
@@ -369,6 +378,8 @@ class ReceivedMessageWidget extends StatelessWidget {
   final String mediaUrl;
   final String rMedia;
   final String type;
+  final String edit;
+  final bool isGroup;
 
   const ReceivedMessageWidget({
     Key key,
@@ -379,7 +390,9 @@ class ReceivedMessageWidget extends StatelessWidget {
     this.media,
     this.mediaUrl,
     this.rMedia,
-    this.type
+    this.type,
+    this.edit,
+    this.isGroup
   }) : super(key: key);
 
 
@@ -392,6 +405,7 @@ class ReceivedMessageWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
         SizedBox(width: 5),
+        isGroup?
         CircleAvatar(
           backgroundImage: NetworkImage(image),
           child: ClipOval(
@@ -402,11 +416,11 @@ class ReceivedMessageWidget extends StatelessWidget {
               )
             ),
           ),
-        ),
+        ) : Container(),
         Flexible(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minWidth: 130.0,
+              minWidth: edit == '1'?150.0:130.0,
             ),
             child: Container(
               child: Padding(
@@ -425,10 +439,11 @@ class ReceivedMessageWidget extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          isGroup?
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 5.0, bottom: 0.0),
                             child: Text(name, style: TextStyle(color: Colors.amber,fontWeight: FontWeight.w500)),
-                          ),
+                          ): Padding(padding: const EdgeInsets.only(top: 5.0),),
                           
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 0.0, bottom: 15.0),
@@ -473,12 +488,24 @@ class ReceivedMessageWidget extends StatelessWidget {
                       Positioned(
                         bottom: 1,
                         right: 10,
-                        child: Text(
-                          time,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.black.withOpacity(0.6),
-                          ),
+                        child: Row(
+                          children: [
+                            edit == '1'?
+                            Text(
+                              "ред. ",
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.black.withOpacity(0.6),
+                              ),
+                            ):Container(),
+                            Text(
+                              time,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.black.withOpacity(0.6),
+                              ),
+                            ),
+                          ],
                         ),
                       )
                     ]),

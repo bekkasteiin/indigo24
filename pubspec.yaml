@@ -55,7 +55,6 @@ dependencies:
   flutter_image_compress: ^0.6.8
   heic_to_jpg: ^0.1.1
   marquee: ^1.5.2
-  audio_recorder: ^1.0.2
   
 dev_dependencies:
   flutter_test:
@@ -67,6 +66,7 @@ flutter:
 
   assets:
     - assets/dev.gif
+    - assets/preloader.gif
     - assets/typing.gif
     - assets/developing.gif 
     - assets/voice.gif
