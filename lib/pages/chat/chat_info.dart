@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/pages/chat/chat_members_selection.dart';
 import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/api.dart';
@@ -20,8 +21,11 @@ class ChatProfileInfo extends StatefulWidget {
   final chatAvatar;
   final chatMembers;
   final chatId;
+  final hiddenId;
+  final chatType;
+
   ChatProfileInfo(
-      {this.chatId, this.chatName, this.chatAvatar, this.chatMembers});
+      {this.chatType, this.hiddenId, this.chatId, this.chatName, this.chatAvatar, this.chatMembers});
   @override
   _ChatProfileInfoState createState() => _ChatProfileInfoState();
 }
@@ -59,7 +63,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
             memberCount = 0;
             membersList = message;
             if(membersList.isNotEmpty){
-              print(membersList);
               membersList.forEach((member){
                 if(member['user_id'].toString() == '${user.id}' && member['role'].toString() == '0'){
                   isImOwner = true;
@@ -72,6 +75,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           });
           break;
         case "chat:members:privileges":
+          ChatRoom.shared.chatMembers(13, widget.chatId);
+          break;
+        case "chat:members:delete":
           ChatRoom.shared.chatMembers(13, widget.chatId);
           break;
         default:
@@ -124,6 +130,22 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
 
   Widget _buildProfileImage() {
     return InkWell(
+      onTap: () {
+        if(widget.chatType == 1){
+          if(isImOwner){
+            // action()
+            // action(widget.chatId, membersList[i]);
+          }
+        } else{
+          membersList.forEach((element){
+            if(widget.hiddenId == element['user_id']){
+              memberAction(element);
+            }
+          });
+        }
+
+        // Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(membersList[0])));
+      },
       // onTap: () => PlatformActionSheet().displaySheet(
       //     context: context,
       //     message: Text("Выберите опцию"),
@@ -174,7 +196,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                 :
                 'https://indigo24.xyz/uploads/avatars/${widget.chatAvatar}',
               errorWidget: (context, url, error) => CachedNetworkImage(
-                imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
               ),
             ),
           ),
@@ -192,8 +214,35 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         onPressed: () {
           // _onImageButtonPressed(ImageSource.camera);
           Navigator.pop(context);
-          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member)));
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member,widget.hiddenId)));
+        },
+      ),
+    ],
+    cancelButton: CupertinoActionSheetAction(
+      child: Text('Назад'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ));
+    showCupertinoModalPopup(
+    context: context,
+    builder: (BuildContext context) => act);
+  }
 
+  addMembers(chatId){
+        final act = CupertinoActionSheet(
+    title: Text('Выберите вариант'),
+    // message: Text('Which option?'),
+    actions: <Widget>[
+      CupertinoActionSheetAction(
+        child: Text('Добавить в группу'),
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatMembersSelection(chatId, membersList))).whenComplete(() {
+            ChatRoom.shared.contactController.close();
+            ChatRoom.shared.closeContactsStream();
+            ChatRoom.shared.chatMembers(13, widget.chatId);
+          });
         },
       ),
     ],
@@ -218,7 +267,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         onPressed: () {
           // _onImageButtonPressed(ImageSource.camera);
           Navigator.pop(context);
-          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member)));
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member, widget.hiddenId)));
         },
       ),
       CupertinoActionSheetAction(
@@ -230,14 +279,16 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           Navigator.pop(context);
         },
       ),
-      // CupertinoActionSheetAction(
-      //   isDestructiveAction: true,
-      //   child: Text('Удалить(не работает)'),
-      //   onPressed: () {
-      //     // _onImageButtonPressed(ImageSource.gallery);
-      //     Navigator.pop(context);
-      //   },
-      // )
+      CupertinoActionSheetAction(
+        isDestructiveAction: true,
+        child: Text('Удалить'),
+        onPressed: () {
+          // _onImageButtonPressed(ImageSource.gallery);
+        ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
+
+          Navigator.pop(context);
+        },
+      )
     ],
     cancelButton: CupertinoActionSheetAction(
       child: Text('Назад'),
@@ -295,7 +346,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         IconButton(
                           icon: Icon(Icons.more_vert),
                           color: Colors.white,
-                          onPressed: () {},
+                          onPressed: () {
+                            addMembers(widget.chatId);
+                            // ChatRoom.shared.addMembers(widget.chatId, )
+                          },
                         ),
                       ],
                     ),
@@ -321,7 +375,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         ),
                       ),
                     ),
-                    memberCount != 0 
+
+
+                    widget.chatType == 1
                     ? Container(
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.only(left: 20),
@@ -338,7 +394,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     membersList.isEmpty
                         ? Center(child: CircularProgressIndicator())
                         :
-                        membersList.length==2?
+                        widget.chatType == 0 ?
                         Center(
                           child: Text("Статус", style: TextStyle(
                             fontSize: 24,
@@ -379,7 +435,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                                       membersList[i]["avatar"] == '' ||
                                                       membersList[i]["avatar"] == false)
                                                   ? CachedNetworkImageProvider(
-                                                      "https://media.indigo24.com/avatars/noAvatar.png")
+                                                      "https://indigo24.xyz/uploads/avatars/noAvatar.png")
                                                   : 
                                                   CachedNetworkImageProvider(
                                                       'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}'),
@@ -388,11 +444,11 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                                 imageUrl: (membersList[i]["avatar"] == null ||
                                                       membersList[i]["avatar"] == '' ||
                                                       membersList[i]["avatar"] == false)?
-                                                      "https://media.indigo24.com/avatars/noAvatar.png"
+                                                      "https://indigo24.xyz/uploads/avatars/noAvatar.png"
                                                       :
                                                       'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}',
                                                 errorWidget: (context, url, error) => CachedNetworkImage(
-                                                  imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                                                  imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
                                                 ),
                                               ),
                                             ),

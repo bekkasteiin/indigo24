@@ -154,6 +154,20 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  addMembers(String chatID, members) {
+    print("add members is called $chatID $members");
+    var data = json.encode({
+      "cmd": 'chat:members:add',
+      "data": {
+        "chat_id": "$chatID",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "members_id": "$members",
+      }
+    });
+    channel.sink.add(data);
+  }
+
   getMessages(String chatID, {page}) {
     print("getMessages is called");
     var data = json.encode({
@@ -208,6 +222,22 @@ class ChatRoom {
     print('checked members');
     channel.sink.add(data);
   }
+
+
+  deleteChatMember(chatId, member_id) {
+    var data = json.encode({
+      "cmd": "chat:members:delete",
+      "data": {
+        "userToken": "${user.unique}",
+        "member_id": "$member_id",
+        "chat_id": '$chatId',
+        "user_id": '${user.id}',
+      }
+    });
+    print('deleted members');
+    channel.sink.add(data);
+  }
+
 
   userCheck(phone) {
     var data = json.encode({
@@ -380,6 +410,9 @@ class ChatRoom {
           case "user:check":
             contactController.add(new MyContactEvent(json));
             break;
+          case "chat:members:add":
+            contactController.add(new MyContactEvent(json));
+            break;
           case "user:check:online":
             cabinetController.add(new MyCabinetEvent(json));
             break;
@@ -404,7 +437,10 @@ class ChatRoom {
           case "message:edit":
             if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
             break;
-            
+          case "chat:members:delete":
+            print('added to chatInfoController');
+            chatInfoController.add(new MyChatInfoEvent(json));
+            break;
           default:
             print('default print cmd: $cmd json: $json');
         }

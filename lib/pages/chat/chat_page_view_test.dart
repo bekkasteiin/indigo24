@@ -411,7 +411,7 @@ class ReceivedMessageWidget extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: image,
               errorWidget: (context, url, error) => CachedNetworkImage(
-                imageUrl: "https://media.indigo24.com/avatars/noAvatar.png"
+                imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png"
               )
             ),
           ),

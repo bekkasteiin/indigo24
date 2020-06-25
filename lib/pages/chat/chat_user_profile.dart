@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/pages/chat/chat_contacts.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:photo_view/photo_view.dart';
@@ -13,7 +14,8 @@ import 'package:indigo24/services/localization.dart' as localization;
 
 class ChatUserProfilePage extends StatefulWidget {
   final member;
-  ChatUserProfilePage(this.member);
+  final hiddenId;
+  ChatUserProfilePage(this.member, this.hiddenId);
   @override
   _ChatUserProfileStatePage createState() => _ChatUserProfileStatePage();
 }
@@ -27,8 +29,17 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
 
 
 
-  
+  bool isInMyPhoneBook = false;
 
+  @override
+  void initState() {
+    contacts.forEach((element) {
+      if(element['phone'].toString() == widget.member['phone'].toString()){
+        isInMyPhoneBook = true;
+      }
+    });
+    super.initState();
+  }
 
   var percent = "0 %";
   double uploadPercent = 0.0;
@@ -149,19 +160,22 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
   }
 
   Widget _buildPhoneSection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("${localization.phoneNumber}"),
-          SizedBox(height: 5),
-          Text('${widget.member['phone']}',
-              textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
-          SizedBox(height: 5),
-        ],
-      ),
-    );
+    if(isInMyPhoneBook)
+      return Container(
+        width: screenSize.width / 1.3,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text("${localization.phoneNumber}"),
+            SizedBox(height: 5),
+            Text('${widget.member['phone']}',
+                textAlign: TextAlign.left, style: TextStyle(fontSize: 18)),
+            SizedBox(height: 5),
+          ],
+        ),
+      );
+    else
+      return Container();
   }
 
   Widget _buildSeparator(Size screenSize) {

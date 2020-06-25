@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -220,7 +221,6 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                                             borderRadius:
                                                 BorderRadius.circular(25.0),
                                             child: Image.network(
-                                              // 'https://media.indigo24.com/avatars/${result[index]['avatar']}',
                                               'https://indigo24.xyz/uploads/avatars/${result[index]['avatar']}',
                                               width: 35,
                                             ),
@@ -306,7 +306,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                                             // even while it's being zoomed in
                                             child: ClipRect(
                                               child: PhotoView(
-                                                imageProvider: NetworkImage(
+                                                imageProvider: CachedNetworkImageProvider(
                                                   'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
                                                 ),
                                                 backgroundDecoration: BoxDecoration(color: Colors.transparent),

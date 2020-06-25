@@ -326,7 +326,7 @@ class _TransferPageState extends State<TransferPage> {
                   child: ClipOval(
                     child: CachedNetworkImage(
                       imageUrl:
-                          "https://media.indigo24.com/avatars/noAvatar.png",
+                          "https://indigo24.xyz/uploads/avatars/noAvatar.png",
                     ),
                   ),
                 ),

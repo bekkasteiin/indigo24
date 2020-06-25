@@ -346,7 +346,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 size: const Size(40, 40),
                 child: ClipOval(
                     child: CachedNetworkImage(
-                  imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                  imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
                 ))),
             title: Text("${m['user_name']}"),
             subtitle: Text("${m["text"]}"),

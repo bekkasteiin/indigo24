@@ -68,13 +68,14 @@ class _ChatsListPageState extends State<ChatsListPage>
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  goToChat(name, chatID, {memberCount, userIds, avatar, avatarUrl}) {
+  goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
     ChatRoom.shared.setCabinetStream();
     ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => ChatPage(name, chatID,
+              chatType: chatType,
               memberCount: memberCount, userIds: userIds,
               avatar: avatar, avatarUrl: avatarUrl,)),
     ).whenComplete(() {
@@ -238,6 +239,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                               myList[i]['name'],
                               myList[i]['id'],
                               memberCount: myList[i]['members_count'],
+                              chatType: myList[i]['type'],
                               userIds: myList[i]['another_user_id'],
                               avatar: myList[i]['avatar'],
                               avatarUrl: myList[i]['avatar_url']

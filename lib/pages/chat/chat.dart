@@ -39,8 +39,9 @@ class ChatPage extends StatefulWidget {
   final userIds;
   final avatar;
   final avatarUrl;
+  final chatType;
   ChatPage(this.name, this.chatID,
-      {this.memberCount, this.userIds, this.avatar, this.avatarUrl});
+      {this.chatType, this.memberCount, this.userIds, this.avatar, this.avatarUrl});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -51,6 +52,7 @@ class _ChatPageState extends State<ChatPage> {
   List myList = [];
   TextEditingController _text = new TextEditingController();
   var online;
+  var hiddenId;
   ScrollController controller;
   bool isLoaded = false;
   bool isTyping = false;
@@ -140,13 +142,6 @@ class _ChatPageState extends State<ChatPage> {
   bool isUploading = false;
   bool isUploaded = false;
 
-  // [{id: message:27886:346, user_id: 27886, user_name: AdilTest,
-  // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
-  // text: 40, time: 1591947445, type: 0, write: 0},
-
-// [{id: 145959, user_id: 27886, user_name: AdilTest,
-// avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
-// text: 20, time: 1591947417, type: 0, write: 0},
 
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
@@ -205,6 +200,7 @@ class _ChatPageState extends State<ChatPage> {
           // print('${e.json['data']['online']}');
           print(e.json);
           setState(() {
+            hiddenId = '${e.json['data'][0]['user_id']}';
             online = '${e.json['data'][0]['online']}';
           });
           break;
@@ -739,7 +735,7 @@ class _ChatPageState extends State<ChatPage> {
                       ],
                     )
                     :
-                (widget.memberCount > 2)
+                (widget.chatType == 1)
                     ? Text(
                         '${localization.members} ${widget.memberCount}',
                         style: TextStyle(
@@ -767,14 +763,19 @@ class _ChatPageState extends State<ChatPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatProfileInfo(
+                    chatType: widget.chatType,
+                    hiddenId: hiddenId,
                     chatName: widget.name,
-                    chatAvatar:
-                        widget.avatar == null ? 'noAvatar.png' : widget.avatar,
+                    chatAvatar: widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatMembers: widget.memberCount,
                     chatId: widget.chatID,
                   ),
                 ),
-              ).whenComplete(() {});
+              ).whenComplete(() {
+                setState(() {
+                    
+                  });
+              });
             },
           ),
           actions: <Widget>[
@@ -794,7 +795,7 @@ class _ChatPageState extends State<ChatPage> {
                                 : widget.avatarUrl + widget.avatar,
                         errorWidget: (context, url, error) => CachedNetworkImage(
                             imageUrl:
-                                "https://media.indigo24.com/avatars/noAvatar.png"))),
+                                "https://indigo24.xyz/uploads/avatars/noAvatar.png"))),
               ),
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
@@ -804,6 +805,8 @@ class _ChatPageState extends State<ChatPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatProfileInfo(
+                      chatType: widget.chatType,
+                      hiddenId: hiddenId,
                       chatName: widget.name,
                       chatAvatar:
                           widget.avatar == null ? 'noAvatar.png' : widget.avatar,
@@ -811,7 +814,11 @@ class _ChatPageState extends State<ChatPage> {
                       chatId: widget.chatID,
                     ),
                   ),
-                ).whenComplete(() {});
+                ).whenComplete(() {
+                  setState(() {
+                    
+                  });
+                });
               },
             ),
           ],
