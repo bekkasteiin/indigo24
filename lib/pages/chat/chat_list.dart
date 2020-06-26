@@ -68,13 +68,14 @@ class _ChatsListPageState extends State<ChatsListPage>
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
+  goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl, members}) {
     ChatRoom.shared.setCabinetStream();
     ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => ChatPage(name, chatID,
+              members: members,
               chatType: chatType,
               memberCount: memberCount, userIds: userIds,
               avatar: avatar, avatarUrl: avatarUrl,)),
@@ -131,40 +132,39 @@ class _ChatsListPageState extends State<ChatsListPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.all(10),
-            child: FlatButton(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                Text('${localization.createGroup}', style: TextStyle(color: Color(0xFF001D52)),),
-                SizedBox(width: 10,),
-                Container(
+            margin: EdgeInsets.only(left: 10, top: 10),
+            child: InkWell(
+              child: Container(
+                padding: EdgeInsets.only(left:10,right: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                  Text('${localization.createGroup}', style: TextStyle(color: Color(0xFF001D52)),),
+                  SizedBox(width: 10,),
+                  Container(
                     height: 10,
                     width: 10,
                     child: Image(
                       image: AssetImage(
                         'assets/images/add.png',
                       ),
+                    ),
                   ),
-                ),
-                Container(
+                  Container(
                     height: 30,
                     width: 20,
                     child: Image(
                       image: AssetImage(
                         'assets/images/group.png',
                       ),
-                  ),
-                )
-              ],),
-              onPressed: () {
-                Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChatGroupSelection()),
-                );
+                    ),
+                  )
+                ],),
+              ),
+              onTap: () {
+                Navigator.push(context,MaterialPageRoute(builder: (context) => ChatGroupSelection()));
               },
             ),
           ),
@@ -238,6 +238,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                             goToChat(
                               myList[i]['name'],
                               myList[i]['id'],
+                              members: myList[i]['members'],
                               memberCount: myList[i]['members_count'],
                               chatType: myList[i]['type'],
                               userIds: myList[i]['another_user_id'],

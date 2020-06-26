@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/chat/chat_info.dart';
+import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/test_timer.dart';
 import 'package:indigo24/widgets/preview.dart';
 import 'dart:async';
@@ -33,6 +34,7 @@ Image backgroundForChat = Image(
 );
 
 class ChatPage extends StatefulWidget {
+  final members;
   final name;
   final chatID;
   final memberCount;
@@ -41,7 +43,7 @@ class ChatPage extends StatefulWidget {
   final avatarUrl;
   final chatType;
   ChatPage(this.name, this.chatID,
-      {this.chatType, this.memberCount, this.userIds, this.avatar, this.avatarUrl});
+      {this.members, this.chatType, this.memberCount, this.userIds, this.avatar, this.avatarUrl});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -50,6 +52,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   Dependencies dependencies =  Dependencies();
   List myList = [];
+  List members = [];
   TextEditingController _text = new TextEditingController();
   var online;
   var hiddenId;
@@ -79,7 +82,7 @@ class _ChatPageState extends State<ChatPage> {
   bool haveFile = false;
   bool isSomeoneTyping = false;
   List typingMembers = [];
-  String typingName;
+  List typingName = [];
 
   void sendSound() {
     print("Send sound is called");
@@ -98,14 +101,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _onLoading() async {
-    // monitor network fetch
 
-    // await Future.delayed(Duration(milliseconds: 1000));
-
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-    // items.add((items.length+1).toString());
     print("_onLoading ");
-    // print("_onLoading ");
     if (mounted)
       setState(() {
         print("mounted ");
@@ -117,9 +114,11 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   initState() {
+    
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
     print('______________________________');
+    print('members of this chat ${widget.members}');
     print('this is chats user online check ${widget.userIds}');
     print('______________________________');
     ChatRoom.shared.checkUserOnline(widget.userIds);
@@ -207,22 +206,15 @@ class _ChatPageState extends State<ChatPage> {
         case "user:writing":
           if(e.json['data'][0]['chat_id'].toString() == widget.chatID.toString()){
             setState(() {
-              
+              typingName = [];
               typingMembers = e.json['data'].toList();
-              for(var i=0; i<typingMembers.length; i++){
-                if(typingMembers.length==1){
-                  typingName = typingMembers[0]['name'];
-                } else {
-                  if(i==0){
-                    typingName = "${typingMembers[i]['name']}";
-                  } else {
-                    typingName = "$typingName, ${typingMembers[i]['name']}";
-                  }
-                }
-              }
-              if(e.json['data'].toList().length>1){
+              if(e.json['data'].toList().length>0){
                 typingMembers.forEach((element) {
-                  typingName = "$typingName, ${element['name']}";
+
+                  if(typingName.contains('${element['name']}'))
+                    element['name'] = '';
+                  if(element['user_id'].toString() != '${user.id}')
+                    typingName.add("${element['name']}");
                 });
               }
               
@@ -536,16 +528,15 @@ class _ChatPageState extends State<ChatPage> {
                                   ),
                                   FittedBox(
                                     fit: BoxFit.fitWidth,
-                                    child: Text('Деньги',
-                                        style: TextStyle(
-                                            color: Color(0xFF001D52),
-                                            fontWeight: FontWeight.w500)),
+                                    child: Text('Деньги',style: TextStyle(color: Color(0xFF001D52),fontWeight: FontWeight.w500)),
                                   ),
                                 ],
                               ),
                               onPressed: () {
-                                print('Деньги');
-                                
+                                print('Деньги'); 
+                                Navigator.pop(context);
+                                showBottomModalSheet(context);
+
                               },
                             ),
                           ),
@@ -674,9 +665,74 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
+  void showBottomModalSheet(context){
+    showModalBottomSheet(context: context, builder: (context){
+      return SafeArea(
+        child: Container(
+          color: Colors.red.withOpacity(0.5),
+          height: 300,
+          width: 100,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.members.length,
+            itemBuilder: (context, i) {
+              print(widget.members);
+              return InkWell(
+                onTap: () {
+                   Navigator.push(context,
+                    MaterialPageRoute(
+                      builder: (context) => TransferPage(
+                        phone: widget.members[i]['phone'],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 80,
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      ClipRRect(
+                        borderRadius:BorderRadius.circular(20.0),
+                        child: Container(
+                          color: Color(0xFF0543B8),
+                          width: 35,
+                          height: 35,
+                          child: Center(
+                            child: Text(
+                              '${widget.members[i]['name'][0].toUpperCase()}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      Container(
+                        child: Text(
+                          '${widget.members[i]['name']}',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                      // Text("${_saved2[index][0]}")
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -718,19 +774,10 @@ class _ChatPageState extends State<ChatPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        (widget.memberCount > 2)?
-                        Text("$typingName ",
-                          style: TextStyle(
-                                    color: Color(0xFF001D52),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400)
+                          (widget.memberCount > 2)?
+                          Text("${typingName.join(' ')} ",
+                            style: TextStyle(color: Color(0xFF001D52),fontSize: 14,fontWeight: FontWeight.w400)
                           ):Container(),
-                        Text(typingMembers.length>1?"печатают ":"печатает ",
-                          style: TextStyle(
-                                  color: Color(0xFF001D52),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400)
-                        ),
                         Image.asset("assets/typing.gif", width: 20,)
                       ],
                     )
@@ -759,20 +806,20 @@ class _ChatPageState extends State<ChatPage> {
             ),
             onTap: () {
               ChatRoom.shared.setChatInfoStream();
+              ChatRoom.shared.cabinetController.close();
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatProfileInfo(
                     chatType: widget.chatType,
-                    hiddenId: hiddenId,
                     chatName: widget.name,
                     chatAvatar: widget.avatar == null ? 'noAvatar.png' : widget.avatar,
-                    chatMembers: widget.memberCount,
                     chatId: widget.chatID,
                   ),
                 ),
               ).whenComplete(() {
                 setState(() {
+                  ChatRoom.shared.getMessages(widget.chatID);
                     
                   });
               });
@@ -800,17 +847,16 @@ class _ChatPageState extends State<ChatPage> {
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
               onPressed: () {
+                ChatRoom.shared.cabinetController.close();
                 ChatRoom.shared.setChatInfoStream();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatProfileInfo(
                       chatType: widget.chatType,
-                      hiddenId: hiddenId,
                       chatName: widget.name,
                       chatAvatar:
                           widget.avatar == null ? 'noAvatar.png' : widget.avatar,
-                      chatMembers: widget.memberCount,
                       chatId: widget.chatID,
                     ),
                   ),
@@ -1116,7 +1162,7 @@ class _ChatPageState extends State<ChatPage> {
 
  
   Widget message(m) {
-    bool isGroup = int.parse("${widget.memberCount}")>2?true:false;
+    bool isGroup = widget.chatType == 1?true:false;
     // return DeviderMessageWidget(date: 'test');
     if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7' || '${m['type']}' == '8')
       return Devider(m);
@@ -1298,7 +1344,6 @@ class Received extends StatelessWidget {
   Widget build(BuildContext context) { 
     
     var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
-
     return Align(
         alignment: Alignment(-1, 0),
         child: Container(
@@ -1350,6 +1395,7 @@ class Received extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
             child: ReceivedMessageWidget(
+              phone: '${m['phone']}',
               content: '${m['text']}',
               time: time('${m['time']}'),
               name: '${m['user_name']}',

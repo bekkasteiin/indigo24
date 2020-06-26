@@ -77,6 +77,8 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
       switch (cmd) {
         case "user:check":
           if ("${e.json['data']['chat_id']}" != "null" && "${e.json['data']['status']}" == 'true') {
+            print('________ user check is valid __________');
+            print('________ user check is valid __________');
             setState(() {
               _saved.add({"index" : tempIndex, "user_id": e.json['data']['user_id']});
               _saved2.add({'phone': e.json['data']['phone'], 'user_id': e.json['data']['user_id'], 'name': e.json['data']['name'],});
@@ -98,10 +100,15 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
           }
           break;
         case "chat:members:add":
+          print('______CHAT MEMBERS ADD______');
+          print('______CHAT MEMBERS ADD______');
+          print('______CHAT MEMBERS ADD______');
+          print('______CHAT MEMBERS ADD______');
           print('e.json ${e.json}');
           Navigator.pop(context);
           break;
         default:
+          print('this is default');
       }
     });
   }

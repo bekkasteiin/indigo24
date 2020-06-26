@@ -16,6 +16,9 @@ import 'package:indigo24/widgets/pin_code.dart';
 
 
 class TransferPage extends StatefulWidget {
+  final phone;
+
+  const TransferPage({this.phone});
   @override
   _TransferPageState createState() => _TransferPageState();
 }
@@ -52,6 +55,13 @@ class _TransferPageState extends State<TransferPage> {
   final receiverController = TextEditingController();
   final sumController = TextEditingController();
 
+  @override
+  void initState() {
+    if(widget.phone != null){
+      receiverController.text = widget.phone;
+    }
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(

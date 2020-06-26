@@ -278,9 +278,8 @@ class Api {
         user.email = '${response.data['email']}';
         user.avatar = '${response.data['avatar']}';
         user.unique = '${response.data['unique']}';
-
-        await updateFCM(token, '${response.data['ID']}', '${response.data['unique']}');
         user.pin = '${response.data['pin']}';
+        await updateFCM(token, '${response.data['ID']}', '${response.data['unique']}');
         return response.data;
       } else {
         return response.data;

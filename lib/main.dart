@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -17,6 +18,9 @@ import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/helper.dart';
 
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/widgets/circle.dart';
+import 'package:indigo24/widgets/keyboard.dart';
+import 'package:indigo24/widgets/pin_code.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +31,7 @@ import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/pages/wallet/wallet.dart' as wallet;
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -72,6 +77,7 @@ String formatPhone(String phone) {
   permissionForPush() async {
     await Permission.notification.request();
   }
+  
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -114,8 +120,6 @@ class MyApp extends StatelessWidget {
     @required this.phone,
     this.authenticated,
   }) : super(key: key);
-  
-
 
   bool authenticated;
   String phone;
@@ -148,7 +152,7 @@ class Tabs extends StatefulWidget {
 }
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
-
+  bool isAuthenticated = false;
   TabController tabController;
   var api = Api();
   MyConnectivity _connectivity = MyConnectivity.instance;
@@ -185,9 +189,152 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         userIds: "${m['user_id']}");
   }
 
-  
+  bool withPin;
+
+  final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
+  var temp;
+_onPasscodeEntered(String enteredPasscode) {
+    if(user.pin == 'waiting' && temp == enteredPasscode){
+      print('creating');
+      api.createPin(enteredPasscode);
+      Navigator.maybePop(context);
+      Navigator.maybePop(context);
+    }
+    if('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode){
+      return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('${localization.error}'),
+          content: Text('${localization.incorrectPin}'),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    }
+    if('${user.pin}'.toString() == 'false'){
+      user.pin = 'waiting';
+      temp = enteredPasscode;
+      print('first set pin $temp');
+    } 
+
+    bool isValid = '${user.pin}' == enteredPasscode;
+    _verificationNotifier.add(isValid);
+    if (isValid) {
+      print(' is really valid ');
+      setState(() {
+        this.isAuthenticated = isValid;
+      });
+    }
+    
+    // if (!isValid){
+    // return showDialog<void>(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return CupertinoAlertDialog(
+    //       title: Text('${localization.error}'),
+    //       content: Text('${localization.incorrectPin}'),
+    //       actions: <Widget>[
+    //         CupertinoDialogAction(
+    //           child: Text('Ok'),
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
+    // }
+  }
+    _showLockScreen(BuildContext context, String title,
+      {
+      bool withPin,
+      bool opaque,
+      CircleUIConfig circleUIConfig,
+      KeyboardUIConfig keyboardUIConfig,
+      Widget cancelButton,
+      List<String> digits}) {
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+        print(withPin);
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+          opaque: opaque,
+          pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+            title: title,
+            withPin: withPin,
+            passwordEnteredCallback: _onPasscodeEntered,
+            cancelButton: (cancelButton),
+            deleteButton: Text(
+              'Delete',
+              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+              semanticsLabel: 'Delete',
+            ),
+            shouldTriggerVerification: _verificationNotifier.stream,
+            backgroundColor: Color(0xFFF7F7F7),
+            cancelCallback: _onPasscodeCancelled,
+            digits: digits,
+          ),
+        ));
+  } 
+
+  _onPasscodeCancelled() {
+    if('${user.pin}' == 'false'){
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs()),(r) => false);
+    } else{
+      exit(0);
+    }
+  }
+
   @override
   void initState() {
+    Timer.run(() {
+      '${user.pin}' == 'false'
+      ? _showLockScreen(
+        context,
+        '${localization.createPin}',
+        withPin : false,
+        opaque: false,
+        cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'))
+    : Text('');
+    // _showLockScreen(
+    //     context,
+    //     '${localization.enterPin}',
+    //     opaque: false,
+    //     cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+      });
     getContacts(context).then((getContactsResult){
       if(!getContactsResult){
         Widget okButton = CupertinoDialogAction(
@@ -295,7 +442,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       // print(e.json);
       switch (cmd) {
         case 'message:create':
-          
           inAppPush(e.json["data"]);
           break;
         case 'chats:get':
@@ -473,6 +619,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   preferences.setString('phone', 'null');
+  preferences.setString('pin', 'false');
   Widget okButton = CupertinoDialogAction(
     child: Text("OK"),
     onPressed: () {

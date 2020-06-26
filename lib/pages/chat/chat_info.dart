@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat_members_selection.dart';
 import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/wallet/wallet.dart';
@@ -19,13 +20,11 @@ import 'package:indigo24/services/localization.dart' as localization;
 class ChatProfileInfo extends StatefulWidget {
   final chatName;
   final chatAvatar;
-  final chatMembers;
   final chatId;
-  final hiddenId;
   final chatType;
 
   ChatProfileInfo(
-      {this.chatType, this.hiddenId, this.chatId, this.chatName, this.chatAvatar, this.chatMembers});
+      {this.chatType, this.chatId, this.chatName, this.chatAvatar});
   @override
   _ChatProfileInfoState createState() => _ChatProfileInfoState();
 }
@@ -39,7 +38,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   void initState() {
     _chatTitle = '${widget.chatName}';
     listen();
-    ChatRoom.shared.chatMembers(13, widget.chatId);
+    ChatRoom.shared.chatMembers(widget.chatId);
+    chatTitleController.text = '${widget.chatName}';
     super.initState();
     memberCount = 0;
 
@@ -64,8 +64,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
             membersList = message;
             if(membersList.isNotEmpty){
               membersList.forEach((member){
-                if(member['user_id'].toString() == '${user.id}' && member['role'].toString() == '0'){
-                  isImOwner = true;
+                if(member['user_id'].toString() == '${user.id}'){
+                  myPrivilege = member['role'].toString();
                 }
                 if(member['online'] == 'online'){
                   memberCount++;
@@ -75,10 +75,15 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           });
           break;
         case "chat:members:privileges":
-          ChatRoom.shared.chatMembers(13, widget.chatId);
+          ChatRoom.shared.chatMembers(widget.chatId);
           break;
         case "chat:members:delete":
-          ChatRoom.shared.chatMembers(13, widget.chatId);
+          ChatRoom.shared.chatMembers(widget.chatId);
+          break;
+        case "chat:member:leave":
+          print('isLeaved is true');
+          Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => Tabs()),(r) => false);
           break;
         default:
           print(message);
@@ -132,15 +137,13 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     return InkWell(
       onTap: () {
         if(widget.chatType == 1){
-          if(isImOwner){
-            // action()
-            // action(widget.chatId, membersList[i]);
-          }
+          // if(myPrivilege){
+          //   // action()
+          //   // action(widget.chatId, membersList[i]);
+          // }
         } else{
           membersList.forEach((element){
-            if(widget.hiddenId == element['user_id']){
-              memberAction(element);
-            }
+           
           });
         }
 
@@ -204,17 +207,67 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ),
     );
   }
-  memberAction(member){
+
+  adminAction(chatId, member){
     final act = CupertinoActionSheet(
     title: Text('Выберите вариант'),
-    // message: Text('Which option?'),
     actions: <Widget>[
       CupertinoActionSheetAction(
         child: Text('Профиль'),
         onPressed: () {
-          // _onImageButtonPressed(ImageSource.camera);
           Navigator.pop(context);
-          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member,widget.hiddenId)));
+          ChatRoom.shared.cabinetController.close();
+          ChatRoom.shared.setCabinetInfoStream();
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(
+            member,
+            name: member['user_name'],
+            phone: member['phone'],
+            email: member['email'],
+            image: member['avatar_url']+member['avatar'],
+          ))).whenComplete(() {
+            ChatRoom.shared.closeCabinetInfoStream();
+          });
+        },
+      ),
+      member['role'] == '2' ? CupertinoActionSheetAction(
+        isDestructiveAction: true,
+        child: Text('Удалить'),
+        onPressed: () {
+          ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
+          Navigator.pop(context);
+        },
+      ) : Center()
+    ],
+    cancelButton: CupertinoActionSheetAction(
+      child: Text('Назад'),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ));
+    showCupertinoModalPopup(
+    context: context,
+    builder: (BuildContext context) => act);
+  }
+
+  memberAction(member){
+    final act = CupertinoActionSheet(
+    title: Text('Выберите вариант'),
+    actions: <Widget>[
+      CupertinoActionSheetAction(
+        child: Text('Профиль'),
+        onPressed: () {
+          Navigator.pop(context);
+          ChatRoom.shared.cabinetController.close();
+          ChatRoom.shared.setCabinetInfoStream();
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(
+            member,
+            name: member['user_name'],
+            phone: member['phone'],
+            email: member['email'],
+            image: member['avatar_url']+member['avatar'],
+          ))).whenComplete(() {
+            ChatRoom.shared.closeCabinetInfoStream();
+          });
         },
       ),
     ],
@@ -230,19 +283,53 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   }
 
   addMembers(chatId){
-        final act = CupertinoActionSheet(
+  final act = CupertinoActionSheet(
     title: Text('Выберите вариант'),
-    // message: Text('Which option?'),
     actions: <Widget>[
-      CupertinoActionSheetAction(
+      myPrivilege == '0' ? CupertinoActionSheetAction(
         child: Text('Добавить в группу'),
         onPressed: () {
           Navigator.pop(context);
           Navigator.push(context,MaterialPageRoute(builder: (context) => ChatMembersSelection(chatId, membersList))).whenComplete(() {
             ChatRoom.shared.contactController.close();
             ChatRoom.shared.closeContactsStream();
-            ChatRoom.shared.chatMembers(13, widget.chatId);
+            ChatRoom.shared.chatMembers(widget.chatId);
           });
+        },
+      ) : Container(),
+      CupertinoActionSheetAction(
+        isDestructiveAction: true,
+        child: Text('Покинуть беседу'),
+        onPressed: () {
+          Widget okButton = CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: Text("Да"),
+            onPressed: () {
+              Navigator.pop(context);
+              ChatRoom.shared.leaveChat(widget.chatId);
+            },
+          );
+          Widget noButton = CupertinoDialogAction(
+            child: Text("Нет"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          );
+          CupertinoAlertDialog alert = CupertinoAlertDialog(
+            title: Text("Внимание"),
+            content: Text('Вы точно хотите покинуть беседу?'),
+            actions: [
+              noButton,
+              okButton,
+            ],
+          );
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return alert;
+            },
+          );
         },
       ),
     ],
@@ -260,22 +347,39 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   action(chatId, member){
     final act = CupertinoActionSheet(
     title: Text('Выберите вариант'),
-    // message: Text('Which option?'),
     actions: <Widget>[
       CupertinoActionSheetAction(
         child: Text('Профиль'),
         onPressed: () {
-          // _onImageButtonPressed(ImageSource.camera);
           Navigator.pop(context);
-          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(member, widget.hiddenId)));
+          ChatRoom.shared.cabinetController.close();
+          ChatRoom.shared.setCabinetInfoStream();
+          Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(
+            member,
+            name: member['user_name'],
+            phone: member['phone'],
+            email: member['email'],
+            image: member['avatar_url']+member['avatar'],
+          ))).whenComplete(() {
+            ChatRoom.shared.closeCabinetInfoStream();
+          });
         },
       ),
       CupertinoActionSheetAction(
-        child: Text('Назначить администратором'),
+        child: member['role'] == '2' ? Text('Назначить администратором') : member['role'] ==  '1' ? Text('Сделать участником') : Text(''),
         onPressed: () {
-          // _onImageButtonPressed(ImageSource.gallery);
-          ChatRoom.shared.makeAdmin(chatId, member['user_id']);
-          
+           switch (member['role']) {
+            case '2':
+              print('toAdmin');
+              ChatRoom.shared.changePrivileges(chatId, member['user_id'], 1);
+              break;
+            case '1':
+              print('toMember');
+              ChatRoom.shared.changePrivileges(chatId, member['user_id'], 2);
+              break;
+             default:
+           }
+          ChatRoom.shared.chatMembers(widget.chatId);
           Navigator.pop(context);
         },
       ),
@@ -283,9 +387,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         isDestructiveAction: true,
         child: Text('Удалить'),
         onPressed: () {
-          // _onImageButtonPressed(ImageSource.gallery);
-        ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
-
+          ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
           Navigator.pop(context);
         },
       )
@@ -301,12 +403,12 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     builder: (BuildContext context) => act);
   }
 
+  TextEditingController chatTitleController = TextEditingController();
   int memberCount = 0;
-  bool isImOwner = false;
-  
+  String myPrivilege = '';
+  bool isEditing = false;
   @override
   Widget build(BuildContext context) {
-    // membersList.sort((a, b) => int.parse(b['role']).compareTo(int.parse(a['role'])));
     Size screenSize = MediaQuery.of(context).size;
     return Container(
       color: Colors.white,
@@ -342,12 +444,46 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                             Navigator.pop(context);
                           },
                         ),
-                        Flexible(child: Text('$_chatTitle', style: fS26(c: 'ffffff'), maxLines: 1, overflow: TextOverflow.ellipsis,)),
+                        Flexible(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                isEditing = !isEditing;
+                              });
+                            },
+                            child: isEditing ? Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextField(
+                                    textAlign: TextAlign.center,
+                                    controller: chatTitleController,
+                                    style: fS26(c: 'ffffff'),
+                                    onSubmitted: (value){
+                                      ChatRoom.shared.changeChatName(widget.chatId, value);
+                                    },
+                                    decoration: new InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    contentPadding:
+                                        EdgeInsets.only(left: 0, bottom: 0, top: 0, right: 0),
+                                    ),
+                                  ),
+                                ),
+                                Icon(Icons.edit, color: Colors.white)
+                              ],
+                            ) : Text('$_chatTitle', style: fS26(c: 'ffffff'), maxLines: 1, overflow: TextOverflow.ellipsis,)
+                            )
+                        ),
                         IconButton(
                           icon: Icon(Icons.more_vert),
                           color: Colors.white,
                           onPressed: () {
-                            addMembers(widget.chatId);
+                            widget.chatType == 1 
+                            ? addMembers(widget.chatId) 
+                            : print('Change this action to private functions'); // TODO
                             // ChatRoom.shared.addMembers(widget.chatId, )
                           },
                         ),
@@ -361,10 +497,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    membersList.length==2?
-                    Divider()
-                    :
-                    Container(
+                    widget.chatType == 1
+                    ? Container(
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.only(left: 20),
                       child: Text(
@@ -374,9 +508,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-
-
+                    )
+                    : Container(),
                     widget.chatType == 1
                     ? Container(
                       alignment: Alignment.centerLeft,
@@ -409,18 +542,31 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                 itemBuilder: (context, i) {
                                   // print(membersList[i]);
                                   return ListTile(
+                                    
                                     onTap: () {
-                                      print(membersList[i]);
-                                       if(membersList[i]['user_id'] == '${user.id}'){
-                                         // TODO if u wanna add action to the Creator.
+                                      if(membersList[i]['user_id'].toString() == '${user.id}'){
+                                        print(membersList[i]['user_id'].toString() == '${user.id}');
+                                        // memberAction(membersList[i]);
+                                      } else{
+                                        switch (myPrivilege) {
+                                          case '0':
+                                              print('ownerAction');
+                                              action(widget.chatId, membersList[i]);
+                                            break;
+                                          case '1':
+                                              print('adminAction');
+                                              adminAction(widget.chatId, membersList[i]);
+                                            break;
+                                          case '2':
+                                              print('memberAction');
+                                              memberAction(membersList[i]);
+                                            break;
+                                          default:
+                                        }
                                       }
-                                      else if(isImOwner){
-                                        setState(() {
-                                          action(widget.chatId, membersList[i]);
-                                        });
-                                      }
-                                      else
-                                        memberAction(membersList[i]);
+
+
+
                                       // ChatRoom.shared.checkUserOnline(ids);
                                       // ChatRoom.shared
                                       //     .getMessages(membersList[i]['id']);
@@ -497,10 +643,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         return Text('${localization.creator}');
         break;
       case '1':
-        return Text('${localization.member}');
+        return Text('Администратор');
         break;
       case '2':
-        return Text('Администратор');
+        return Text('${localization.member}');
         break;
       default:
         return Text('hi');

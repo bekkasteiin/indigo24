@@ -113,13 +113,13 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
-  makeAdmin(chatId,members) {
+  changePrivileges(chatId,members,role) {
     var data = json.encode({
       "cmd": 'chat:members:privileges',
       "data": {
         "user_id": '${user.id}',
         "chat_id": '$chatId',
-        "role": '2',
+        "role": '$role',
         "userToken": "${user.unique}",
         "members":"$members",
       }
@@ -154,8 +154,20 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  leaveChat(chatID) {
+    var data = json.encode({
+      "cmd": 'chat:member:leave',
+      "data": {
+        "chat_id": "$chatID",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+      }
+    });
+    channel.sink.add(data);
+    print("leave ${user.id} member from chat $chatID is called");
+  }
+
   addMembers(String chatID, members) {
-    print("add members is called $chatID $members");
     var data = json.encode({
       "cmd": 'chat:members:add',
       "data": {
@@ -166,6 +178,7 @@ class ChatRoom {
       }
     });
     channel.sink.add(data);
+    print("add members is added $chatID $members");
   }
 
   getMessages(String chatID, {page}) {
@@ -209,12 +222,11 @@ class ChatRoom {
     }
   }
 
-  chatMembers(users_ids, chatId) {
+  chatMembers(chatId) {
     var data = json.encode({
       "cmd": "chat:members",
       "data": {
         "userToken": "${user.unique}",
-        "users_ids": "$users_ids",
         "chat_id": chatId,
         "user_id": '${user.id}',
       }
@@ -249,6 +261,20 @@ class ChatRoom {
       }
     });
     print('added user check');
+    channel.sink.add(data);
+  }
+
+  changeChatName(chatId, chatName){
+    var data = json.encode({
+      "cmd": "chat:change:name",
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "chat_id": "$chatId",
+        "chat_name": "$chatName",
+      }
+    });
+    print('chat name changed $data');
     channel.sink.add(data);
   }
 
@@ -362,24 +388,13 @@ class ChatRoom {
 
         var cmd = json['cmd'];
         var data = json['data'];
-
         switch (cmd) {
           case "init":
-
             print(user.id);
             print(data);
             if (data['status'].toString() == 'true') {
               print("INIT status is ${data['status']}");
               forceGetChat();
-              // var obj = {
-              //   "cmd": 'chats:get',
-              //   "data": {
-              //     "user_id": "$userId",
-              //     "userToken": "$userToken",
-              //     "page": '1',
-              //   }
-              // };
-              // channel.sink.add(jsonEncode(obj));
             }
             break;
           case "chats:get":
@@ -408,7 +423,13 @@ class ChatRoom {
             }
             break;
           case "user:check":
-            contactController.add(new MyContactEvent(json));
+            if(contactController != null){
+              contactController.add(new MyContactEvent(json));
+            }
+            if(cabinetInfoController != null) {
+              print('added to cabinet info');
+              cabinetInfoController.add(new MyCabinetInfoEvent(json));
+            }
             break;
           case "chat:members:add":
             contactController.add(new MyContactEvent(json));
@@ -441,14 +462,21 @@ class ChatRoom {
             print('added to chatInfoController');
             chatInfoController.add(new MyChatInfoEvent(json));
             break;
+          case "chat:member:leave":
+            print('added to chatInfoController');
+            chatInfoController.add(new MyChatInfoEvent(json));
+            break;
           default:
             print('default print cmd: $cmd json: $json');
         }
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        connect();
-        init();
+        Future.delayed(const Duration(milliseconds: 15000), () {
+          print('tis is wainti secodn');
+          connect();
+          init();
+        });
       },
     );
   }

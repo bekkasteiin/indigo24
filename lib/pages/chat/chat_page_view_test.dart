@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/chat/chat_info.dart';
+import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/full_photo.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
@@ -378,10 +381,12 @@ class ReceivedMessageWidget extends StatelessWidget {
   final String rMedia;
   final String type;
   final String edit;
+  final phone;
   final bool isGroup;
 
   const ReceivedMessageWidget({
     Key key,
+    this.phone,
     this.content,
     this.time,
     this.image,
@@ -405,14 +410,34 @@ class ReceivedMessageWidget extends StatelessWidget {
       children: <Widget>[
         SizedBox(width: 5),
         isGroup?
-        CircleAvatar(
-          backgroundImage: NetworkImage(image),
-          child: ClipOval(
-            child: CachedNetworkImage(
-              imageUrl: image,
-              errorWidget: (context, url, error) => CachedNetworkImage(
-                imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png"
-              )
+        InkWell(
+          onTap: (){
+              ChatRoom.shared.cabinetController.close();
+              ChatRoom.shared.setCabinetInfoStream();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatUserProfilePage(
+                    '100',
+                    email: 'email',
+                    image: image,
+                    name: name,
+                    phone: phone,
+                  ),
+                ),
+              ).whenComplete(() {
+                ChatRoom.shared.closeCabinetInfoStream();
+              });
+          },
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(image),
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: image,
+                errorWidget: (context, url, error) => CachedNetworkImage(
+                  imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+                )
+              ),
             ),
           ),
         ) : Container(),
