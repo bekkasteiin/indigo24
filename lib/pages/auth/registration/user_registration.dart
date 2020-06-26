@@ -5,6 +5,7 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart';
+import 'package:indigo24/widgets/backgrounds.dart';
 
 class UserRegistrationPage extends StatefulWidget {
   final phone;
@@ -96,7 +97,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
               Container(
                   decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage("assets/images/background_login.png"),
+                    image: introBackgroundProvider,
                     fit: BoxFit.cover),
               )),
               _buildForeground()

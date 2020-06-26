@@ -29,6 +29,18 @@
 	</dict>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>ShareMedia</string>
+			</array>
+		</dict>
+		<dict/>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires camera.</string>
 	<key>NSContactsUsageDescription</key>

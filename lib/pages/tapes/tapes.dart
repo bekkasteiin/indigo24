@@ -221,7 +221,7 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                                                 BorderRadius.circular(25.0),
                                             child: Image.network(
                                               // 'https://media.indigo24.com/avatars/${result[index]['avatar']}',
-                                              'https://indigo24.xyz/uploads/avatars/${result[index]['avatar']}',
+                                              'https://indigo24.xyz/uploads/avatars/${result[index]['avatar'].toString().replaceAll('AxB', '100x100')}',
                                               width: 35,
                                             ),
                                           ),
@@ -435,10 +435,6 @@ class _TapesPageState extends State<TapesPage> with AutomaticKeepAliveClientMixi
                                             child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(25.0),
-                                              // child: Image.network(
-                                              //   'https://indigo24.xyz/uploads/avatars/${db.getItem('own_avatar')}',
-                                              //   width: 35,
-                                              // ),
                                             ),
                                           ),
                                         ],
@@ -562,6 +558,7 @@ class _ChewieVideoState extends State<ChewieVideo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: FutureBuilder(
           future: _future,

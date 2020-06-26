@@ -9,6 +9,7 @@ import 'package:indigo24/pages/auth/login/login.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/backgrounds.dart';
 
 class RestorePasswordPage extends StatefulWidget {
   @override
@@ -106,7 +107,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
             Container(
                 decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("assets/images/background_login.png"),
+                  image: introBackgroundProvider,
                   fit: BoxFit.cover),
             )),
             _buildForeground()

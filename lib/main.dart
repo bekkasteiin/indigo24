@@ -19,6 +19,7 @@ import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
 import 'db/chats_model.dart';
@@ -155,6 +156,48 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   Map _source = {ConnectivityResult.none: false};
 
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  
+  StreamSubscription _intentDataStreamSubscription;
+  List<SharedMediaFile> _sharedFiles;
+  String _sharedText;
+
+  share(){
+    // For sharing images coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
+      setState(() {
+        print("Shared:" + (value?.map((f)=> f.path)?.join(",") ?? ""));
+        _sharedFiles = value;
+      });
+    }, onError: (err) {
+      print("getIntentDataStream error: $err");
+    });
+
+    // For sharing images coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
+      setState(() {
+        _sharedFiles = value;
+      });
+    });
+
+    // For sharing or opening urls/text coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.getTextStream().listen((String value) {
+      setState(() {
+        print("Shared:" + (value ?? ""));
+        _sharedText = value;
+      });
+    }, onError: (err) {
+      print("getLinkStream error: $err");
+    });
+
+    // For sharing or opening urls/text coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialText().then((String value) {
+      setState(() {
+        _sharedText = value;
+      });
+    });
+  }
 
   var chatsDB = ChatsDB();
   setUser() async {
@@ -188,6 +231,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   
   @override
   void initState() {
+    share();
+
     getContacts(context).then((getContactsResult){
       if(!getContactsResult){
         Widget okButton = CupertinoDialogAction(
@@ -295,7 +340,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       // print(e.json);
       switch (cmd) {
         case 'message:create':
-          
+          print(e.json["data"]);
           inAppPush(e.json["data"]);
           break;
         case 'chats:get':
@@ -465,6 +510,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
+    _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 }

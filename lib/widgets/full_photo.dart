@@ -1,9 +1,14 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/widgets/backgrounds.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:share/share.dart';
 
 class FullPhoto extends StatelessWidget {
   final String url;
@@ -12,39 +17,45 @@ class FullPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: AppBar(
-        brightness: Brightness.light,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(image: previewBackgoundProvider)
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          backgroundColor: Colors.white.withOpacity(0.2),
+          centerTitle: true,
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/backWhite.png',
+                ),
               ),
             ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          title: InkWell(
+            child: Column(
+              children: <Widget>[
+                Text('Медиафайлы',
+                  style: TextStyle(
+                      color: Color(0xFFffffff), fontWeight: FontWeight.w400),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ]),
+          ),
         ),
-        title: InkWell(
-          child: Column(
-            children: <Widget>[
-              Text('Медиафайлы',
-                style: TextStyle(
-                    color: Color(0xFF001D52), fontWeight: FontWeight.w400),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ]),
-        ),
+        body: SafeArea(child: FullPhotoScreen(url: url)),
       ),
-body: SafeArea(child: FullPhotoScreen(url: url)),
     );
   }
 }
@@ -87,23 +98,68 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
   Future movingToIndex(i) async {
     return _controller.move(i, animation: false,);
   }
+  var url1;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
         children: <Widget>[
           Expanded(
-            flex: 5,
+            flex: 1,
+            child: Container(
+              color: Colors.white.withOpacity(0.2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  FlatButton(
+                    child: Row(
+                      children: [
+                        Text("Сохранить ", 
+                          style: TextStyle(color: Colors.white),
+                          maxLines: 1, softWrap: false, 
+                          overflow: TextOverflow.ellipsis,),
+                        Image.asset("assets/images/download.png", width: 20,)
+                      ],
+                    ),
+                    onPressed: (){
+                      _saveNetworkImage(currentIndex==null?url:url1);
+                    },
+                  ),
+                  FlatButton(
+                    child: Row(
+                      children: [
+                        Text("Поделиться ", 
+                          style: TextStyle(color: Colors.white),
+                          maxLines: 1, softWrap: false, 
+                          overflow: TextOverflow.ellipsis,),
+                        Image.asset("assets/images/upload.png", width: 20,)
+                      ],
+                    ),
+                    onPressed: (){
+                      Share.share(currentIndex==null?url:url1, subject: 'Изображение');
+                    },
+                  ),
+                ],
+              ),
+            )
+          ),
+          Expanded(
+            flex: 10,
             child: new Swiper(
               loop: false,
               itemCount: itemCounter(),
               itemBuilder: (BuildContext context,int index){
-                print(tempList[index]);
                 var a = jsonDecode(tempList[index]['attachments']);
-                var url1 = '${tempList[index]['attachment_url']}${a[0]['filename']}';
-
-                return Image(
-                  image: CachedNetworkImageProvider(currentIndex==null?url:url1)
+                url1 = '${tempList[index]['attachment_url']}${a[0]['filename']}';
+                
+                return PhotoView(
+                  imageProvider: CachedNetworkImageProvider(currentIndex==null?url:url1),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.contained*3,
+                  backgroundDecoration: BoxDecoration(
+                    color: Colors.transparent
+                  ),
                 );
               },
               onIndexChanged: (i){
@@ -115,7 +171,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
             )
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: itemCounter(),
@@ -150,5 +206,14 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
         ],
       )
     );
+  }
+
+
+  void _saveNetworkImage(url) async {
+    GallerySaver.saveImage(url).then((bool success) {
+      setState(() {
+        print('Image is saved');
+      });
+    });
   }
 }

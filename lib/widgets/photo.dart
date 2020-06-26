@@ -245,6 +245,7 @@ class FullScreenWrapper extends StatelessWidget {
     return Container(
       color: Colors.white,
       child: SafeArea(
+        bottom: false,
         child: Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -276,20 +277,22 @@ class FullScreenWrapper extends StatelessWidget {
             ),
             backgroundColor: Colors.white,
           ),
-          body: Container(
-            color: Colors.white,
-            constraints: BoxConstraints.expand(
-              height: MediaQuery.of(context).size.height,
-            ),
-            child: PhotoView(
-              imageProvider: imageProvider,
-              loadingBuilder: loadingBuilder,
-              backgroundDecoration: backgroundDecoration,
-              minScale: minScale,
-              maxScale: maxScale,
-              initialScale: initialScale,
-              basePosition: basePosition,
-              filterQuality: filterQuality,
+          body: ClipRect(
+            child: Container(
+              color: Colors.white,
+              constraints: BoxConstraints.expand(
+                height: MediaQuery.of(context).size.height,
+              ),
+              child: PhotoView(
+                imageProvider: imageProvider,
+                loadingBuilder: loadingBuilder,
+                backgroundDecoration: backgroundDecoration,
+                minScale: minScale,
+                maxScale: maxScale,
+                initialScale: initialScale,
+                basePosition: basePosition,
+                filterQuality: filterQuality,
+              ),
             ),
           ),
         ),

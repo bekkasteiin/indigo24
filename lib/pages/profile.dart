@@ -69,6 +69,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
             return r;
           } else {
             if (r["success"]) {
+              print("avatar url ${r["fileName"]}");
+              
               await SharedPreferencesHelper.setString(
                   'avatar', '${r["fileName"]}');
               setState(() {
@@ -191,13 +193,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
       CupertinoActionSheetAction(
         child: Text('Посмотреть'),
         onPressed: () {
-          print("посмотреть");
+          print("посмотреть ${user.avatarUrl}${user.avatar}");
           Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider("${user.avatarUrl}${user.avatar.replaceAll("AxB", "500x500")}"),
+                  imageProvider: CachedNetworkImageProvider("${user.avatarUrl}${user.avatar}"),
                   minScale: PhotoViewComputedScale.contained,
                   maxScale: PhotoViewComputedScale.contained*3,
                   backgroundDecoration: BoxDecoration(
@@ -343,7 +345,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    print(screenSize);
     return SafeArea(
       child: Scaffold(
         body: Stack(

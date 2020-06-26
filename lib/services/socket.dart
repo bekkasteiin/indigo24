@@ -296,6 +296,29 @@ class ChatRoom {
     if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
   }
 
+  scrolling(i){
+    var object = {
+      "cmd": "scrolling",
+      "index": i,
+    };
+    var json = jsonDecode(jsonEncode(object));
+
+    if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+  }
+
+  replyingMessage(m){
+    print("REPLYING IN SOCKET $m");
+    var object = {
+      "cmd": "replyMessage",
+      "text": m['text'],
+      "message_id": m['id'],
+      "message": m
+    };
+    var json = jsonDecode(jsonEncode(object));
+
+    if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+  }
+
   editMessage(message, chatID, type, time, mId){
     outSound();
 
@@ -314,6 +337,32 @@ class ChatRoom {
           "message_type": type==null?0:type,
           "time": time
           // "attachments": attachments==null?null:attachments
+        }
+      });
+      print('added message');
+      print("$data");
+      channel.sink.add(data);
+    } else {
+      print('message is empty');
+    }
+  }
+
+  replyMessage(message, chatID, type, mId){
+    outSound();
+
+    message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
+    message = message.trimLeft();
+    message = message.trimRight();
+    if (message.isNotEmpty) {
+      var data = json.encode({
+        "cmd": 'message:create',
+        "data": {
+          "user_id": "${user.id}",
+          "userToken": "${user.unique}",
+          "chat_id": "$chatID",
+          "text": '$message',
+          "message_id": mId,
+          "message_type": type==null?0:type,
         }
       });
       print('added message');

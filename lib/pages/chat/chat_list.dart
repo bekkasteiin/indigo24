@@ -239,7 +239,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                               myList[i]['id'],
                               memberCount: myList[i]['members_count'],
                               userIds: myList[i]['another_user_id'],
-                              avatar: myList[i]['avatar'],
+                              avatar: myList[i]['avatar'].toString().replaceAll("AxB", "200x200"),
                               avatarUrl: myList[i]['avatar_url']
                             );
                           },
@@ -250,7 +250,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                                 imageUrl: (myList[i]["avatar"] == null || 
                                 myList[i]["avatar"] == '' || myList[i]["avatar"] == false) ?
                                 "https://indigo24.xyz/uploads/avatars/noAvatar.png" :
-                                'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"]}',
+                                'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
                                 placeholder: (context, url) => const CircularProgressIndicator(),
                                 errorWidget: (context, url, error) => CachedNetworkImage(
                                   imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",

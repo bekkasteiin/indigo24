@@ -6,7 +6,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/chat/chat_info.dart';
+import 'package:indigo24/pages/chat/ui/received.dart';
+import 'package:indigo24/pages/chat/ui/sended.dart';
 import 'package:indigo24/services/test_timer.dart';
+import 'package:indigo24/widgets/backgrounds.dart';
+import 'package:indigo24/widgets/keyboard_dismisser.dart';
 import 'package:indigo24/widgets/preview.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
@@ -19,6 +23,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:vibration/vibration.dart';
 import 'chat_page_view_test.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
@@ -27,10 +32,6 @@ import 'package:indigo24/services/localization.dart' as localization;
 var parser = EmojiParser();
 List listMessages = [];
 
-Image backgroundForChat = Image(
-  image: AssetImage('assets/images/background_chat.png'),
-  fit: BoxFit.fill,
-);
 
 class ChatPage extends StatefulWidget {
   final name;
@@ -65,7 +66,9 @@ class _ChatPageState extends State<ChatPage> {
   bool hasPermission = false;
   bool isEditing = false;
   var editMessage;
-  
+  bool isReplying = false;
+  var replyMessage;
+
   String _fileName;
   String _path;
   Map<String, String> _paths;
@@ -78,6 +81,10 @@ class _ChatPageState extends State<ChatPage> {
   bool isSomeoneTyping = false;
   List typingMembers = [];
   String typingName;
+
+  final ItemScrollController itemScrollController = ItemScrollController();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
 
   void sendSound() {
     print("Send sound is called");
@@ -150,7 +157,7 @@ class _ChatPageState extends State<ChatPage> {
 
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
-      print("CABINET EVENT");
+      print("CABINET EVENT ${e.json['cmd']}");
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
@@ -209,6 +216,7 @@ class _ChatPageState extends State<ChatPage> {
           });
           break;
         case "user:writing":
+        print("PRINT PRINT ${e.json['data']}");
           if(e.json['data'][0]['chat_id'].toString() == widget.chatID.toString()){
             setState(() {
               
@@ -269,6 +277,24 @@ class _ChatPageState extends State<ChatPage> {
             isEditing = true;
             editMessage = e.json['message'];
           });
+          break;
+        case "replyMessage":
+          setState(() {
+            isReplying = true;
+            replyMessage = e.json['message'];
+          });
+          break;
+        case "scrolling":
+          print("Scrolling to ${e.json['index']}");
+          setState(() {
+            itemScrollController.scrollTo(
+              index: e.json['index'],
+              duration: Duration(milliseconds: 300),
+              curve: Curves.linear,
+              alignment: 0.9
+            );
+          });
+          
           break;
         default:
           print('CABINET EVENT DEFAULT');
@@ -371,7 +397,19 @@ class _ChatPageState extends State<ChatPage> {
       });
       print(_image);
       
-      setState(() {
+      final popResult = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PreviewMedia(
+            filePath: pickedFile.path,
+            type: 'video',
+          ),
+        ),
+      ).whenComplete(() {
+      });
+
+      if(popResult=="sending"){
+        setState(() {
         isUploading = true;
         myList.insert(0, uploadingMessage);
       });
@@ -379,18 +417,20 @@ class _ChatPageState extends State<ChatPage> {
       api.uploadMedia(_image.path, 4).then((r) async {
         print("RRR $r");
         if (r["status"]) {
-          var a = [{
-            "filename": "${r["file_name"]}"
-          }];
-          setState(() {
-            isUploaded = true;
-          });
-          ChatRoom.shared.sendMessage('${widget.chatID}', "video", type: 4, attachments: jsonDecode(jsonEncode(a)));
-        } else {
-          showAlertDialog(context, r["message"]);
-          print("error");
-        }
-      });
+            var a = [{
+              "filename": "${r["file_name"]}"
+            }];
+            setState(() {
+              isUploaded = true;
+            });
+            ChatRoom.shared.sendMessage('${widget.chatID}', "video", type: 4, attachments: jsonDecode(jsonEncode(a)));
+          } else {
+            showAlertDialog(context, r["message"]);
+            print("error");
+          }
+        });
+      }
+      
     }
   } 
 
@@ -466,6 +506,10 @@ class _ChatPageState extends State<ChatPage> {
             child: InkWell(
               onTap: () {
                 SystemChannels.textInput.invokeMethod('TextInput.hide');
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
                 Navigator.of(context).pop();
               },
               child: Container(
@@ -510,6 +554,11 @@ class _ChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               onPressed: () {
+                                SystemChannels.textInput.invokeMethod('TextInput.hide');
+                                FocusScopeNode currentFocus = FocusScope.of(context);
+                                if (!currentFocus.hasPrimaryFocus) {
+                                  currentFocus.unfocus();
+                                }
                                 Navigator.pop(context);
                                 getImage(ImageSource.camera);
                                 print('Камера');
@@ -681,13 +730,18 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     
-    return GestureDetector(
-      onTap: () {
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
+    return KeyboardDismisser(
+      gestures: [
+        GestureType.onTap,
+        GestureType.onPanUpdateDownDirection,
+      ],
+      // onTap: () {
+      //   SystemChannels.textInput.invokeMethod('TextInput.hide');
+      //   FocusScopeNode currentFocus = FocusScope.of(context);
+      //   if (!currentFocus.hasPrimaryFocus) {
+      //     currentFocus.unfocus();
+      //   }
+      // },
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -823,21 +877,15 @@ class _ChatPageState extends State<ChatPage> {
           child: Stack(
             fit: StackFit.loose,
             children: <Widget>[
-              // Image(
-              //   width: MediaQuery.of(context).size.width,
-              //   image:
-              //       ExactAssetImage('assets/images/background_chat.png'),
-              //   fit: BoxFit.cover,
-              //   // colorFilter: ColorFilter.linearToSrgbGamma()
-              // ),
               Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: backgroundForChat),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: const Image(
+                  image: chatBackgroundProvider,
+                  fit: BoxFit.fill, 
+              )),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.start,
-                // mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   Divider(
                     height: 0,
@@ -845,16 +893,7 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   Flexible(
                     fit: FlexFit.tight,
-                    // height: 500,
                     child: Container(
-                      // width: MediaQuery.of(context).size.width,
-                      // decoration: BoxDecoration(
-                      //   image: DecorationImage(
-                      //       image:
-                      //           AssetImage('assets/images/background_chat.png'),
-                      //       fit: BoxFit.cover,
-                      //       colorFilter: ColorFilter.linearToSrgbGamma()),
-                      // ),
                       child: Container(
                         child: myList.isEmpty
                             ? Center(
@@ -882,6 +921,8 @@ class _ChatPageState extends State<ChatPage> {
                                       onLoading: _onLoading,
                                       child: ListView.builder(
                                         controller: controller,
+                                        // itemScrollController: itemScrollController,
+                                        // itemPositionsListener: itemPositionsListener,
                                         itemCount: myList.length,
                                         reverse: true,
                                         itemBuilder: (context, i) {
@@ -898,23 +939,41 @@ class _ChatPageState extends State<ChatPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
-                                        children: [
-                                          // Container(
-                                          //   width: MediaQuery.of(context).size.width*0.07,
-                                          // ),
-                                          IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
-                                          Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
-                                          Container(width: 5),
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Text("Редактирование", style: TextStyle(color: Color(0xff0543B8))),
-                                              Text("${editMessage["text"]}")
-                                            ],
-                                          ),
-                                        ],
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
+                                            Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
+                                            Container(width: 5),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Flexible(
+                                                      child: Container(
+                                                        child: Text("Редактирование", 
+                                                          style: TextStyle(color: Color(0xff0543B8)),
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 1,
+                                                          softWrap: false
+                                                        )
+                                                      )
+                                                    ),
+                                                    Flexible(
+                                                      child: Container(
+                                                        child: Text("${editMessage["text"]}", 
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 1,
+                                                          softWrap: false
+                                                        )
+                                                      )
+                                                    )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                       Align(
                                         alignment: Alignment.centerRight,
@@ -924,6 +983,78 @@ class _ChatPageState extends State<ChatPage> {
                                               setState(() {
                                                 isEditing = false;
                                                 editMessage = null;
+                                                _text.text = "";
+                                              });
+                                            },
+                                          ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                :
+                                Container(),
+
+                                isReplying?Container(
+                                  height: 50,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.white,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
+                                            Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
+                                            Container(width: 5),
+                                            replyMessage["attachment_url"]!=null?
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              child: CachedNetworkImage(
+                                                imageUrl: "${replyMessage["attachment_url"]}${json.decode(replyMessage["attachments"])[0]["r_filename"]}",
+                                              ),
+                                            ):Container(),
+                                            Container(width: 5),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Flexible(
+                                                    child: Container(
+                                                      child: Text("${replyMessage["user_name"]}", 
+                                                        style: TextStyle(color: Color(0xff0543B8)),
+                                                        overflow: TextOverflow.ellipsis,
+                                                        maxLines: 1,
+                                                        softWrap: false
+                                                      )
+                                                    )
+                                                  ),
+                                                  Flexible(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${replyMessage["type"].toString()=='1'?"Изображение":replyMessage["type"].toString()=='4'?"Видео":replyMessage["text"]}", 
+                                                        overflow: TextOverflow.ellipsis,
+                                                        maxLines: 1,
+                                                        softWrap: false
+                                                      )
+                                                    )
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: IconButton(
+                                            icon: Icon(Icons.close),
+                                            onPressed: (){
+                                              setState(() {
+                                                isReplying = false;
+                                                replyMessage = null;
                                                 _text.text = "";
                                               });
                                             },
@@ -969,7 +1100,11 @@ class _ChatPageState extends State<ChatPage> {
                                       icon: Icon(Icons.attach_file),
                                       onPressed: () {
                                         print("Прикрепить");
-                                        SystemChannels.textInput.invokeMethod('TextInput.hide');
+
+                                        FocusScopeNode currentFocus = FocusScope.of(context);
+                                        if (!currentFocus.hasPrimaryFocus) {
+                                          currentFocus.unfocus();
+                                        }
                                         showAttachmentBottomSheet(context);
                                       },
                                     ),
@@ -1057,6 +1192,16 @@ class _ChatPageState extends State<ChatPage> {
                                               isEditing = false;
                                               editMessage = null;
                                           });
+                                        } else if(isReplying){
+                                          print("Reply message is called");
+                                          var mId = replyMessage['id']==null?replyMessage['message_id']:replyMessage['id'];
+                                          ChatRoom.shared.replyMessage(_text.text, widget.chatID, 10, mId);
+                                          setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                              isReplying = false;
+                                              replyMessage = null;
+                                          });
                                         } else {
                                           ChatRoom.shared.sendMessage(
                                             '${widget.chatID}', _text.text);
@@ -1104,18 +1249,6 @@ class _ChatPageState extends State<ChatPage> {
         )),
       ),
     );
-  }
-
-
- 
-  Widget message(m) {
-    bool isGroup = int.parse("${widget.memberCount}")>2?true:false;
-    // return DeviderMessageWidget(date: 'test');
-    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7' || '${m['type']}' == '8')
-      return Devider(m);
-    return '${m['user_id']}' == '${user.id}' ? Sended(m, chatId: widget.chatID)
-    :
-    Received(m, chatId: widget.chatID, isGroup: isGroup);
   }
 
   Future<bool> checkPermission() async {
@@ -1258,6 +1391,20 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
   
+
+
+
+  Widget message(m) {
+    bool isGroup = int.parse("${widget.memberCount}")>2?true:false;
+    // return DeviderMessageWidget(date: 'test');
+    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7' || '${m['type']}' == '8')
+      return Devider(m);
+    return '${m['user_id']}' == '${user.id}' ? Sended(m, chatId: widget.chatID)
+    :
+    Received(m, chatId: widget.chatID, isGroup: isGroup);
+  }
+
+  
 }
 
 class Devider extends StatelessWidget {
@@ -1282,190 +1429,5 @@ class Devider extends StatelessWidget {
   }
 }
 
-class Received extends StatelessWidget {
-  final m;
-  final chatId;
-  final bool isGroup;
-  Received(this.m, {this.chatId, this.isGroup});
-  @override
-  Widget build(BuildContext context) { 
-    
-    var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
 
-    return Align(
-        alignment: Alignment(-1, 0),
-        child: Container(
-          child: CupertinoContextMenu(
-            actions: [
-                // CupertinoContextMenuAction(
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     crossAxisAlignment: CrossAxisAlignment.center,
-                //     children: [
-                //       const Text('Удалить', style: TextStyle(color:Colors.red, fontSize: 14),),
-                //       const Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
-                //     ],
-                //   ),
-                //   onPressed: () {
-                //     ChatRoom.shared.deleteFromAll(chatId, m['id']==null?m['message_id']:m['id']);
-                //     Navigator.pop(context);
-                //   },
-                // ),
-                // CupertinoContextMenuAction(
-                //   child: Container(
-                //     child: Row(
-                //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //       crossAxisAlignment: CrossAxisAlignment.center,
-                //       children: [
-                //         const Text('Редактировать', style: TextStyle(fontSize: 14)),
-                //         const Icon(CupertinoIcons.pen, size: 20,)
-                //       ],
-                //     ),
-                //   ),
-                //   onPressed: () {
-                //     Navigator.pop(context);
-                //   },
-                // ),
-                CupertinoContextMenuAction(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text('Ответить', style: TextStyle(fontSize: 14)),
-                      const Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                    ],
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-              child: Material(
-                color: Colors.transparent,
-            child: ReceivedMessageWidget(
-              content: '${m['text']}',
-              time: time('${m['time']}'),
-              name: '${m['user_name']}',
-              image: (m["avatar"] == null || m["avatar"] == "")
-                  ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
-                  : m["avatar_url"] == null
-                      ? "https://indigo24.xyz/uploads/avatars/${m["avatar"]}"
-                      : "${m["avatar_url"]}${m["avatar"]}",
-              type: "${m["type"]}",
-              media: (a==false || a==null)? null : a[0]['filename'],
-              rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
-              mediaUrl: (a==false || a==null)? null : m['attachment_url'],
-              edit: "${m["edit"]}",
-              isGroup: isGroup,
-            ),
-          ),)
-        ));
-  }
 
-  String time(timestamp) {
-    var date = DateTime.fromMillisecondsSinceEpoch(
-      int.parse(timestamp) * 1000,
-    );
-    TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
-    var hours;
-    var minutes;
-    hours = '${roomBooked.hour}';
-    minutes = '${roomBooked.minute}';
-
-    if (roomBooked.hour.toString().length == 1) hours = '0${roomBooked.hour}';
-    if (roomBooked.minute.toString().length == 1)
-      minutes = '0${roomBooked.minute}';
-    return '$hours:$minutes';
-  }
-}
-
-class Sended extends StatelessWidget {
-  final m;
-  final chatId;
-  Sended(this.m, {this.chatId});
-  @override
-  Widget build(BuildContext context) {
-    var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
-    return Align(
-        alignment: Alignment(1, 0),
-        child: Container(
-          child: CupertinoContextMenu(
-            actions: [
-                CupertinoContextMenuAction(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text('Удалить', style: TextStyle(color:Colors.red, fontSize: 14),),
-                      const Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
-                    ],
-                  ),
-                  onPressed: () {
-                    ChatRoom.shared.deleteFromAll(chatId, m['id']==null?m['message_id']:m['id']);
-                    Navigator.pop(context);
-                  },
-                ),
-                CupertinoContextMenuAction(
-                  child: Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text('Редактировать', style: TextStyle(fontSize: 14)),
-                        const Icon(CupertinoIcons.pen, size: 20,)
-                      ],
-                    ),
-                  ),
-                  onPressed: () {
-                    ChatRoom.shared.editingMessage(m);
-                    Navigator.pop(context);
-                  },
-                ),
-                CupertinoContextMenuAction(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text('Ответить', style: TextStyle(fontSize: 14)),
-                      const Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                    ],
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                
-            ],
-            child: Material(
-              color: Colors.transparent,
-              child: SendedMessageWidget(
-                content: '${m['text']}',
-                time: time('${m['time']}'),
-                write: '${m['write']}',
-                type: "${m["type"]}",
-                media: (a==false || a==null)? null : a[0]['filename'],
-                rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
-                mediaUrl: (a==false || a==null)? null : m['attachment_url'],
-                edit: "${m["edit"]}"
-              ),
-            ),
-          ),
-        ));
-  }
-
-  String time(timestamp) {
-    var date = DateTime.fromMillisecondsSinceEpoch(
-      int.parse(timestamp) * 1000,
-    );
-    TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
-    var hours;
-    var minutes;
-    hours = '${roomBooked.hour}';
-    minutes = '${roomBooked.minute}';
-
-    if (roomBooked.hour.toString().length == 1) hours = '0${roomBooked.hour}';
-    if (roomBooked.minute.toString().length == 1)
-      minutes = '0${roomBooked.minute}';
-    return '$hours:$minutes';
-  }
-}

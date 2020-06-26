@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/widgets/backgrounds.dart';
 import 'user_registration.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -77,7 +78,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
               Container(
                   decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage("assets/images/background_login.png"),
+                    image: introBackgroundProvider,
                     fit: BoxFit.cover),
               )),
               Center(child: _buildForeground())
