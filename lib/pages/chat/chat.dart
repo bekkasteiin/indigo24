@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/chat/chat_info.dart';
 import 'package:indigo24/pages/chat/ui/received.dart';
 import 'package:indigo24/pages/chat/ui/sended.dart';
+import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/test_timer.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/keyboard_dismisser.dart';
@@ -32,26 +33,36 @@ import 'package:indigo24/services/localization.dart' as localization;
 var parser = EmojiParser();
 List listMessages = [];
 
-
 class ChatPage extends StatefulWidget {
+  final members;
   final name;
   final chatID;
   final memberCount;
   final userIds;
   final avatar;
   final avatarUrl;
+  final chatType;
+  final phone;
   ChatPage(this.name, this.chatID,
-      {this.memberCount, this.userIds, this.avatar, this.avatarUrl});
+      {this.members,
+      this.chatType,
+      this.memberCount,
+      this.userIds,
+      this.avatar,
+      this.avatarUrl,
+      this.phone});
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  Dependencies dependencies =  Dependencies();
+  Dependencies dependencies = Dependencies();
   List myList = [];
+  List members = [];
   TextEditingController _text = new TextEditingController();
   var online;
+  var hiddenId;
   ScrollController controller;
   bool isLoaded = false;
   bool isTyping = false;
@@ -59,7 +70,8 @@ class _ChatPageState extends State<ChatPage> {
   Api api = Api();
   int page = 1;
   // RefreshController _refreshController = RefreshController();
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   String statusText = "";
   bool isComplete = false;
@@ -80,7 +92,7 @@ class _ChatPageState extends State<ChatPage> {
   bool haveFile = false;
   bool isSomeoneTyping = false;
   List typingMembers = [];
-  String typingName;
+  List typingName = [];
 
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
@@ -103,14 +115,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _onLoading() async {
-    // monitor network fetch
-
-    // await Future.delayed(Duration(milliseconds: 1000));
-
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-    // items.add((items.length+1).toString());
     print("_onLoading ");
-    // print("_onLoading ");
     if (mounted)
       setState(() {
         print("mounted ");
@@ -125,6 +130,7 @@ class _ChatPageState extends State<ChatPage> {
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
     print('______________________________');
+    print('members of this chat ${widget.members}');
     print('this is chats user online check ${widget.userIds}');
     print('______________________________');
     ChatRoom.shared.checkUserOnline(widget.userIds);
@@ -147,14 +153,6 @@ class _ChatPageState extends State<ChatPage> {
   bool isUploading = false;
   bool isUploaded = false;
 
-  // [{id: message:27886:346, user_id: 27886, user_name: AdilTest,
-  // avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
-  // text: 40, time: 1591947445, type: 0, write: 0},
-
-// [{id: 145959, user_id: 27886, user_name: AdilTest,
-// avatar: 27886.20200612143047_100x100.jpg, avatar_url: https://media.indigo24.com/avatars/,
-// text: 20, time: 1591947417, type: 0, write: 0},
-
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
       print("CABINET EVENT ${e.json['cmd']}");
@@ -169,7 +167,8 @@ class _ChatPageState extends State<ChatPage> {
               listMessages = e.json['data'].toList();
             });
           } else {
-            print('____________________________________________________________$page');
+            print(
+                '____________________________________________________________$page');
             print(e.json['data']);
             setState(() {
               page += 1;
@@ -181,13 +180,13 @@ class _ChatPageState extends State<ChatPage> {
         case "message:create":
           var message = e.json['data'];
           print("Message created with data $message");
-          if(message['type'].toString() == '1'){
+          if (message['type'].toString() == '1') {
             // setState(() {
             //   uploadingImage = null;
             // });
           }
           if ('${widget.chatID}' == '${e.json['data']['chat_id']}') {
-            if(isUploaded){
+            if (isUploaded) {
               setState(() {
                 isUploaded = false;
                 ChatRoom.shared.lastMessage = message;
@@ -195,7 +194,7 @@ class _ChatPageState extends State<ChatPage> {
                 myList.insert(0, message);
                 listMessages.insert(0, message);
               });
-            } else{
+            } else {
               setState(() {
                 ChatRoom.shared.lastMessage = message;
                 myList.insert(0, message);
@@ -212,34 +211,27 @@ class _ChatPageState extends State<ChatPage> {
           // print('${e.json['data']['online']}');
           print(e.json);
           setState(() {
+            hiddenId = '${e.json['data'][0]['user_id']}';
             online = '${e.json['data'][0]['online']}';
           });
           break;
         case "user:writing":
-        print("PRINT PRINT ${e.json['data']}");
-          if(e.json['data'][0]['chat_id'].toString() == widget.chatID.toString()){
+          print("PRINT PRINT ${e.json['data']}");
+          if (e.json['data'][0]['chat_id'].toString() ==
+              widget.chatID.toString()) {
             setState(() {
-              
+              typingName = [];
               typingMembers = e.json['data'].toList();
-              for(var i=0; i<typingMembers.length; i++){
-                if(typingMembers.length==1){
-                  typingName = typingMembers[0]['name'];
-                } else {
-                  if(i==0){
-                    typingName = "${typingMembers[i]['name']}";
-                  } else {
-                    typingName = "$typingName, ${typingMembers[i]['name']}";
-                  }
-                }
-              }
-              if(e.json['data'].toList().length>1){
+              if (e.json['data'].toList().length > 0) {
                 typingMembers.forEach((element) {
-                  typingName = "$typingName, ${element['name']}";
+                  if (typingName.contains('${element['name']}'))
+                    element['name'] = '';
+                  if (element['user_id'].toString() != '${user.id}')
+                    typingName.add("${element['name']}");
                 });
               }
-              
             });
-            if(!isSomeoneTyping){
+            if (!isSomeoneTyping) {
               setState(() {
                 isSomeoneTyping = true;
 
@@ -248,12 +240,12 @@ class _ChatPageState extends State<ChatPage> {
             }
           }
           break;
-        case "message:deleted:all": 
+        case "message:deleted:all":
           var mId = e.json['data']['message_id'];
           print("deleting $mId");
-          var i = myList.indexWhere((element) => 
-            (element['id']==null?element['message_id']:element['id']) == mId
-          );
+          var i = myList.indexWhere((element) =>
+              (element['id'] == null ? element['message_id'] : element['id']) ==
+              mId);
           print("deleting ${e.json}");
           setState(() {
             myList.removeAt(i);
@@ -262,9 +254,9 @@ class _ChatPageState extends State<ChatPage> {
           break;
         case "message:edit":
           var mId = e.json['data']['message_id'];
-          var i = myList.indexWhere((element) => 
-            (element['id']==null?element['message_id']:element['id']) == mId
-          );
+          var i = myList.indexWhere((element) =>
+              (element['id'] == null ? element['message_id'] : element['id']) ==
+              mId);
           print("editing ${e.json}");
           setState(() {
             myList[i] = e.json['data'];
@@ -288,13 +280,12 @@ class _ChatPageState extends State<ChatPage> {
           print("Scrolling to ${e.json['index']}");
           setState(() {
             itemScrollController.scrollTo(
-              index: e.json['index'],
-              duration: Duration(milliseconds: 300),
-              curve: Curves.linear,
-              alignment: 0.9
-            );
+                index: e.json['index'],
+                duration: Duration(milliseconds: 300),
+                curve: Curves.linear,
+                alignment: 0.9);
           });
-          
+
           break;
         default:
           print('CABINET EVENT DEFAULT');
@@ -308,7 +299,6 @@ class _ChatPageState extends State<ChatPage> {
         isSomeoneTyping = false;
       });
     });
-    
   }
   // bool isLoading = false;
 
@@ -332,11 +322,8 @@ class _ChatPageState extends State<ChatPage> {
 
   final picker = ImagePicker();
 
-  var uploadingMessage = json.decode(json.encode({
-    "type": "uploading",
-    "time": "1",
-    "user_id": user.id
-  }));
+  var uploadingMessage = json.decode(
+      json.encode({"type": "uploading", "time": "1", "user_id": user.id}));
 
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(source: imageSource);
@@ -346,10 +333,9 @@ class _ChatPageState extends State<ChatPage> {
       });
       print(_image);
 
-      // {status: true, write: 0, chat_id: 101, message_id: message:27886:117, 
-      // user_id: 27886, time: 1592914094, avatar: 27886.20200623174222_200x200.jpg, 
+      // {status: true, write: 0, chat_id: 101, message_id: message:27886:117,
+      // user_id: 27886, time: 1592914094, avatar: 27886.20200623174222_200x200.jpg,
       // avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: AdilTest, text: tres, type: 0}
-      
 
       final popResult = await Navigator.push(
         context,
@@ -358,10 +344,9 @@ class _ChatPageState extends State<ChatPage> {
             filePath: pickedFile.path,
           ),
         ),
-      ).whenComplete(() {
-      });
+      ).whenComplete(() {});
 
-      if(popResult=="sending"){
+      if (popResult == "sending") {
         setState(() {
           isUploading = true;
           uploadingImage = _image;
@@ -371,21 +356,23 @@ class _ChatPageState extends State<ChatPage> {
         api.uploadMedia(_image.path, 1).then((r) async {
           print("RRR $r");
           if (r["status"]) {
-            var a = [{
-              "filename": "${r["file_name"]}",
-              "r_filename": "${r["resize_file_name"]}"
-            }];
+            var a = [
+              {
+                "filename": "${r["file_name"]}",
+                "r_filename": "${r["resize_file_name"]}"
+              }
+            ];
             setState(() {
               isUploaded = true;
             });
-            ChatRoom.shared.sendMessage('${widget.chatID}', "image", type: 1, attachments: jsonDecode(jsonEncode(a)));
+            ChatRoom.shared.sendMessage('${widget.chatID}', "image",
+                type: 1, attachments: jsonDecode(jsonEncode(a)));
           } else {
             showAlertDialog(context, r["message"]);
             print("error");
           }
         });
       }
-      
     }
   }
 
@@ -396,7 +383,7 @@ class _ChatPageState extends State<ChatPage> {
         _image = File(pickedFile.path);
       });
       print(_image);
-      
+
       final popResult = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -405,34 +392,33 @@ class _ChatPageState extends State<ChatPage> {
             type: 'video',
           ),
         ),
-      ).whenComplete(() {
-      });
+      ).whenComplete(() {});
 
-      if(popResult=="sending"){
+      if (popResult == "sending") {
         setState(() {
-        isUploading = true;
-        myList.insert(0, uploadingMessage);
-      });
+          isUploading = true;
+          myList.insert(0, uploadingMessage);
+        });
 
-      api.uploadMedia(_image.path, 4).then((r) async {
-        print("RRR $r");
-        if (r["status"]) {
-            var a = [{
-              "filename": "${r["file_name"]}"
-            }];
+        api.uploadMedia(_image.path, 4).then((r) async {
+          print("RRR $r");
+          if (r["status"]) {
+            var a = [
+              {"filename": "${r["file_name"]}"}
+            ];
             setState(() {
               isUploaded = true;
             });
-            ChatRoom.shared.sendMessage('${widget.chatID}', "video", type: 4, attachments: jsonDecode(jsonEncode(a)));
+            ChatRoom.shared.sendMessage('${widget.chatID}', "video",
+                type: 4, attachments: jsonDecode(jsonEncode(a)));
           } else {
             showAlertDialog(context, r["message"]);
             print("error");
           }
         });
       }
-      
     }
-  } 
+  }
 
   void _openFileExplorer() async {
     setState(() => _loadingPath = true);
@@ -451,8 +437,8 @@ class _ChatPageState extends State<ChatPage> {
             allowedExtensions: (_extension?.isNotEmpty ?? false)
                 ? _extension?.replaceAll(' ', '')?.split(',')
                 : null);
-        
-                print(_path);
+
+        print(_path);
       }
     } on PlatformException catch (e) {
       print("Unsupported operation" + e.toString());
@@ -470,10 +456,11 @@ class _ChatPageState extends State<ChatPage> {
     api.uploadMedia(_path, 2).then((r) async {
       print("RRR ${r["message"]}");
       if (r["status"]) {
-        var a = [{
-          "filename": "${r["file_name"]}"
-        }];
-        ChatRoom.shared.sendMessage('${widget.chatID}', "file", type: 2, attachments: jsonDecode(jsonEncode(a)));
+        var a = [
+          {"filename": "${r["file_name"]}"}
+        ];
+        ChatRoom.shared.sendMessage('${widget.chatID}', "file",
+            type: 2, attachments: jsonDecode(jsonEncode(a)));
       } else {
         showAlertDialog(context, r["message"]);
         print("error");
@@ -483,7 +470,6 @@ class _ChatPageState extends State<ChatPage> {
     // doReguest();
   }
 
-  
   @override
   void dispose() {
     ChatRoom.shared.cabinetController.close();
@@ -554,8 +540,10 @@ class _ChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               onPressed: () {
-                                SystemChannels.textInput.invokeMethod('TextInput.hide');
-                                FocusScopeNode currentFocus = FocusScope.of(context);
+                                SystemChannels.textInput
+                                    .invokeMethod('TextInput.hide');
+                                FocusScopeNode currentFocus =
+                                    FocusScope.of(context);
                                 if (!currentFocus.hasPrimaryFocus) {
                                   currentFocus.unfocus();
                                 }
@@ -575,7 +563,7 @@ class _ChatPageState extends State<ChatPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                   Container(
+                                  Container(
                                     width: 40,
                                     height: 40,
                                     child: Image(
@@ -598,7 +586,22 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               onPressed: () {
                                 print('Деньги');
-                                
+                                Navigator.pop(context);
+                                print("${widget.phone}");
+
+                                widget.chatType == 0
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => TransferPage(
+                                            phone: widget
+                                                .phone, // TODO ADIL CHECK DIS PLS LPLSLPSLPS
+                                          ),
+                                        ))
+                                    // showBottomModalSheet(context,
+                                    //   private: true)
+
+                                    : showBottomModalSheet(context);
                               },
                             ),
                           ),
@@ -612,7 +615,7 @@ class _ChatPageState extends State<ChatPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                   Container(
+                                  Container(
                                     width: 40,
                                     height: 40,
                                     child: Image(
@@ -650,7 +653,7 @@ class _ChatPageState extends State<ChatPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                   Container(
+                                  Container(
                                     width: 40,
                                     height: 40,
                                     child: Image(
@@ -688,7 +691,7 @@ class _ChatPageState extends State<ChatPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                   Container(
+                                  Container(
                                     width: 40,
                                     height: 40,
                                     child: Image(
@@ -727,9 +730,87 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
+  showBottomModalSheet(context, {private}) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return SafeArea(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: 40.0,
+                maxHeight: 200.0,
+              ),
+              child: Container(
+                color: Colors.red.withOpacity(0.5),
+                // height: 120,
+                // width: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.members.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, i) {
+                    return Center(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TransferPage(
+                                phone: widget.members[i]['phone'],
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 80,
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20.0),
+                                child: Container(
+                                  color: Color(0xFF0543B8),
+                                  width: 35,
+                                  height: 35,
+                                  child: Center(
+                                    child: Text(
+                                      '${widget.members[i]['name'][0].toUpperCase()}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                child: Text(
+                                  '${widget.members[i]['name']}',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                              // Text("${_saved2[index][0]}")
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    
     return KeyboardDismisser(
       gestures: [
         GestureType.onTap,
@@ -772,63 +853,64 @@ class _ChatPageState extends State<ChatPage> {
                       color: Color(0xFF001D52), fontWeight: FontWeight.w400),
                   overflow: TextOverflow.ellipsis,
                 ),
-                isSomeoneTyping?
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        (widget.memberCount > 2)?
-                        Text("$typingName ",
-                          style: TextStyle(
-                                    color: Color(0xFF001D52),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400)
-                          ):Container(),
-                        Text(typingMembers.length>1?"печатают ":"печатает ",
-                          style: TextStyle(
-                                  color: Color(0xFF001D52),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400)
-                        ),
-                        Image.asset("assets/typing.gif", width: 20,)
-                      ],
-                    )
-                    :
-                (widget.memberCount > 2)
-                    ? Text(
-                        '${localization.members} ${widget.memberCount}',
-                        style: TextStyle(
-                            color: Color(0xFF001D52),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
+                isSomeoneTyping
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          (widget.memberCount > 2)
+                              ? Text("${typingName.join(' ')} ",
+                                  style: TextStyle(
+                                      color: Color(0xFF001D52),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400))
+                              : Container(),
+                          Image.asset(
+                            "assets/typing.gif",
+                            width: 20,
+                          )
+                        ],
                       )
-                    : 
-                    online == null
-                        ? Container()
-                        : Text(
-                            ('$online' == 'online' || '$online' == 'offline')
-                                ? '$online'
-                                : 'был в сети $online',
+                    : (widget.chatType == 1)
+                        ? Text(
+                            '${localization.members} ${widget.memberCount}',
                             style: TextStyle(
                                 color: Color(0xFF001D52),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400),
-                          ),
+                          )
+                        : online == null
+                            ? Container()
+                            : Text(
+                                ('$online' == 'online' ||
+                                        '$online' == 'offline')
+                                    ? '$online'
+                                    : 'был в сети $online',
+                                style: TextStyle(
+                                    color: Color(0xFF001D52),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                              ),
               ],
             ),
             onTap: () {
               ChatRoom.shared.setChatInfoStream();
+              ChatRoom.shared.cabinetController.close();
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatProfileInfo(
+                    chatType: widget.chatType,
                     chatName: widget.name,
                     chatAvatar:
                         widget.avatar == null ? 'noAvatar.png' : widget.avatar,
-                    chatMembers: widget.memberCount,
                     chatId: widget.chatID,
                   ),
                 ),
-              ).whenComplete(() {});
+              ).whenComplete(() {
+                setState(() {
+                  ChatRoom.shared.getMessages(widget.chatID);
+                });
+              });
             },
           ),
           actions: <Widget>[
@@ -848,24 +930,28 @@ class _ChatPageState extends State<ChatPage> {
                                 : widget.avatarUrl + widget.avatar,
                         errorWidget: (context, url, error) => CachedNetworkImage(
                             imageUrl:
-                                "https://media.indigo24.com/avatars/noAvatar.png"))),
+                                "https://indigo24.xyz/uploads/avatars/noAvatar.png"))),
               ),
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
               onPressed: () {
+                ChatRoom.shared.cabinetController.close();
                 ChatRoom.shared.setChatInfoStream();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatProfileInfo(
+                      chatType: widget.chatType,
                       chatName: widget.name,
-                      chatAvatar:
-                          widget.avatar == null ? 'noAvatar.png' : widget.avatar,
-                      chatMembers: widget.memberCount,
+                      chatAvatar: widget.avatar == null
+                          ? 'noAvatar.png'
+                          : widget.avatar,
                       chatId: widget.chatID,
                     ),
                   ),
-                ).whenComplete(() {});
+                ).whenComplete(() {
+                  setState(() {});
+                });
               },
             ),
           ],
@@ -873,17 +959,17 @@ class _ChatPageState extends State<ChatPage> {
           brightness: Brightness.light,
         ),
         body: SafeArea(
-        child: Container(
+            child: Container(
           child: Stack(
             fit: StackFit.loose,
             children: <Widget>[
               Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: const Image(
-                  image: chatBackgroundProvider,
-                  fit: BoxFit.fill, 
-              )),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: const Image(
+                    image: chatBackgroundProvider,
+                    fit: BoxFit.fill,
+                  )),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -897,18 +983,20 @@ class _ChatPageState extends State<ChatPage> {
                       child: Container(
                         child: myList.isEmpty
                             ? Center(
-                                child: Image.asset("assets/empty.gif", height: MediaQuery.of(context).size.width / 2,)
-                              )
+                                child: Image.asset(
+                                "assets/empty.gif",
+                                height: MediaQuery.of(context).size.width / 2,
+                              ))
                             : Column(
-                              children: [
-                                Expanded(
-                                  child: SmartRefresher(
+                                children: [
+                                  Expanded(
+                                    child: SmartRefresher(
                                       enablePullDown: false,
                                       enablePullUp: true,
                                       // header: WaterDropHeader(),
                                       footer: CustomFooter(
-                                        builder:
-                                            (BuildContext context, LoadStatus mode) {
+                                        builder: (BuildContext context,
+                                            LoadStatus mode) {
                                           Widget body;
                                           return Container(
                                             height: 55.0,
@@ -930,143 +1018,187 @@ class _ChatPageState extends State<ChatPage> {
                                         },
                                       ),
                                     ),
-                                ),
-
-                                isEditing?Container(
-                                  height: 50,
-                                  width: MediaQuery.of(context).size.width,
-                                  color: Colors.white,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
-                                            Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
-                                            Container(width: 5),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Flexible(
-                                                      child: Container(
-                                                        child: Text("Редактирование", 
-                                                          style: TextStyle(color: Color(0xff0543B8)),
-                                                          overflow: TextOverflow.ellipsis,
-                                                          maxLines: 1,
-                                                          softWrap: false
-                                                        )
-                                                      )
+                                  ),
+                                  isEditing
+                                      ? Container(
+                                          height: 50,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          color: Colors.white,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Row(
+                                                  children: [
+                                                    IconButton(
+                                                        icon: Icon(Icons.edit,
+                                                            color: Colors
+                                                                .transparent),
+                                                        onPressed: null),
+                                                    Container(
+                                                        width: 2.5,
+                                                        height: 45,
+                                                        color:
+                                                            Color(0xff0543B8)),
+                                                    Container(width: 5),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Flexible(
+                                                              child: Container(
+                                                                  child: Text(
+                                                                      "Редактирование",
+                                                                      style: TextStyle(
+                                                                          color: Color(
+                                                                              0xff0543B8)),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                      softWrap:
+                                                                          false))),
+                                                          Flexible(
+                                                              child: Container(
+                                                                  child: Text(
+                                                                      "${editMessage["text"]}",
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                      softWrap:
+                                                                          false)))
+                                                        ],
+                                                      ),
                                                     ),
-                                                    Flexible(
-                                                      child: Container(
-                                                        child: Text("${editMessage["text"]}", 
-                                                          overflow: TextOverflow.ellipsis,
-                                                          maxLines: 1,
-                                                          softWrap: false
-                                                        )
-                                                      )
-                                                    )
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: IconButton(
-                                            icon: Icon(Icons.close),
-                                            onPressed: (){
-                                              setState(() {
-                                                isEditing = false;
-                                                editMessage = null;
-                                                _text.text = "";
-                                              });
-                                            },
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: IconButton(
+                                                  icon: Icon(Icons.close),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      isEditing = false;
+                                                      editMessage = null;
+                                                      _text.text = "";
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                :
-                                Container(),
-
-                                isReplying?Container(
-                                  height: 50,
-                                  width: MediaQuery.of(context).size.width,
-                                  color: Colors.white,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            IconButton(icon: Icon(Icons.edit, color: Colors.transparent), onPressed: null),
-                                            Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
-                                            Container(width: 5),
-                                            replyMessage["attachment_url"]!=null?
-                                            Container(
-                                              width: 40,
-                                              height: 40,
-                                              child: CachedNetworkImage(
-                                                imageUrl: "${replyMessage["attachment_url"]}${json.decode(replyMessage["attachments"])[0]["r_filename"]}",
+                                        )
+                                      : Container(),
+                                  isReplying
+                                      ? Container(
+                                          height: 50,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          color: Colors.white,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Row(
+                                                  children: [
+                                                    IconButton(
+                                                        icon: Icon(Icons.edit,
+                                                            color: Colors
+                                                                .transparent),
+                                                        onPressed: null),
+                                                    Container(
+                                                        width: 2.5,
+                                                        height: 45,
+                                                        color:
+                                                            Color(0xff0543B8)),
+                                                    Container(width: 5),
+                                                    replyMessage[
+                                                                "attachment_url"] !=
+                                                            null
+                                                        ? Container(
+                                                            width: 40,
+                                                            height: 40,
+                                                            child:
+                                                                CachedNetworkImage(
+                                                              imageUrl:
+                                                                  "${replyMessage["attachment_url"]}${json.decode(replyMessage["attachments"])[0]["r_filename"]}",
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                    Container(width: 5),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Flexible(
+                                                              child: Container(
+                                                                  child: Text(
+                                                                      "${replyMessage["user_name"]}",
+                                                                      style: TextStyle(
+                                                                          color: Color(
+                                                                              0xff0543B8)),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                      softWrap:
+                                                                          false))),
+                                                          Flexible(
+                                                              child: Container(
+                                                                  child: Text(
+                                                                      "${replyMessage["type"].toString() == '1' ? "Изображение" : replyMessage["type"].toString() == '4' ? "Видео" : replyMessage["text"]}",
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                      softWrap:
+                                                                          false)))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ):Container(),
-                                            Container(width: 5),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Flexible(
-                                                    child: Container(
-                                                      child: Text("${replyMessage["user_name"]}", 
-                                                        style: TextStyle(color: Color(0xff0543B8)),
-                                                        overflow: TextOverflow.ellipsis,
-                                                        maxLines: 1,
-                                                        softWrap: false
-                                                      )
-                                                    )
-                                                  ),
-                                                  Flexible(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${replyMessage["type"].toString()=='1'?"Изображение":replyMessage["type"].toString()=='4'?"Видео":replyMessage["text"]}", 
-                                                        overflow: TextOverflow.ellipsis,
-                                                        maxLines: 1,
-                                                        softWrap: false
-                                                      )
-                                                    )
-                                                  )
-                                                ],
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: IconButton(
+                                                  icon: Icon(Icons.close),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      isReplying = false;
+                                                      replyMessage = null;
+                                                      _text.text = "";
+                                                    });
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: IconButton(
-                                            icon: Icon(Icons.close),
-                                            onPressed: (){
-                                              setState(() {
-                                                isReplying = false;
-                                                replyMessage = null;
-                                                _text.text = "";
-                                              });
-                                            },
+                                            ],
                                           ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                :
-                                Container()
-                              ],
-                            ),
+                                        )
+                                      : Container()
+                                ],
+                              ),
                       ),
                     ),
                   ),
@@ -1095,19 +1227,20 @@ class _ChatPageState extends State<ChatPage> {
                               //           ),
                               //         ),
                               //       )
-                              //     : 
-                                  IconButton(
-                                      icon: Icon(Icons.attach_file),
-                                      onPressed: () {
-                                        print("Прикрепить");
+                              //     :
+                              IconButton(
+                                icon: Icon(Icons.attach_file),
+                                onPressed: () {
+                                  print("Прикрепить");
 
-                                        FocusScopeNode currentFocus = FocusScope.of(context);
-                                        if (!currentFocus.hasPrimaryFocus) {
-                                          currentFocus.unfocus();
-                                        }
-                                        showAttachmentBottomSheet(context);
-                                      },
-                                    ),
+                                  FocusScopeNode currentFocus =
+                                      FocusScope.of(context);
+                                  if (!currentFocus.hasPrimaryFocus) {
+                                    currentFocus.unfocus();
+                                  }
+                                  showAttachmentBottomSheet(context);
+                                },
+                              ),
                               !isRecording
                                   ? Flexible(
                                       child: TextField(
@@ -1121,7 +1254,8 @@ class _ChatPageState extends State<ChatPage> {
                                               isTyping = false;
                                             });
                                           } else {
-                                            ChatRoom.shared.typing(widget.chatID);
+                                            ChatRoom.shared
+                                                .typing(widget.chatID);
                                             setState(() {
                                               isTyping = true;
                                             });
@@ -1129,25 +1263,25 @@ class _ChatPageState extends State<ChatPage> {
                                         },
                                       ),
                                     )
-                                  : 
-                                  Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: <Widget>[
-                                        Image.asset("assets/record.gif", width: 10, height: 10),
+                                        Image.asset("assets/record.gif",
+                                            width: 10, height: 10),
                                         Container(width: 5),
                                         TimerText(dependencies: dependencies),
                                       ],
-                                  ),
+                                    ),
                               !isTyping
                                   ? ClipOval(
                                       child: GestureDetector(
                                         onLongPress: () async {
                                           print("long press");
                                           bool p = await checkPermission();
-                                          if(p){
+                                          if (p) {
                                             startRecord();
                                           }
-                                          
                                         },
                                         onLongPressUp: () {
                                           print("long press UP");
@@ -1160,13 +1294,12 @@ class _ChatPageState extends State<ChatPage> {
                                         //   stopRecord();
                                         // },
                                         child: Center(
-                                          child: !isRecording?
-                                          Icon(
-                                            Icons.mic,
-                                            size: 30,
-                                          )
-                                          : Container()
-                                        ),
+                                            child: !isRecording
+                                                ? Icon(
+                                                    Icons.mic,
+                                                    size: 30,
+                                                  )
+                                                : Container()),
                                       ),
                                     )
 
@@ -1179,36 +1312,50 @@ class _ChatPageState extends State<ChatPage> {
                                   : IconButton(
                                       icon: Icon(Icons.send),
                                       onPressed: () {
-                                        print("new message or editing? editing: $isEditing");
-                                        if(isEditing){
+                                        print(
+                                            "new message or editing? editing: $isEditing");
+                                        if (isEditing) {
                                           print("Edit message is called");
-                                          var mId = editMessage['id']==null?editMessage['message_id']:editMessage['id'];
+                                          var mId = editMessage['id'] == null
+                                              ? editMessage['message_id']
+                                              : editMessage['id'];
                                           var type = editMessage['type'];
                                           var time = editMessage['time'];
-                                          ChatRoom.shared.editMessage(_text.text, widget.chatID, type, time, mId);
+                                          ChatRoom.shared.editMessage(
+                                              _text.text,
+                                              widget.chatID,
+                                              type,
+                                              time,
+                                              mId);
                                           setState(() {
-                                              isTyping = false;
-                                              _text.text = '';
-                                              isEditing = false;
-                                              editMessage = null;
+                                            isTyping = false;
+                                            _text.text = '';
+                                            isEditing = false;
+                                            editMessage = null;
                                           });
-                                        } else if(isReplying){
+                                        } else if (isReplying) {
                                           print("Reply message is called");
-                                          var mId = replyMessage['id']==null?replyMessage['message_id']:replyMessage['id'];
-                                          ChatRoom.shared.replyMessage(_text.text, widget.chatID, 10, mId);
+                                          var mId = replyMessage['id'] == null
+                                              ? replyMessage['message_id']
+                                              : replyMessage['id'];
+                                          ChatRoom.shared.replyMessage(
+                                              _text.text,
+                                              widget.chatID,
+                                              10,
+                                              mId);
                                           setState(() {
-                                              isTyping = false;
-                                              _text.text = '';
-                                              isReplying = false;
-                                              replyMessage = null;
+                                            isTyping = false;
+                                            _text.text = '';
+                                            isReplying = false;
+                                            replyMessage = null;
                                           });
                                         } else {
                                           ChatRoom.shared.sendMessage(
-                                            '${widget.chatID}', _text.text);
-                                            setState(() {
-                                              isTyping = false;
-                                              _text.text = '';
-                                            });
+                                              '${widget.chatID}', _text.text);
+                                          setState(() {
+                                            isTyping = false;
+                                            _text.text = '';
+                                          });
                                         }
                                       },
                                     ),
@@ -1220,20 +1367,19 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ],
               ),
-              isRecording?
-              Positioned.fill(
-                // top: 100,
-                left: MediaQuery.of(context).size.width*0.8,
-                child: Image.asset(
-                  "assets/voice.gif",
-                  // fit: BoxFit.fitWidth,
-                  width: 100,
-                  height: 100,
-                  alignment: Alignment.bottomCenter,
-                ),
-              )
-              :
-              Container(),
+              isRecording
+                  ? Positioned.fill(
+                      // top: 100,
+                      left: MediaQuery.of(context).size.width * 0.8,
+                      child: Image.asset(
+                        "assets/voice.gif",
+                        // fit: BoxFit.fitWidth,
+                        width: 100,
+                        height: 100,
+                        alignment: Alignment.bottomCenter,
+                      ),
+                    )
+                  : Container(),
               // Container(
               //   width: 200,
               //   height: 200,
@@ -1269,8 +1415,7 @@ class _ChatPageState extends State<ChatPage> {
       recordFilePath = await getAudioFilePath();
       isComplete = false;
       isRecording = true;
-      
-      
+
       print("RECORD FILE PATH $recordFilePath");
       dependencies.stopwatch.start();
 
@@ -1310,16 +1455,17 @@ class _ChatPageState extends State<ChatPage> {
       dependencies.stopwatch.stop();
       dependencies = new Dependencies();
 
-      
-
       api.uploadMedia(recordFilePath, 3).then((r) async {
         print("RRRRR ${r["message"]}");
         if (r["status"]) {
-          var a = [{
-            "filename": "${r["file_name"]}",
-          }];
-          ChatRoom.shared.sendMessage('${widget.chatID}', "voice", type: 3, attachments: jsonDecode(jsonEncode(a)));
-          
+          var a = [
+            {
+              "filename": "${r["file_name"]}",
+            }
+          ];
+          ChatRoom.shared.sendMessage('${widget.chatID}', "voice",
+              type: 3, attachments: jsonDecode(jsonEncode(a)));
+
           Directory storageDirectory = await getApplicationDocumentsDirectory();
           String sdPath = storageDirectory.path + "/record";
           var dir = Directory(sdPath);
@@ -1331,7 +1477,6 @@ class _ChatPageState extends State<ChatPage> {
       });
 
       setState(() {});
-
     }
   }
 
@@ -1390,21 +1535,17 @@ class _ChatPageState extends State<ChatPage> {
       },
     );
   }
-  
-
-
 
   Widget message(m) {
-    bool isGroup = int.parse("${widget.memberCount}")>2?true:false;
+    bool isGroup = int.parse("${widget.memberCount}") > 2 ? true : false;
     // return DeviderMessageWidget(date: 'test');
-    if ('${m['id']}' == 'chat:message:create' || '${m['type']}' == '7' || '${m['type']}' == '8')
-      return Devider(m);
-    return '${m['user_id']}' == '${user.id}' ? Sended(m, chatId: widget.chatID)
-    :
-    Received(m, chatId: widget.chatID, isGroup: isGroup);
+    if ('${m['id']}' == 'chat:message:create' ||
+        '${m['type']}' == '7' ||
+        '${m['type']}' == '8') return Devider(m);
+    return '${m['user_id']}' == '${user.id}'
+        ? Sended(m, chatId: widget.chatID)
+        : Received(m, chatId: widget.chatID, isGroup: isGroup);
   }
-
-  
 }
 
 class Devider extends StatelessWidget {
@@ -1428,6 +1569,3 @@ class Devider extends StatelessWidget {
     return '${roomBooked.hour}:${roomBooked.minute}';
   }
 }
-
-
-

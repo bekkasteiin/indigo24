@@ -12,4 +12,4 @@ final Image backgroundForChat = Image(
   fit: BoxFit.fill,
 );
 
-const ImageProvider chatBackgroundProvider = ExactAssetImage("assets/images/background_chat.png");
+const ImageProvider chatBackgroundProvider = AssetImage("assets/images/background_chat.png");

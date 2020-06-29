@@ -3,12 +3,16 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/widgets/full_photo.dart';
+import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'chat.dart';
 
 var parser = EmojiParser();
 
@@ -42,6 +46,7 @@ File uploadingImage;
 
   List imageCount = [];
   var test;
+
 
 
 

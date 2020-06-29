@@ -126,6 +126,8 @@ class _TapePageState extends State<TapePage>
                                       margin: EdgeInsets.only(bottom: 10),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.start,
+
                                         children: <Widget>[
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -135,35 +137,42 @@ class _TapePageState extends State<TapePage>
                                                 backgroundImage: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
                                                 backgroundColor: Colors.red,
                                               ),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
+                                              
                                             ],
                                           ),
                                           
                                           SizedBox(
                                             width: 10,
                                           ),
-                                          Expanded(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                text: '${com[index]['name']} ',
-                                                style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w600),
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                    text: '${com[index]['comment']}',
-                                                    style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
+                                          Flexible(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                RichText(
+                                                  text: TextSpan(
+                                                    text: '${com[index]['name']} ',
+                                                    style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w600),
+                                                    children: <TextSpan>[
+                                                      TextSpan(
+                                                        text: '${com[index]['comment']}',
+                                                        style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
+                                                ),
+                                                 Container(
+                                                   padding: EdgeInsets.only(top: 5),
+                                                   alignment: Alignment.centerLeft,
+                                                   child: Text(
+                                                   '${com[index]['date']}',
+                                                   overflow: TextOverflow.ellipsis,
+                                                   style: TextStyle(color: Color(0xFF5E5E5E), fontWeight: FontWeight.w300),
                                               ),
+                                                 ),
+                                              ],
                                             ),
-                                            // Text(
-                                            //   '${com[index]['comment']}',
-                                            //   overflow: TextOverflow.ellipsis,
-                                            //   maxLines: _saved[index]['maxLines'],
-                                            //   style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
-                                            // ),
                                           ),
+                                        
                                           // SizedBox(
                                             // width: 10,
                                           // ),
@@ -281,6 +290,8 @@ class _TapePageState extends State<TapePage>
                                     "avatar": "${user.avatar}",
                                     "comment": "${_commentController.text}",
                                     "name": "${user.name}",
+                                    "date": "${v['result']['date']}"
+                                    // TODO add date from v
                                   };
                                   setState(() {
                                     com.add(result);

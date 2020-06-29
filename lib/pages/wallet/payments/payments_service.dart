@@ -179,7 +179,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           Positioned(
                             child: AppBar(
                               centerTitle: true,
-                              title: Text("${widget.title}"),
+                              title: Text("${localization.payments}"),
                               leading: IconButton(
                                 icon: Container(
                                   padding: EdgeInsets.all(10),
@@ -225,6 +225,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             '${user.balance} ₸',
                                             style: fS18(c: 'FFFFFF'),
                                           ),
+
                                         ],
                                       ),
                                     ),
@@ -235,7 +236,14 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           ),
                           ],
                         ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          color: Colors.white,
+                          padding: EdgeInsets.only(left: 20, top: 20),
+                          child: Text('${widget.title}', maxLines: 3, style: TextStyle(fontSize: 16, color: Color(0xFF001D52)))
+                        ),
                         mainPaymentsDetailMobile(snapshot.data),
+                        SizedBox(height: 10,),
                         Center(child: Text('${localization.minAmount} ${snapshot.data['service']['min']} KZT', style: TextStyle(color: Color(0xFF001D52)))),
                         Center(child: Text('${localization.maxAmount} ${snapshot.data['service']['max']} KZT', style: TextStyle(color: Color(0xFF001D52)))),
                         Center(child: Text('${localization.commission} ${snapshot.data['service']['commission']}%', style: TextStyle(color: Color(0xFF001D52)))),

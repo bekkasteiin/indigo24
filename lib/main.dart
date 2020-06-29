@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/db/contact.dart';
+import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/pages/auth/intro.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_contacts.dart';
@@ -17,7 +22,11 @@ import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/helper.dart';
 
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/widgets/circle.dart';
+import 'package:indigo24/widgets/keyboard.dart';
+import 'package:indigo24/widgets/pin_code.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,47 +41,51 @@ import 'package:indigo24/services/localization.dart' as localization;
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 String formatPhone(String phone) {
-    String r = phone.replaceAll(" ", "");
-    r = r.replaceAll("(", "");
-    r = r.replaceAll(")", "");
-    r = r.replaceAll("+", "");
-    r = r.replaceAll("-", "");
-    if (r.startsWith("8")) {
-      r = r.replaceFirst("8", "7");
+  String r = phone.replaceAll(" ", "");
+  r = r.replaceAll("(", "");
+  r = r.replaceAll(")", "");
+  r = r.replaceAll("+", "");
+  r = r.replaceAll("-", "");
+  if (r.startsWith("8")) {
+    r = r.replaceFirst("8", "7");
+  }
+  return r;
+}
+
+getContacts(context) async {
+  try {
+    contacts.clear();
+    if (await Permission.contacts.request().isGranted) {
+      Iterable<Contact> phonebook =
+          await ContactsService.getContacts(withThumbnails: false);
+      phonebook.forEach((el) {
+        if (el.displayName != null) {
+          el.phones.forEach((phone) {
+            if (!contacts.contains(formatPhone(phone.value))) {
+              phone.value = formatPhone(phone.value);
+              // print('name: ${el.displayName } phone:${phone.value}');
+              contacts.add({
+                'name': el.displayName,
+                'phone': phone.value,
+              });
+            }
+          });
+        }
+      });
+      return contacts;
+    } else {
+      return false;
     }
-    return r;
+  } catch (_) {
+    print(_);
+    return "disconnect";
   }
-  getContacts(context) async {
-    try {
-      contacts.clear();
-      if (await Permission.contacts.request().isGranted) {
-        Iterable<Contact> phonebook = await ContactsService.getContacts(withThumbnails: false);
-        phonebook.forEach((el) {
-          if (el.displayName != null) {
-            el.phones.forEach((phone) {
-              if (!contacts.contains(formatPhone(phone.value))) {
-                phone.value = formatPhone(phone.value);
-                // print('name: ${el.displayName } phone:${phone.value}');
-                contacts.add({
-                  'name': el.displayName,
-                  'phone': phone.value,
-                });
-              }
-            });
-          }
-        });
-        return contacts;
-      } else{
-        return false;
-      }
-    } catch (_) {
-      print(_);
-      return "disconnect";
-    }
-  }
-  permissionForPush() async {
-    await Permission.notification.request();
-  }
+}
+
+permissionForPush() async {
+  await Permission.notification.request();
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -89,6 +102,13 @@ Future<void> main() async {
   Api api = Api();
   bool authenticated = false;
 
+  if (!await Permission.microphone.isGranted) {
+    PermissionStatus status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      return false;
+    }
+  }
+
   await api.checkUnique(unique, customerID).then((r) async {
     if (r['success'] != null) {
       authenticated = r['success'].toString() == 'true';
@@ -99,24 +119,20 @@ Future<void> main() async {
     }
   });
 
-
   permissionForPush();
-
 
   runApp(MyApp(phone: phone, authenticated: authenticated));
 }
 
 final tabPageKey = new GlobalKey<_TabsState>();
 
+// ignore: must_be_immutable
 class MyApp extends StatelessWidget {
-  
   MyApp({
     Key key,
     @required this.phone,
     this.authenticated,
   }) : super(key: key);
-  
-
 
   bool authenticated;
   String phone;
@@ -134,8 +150,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home:
-            (phone == 'null' || authenticated == false) ? IntroPage() : Tabs(key: tabPageKey),
+        home: (phone == 'null' || authenticated == false)
+            ? IntroPage()
+            : Tabs(key: tabPageKey),
       ),
     );
   }
@@ -149,26 +166,35 @@ class Tabs extends StatefulWidget {
 }
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
-
+  bool isAuthenticated = false;
   TabController tabController;
   var api = Api();
   MyConnectivity _connectivity = MyConnectivity.instance;
+  // ignore: unused_field
   Map _source = {ConnectivityResult.none: false};
 
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  
+  // StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   StreamSubscription _intentDataStreamSubscription;
+  // ignore: unused_field
   List<SharedMediaFile> _sharedFiles;
+  // ignore: unused_field
   String _sharedText;
 
-  share(){
+  var contactsDB = ContactsDB();
+  List<MyContact> myContacts = [];
+
+  share() async {
+    await contactsDB.getAll().then((value) => myContacts = value);
+
     // For sharing images coming from outside the app while the app is in the memory
-    _intentDataStreamSubscription =
-        ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
+    _intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream()
+        .listen((List<SharedMediaFile> value) {
       setState(() {
-        print("Shared:" + (value?.map((f)=> f.path)?.join(",") ?? ""));
+        print("Shared:" + (value?.map((f) => f.path)?.join(",") ?? ""));
         _sharedFiles = value;
       });
+      if (value != null) shareModal();
     }, onError: (err) {
       print("getIntentDataStream error: $err");
     });
@@ -176,8 +202,12 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // For sharing images coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
       setState(() {
+        print("app is closed Shared:  ${value == null}" +
+            (value?.map((f) => f.path)?.join(",") ?? ""));
+
         _sharedFiles = value;
       });
+      if (value != null) shareModal();
     });
 
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
@@ -200,6 +230,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   var chatsDB = ChatsDB();
+
   setUser() async {
     user.id = await SharedPreferencesHelper.getCustomerID();
     user.phone = await SharedPreferencesHelper.getString('phone');
@@ -216,7 +247,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
-  Future<void> _handleNotification (Map<dynamic, dynamic> message, bool dialog) async {
+  Future<void> _handleNotification(
+      Map<dynamic, dynamic> message, bool dialog) async {
     var m = message['data'] ?? message;
 
     _init();
@@ -228,13 +260,142 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         userIds: "${m['user_id']}");
   }
 
-  
+  bool withPin;
+
+  final StreamController<bool> _verificationNotifier =
+      StreamController<bool>.broadcast();
+  var temp;
+  _onPasscodeEntered(String enteredPasscode) {
+    if (user.pin == 'waiting' && temp == enteredPasscode) {
+      print('creating');
+      api.createPin(enteredPasscode);
+      Navigator.maybePop(context);
+      Navigator.maybePop(context);
+    }
+    if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('${localization.error}'),
+            content: Text('${localization.incorrectPin}'),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    if ('${user.pin}'.toString() == 'false') {
+      user.pin = 'waiting';
+      temp = enteredPasscode;
+      print('first set pin $temp');
+    }
+
+    bool isValid = '${user.pin}' == enteredPasscode;
+    _verificationNotifier.add(isValid);
+    if (isValid) {
+      print(' is really valid ');
+      setState(() {
+        this.isAuthenticated = isValid;
+      });
+    }
+
+    // if (!isValid){
+    // return showDialog<void>(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return CupertinoAlertDialog(
+    //       title: Text('${localization.error}'),
+    //       content: Text('${localization.incorrectPin}'),
+    //       actions: <Widget>[
+    //         CupertinoDialogAction(
+    //           child: Text('Ok'),
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
+    // }
+  }
+
+  _showLockScreen(BuildContext context, String title,
+      {bool withPin,
+      bool opaque,
+      CircleUIConfig circleUIConfig,
+      KeyboardUIConfig keyboardUIConfig,
+      Widget cancelButton,
+      List<String> digits}) {
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+          opaque: opaque,
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              PasscodeScreen(
+            title: title,
+            withPin: withPin,
+            passwordEnteredCallback: _onPasscodeEntered,
+            cancelButton: (cancelButton),
+            deleteButton: Text(
+              'Delete',
+              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+              semanticsLabel: 'Delete',
+            ),
+            shouldTriggerVerification: _verificationNotifier.stream,
+            backgroundColor: Color(0xFFF7F7F7),
+            cancelCallback: _onPasscodeCancelled,
+            digits: digits,
+          ),
+        ));
+  }
+
+  _onPasscodeCancelled() {
+    if ('${user.pin}' == 'false') {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
+    } else {
+      exit(0);
+    }
+  }
+
   @override
   void initState() {
     share();
 
-    getContacts(context).then((getContactsResult){
-      if(!getContactsResult){
+    Timer.run(() {
+      '${user.pin}' == 'false'
+          ? _showLockScreen(context, '${localization.createPin}',
+              withPin: false,
+              opaque: false,
+              cancelButton: Text('Cancel',
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+                  semanticsLabel: 'Cancel'))
+          : Text('');
+      // _showLockScreen(
+      //     context,
+      //     '${localization.enterPin}',
+      //     opaque: false,
+      //     cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+    });
+
+    getContacts(context).then((getContactsResult) {
+      // Future.delayed(Duration(seconds: 5)).then((value) {
+      // ChatRoom.shared.userCheck(getContactsResult[306]['phone']);
+      // });
+      for (int i = 0; i < getContactsResult.length; i++) {
+        ChatRoom.shared.userCheck(getContactsResult[i]['phone']);
+      }
+
+      if (!getContactsResult) {
         Widget okButton = CupertinoDialogAction(
           child: Text("Открыть настройки"),
           onPressed: () {
@@ -257,7 +418,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         );
       }
     });
-    _firebaseMessaging.getToken().then((value) async { 
+    _firebaseMessaging.getToken().then((value) async {
       print("MY FCM TOKEN $value");
       await api.updateFCM(value, user.id, user.unique);
     });
@@ -335,20 +496,40 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   _connect() async {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
-      print("LISTENING EVENT");
+      if (e.json["cmd"] != 'user:check')
+        print("LISTENING EVENT ${e.json["cmd"]}");
       var cmd = e.json["cmd"];
       // print(e.json);
       switch (cmd) {
         case 'message:create':
           print(e.json["data"]);
-          inAppPush(e.json["data"]);
+          var senderId = e.json["data"]['user_id'].toString();
+          var userId = user.id.toString();
+          print("$senderId $userId");
+          if (senderId != userId) inAppPush(e.json["data"]);
           break;
         case 'chats:get':
           setState(() {
             // chatsPage += 1;
             myList = e.json['data'].toList();
-            chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
+            // chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
           });
+          break;
+        case 'user:check':
+          var data = e.json["data"];
+          // print("USER CHECK ${data['status']}");
+          if (data['status'].toString() == 'true') {
+            setState(() async {
+              MyContact contact = MyContact(
+                  phone: data['phone'],
+                  id: data['user_id'],
+                  avatar: data['avatar'],
+                  name: data['name'],
+                  chatId: data['chat_id'],
+                  online: data['online']);
+              await contactsDB.updateOrInsert(contact);
+            });
+          }
           break;
         default:
           print("default in main");
@@ -374,6 +555,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   inAppPush(m) {
+    ChatRoom.shared.inSound();
     showOverlayNotification((context) {
       return Card(
         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -391,7 +573,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 size: const Size(40, 40),
                 child: ClipOval(
                     child: CachedNetworkImage(
-                  imageUrl: "https://media.indigo24.com/avatars/noAvatar.png",
+                  imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
                 ))),
             title: Text("${m['user_name']}"),
             subtitle: Text("${m["text"]}"),
@@ -513,12 +695,219 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     _intentDataStreamSubscription.cancel();
     super.dispose();
   }
-}
 
+  shareModal() {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return CupertinoActionSheet(
+              title: Container(
+                padding: EdgeInsets.all(10),
+                child: new Row(
+                  children: [
+                    _sharedFiles == null
+                        ? Container()
+                        : Image.file(
+                            File(_sharedFiles[0].path),
+                            width: MediaQuery.of(context).size.width * 0.2,
+                          ),
+                    Container(width: 10),
+                    Flexible(
+                      child: Text("Отправка медиа"),
+                    )
+                  ],
+                ),
+              ),
+              message: Container(
+                height: MediaQuery.of(context).size.height * 0.3,
+                color: Colors.transparent,
+                child: Stack(
+                  children: [
+                    isUploading
+                        ? Container(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Center(
+                                  child: CircularPercentIndicator(
+                                    radius: 120.0,
+                                    lineWidth: 13.0,
+                                    animation: false,
+                                    percent: uploadPercent,
+                                    progressColor: Color(0xFF0543B8),
+                                    backgroundColor: Color(0xFF000000),
+                                    center: Text(
+                                      percent,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 20.0),
+                                    ),
+                                    footer: Text(
+                                      "Загрузка",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 17.0),
+                                    ),
+                                    circularStrokeCap: CircularStrokeCap.round,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Material(
+                            color: Colors.transparent,
+                            child: ListView.builder(
+                              itemCount: myContacts.length,
+                              itemBuilder: (BuildContext context, int i) {
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: CachedNetworkImageProvider(
+                                        "https://indigo24.xyz/uploads/avatars/noAvatar.png"),
+                                    // child: Text('${myContacts[i].name[0]}'),
+                                  ),
+                                  title: Text("${myContacts[i].name}"),
+                                  onTap: () {
+                                    print(myContacts[i]);
+                                    if (_sharedFiles != null &&
+                                        myContacts[i].chatId != null)
+                                      sendMedia(_sharedFiles[0].path,
+                                          myContacts[i].chatId, setState);
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+              cancelButton: CupertinoActionSheetAction(
+                isDefaultAction: true,
+                child: Text('Отмена'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            );
+          });
+        });
+  }
+
+  sendMedia(path, chatId, StateSetter setState) {
+    uploadMedia(path, 1, setState).then((r) async {
+      print("RRR $r");
+      if (r["status"]) {
+        var a = [
+          {
+            "filename": "${r["file_name"]}",
+            "r_filename": "${r["resize_file_name"]}"
+          }
+        ];
+        // setState(() {
+        //   isUploaded = true;
+        // });
+        ChatRoom.shared.sendMessage('$chatId', "image",
+            type: 1, attachments: jsonDecode(jsonEncode(a)));
+
+        Navigator.pop(context);
+      } else {
+        showAlertDialog(context, r["message"]);
+        print("error");
+      }
+    });
+  }
+
+  Response response;
+  BaseOptions options = new BaseOptions(
+    baseUrl: "https://api.indigo24.xyz/api/v2.1",
+    connectTimeout: 25000,
+    receiveTimeout: 3000,
+  );
+
+  Dio dio;
+  var percent = "0 %";
+  double uploadPercent = 0.0;
+  bool isUploading = false;
+
+  uploadMedia(_path, type, StateSetter setState) async {
+    dio = new Dio(options);
+    try {
+      FormData formData = FormData.fromMap({
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "file": await MultipartFile.fromFile(_path),
+        "type": type
+      });
+
+      print("Uploading media with data ${formData.fields}");
+
+      response = await dio.post(
+        "https://media.chat.indigo24.xyz/upload",
+        data: formData,
+        onSendProgress: (int sent, int total) {
+          String p = (sent / total * 100).toStringAsFixed(2);
+
+          setState(() {
+            isUploading = true;
+            uploadPercent = sent / total;
+            percent = "$p %";
+          });
+          print("$percent");
+        },
+        onReceiveProgress: (count, total) {
+          setState(() {
+            isUploading = false;
+            uploadPercent = 0.0;
+            percent = "0 %";
+          });
+        },
+      );
+      print("Getting response from media upload ${response.data}");
+
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response);
+      } else {
+        print("ERROR $e");
+        print(e.request.data);
+        print(e.message);
+      }
+      return e.response.data;
+    }
+  }
+
+  showAlertDialog(BuildContext context, String message) {
+    Widget okButton = CupertinoDialogAction(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("Ошибка"),
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+}
 
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   preferences.setString('phone', 'null');
+  preferences.setString('pin', 'false');
   Widget okButton = CupertinoDialogAction(
     child: Text("OK"),
     onPressed: () {
@@ -528,7 +917,7 @@ logOut(BuildContext context) async {
           builder: (context) => IntroPage(),
         ),
         (r) => false,
-    );
+      );
     },
   );
   CupertinoAlertDialog alert = CupertinoAlertDialog(
@@ -546,7 +935,7 @@ logOut(BuildContext context) async {
   );
 }
 
-
+// ignore: must_be_immutable
 class Developing extends StatelessWidget {
   String string = '${localization.chats}';
 

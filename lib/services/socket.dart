@@ -7,8 +7,7 @@ import 'package:indigo24/services/user.dart' as user;
 
 class ChatRoom {
   static var shared = ChatRoom();
-  var channel =
-      new IOWebSocketChannel.connect('wss://chat.indigo24.xyz:9502');
+  var channel = new IOWebSocketChannel.connect('wss://chat.indigo24.xyz:9502');
 
   var changeController;
   var cabinetController;
@@ -20,15 +19,17 @@ class ChatRoom {
   Stream<MyContactEvent> get onContactChange => contactController.stream;
   Stream<MyCabinetEvent> get onCabinetChange => cabinetController.stream;
   Stream<MyChatInfoEvent> get onChatInfoChange => chatInfoController.stream;
-  Stream<MyCabinetInfoEvent> get onCabinetInfoChange => cabinetInfoController.stream;
+  Stream<MyCabinetInfoEvent> get onCabinetInfoChange =>
+      cabinetInfoController.stream;
 
   var lastMessage;
 
-  void outSound(){
+  void outSound() {
     print("msg out sound is called");
     final player = AudioCache();
     player.play("sound/msg_out.mp3");
   }
+
   void inSound1() async {
     print("msg in sound is called");
     final player = AudioCache();
@@ -39,9 +40,8 @@ class ChatRoom {
     print("msg in sound is called");
     final player = AudioCache();
     await player.play("sound/message_in.mp3");
-    
   }
-  
+
   // var userId = user.id;
   // var userToken = user.unique;
 
@@ -54,7 +54,7 @@ class ChatRoom {
     print("Setting StreamController for Chat Info Events");
     chatInfoController = new StreamController<MyChatInfoEvent>();
   }
-  
+
   setCabinetInfoStream() {
     print("Setting StreamController for Chat Info Events");
     cabinetInfoController = new StreamController<MyCabinetInfoEvent>();
@@ -94,11 +94,10 @@ class ChatRoom {
     changeController.close();
   }
 
-
-  closeConnection(){
+  closeConnection() {
     channel.sink.close();
   }
-  
+
   init() {
     print("Init is called");
 
@@ -113,15 +112,15 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
-  makeAdmin(chatId,members) {
+  changePrivileges(chatId, members, role) {
     var data = json.encode({
       "cmd": 'chat:members:privileges',
       "data": {
         "user_id": '${user.id}',
         "chat_id": '$chatId',
-        "role": '2',
+        "role": '$role',
         "userToken": "${user.unique}",
-        "members":"$members",
+        "members": "$members",
       }
     });
     channel.sink.add(data);
@@ -154,6 +153,33 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  leaveChat(chatID) {
+    var data = json.encode({
+      "cmd": 'chat:member:leave',
+      "data": {
+        "chat_id": "$chatID",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+      }
+    });
+    channel.sink.add(data);
+    print("leave ${user.id} member from chat $chatID is called");
+  }
+
+  addMembers(String chatID, members) {
+    var data = json.encode({
+      "cmd": 'chat:members:add',
+      "data": {
+        "chat_id": "$chatID",
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "members_id": "$members",
+      }
+    });
+    channel.sink.add(data);
+    print("add members is added $chatID $members");
+  }
+
   getMessages(String chatID, {page}) {
     print("getMessages is called");
     var data = json.encode({
@@ -183,8 +209,8 @@ class ChatRoom {
           "userToken": "${user.unique}",
           "chat_id": "$chatID",
           "text": '$message',
-          "message_type": type==null?0:type,
-          "attachments": attachments==null?null:attachments
+          "message_type": type == null ? 0 : type,
+          "attachments": attachments == null ? null : attachments
         }
       });
       print('added message');
@@ -195,17 +221,30 @@ class ChatRoom {
     }
   }
 
-  chatMembers(users_ids, chatId) {
+  chatMembers(chatId) {
     var data = json.encode({
       "cmd": "chat:members",
       "data": {
         "userToken": "${user.unique}",
-        "users_ids": "$users_ids",
         "chat_id": chatId,
         "user_id": '${user.id}',
       }
     });
     print('checked members');
+    channel.sink.add(data);
+  }
+
+  deleteChatMember(chatId, member_id) {
+    var data = json.encode({
+      "cmd": "chat:members:delete",
+      "data": {
+        "userToken": "${user.unique}",
+        "member_id": "$member_id",
+        "chat_id": '$chatId',
+        "user_id": '${user.id}',
+      }
+    });
+    print('deleted members');
     channel.sink.add(data);
   }
 
@@ -218,11 +257,26 @@ class ChatRoom {
         "phone": phone,
       }
     });
-    print('added user check');
+    // USER:CHECK test print
+    // print('added user check with data ${json.decode(data)['data']['phone']}');
     channel.sink.add(data);
   }
 
-  deleteFromAll(chatId, messageId){
+  changeChatName(chatId, chatName) {
+    var data = json.encode({
+      "cmd": "chat:change:name",
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "chat_id": "$chatId",
+        "chat_name": "$chatName",
+      }
+    });
+    print('chat name changed $data');
+    channel.sink.add(data);
+  }
+
+  deleteFromAll(chatId, messageId) {
     var data = json.encode({
       "cmd": "message:deleted:all",
       "data": {
@@ -235,20 +289,19 @@ class ChatRoom {
     print('message deleted from all $data');
     channel.sink.add(data);
   }
-  
-  typing(chatId){
+
+  typing(chatId) {
     var data = json.encode({
       "cmd": "user:writing",
       "data": {
         "user_id": "${user.id}",
         "chat_id": chatId,
-        "userToken": "${user.unique}"        
+        "userToken": "${user.unique}"
       }
     });
     print('sending status with $data');
     channel.sink.add(data);
   }
-
 
   cabinetCreate(ids, type, {title}) {
     var data = json.encode({
@@ -278,12 +331,12 @@ class ChatRoom {
     channel.sink.add(jsonEncode(data));
   }
 
-  connect(){
+  connect() {
     channel = new IOWebSocketChannel.connect('wss://chat.indigo24.xyz:9502');
     listen();
   }
 
-  editingMessage(m){
+  editingMessage(m) {
     print("EDITING IN SOCKET $m");
     var object = {
       "cmd": "editMessage",
@@ -293,20 +346,22 @@ class ChatRoom {
     };
     var json = jsonDecode(jsonEncode(object));
 
-    if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+    if (cabinetController != null)
+      cabinetController.add(new MyCabinetEvent(json));
   }
 
-  scrolling(i){
+  scrolling(i) {
     var object = {
       "cmd": "scrolling",
       "index": i,
     };
     var json = jsonDecode(jsonEncode(object));
 
-    if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+    if (cabinetController != null)
+      cabinetController.add(new MyCabinetEvent(json));
   }
 
-  replyingMessage(m){
+  replyingMessage(m) {
     print("REPLYING IN SOCKET $m");
     var object = {
       "cmd": "replyMessage",
@@ -316,10 +371,11 @@ class ChatRoom {
     };
     var json = jsonDecode(jsonEncode(object));
 
-    if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+    if (cabinetController != null)
+      cabinetController.add(new MyCabinetEvent(json));
   }
 
-  editMessage(message, chatID, type, time, mId){
+  editMessage(message, chatID, type, time, mId) {
     outSound();
 
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
@@ -334,7 +390,7 @@ class ChatRoom {
           "chat_id": "$chatID",
           "text": '$message',
           "message_id": mId,
-          "message_type": type==null?0:type,
+          "message_type": type == null ? 0 : type,
           "time": time
           // "attachments": attachments==null?null:attachments
         }
@@ -347,7 +403,7 @@ class ChatRoom {
     }
   }
 
-  replyMessage(message, chatID, type, mId){
+  replyMessage(message, chatID, type, mId) {
     outSound();
 
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
@@ -362,7 +418,7 @@ class ChatRoom {
           "chat_id": "$chatID",
           "text": '$message',
           "message_id": mId,
-          "message_type": type==null?0:type,
+          "message_type": type == null ? 0 : type,
         }
       });
       print('added message');
@@ -374,44 +430,31 @@ class ChatRoom {
   }
 
   listen() {
-    
     channel.stream.listen(
       (event) {
         var json = jsonDecode(event);
 
         var cmd = json['cmd'];
         var data = json['data'];
-
         switch (cmd) {
           case "init":
-
             print(user.id);
             print(data);
             if (data['status'].toString() == 'true') {
               print("INIT status is ${data['status']}");
               forceGetChat();
-              // var obj = {
-              //   "cmd": 'chats:get',
-              //   "data": {
-              //     "user_id": "$userId",
-              //     "userToken": "$userToken",
-              //     "page": '1',
-              //   }
-              // };
-              // channel.sink.add(jsonEncode(obj));
             }
             break;
           case "chats:get":
             changeController.add(new MyEvent(json));
             break;
           case "chat:get":
-
             cabinetController.add(new MyCabinetEvent(json));
             break;
           case "message:create":
             forceGetChat();
             if (cabinetController == null) {
-              inSound();
+              // inSound();
               changeController.add(new MyEvent(json));
               print("new message in CHATS null page");
             } else {
@@ -420,13 +463,25 @@ class ChatRoom {
                 // inSound();
                 cabinetController.add(new MyCabinetEvent(json));
               } else {
-                inSound();
+                // inSound();
                 changeController.add(new MyEvent(json));
                 print("new message in CHATS page");
               }
             }
             break;
           case "user:check":
+            if (contactController != null) {
+              contactController.add(new MyContactEvent(json));
+            }
+            if (cabinetInfoController != null) {
+              print('added to cabinet info');
+              cabinetInfoController.add(new MyCabinetInfoEvent(json));
+            }
+            if (changeController != null) {
+              changeController.add(new MyEvent(json));
+            }
+            break;
+          case "chat:members:add":
             contactController.add(new MyContactEvent(json));
             break;
           case "user:check:online":
@@ -444,24 +499,37 @@ class ChatRoom {
             print('added to chatInfoController');
             chatInfoController.add(new MyChatInfoEvent(json));
             break;
-          case "user:writing": 
-            if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+          case "user:writing":
+            if (cabinetController != null)
+              cabinetController.add(new MyCabinetEvent(json));
             break;
-          case "message:deleted:all": 
-            if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+          case "message:deleted:all":
+            if (cabinetController != null)
+              cabinetController.add(new MyCabinetEvent(json));
             break;
           case "message:edit":
-            if(cabinetController != null) cabinetController.add(new MyCabinetEvent(json));
+            if (cabinetController != null)
+              cabinetController.add(new MyCabinetEvent(json));
             break;
-            
+          case "chat:members:delete":
+            print('added to chatInfoController');
+            chatInfoController.add(new MyChatInfoEvent(json));
+            break;
+          case "chat:member:leave":
+            print('added to chatInfoController');
+            chatInfoController.add(new MyChatInfoEvent(json));
+            break;
           default:
             print('default print cmd: $cmd json: $json');
         }
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        connect();
-        init();
+        Future.delayed(const Duration(milliseconds: 15000), () {
+          print('tis is wainti secodn');
+          connect();
+          init();
+        });
       },
     );
   }
@@ -506,4 +574,3 @@ class MyCabinetInfoEvent {
     this.json = json;
   }
 }
-

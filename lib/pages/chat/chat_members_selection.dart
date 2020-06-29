@@ -12,12 +12,17 @@ import 'package:indigo24/services/user.dart' as user;
 import 'chat.dart';
 import 'chat_contacts.dart';
 
-class ChatGroupSelection extends StatefulWidget {
+class ChatMembersSelection extends StatefulWidget {
+  final chatId;
+  final currentChatMembers;
+  
+  ChatMembersSelection(this.chatId, this.currentChatMembers);
+
   @override
-  _ChatGroupSelectionState createState() => _ChatGroupSelectionState();
+  _ChatMembersSelectionState createState() => _ChatMembersSelectionState();
 }
 
-class _ChatGroupSelectionState extends State<ChatGroupSelection> {
+class _ChatMembersSelectionState extends State<ChatMembersSelection> {
   var arrays = [];
   var _saved = List<dynamic>();
   var _saved2 = List<dynamic>();
@@ -48,9 +53,16 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   @override
   void initState() {
     super.initState();
-    actualList.addAll(contacts);
+    if(contacts.isNotEmpty){
+      actualList.addAll(contacts);
+
+      widget.currentChatMembers.forEach((value){
+        actualList.removeWhere((element) { 
+          return '${value['phone']}' == '${element['phone']}';
+        });
+      });
+    }
     ChatRoom.shared.setContactsStream();
-    _saved2.add({"phone": "${user.phone}", "user_id": "${user.id}", "name": "${user.name}"});
     listen();
     print('listened');
   }
@@ -59,12 +71,14 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
 
   listen() {
     ChatRoom.shared.onContactChange.listen((e) {
-      print("GROUP SELECTION EVENT");
+      print("MEMBER SELECTION EVENT");
       print(e.json);
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "user:check":
           if ("${e.json['data']['chat_id']}" != "null" && "${e.json['data']['status']}" == 'true') {
+            print('________ user check is valid __________');
+            print('________ user check is valid __________');
             setState(() {
               _saved.add({"index" : tempIndex, "user_id": e.json['data']['user_id']});
               _saved2.add({'phone': e.json['data']['phone'], 'user_id': e.json['data']['user_id'], 'name': e.json['data']['name'],});
@@ -85,39 +99,16 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             _showError(context, 'Данного пользователя нет в системе');
           }
           break;
-        case "chat:create":
-          print("STATUS ${e.json["data"]["status"]}");
-          if (e.json["data"]["status"].toString() == "true") {
-            var name = e.json["data"]["chat_name"];
-            var chatID = e.json["data"]["chat_id"];
-            print(e.json['data']['type']);
-            ChatRoom.shared.setCabinetStream();
-            ChatRoom.shared.getMessages('$chatID');
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                      name, chatID,
-                      chatType: e.json['data']['type'],
-                      memberCount: e.json["data"]['members_count'])),
-            ).whenComplete(() {
-              ChatRoom.shared.closeCabinetStream();
-            });
-          } else {
-            print('++++++++++++++++++++');
-
-            // Navigator.pop(context);
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
-            // ).whenComplete(() {
-            //   ChatRoom.shared.closeCabinetStream();
-            // });
-          }
+        case "chat:members:add":
+          print('______CHAT MEMBERS ADD______');
+          print('______CHAT MEMBERS ADD______');
+          print('______CHAT MEMBERS ADD______');
+          print('______CHAT MEMBERS ADD______');
+          print('e.json ${e.json}');
+          Navigator.pop(context);
           break;
-
         default:
+          print('this is default');
       }
     });
   }
@@ -164,7 +155,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
 
 
   TextEditingController _searchController = TextEditingController();
-  TextEditingController _titleController = TextEditingController();
 
   var actualList = List<dynamic>();
 
@@ -209,7 +199,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 centerTitle: true,
                 brightness: Brightness.light,
                 title: Text(
-                  "${localization.createGroup}",
+                  "Добавить в группу",
                   style: TextStyle(
                     color: Color(0xFF001D52),
                     fontWeight: FontWeight.w400,
@@ -223,26 +213,14 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       iconSize: 30,
                       color: Color(0xFF001D52),
                       onPressed: () {
-                        if (_saved2.length > 1) {
-                          if (_titleController.text.isNotEmpty) {
-                            String user_ids = '';
-                            _saved2.removeAt(0);
-                            _saved2.forEach((element) {
-                              user_ids += '${element['user_id']}' + ',';
-                              print(element);
-                            });
-                            print(user_ids);
-                            user_ids = user_ids.substring(0, user_ids.length - 1);
-                            ChatRoom.shared.cabinetCreate(user_ids, 1, title: _titleController.text);
-                          } else {
-                            print('chat name is empty');
-                            _showError(context, 'Отсутствует название чата');
-                          }
-                        } else {
-                          print('member count less than 3');
-                          _showError(
-                              context, 'Минимальное количество участников : 3');
-                        }
+                        print(_saved2);
+                        String user_ids = '';
+                        _saved2.forEach((element) {
+                          user_ids += '${element['user_id']}' + ',';
+                        });
+                        user_ids = user_ids.substring(0, user_ids.length - 1);
+                        print('$user_ids');
+                        ChatRoom.shared.addMembers('${widget.chatId}', '$user_ids');
                       })
                 ],
                 backgroundColor: Colors.white,
@@ -326,7 +304,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                                       return '${item['phone']}' == '${_saved2[index]['phone']}';
                                                     });
                                                   });
-                                                  
                                                 },
                                               ),
                                             ),
@@ -338,17 +315,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                },
                               ),
                             ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 10.0, left: 10.0, right: 10, bottom: 0),
-                            child: TextField(
-                              decoration: new InputDecoration(
-                                hintText: "${localization.chatName}",
-                                fillColor: Colors.white,
-                              ),
-                              controller: _titleController,
-                            ),
-                          ),
                           Container(
                             height: 50,
                             padding: const EdgeInsets.only(
