@@ -180,6 +180,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   List<SharedMediaFile> _sharedFiles;
   // ignore: unused_field
   String _sharedText;
+  bool isSharedVideo = false;
+
+  var sharedType;
 
   var contactsDB = ContactsDB();
   List<MyContact> myContacts = [];
@@ -191,10 +194,13 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     _intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream()
         .listen((List<SharedMediaFile> value) {
       setState(() {
+        print(
+            'path of thumbnail: ${value[0].thumbnail}   ${value[0].type == SharedMediaType.VIDEO} ');
+        if (value[0].type == SharedMediaType.VIDEO) isSharedVideo = true;
         print("Shared:" + (value?.map((f) => f.path)?.join(",") ?? ""));
         _sharedFiles = value;
       });
-      if (value != null) shareModal();
+      if (_sharedFiles != null) shareModal();
     }, onError: (err) {
       print("getIntentDataStream error: $err");
     });
@@ -207,7 +213,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
         _sharedFiles = value;
       });
-      if (value != null) shareModal();
+      if (_sharedFiles != null) shareModal(); // TESTING
     });
 
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
@@ -699,29 +705,42 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   shareModal() {
     showCupertinoModalPopup(
         context: context,
+        semanticsDismissible: false,
         builder: (BuildContext context) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return CupertinoActionSheet(
               title: Container(
                 padding: EdgeInsets.all(10),
-                child: new Row(
-                  children: [
-                    _sharedFiles == null
-                        ? Container()
-                        : Image.file(
-                            File(_sharedFiles[0].path),
-                            width: MediaQuery.of(context).size.width * 0.2,
-                          ),
-                    Container(width: 10),
-                    Flexible(
-                      child: Text("Отправка медиа"),
-                    )
-                  ],
+                child: Material(
+                  color: Colors.transparent,
+                  // TODO padding top
+                  child: new Row(
+                    children: [
+                      _sharedFiles == null
+                          ? Container()
+                          : _sharedFiles == null || _sharedFiles.isEmpty
+                              ? Container()
+                              : Image.file(
+                                  File(isSharedVideo
+                                      ? _sharedFiles[0].thumbnail
+                                      : _sharedFiles[0].path),
+                                  fit: BoxFit.cover,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.2,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.2,
+                                ),
+                      Container(width: 10),
+                      Flexible(child: TextField()
+                          // Text("Отправка медиа"),
+                          )
+                    ],
+                  ),
                 ),
               ),
               message: Container(
-                height: MediaQuery.of(context).size.height * 0.3,
+                height: MediaQuery.of(context).size.height * 0.5,
                 color: Colors.transparent,
                 child: Stack(
                   children: [
@@ -766,10 +785,18 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                                 return ListTile(
                                   leading: CircleAvatar(
                                     backgroundImage: CachedNetworkImageProvider(
-                                        "https://indigo24.xyz/uploads/avatars/noAvatar.png"),
+                                        "https://indigo24.xyz/uploads/avatars/${myContacts[i].avatar}"),
                                     // child: Text('${myContacts[i].name[0]}'),
                                   ),
-                                  title: Text("${myContacts[i].name}"),
+                                  title: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("${myContacts[i].name}"),
+                                      Text("${myContacts[i].phone}")
+                                    ],
+                                  ),
                                   onTap: () {
                                     print(myContacts[i]);
                                     if (_sharedFiles != null &&
@@ -789,6 +816,10 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 child: Text('Отмена'),
                 onPressed: () {
                   Navigator.pop(context);
+                  // setState(() {
+                  _sharedFiles.clear();
+                  isSharedVideo = false;
+                  // });
                 },
               ),
             );
@@ -797,22 +828,35 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   sendMedia(path, chatId, StateSetter setState) {
-    uploadMedia(path, 1, setState).then((r) async {
+    var type = isSharedVideo ? 4 : 1;
+    uploadMedia(path, type, setState).then((r) async {
       print("RRR $r");
       if (r["status"]) {
         var a = [
-          {
-            "filename": "${r["file_name"]}",
-            "r_filename": "${r["resize_file_name"]}"
-          }
+          isSharedVideo
+              ? {
+                  "filename": "${r["file_name"]}",
+                }
+              : {
+                  "filename": "${r["file_name"]}",
+                  "r_filename": "${r["resize_file_name"]}"
+                }
         ];
         // setState(() {
         //   isUploaded = true;
         // });
-        ChatRoom.shared.sendMessage('$chatId', "image",
-            type: 1, attachments: jsonDecode(jsonEncode(a)));
-
+        var mediaType = isSharedVideo ? "video" : "image";
+        ChatRoom.shared.sendMessage('$chatId', "$mediaType",
+            type: type, attachments: jsonDecode(jsonEncode(a)));
+        // setState(() {
+        _sharedFiles.clear();
+        isSharedVideo = false;
+        // });
         Navigator.pop(context);
+        // setState(() {
+        // _sharedFiles.clear();
+        // isSharedVideo = false;
+        // });
       } else {
         showAlertDialog(context, r["message"]);
         print("error");

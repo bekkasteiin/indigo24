@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat.dart';
@@ -15,13 +14,12 @@ class ReplyMessage extends StatefulWidget {
 }
 
 class _ReplyMessageState extends State<ReplyMessage> {
-
   @override
   void initState() {
     super.initState();
     print("Reply data ${widget.replyData}");
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -33,7 +31,8 @@ class _ReplyMessageState extends State<ReplyMessage> {
           InkWell(
             onTap: () {
               var id = widget.replyData['message_id'];
-              int i = listMessages.indexWhere((e) => e['id']==null?e['message_id']:e['id']==id);
+              int i = listMessages.indexWhere(
+                  (e) => e['id'] == null ? e['message_id'] : e['id'] == id);
               print("index of message is $i");
               // ChatRoom.shared.scrolling(i);
             },
@@ -46,30 +45,33 @@ class _ReplyMessageState extends State<ReplyMessage> {
                 children: [
                   Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
                   Container(width: 5),
-                  widget.replyData['attachments']==null? Container():
-                  Container(
-                    width: 40,
-                    height: 40,
-                    child: Image.network("${widget.replyData['attachments_url']}${widget.replyData['attachments']["r_filename"]}"),
-                  ),
+                  widget.replyData == null
+                      ? Container()
+                      : widget.replyData['attachments'] == null
+                          ? Container()
+                          : Container(
+                              width: 40,
+                              height: 40,
+                              child: Image.network(
+                                  "${widget.replyData['attachments_url']}${widget.replyData['attachments']["r_filename"]}"),
+                            ),
                   Container(width: 5),
                   Flexible(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("${widget.replyData["user_name"]}", 
-                          style: TextStyle(color: Color(0xff0543B8)), 
-                          overflow: TextOverflow.ellipsis, 
-                          maxLines: 1, 
-                          softWrap: false
-                        ),
                         Text(
-                          "${widget.replyData["message_text_for_type"]==null?widget.replyData["text"]:widget.replyData["message_text_for_type"]}", 
-                          overflow: TextOverflow.ellipsis, 
-                          maxLines: 1, 
-                          softWrap: false
-                        )
+                            "${widget.replyData == null ? "" : widget.replyData["user_name"]}",
+                            style: TextStyle(color: Color(0xff0543B8)),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            softWrap: false),
+                        Text(
+                            "${widget.replyData == null ? "" : widget.replyData["message_text_for_type"] == null ? widget.replyData["text"] : widget.replyData["message_text_for_type"]}",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            softWrap: false)
                       ],
                     ),
                   ),

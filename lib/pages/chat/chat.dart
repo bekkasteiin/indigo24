@@ -594,8 +594,7 @@ class _ChatPageState extends State<ChatPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => TransferPage(
-                                            phone: widget
-                                                .phone, // TODO ADIL CHECK DIS PLS LPLSLPSLPS
+                                            phone: widget.phone,
                                           ),
                                         ))
                                     // showBottomModalSheet(context,
