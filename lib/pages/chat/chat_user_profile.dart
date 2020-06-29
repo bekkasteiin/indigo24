@@ -1,17 +1,13 @@
-import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_contacts.dart';
-import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-
 
 class ChatUserProfilePage extends StatefulWidget {
   final phone;
@@ -19,11 +15,11 @@ class ChatUserProfilePage extends StatefulWidget {
   final image;
   final member;
   final name;
-  ChatUserProfilePage(this.member, {this.name, this.phone, this.email, this.image});
+  ChatUserProfilePage(this.member,
+      {this.name, this.phone, this.email, this.image});
 
   @override
   _ChatUserProfileStatePage createState() => _ChatUserProfileStatePage();
-
 }
 
 class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
@@ -34,14 +30,12 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     ChatRoom.shared.closeCabinetInfoStream();
   }
 
-
-
   bool isInMyPhoneBook = false;
 
   @override
   void initState() {
     contacts.forEach((element) {
-      if(element['phone'].toString() == widget.phone.toString()){
+      if (element['phone'].toString() == widget.phone.toString()) {
         print(widget.phone);
         print(element['phone'].toString());
         isInMyPhoneBook = true;
@@ -51,7 +45,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
 
     listen();
   }
-  
 
   listen() {
     ChatRoom.shared.onCabinetInfoChange.listen((e) {
@@ -113,7 +106,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
   double uploadPercent = 0.0;
   bool isUploading = false;
 
-
   Widget _buildCoverImage(Size screenSize) {
     return Container(
       height: 120,
@@ -130,62 +122,60 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     return InkWell(
       onTap: () {
         final act = CupertinoActionSheet(
-    title: Text('Выберите опцию'),
-    // message: Text('Which option?'),
-    actions: <Widget>[
-      CupertinoActionSheetAction(
-        child: Text('Посмотреть'),
-        onPressed: () {
-          print("посмотреть");
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider("${widget.image}"),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained*3,
-                  backgroundDecoration: BoxDecoration(
-                    color: Colors.transparent
-                  ),
-                )));
-        },
-      ),
-      // CupertinoActionSheetAction(
-      //   child: Text('Перейти в чат с ${widget.member['user_name']}'),
-      //   onPressed: () {
-      //     // Navigator.pop(context);
-      //     // TODO check user online
-      //     // Navigator.push(context,MaterialPageRoute(builder: (context) => ChatPage(name, chatID, userIds: widget.member['user_id'], avatar: widget.member['avatar'], avatarUrl: widget.member['avatar_url'],)));
-      //   },
-      // ),
-      CupertinoActionSheetAction(
-        child: Text('Перейти в чат'),
-        onPressed: () {
-          print(widget.phone);
-          ChatRoom.shared.userCheck(widget.phone);
-          // Navigator.pop(context);
-        },
-      )
-    ],
-    cancelButton: CupertinoActionSheetAction(
-      child: Text('Назад'),
-      onPressed: () {
-        Navigator.pop(context);
+            title: Text('Выберите опцию'),
+            // message: Text('Which option?'),
+            actions: <Widget>[
+              CupertinoActionSheetAction(
+                child: Text('Посмотреть'),
+                onPressed: () {
+                  print("посмотреть");
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullScreenWrapper(
+                                imageProvider: CachedNetworkImageProvider(
+                                    "${widget.image}"),
+                                minScale: PhotoViewComputedScale.contained,
+                                maxScale: PhotoViewComputedScale.contained * 3,
+                                backgroundDecoration:
+                                    BoxDecoration(color: Colors.transparent),
+                              )));
+                },
+              ),
+              // CupertinoActionSheetAction(
+              //   child: Text('Перейти в чат с ${widget.member['user_name']}'),
+              //   onPressed: () {
+              //     // Navigator.pop(context);
+              //     // TODO check user online
+              //     // Navigator.push(context,MaterialPageRoute(builder: (context) => ChatPage(name, chatID, userIds: widget.member['user_id'], avatar: widget.member['avatar'], avatarUrl: widget.member['avatar_url'],)));
+              //   },
+              // ),
+              CupertinoActionSheetAction(
+                child: Text('Перейти в чат'),
+                onPressed: () {
+                  print(widget.phone);
+                  ChatRoom.shared.userCheck(widget.phone);
+                  // Navigator.pop(context);
+                },
+              )
+            ],
+            cancelButton: CupertinoActionSheetAction(
+              child: Text('Назад'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ));
+        showCupertinoModalPopup(
+            context: context, builder: (BuildContext context) => act);
       },
-    ));
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act);
-    },
       child: Center(
         child: Container(
           width: 100.0,
           height: 100.0,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: CachedNetworkImageProvider(
-                  '${widget.image}'),
+              image: CachedNetworkImageProvider('${widget.image}'),
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(80.0),
@@ -212,8 +202,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     );
   }
 
-
-
   Widget _buildEmailSection(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
@@ -230,7 +218,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
   }
 
   Widget _buildPhoneSection(Size screenSize) {
-    if(isInMyPhoneBook)
+    if (isInMyPhoneBook)
       return Column(
         children: <Widget>[
           Container(
@@ -287,9 +275,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
                         ],
                       ),
                       Column(
-                        children: <Widget>[
-                          Container(height: 20)
-                        ],
+                        children: <Widget>[Container(height: 20)],
                       ),
                     ],
                   ),
@@ -334,4 +320,3 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     );
   }
 }
-

@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
@@ -44,13 +41,16 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     );
   }
 
-
   @override
   void initState() {
     super.initState();
     actualList.addAll(contacts);
     ChatRoom.shared.setContactsStream();
-    _saved2.add({"phone": "${user.phone}", "user_id": "${user.id}", "name": "${user.name}"});
+    _saved2.add({
+      "phone": "${user.phone}",
+      "user_id": "${user.id}",
+      "name": "${user.name}"
+    });
     listen();
     print('listened');
   }
@@ -64,11 +64,17 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "user:check":
-          if ("${e.json['data']['chat_id']}" != "null" && "${e.json['data']['status']}" == 'true') {
+          if ("${e.json['data']['chat_id']}" != "null" &&
+              "${e.json['data']['status']}" == 'true') {
             setState(() {
-              _saved.add({"index" : tempIndex, "user_id": e.json['data']['user_id']});
-              _saved2.add({'phone': e.json['data']['phone'], 'user_id': e.json['data']['user_id'], 'name': e.json['data']['name'],});
+              _saved.add(
+                  {"index": tempIndex, "user_id": e.json['data']['user_id']});
+              _saved2.add({
+                'phone': e.json['data']['phone'],
+                'user_id': e.json['data']['user_id'],
+                'name': e.json['data']['name'],
               });
+            });
 
             // Navigator.push(
             //   context,
@@ -81,7 +87,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             // });
           } else if (e.json['data']['status'] == 'true') {
             // ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
-          } else{
+          } else {
             _showError(context, 'Данного пользователя нет в системе');
           }
           break;
@@ -97,8 +103,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                      name, chatID,
+                  builder: (context) => ChatPage(name, chatID,
                       chatType: e.json['data']['type'],
                       memberCount: e.json["data"]['members_count'])),
             ).whenComplete(() {
@@ -161,8 +166,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     return r;
   }
 
-
-
   TextEditingController _searchController = TextEditingController();
   TextEditingController _titleController = TextEditingController();
 
@@ -192,248 +195,262 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                icon: Container(
-                  padding: EdgeInsets.all(10),
-                  child: Image(
-                    image: AssetImage(
-                      'assets/images/back.png',
-                    ),
-                  ),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
                 ),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          centerTitle: true,
+          brightness: Brightness.light,
+          title: Text(
+            "${localization.createGroup}",
+            style: TextStyle(
+              color: Color(0xFF001D52),
+              fontWeight: FontWeight.w400,
+              fontSize: 22,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          actions: <Widget>[
+            IconButton(
+                icon: Icon(Icons.group_add),
+                iconSize: 30,
+                color: Color(0xFF001D52),
                 onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-                centerTitle: true,
-                brightness: Brightness.light,
-                title: Text(
-                  "${localization.createGroup}",
-                  style: TextStyle(
-                    color: Color(0xFF001D52),
-                    fontWeight: FontWeight.w400,
-                    fontSize: 22,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                actions: <Widget>[
-                  IconButton(
-                      icon: Icon(Icons.group_add),
-                      iconSize: 30,
-                      color: Color(0xFF001D52),
-                      onPressed: () {
-                        if (_saved2.length > 1) {
-                          if (_titleController.text.isNotEmpty) {
-                            String user_ids = '';
-                            _saved2.removeAt(0);
-                            _saved2.forEach((element) {
-                              user_ids += '${element['user_id']}' + ',';
-                              print(element);
-                            });
-                            print(user_ids);
-                            user_ids = user_ids.substring(0, user_ids.length - 1);
-                            ChatRoom.shared.cabinetCreate(user_ids, 1, title: _titleController.text);
-                          } else {
-                            print('chat name is empty');
-                            _showError(context, 'Отсутствует название чата');
-                          }
-                        } else {
-                          print('member count less than 3');
-                          _showError(
-                              context, 'Минимальное количество участников : 3');
-                        }
-                      })
-                ],
-                backgroundColor: Colors.white,
-              ),
-              body: contacts.isNotEmpty
-                  ? SafeArea(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                            Container( padding: EdgeInsets.only(top: 10, left: 10),child: Text('${_saved2.length} ${localization.contacts}')),
-                            Container(
-                              height: _saved2.length == 0  ? 0 : 82,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: _saved2.length != null ? _saved2.length : 0,
-                                itemBuilder: (BuildContext context, int index) {
-                                // print(_saved2[index]);
-                                return Stack(
+                  if (_saved2.length > 1) {
+                    if (_titleController.text.isNotEmpty) {
+                      String user_ids = '';
+                      _saved2.removeAt(0);
+                      _saved2.forEach((element) {
+                        user_ids += '${element['user_id']}' + ',';
+                        print(element);
+                      });
+                      print(user_ids);
+                      user_ids = user_ids.substring(0, user_ids.length - 1);
+                      ChatRoom.shared.cabinetCreate(user_ids, 1,
+                          title: _titleController.text);
+                    } else {
+                      print('chat name is empty');
+                      _showError(context, 'Отсутствует название чата');
+                    }
+                  } else {
+                    print('member count less than 3');
+                    _showError(
+                        context, 'Минимальное количество участников : 3');
+                  }
+                })
+          ],
+          backgroundColor: Colors.white,
+        ),
+        body: contacts.isNotEmpty
+            ? SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                        padding: EdgeInsets.only(top: 10, left: 10),
+                        child:
+                            Text('${_saved2.length} ${localization.contacts}')),
+                    Container(
+                      height: _saved2.length == 0 ? 0 : 82,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _saved2.length != null ? _saved2.length : 0,
+                        itemBuilder: (BuildContext context, int index) {
+                          // print(_saved2[index]);
+                          return Stack(
+                            children: <Widget>[
+                              Container(
+                                width: 80,
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
-                                    Container(
-                                      width: 80,
-                                      padding: EdgeInsets.all(10),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          ClipRRect(
-                                            borderRadius:BorderRadius.circular(20.0),
-                                            child: Container(
-                                              color: Color(0xFF0543B8),
-                                              width: 35,
-                                              height: 35,
-                                              child: Center(
-                                                child: Text(
-                                                  '${_saved2[index]['name'][0].toUpperCase()}',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.w500
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      child: Container(
+                                        color: Color(0xFF0543B8),
+                                        width: 35,
+                                        height: 35,
+                                        child: Center(
+                                          child: Text(
+                                            '${_saved2[index]['name'][0].toUpperCase()}',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.w500),
                                           ),
-                                          SizedBox(height: 10,),
-                                          Container(
-                                            child: Text(
-                                              // '${_saved2[index]['data']['data']['name']} asd',
-                                              '${_saved2[index]['name']}',
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ),
-                                          ),
-                                          // Text("${_saved2[index][0]}")
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                    _saved2[index]['user_id'] == '${user.id}' 
-                                    ? Center()
-                                    : Positioned(
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      child: Text(
+                                        // '${_saved2[index]['data']['data']['name']} asd',
+                                        '${_saved2[index]['name']}',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                    // Text("${_saved2[index][0]}")
+                                  ],
+                                ),
+                              ),
+                              _saved2[index]['user_id'] == '${user.id}'
+                                  ? Center()
+                                  : Positioned(
                                       bottom: 30,
                                       right: 20,
-                                        child: Container(
+                                      child: Container(
                                           decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              border: Border.all(
-                                               color: Color(0xFF0543B8),
-                                              ),
-                                              borderRadius: BorderRadius.circular(20.0),
-                                            ), 
-                                          width: 22, 
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color: Color(0xFF0543B8),
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                          width: 22,
                                           height: 22,
                                           child: Center(
                                             child: Center(
                                               child: InkWell(
-                                                child: Icon(Icons.close, size: 14, color: Color(0xFF0543B8),),
-                                                onTap: (){
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 14,
+                                                  color: Color(0xFF0543B8),
+                                                ),
+                                                onTap: () {
                                                   setState(() {
-                                                    _saved2.removeWhere((item) { 
-                                                      return '${item['phone']}' == '${_saved2[index]['phone']}';
+                                                    _saved2.removeWhere((item) {
+                                                      return '${item['phone']}' ==
+                                                          '${_saved2[index]['phone']}';
                                                     });
                                                   });
-                                                  
                                                 },
                                               ),
                                             ),
-                                          )
-                                        ),
+                                          )),
+                                    ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 10.0, left: 10.0, right: 10, bottom: 0),
+                      child: TextField(
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(40),
+                        ],
+                        decoration: InputDecoration(
+                          hintText: "${localization.chatName}",
+                          fillColor: Colors.white,
+                        ),
+                        controller: _titleController,
+                      ),
+                    ),
+                    Container(
+                      height: 50,
+                      padding: const EdgeInsets.only(
+                          top: 10.0, left: 10.0, right: 10, bottom: 0),
+                      child: Center(
+                        child: TextField(
+                          decoration: new InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: Color(0xFF001D52),
+                            ),
+                            hintText: "${localization.search}",
+                            fillColor: Color(0xFF001D52),
+                          ),
+                          onChanged: (value) {
+                            search(value);
+                          },
+                          controller: _searchController,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: actualList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          if ('${user.phone}' ==
+                              '+${actualList[index]['phone']}') return Center();
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Container(
+                              child: CheckboxListTile(
+                                title: Wrap(
+                                  children: <Widget>[
+                                    Text(
+                                      '${actualList[index]['name']}',
+                                      style: TextStyle(fontSize: 16.0),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
-                                );
-                               },
-                              ),
-                            ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 10.0, left: 10.0, right: 10, bottom: 0),
-                            child: TextField(
-                              decoration: new InputDecoration(
-                                hintText: "${localization.chatName}",
-                                fillColor: Colors.white,
-                              ),
-                              controller: _titleController,
-                            ),
-                          ),
-                          Container(
-                            height: 50,
-                            padding: const EdgeInsets.only(
-                                top: 10.0, left: 10.0, right: 10, bottom: 0),
-                            child: Center(
-                              child: TextField(
-                                decoration: new InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.search,
-                                    color: Color(0xFF001D52),
-                                  ),
-                                  hintText: "${localization.search}",
-                                  fillColor: Color(0xFF001D52),
                                 ),
-                                onChanged: (value) {
-                                  search(value);
+                                subtitle: Text(
+                                  '${actualList[index]['phone']}',
+                                  style: TextStyle(fontSize: 14.0),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                value: valu(index),
+                                onChanged: (val) {
+                                  // print(_savedList.contains({'phone': '77479918574'},));
+                                  // print(_savedList);
+                                  print(_saved2);
+                                  setState(() {
+                                    if (val == true) {
+                                      tempIndex = index;
+                                      ChatRoom.shared.userCheck(
+                                          actualList[index]['phone']);
+                                    } else {
+                                      print(_saved2);
+                                      _saved2.removeWhere((item) {
+                                        return '${item['phone']}' ==
+                                            '${actualList[index]['phone']}';
+                                      });
+                                    }
+                                  });
                                 },
-                                controller: _searchController,
                               ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.white,
+                              ),
+                              margin: EdgeInsets.only(left: 10, right: 10),
                             ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: actualList.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                if('${user.phone}' == '+${actualList[index]['phone']}')
-                                  return Center();
-                                return Padding(
-                                  padding: const EdgeInsets.only(top: 2),
-                                  child: Container(
-                                    child: CheckboxListTile(
-                                      title: Wrap(
-                                        children: <Widget>[
-                                          Text(
-                                            '${actualList[index]['name']}',
-                                            style: TextStyle(fontSize: 16.0),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                      subtitle: Text(
-                                        '${actualList[index]['phone']}',
-                                        style: TextStyle(fontSize: 14.0),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      value: valu(index),
-                                      onChanged: (val) {
-                                        // print(_savedList.contains({'phone': '77479918574'},));
-                                        // print(_savedList);
-                                        print(_saved2);
-                                        setState(() {
-                                          if (val == true) {
-                                            tempIndex = index;
-                                            ChatRoom.shared.userCheck(actualList[index]['phone']);
-                                          } else {
-                                            print(_saved2);
-                                            _saved2.removeWhere((item) { 
-                                              return '${item['phone']}' == '${actualList[index]['phone']}';
-                                            });
-                                          }
-                                        });
-                                      },
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: Colors.white,
-                                    ),
-                                    margin: EdgeInsets.only(left: 10, right: 10),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                  )
-                  : Center(child: CircularProgressIndicator()));
-    
+                    ),
+                  ],
+                ),
+              )
+            : Center(child: CircularProgressIndicator()));
   }
-  valu(index){
+
+  valu(index) {
     bool tempo = false;
-    _saved2.forEach((element) { 
-    if('${element['phone']}' == '${actualList[index]['phone']}'){
-      tempo = true;
-    } 
+    _saved2.forEach((element) {
+      if ('${element['phone']}' == '${actualList[index]['phone']}') {
+        tempo = true;
+      }
     });
     return tempo;
   }

@@ -1,8 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat.dart';
-import 'package:indigo24/services/localization.dart';
-import 'package:indigo24/services/socket.dart';
 
 class ReplyMessage extends StatefulWidget {
   final text;

@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/services/localization.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 
 class UserRegistrationPage extends StatefulWidget {
@@ -35,7 +34,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
     passwordController2 = new TextEditingController();
   }
 
-
   @override
   void dispose() {
     super.dispose();
@@ -61,6 +59,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
       },
     );
   }
+
   bool isNameValid = true;
   bool isLastnameValid = true;
   bool isEmailValid = true;
@@ -97,8 +96,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
               Container(
                   decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: introBackgroundProvider,
-                    fit: BoxFit.cover),
+                    image: introBackgroundProvider, fit: BoxFit.cover),
               )),
               _buildForeground()
             ],
@@ -134,29 +132,48 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('$globalError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 13), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$globalError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Text("Имя", style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
-                              SizedBox(width: 20,),
-                              isNameValid == true ? Center()
-                              : Container(
-                                height: 15, 
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ), 
-                                width: 15, 
+                              Text("Имя",
+                                  style: TextStyle(
+                                      color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(
+                                width: 20,
                               ),
-                              
+                              isNameValid == true
+                                  ? Center()
+                                  : Container(
+                                      height: 15,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      width: 15,
+                                    ),
                             ],
                           ),
                           TextField(
                             controller: nameController,
                             decoration: InputDecoration(hintText: ""),
                           ),
-                          Text('$nameError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$nameError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 10),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
@@ -168,24 +185,37 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Фамилия",style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
-                              SizedBox(width: 20,),
-                              isLastnameValid == true ? Center()
-                              : Container(
-                                height: 15, 
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ), 
-                                width: 15, 
+                              Text("Фамилия",
+                                  style: TextStyle(
+                                      color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(
+                                width: 20,
                               ),
+                              isLastnameValid == true
+                                  ? Center()
+                                  : Container(
+                                      height: 15,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      width: 15,
+                                    ),
                             ],
                           ),
                           TextField(
                             controller: lastNameController,
                             decoration: InputDecoration(hintText: ""),
                           ),
-                           Text('$lastnameError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$lastnameError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 10),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
@@ -197,24 +227,37 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Email", style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
-                              SizedBox(width: 20,),
-                              isEmailValid == true ? Center()
-                              : Container(
-                                height: 15, 
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ), 
-                                width: 15, 
+                              Text("Email",
+                                  style: TextStyle(
+                                      color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(
+                                width: 20,
                               ),
+                              isEmailValid == true
+                                  ? Center()
+                                  : Container(
+                                      height: 15,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      width: 15,
+                                    ),
                             ],
                           ),
                           TextField(
                             controller: emailController,
                             decoration: InputDecoration(hintText: ""),
                           ),
-                          Text('$emailError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$emailError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 10),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
@@ -226,18 +269,23 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Пароль",style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
-                              SizedBox(width: 20,),
-                              isFirstPasswordValid == true ? Center()
-                              : Container(
-                                height: 15, 
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ), 
-                                width: 15, 
+                              Text("Пароль",
+                                  style: TextStyle(
+                                      color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(
+                                width: 20,
                               ),
-                             
+                              isFirstPasswordValid == true
+                                  ? Center()
+                                  : Container(
+                                      height: 15,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      width: 15,
+                                    ),
                             ],
                           ),
                           TextField(
@@ -262,7 +310,14 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                               ),
                             ),
                           ),
-                           Text('$firstPasswordError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$firstPasswordError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 10),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
@@ -274,18 +329,23 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Пароль",style: TextStyle(color: Color(0xff0543B8), fontSize: 16)),
-                              SizedBox(width: 20,),
-                              isSecondPasswordValid == true ? Center()
-                              : Container(
-                                height: 15, 
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ), 
-                                width: 15, 
+                              Text("Пароль",
+                                  style: TextStyle(
+                                      color: Color(0xff0543B8), fontSize: 16)),
+                              SizedBox(
+                                width: 20,
                               ),
-                              
+                              isSecondPasswordValid == true
+                                  ? Center()
+                                  : Container(
+                                      height: 15,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      width: 15,
+                                    ),
                             ],
                           ),
                           TextField(
@@ -310,7 +370,14 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                               ),
                             ),
                           ),
-                          Text('$secondPasswordError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$secondPasswordError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 10),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
@@ -329,56 +396,78 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                       // ),
                       child: ProgressButton(
                         defaultWidget: Text("Далее",
-                            style: TextStyle(color: Colors.white, fontSize: 22)),
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 22)),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: Color(0xff0543B8),
                         onPressed: () async {
-                          if(passwordController.text.isNotEmpty && passwordController2.text.isNotEmpty && nameController.text.isNotEmpty && lastNameController.text.isNotEmpty && emailController.text.isNotEmpty){
-                            setState((){
+                          if (passwordController.text.isNotEmpty &&
+                              passwordController2.text.isNotEmpty &&
+                              nameController.text.isNotEmpty &&
+                              lastNameController.text.isNotEmpty &&
+                              emailController.text.isNotEmpty) {
+                            setState(() {
                               globalError = '';
                             });
                             print('is not empty ');
-                            if (passwordController.text == passwordController2.text) {
+                            if (passwordController.text ==
+                                passwordController2.text) {
                               password = passwordController.text;
                               setState(() {
                                 secondPasswordError = '';
                                 emailError = '';
                                 nameError = '';
-                                lastnameError =  '';
+                                lastnameError = '';
                                 firstPasswordError = '';
                                 emailError = '';
                               });
-                              await api.register("${widget.phone}", "${nameController.text + ' ' + lastNameController.text}", "$password", "${emailController.text}").then((registerResponse) {
-                                print('this is register result $registerResponse');
-                                if(registerResponse['success'] == true){
-                                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => LoginPage()),(r) => false);
+                              await api
+                                  .register(
+                                      "${widget.phone}",
+                                      "${nameController.text + ' ' + lastNameController.text}",
+                                      "$password",
+                                      "${emailController.text}")
+                                  .then((registerResponse) {
+                                print(
+                                    'this is register result $registerResponse');
+                                if (registerResponse['success'] == true) {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginPage()),
+                                      (r) => false);
                                   setState(() {
                                     firstPasswordError = '';
-                                    emailError = ''; 
+                                    emailError = '';
                                   });
-                                } else if(registerResponse['message'] != null){
-                                  _showError(context, registerResponse['message']);
-                                }
-                                else{
+                                } else if (registerResponse['message'] !=
+                                    null) {
+                                  _showError(
+                                      context, registerResponse['message']);
+                                } else {
                                   setState(() {
-                                    firstPasswordError = '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
-                                    secondPasswordError = '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
-                                    emailError =  '${registerResponse['message']['email'] == null ? '' : registerResponse['message']['email']}';
+                                    firstPasswordError =
+                                        '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                    secondPasswordError =
+                                        '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                    emailError =
+                                        '${registerResponse['message']['email'] == null ? '' : registerResponse['message']['email']}';
                                   });
                                 }
                               });
                             } else {
-                                print('different passwords');
-                                setState(() {
-                                  firstPasswordError = 'Пароли должны быть идентичными';
-                                  secondPasswordError = 'Пароли должны быть идентичными';
-                                });
+                              print('different passwords');
+                              setState(() {
+                                firstPasswordError =
+                                    'Пароли должны быть идентичными';
+                                secondPasswordError =
+                                    'Пароли должны быть идентичными';
+                              });
                             }
-                          } else{
+                          } else {
                             print('empty');
                             setState(() {
-                               globalError = 'Заполните все нужные поля';
+                              globalError = 'Заполните все нужные поля';
                             });
                           }
                         },

@@ -5,12 +5,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat_info.dart';
 import 'package:indigo24/pages/chat/ui/received.dart';
 import 'package:indigo24/pages/chat/ui/sended.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/test_timer.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
+import 'package:indigo24/widgets/constants.dart';
 import 'package:indigo24/widgets/keyboard_dismisser.dart';
 import 'package:indigo24/widgets/preview.dart';
 import 'dart:async';
@@ -125,10 +127,26 @@ class _ChatPageState extends State<ChatPage> {
     _refreshController.loadComplete();
   }
 
+  var temp;
   @override
   initState() {
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
+    if (widget.members != null) {
+      temp = [];
+      widget.members.forEach((memberElement) {
+        myContacts.toList().forEach((element) {
+          if ('${element.phone}' == '${memberElement['phone']}') {
+            print('match ${element.phone}');
+            temp.add(element);
+          }
+        });
+      });
+    }
+
+    // widget.members.forEach((element){
+    // element ==  myContacts;
+    // });
     print('______________________________');
     print('members of this chat ${widget.members}');
     print('this is chats user online check ${widget.userIds}');
@@ -332,11 +350,6 @@ class _ChatPageState extends State<ChatPage> {
         _image = File(pickedFile.path);
       });
       print(_image);
-
-      // {status: true, write: 0, chat_id: 101, message_id: message:27886:117,
-      // user_id: 27886, time: 1592914094, avatar: 27886.20200623174222_200x200.jpg,
-      // avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: AdilTest, text: tres, type: 0}
-
       final popResult = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -498,228 +511,230 @@ class _ChatPageState extends State<ChatPage> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Container(
-                padding: EdgeInsets.only(bottom: 80),
-                margin: EdgeInsets.only(
-                    right: MediaQuery.of(context).size.width * 0.5),
-                child: ClipRRect(
-                  borderRadius:
-                      BorderRadius.only(topRight: Radius.circular(15)),
-                  child: Container(
-                    color: Colors.white.withOpacity(0.9),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Container(
-                          height: 50,
-                          child: Theme(
-                            data: ThemeData(),
-                            child: FlatButton(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/cameraPurple.png',
+              child: SafeArea(
+                child: Container(
+                  padding: EdgeInsets.only(bottom: 48),
+                  margin: EdgeInsets.only(
+                      right: MediaQuery.of(context).size.width * 0.5),
+                  child: ClipRRect(
+                    borderRadius:
+                        BorderRadius.only(topRight: Radius.circular(15)),
+                    child: Container(
+                      color: Colors.white.withOpacity(0.9),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            height: 50,
+                            child: Theme(
+                              data: ThemeData(),
+                              child: FlatButton(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/images/cameraPurple.png',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text('Камера',
-                                        style: TextStyle(
-                                            color: Color(0xFF001D52),
-                                            fontWeight: FontWeight.w500)),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text('Камера',
+                                          style: TextStyle(
+                                              color: Color(0xFF001D52),
+                                              fontWeight: FontWeight.w500)),
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  SystemChannels.textInput
+                                      .invokeMethod('TextInput.hide');
+                                  FocusScopeNode currentFocus =
+                                      FocusScope.of(context);
+                                  if (!currentFocus.hasPrimaryFocus) {
+                                    currentFocus.unfocus();
+                                  }
+                                  Navigator.pop(context);
+                                  getImage(ImageSource.camera);
+                                  print('Камера');
+                                },
                               ),
-                              onPressed: () {
-                                SystemChannels.textInput
-                                    .invokeMethod('TextInput.hide');
-                                FocusScopeNode currentFocus =
-                                    FocusScope.of(context);
-                                if (!currentFocus.hasPrimaryFocus) {
-                                  currentFocus.unfocus();
-                                }
-                                Navigator.pop(context);
-                                getImage(ImageSource.camera);
-                                print('Камера');
-                              },
                             ),
                           ),
-                        ),
-                        Container(
-                          height: 50,
-                          child: Theme(
-                            data: ThemeData(),
-                            child: FlatButton(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/money.png',
+                          Container(
+                            height: 50,
+                            child: Theme(
+                              data: ThemeData(),
+                              child: FlatButton(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/images/money.png',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text('Деньги',
-                                        style: TextStyle(
-                                            color: Color(0xFF001D52),
-                                            fontWeight: FontWeight.w500)),
-                                  ),
-                                ],
-                              ),
-                              onPressed: () {
-                                print('Деньги');
-                                Navigator.pop(context);
-                                print("${widget.phone}");
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text('Деньги',
+                                          style: TextStyle(
+                                              color: Color(0xFF001D52),
+                                              fontWeight: FontWeight.w500)),
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  print('Деньги');
+                                  Navigator.pop(context);
+                                  print("${widget.phone}");
 
-                                widget.chatType == 0
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => TransferPage(
-                                            phone: widget.phone,
-                                          ),
-                                        ))
-                                    // showBottomModalSheet(context,
-                                    //   private: true)
+                                  widget.chatType == 0
+                                      ? Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => TransferPage(
+                                              phone: widget.phone,
+                                            ),
+                                          ))
+                                      // showBottomModalSheet(context,
+                                      //   private: true)
 
-                                    : showBottomModalSheet(context);
-                              },
+                                      : showBottomModalSheet(context);
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          height: 50,
-                          child: Theme(
-                            data: ThemeData(),
-                            child: FlatButton(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/gallery.png',
+                          Container(
+                            height: 50,
+                            child: Theme(
+                              data: ThemeData(),
+                              child: FlatButton(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/images/gallery.png',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text('Галерея',
-                                        style: TextStyle(
-                                            color: Color(0xFF001D52),
-                                            fontWeight: FontWeight.w500)),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text('Галерея',
+                                          style: TextStyle(
+                                              color: Color(0xFF001D52),
+                                              fontWeight: FontWeight.w500)),
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  print('Галерея');
+                                  Navigator.pop(context);
+                                  getImage(ImageSource.gallery);
+                                },
                               ),
-                              onPressed: () {
-                                print('Галерея');
-                                Navigator.pop(context);
-                                getImage(ImageSource.gallery);
-                              },
                             ),
                           ),
-                        ),
-                        Container(
-                          height: 50,
-                          child: Theme(
-                            data: ThemeData(),
-                            child: FlatButton(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/files.png',
+                          Container(
+                            height: 50,
+                            child: Theme(
+                              data: ThemeData(),
+                              child: FlatButton(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/images/files.png',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text('Видео',
-                                        style: TextStyle(
-                                            color: Color(0xFF001D52),
-                                            fontWeight: FontWeight.w500)),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text('Видео',
+                                          style: TextStyle(
+                                              color: Color(0xFF001D52),
+                                              fontWeight: FontWeight.w500)),
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  print('видео');
+                                  Navigator.pop(context);
+                                  getVideo(ImageSource.gallery);
+                                },
                               ),
-                              onPressed: () {
-                                print('видео');
-                                Navigator.pop(context);
-                                getVideo(ImageSource.gallery);
-                              },
                             ),
                           ),
-                        ),
-                        Container(
-                          height: 50,
-                          child: Theme(
-                            data: ThemeData(),
-                            child: FlatButton(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/files.png',
+                          Container(
+                            height: 50,
+                            child: Theme(
+                              data: ThemeData(),
+                              child: FlatButton(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/images/files.png',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text('Файлы',
-                                        style: TextStyle(
-                                            color: Color(0xFF001D52),
-                                            fontWeight: FontWeight.w500)),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text('Файлы',
+                                          style: TextStyle(
+                                              color: Color(0xFF001D52),
+                                              fontWeight: FontWeight.w500)),
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  print('Файлы');
+                                  Navigator.pop(context);
+                                  _openFileExplorer();
+                                },
                               ),
-                              onPressed: () {
-                                print('Файлы');
-                                Navigator.pop(context);
-                                _openFileExplorer();
-                              },
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -737,25 +752,25 @@ class _ChatPageState extends State<ChatPage> {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 minHeight: 40.0,
-                maxHeight: 200.0,
+                maxHeight: 100.0,
               ),
               child: Container(
-                color: Colors.red.withOpacity(0.5),
                 // height: 120,
                 // width: 100,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: widget.members.length,
+                  itemCount: temp.length,
                   shrinkWrap: true,
                   itemBuilder: (context, i) {
                     return Center(
                       child: InkWell(
                         onTap: () {
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => TransferPage(
-                                phone: widget.members[i]['phone'],
+                                phone: temp[i]['phone'],
                               ),
                             ),
                           );
@@ -768,20 +783,11 @@ class _ChatPageState extends State<ChatPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(20.0),
-                                child: Container(
-                                  color: Color(0xFF0543B8),
+                                borderRadius: BorderRadius.circular(25.0),
+                                child: Image.network(
+                                  '$avatarUrl${widget.members[i]['avatar']}',
                                   width: 35,
                                   height: 35,
-                                  child: Center(
-                                    child: Text(
-                                      '${widget.members[i]['name'][0].toUpperCase()}',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
                                 ),
                               ),
                               SizedBox(
@@ -917,19 +923,20 @@ class _ChatPageState extends State<ChatPage> {
               elevation: 0,
               color: Colors.transparent,
               textColor: Colors.white,
-              child: CircleAvatar(
-                radius: 25,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25.0),
                 child: ClipOval(
                     child: CachedNetworkImage(
+                        height: 50,
+                        width: 50,
                         imageUrl: widget.avatar == null
-                            ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+                            ? "${avatarUrl}noAvatar.png"
                             : widget.avatarUrl == null
-                                ? "https://indigo24.xyz/uploads/avatars/" +
-                                    widget.avatar
-                                : widget.avatarUrl + widget.avatar,
-                        errorWidget: (context, url, error) => CachedNetworkImage(
-                            imageUrl:
-                                "https://indigo24.xyz/uploads/avatars/noAvatar.png"))),
+                                ? avatarUrl + widget.avatar
+                                : '${widget.avatarUrl}${widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                        errorWidget: (context, url, error) =>
+                            CachedNetworkImage(
+                                imageUrl: "${avatarUrl}noAvatar.png"))),
               ),
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
@@ -1207,6 +1214,7 @@ class _ChatPageState extends State<ChatPage> {
                   Container(
                     color: Colors.white,
                     width: MediaQuery.of(context).size.width,
+                    height: 48,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5, right: 5),
                       child: Column(

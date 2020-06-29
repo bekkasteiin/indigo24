@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/tapes/add_tape.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/widgets/constants.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -223,8 +224,9 @@ class _TapesPageState extends State<TapesPage>
                                               borderRadius:
                                                   BorderRadius.circular(25.0),
                                               child: Image.network(
-                                                'https://indigo24.xyz/uploads/avatars/${result[index]['avatar']}',
+                                                '${avatarUrl}${result[index]['avatar']}',
                                                 width: 35,
+                                                height: 35,
                                               ),
                                             ),
                                             Flexible(

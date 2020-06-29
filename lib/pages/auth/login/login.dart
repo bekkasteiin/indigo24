@@ -7,9 +7,6 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/restore_password.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/services/helper.dart';
-import 'package:indigo24/services/push.dart';
-import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/widgets/backgrounds.dart';
 
@@ -74,9 +71,6 @@ class _LoginPageState extends State<LoginPage> {
     _getCountries();
   }
 
-
-  
-
   Future<void> _showError(BuildContext context, m) {
     return showDialog<void>(
       context: context,
@@ -99,8 +93,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
@@ -122,8 +114,7 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                   decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: introBackgroundProvider,
-                    fit: BoxFit.cover),
+                    image: introBackgroundProvider, fit: BoxFit.cover),
               )),
               _buildForeground()
             ],
@@ -162,8 +153,13 @@ class _LoginPageState extends State<LoginPage> {
                             child: Ink(
                               child: Row(
                                 children: <Widget>[
-                                  Text('$_currentCountry ',style: TextStyle(color: Color(0xFF001D52), fontSize: 18)),
-                                  SizedBox(width: 10,),
+                                  Text('$_currentCountry ',
+                                      style: TextStyle(
+                                          color: Color(0xFF001D52),
+                                          fontSize: 18)),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
                                   Container(
                                     child: Image(
                                       width: 15,
@@ -204,12 +200,17 @@ class _LoginPageState extends State<LoginPage> {
                               TextField(
                                 controller: loginController,
                                 inputFormatters: [
-                                  phonePrefix!= null ? length != null ? LengthLimitingTextInputFormatter(length - phonePrefix.length) : LengthLimitingTextInputFormatter(100) :  LengthLimitingTextInputFormatter(100),
+                                  phonePrefix != null
+                                      ? length != null
+                                          ? LengthLimitingTextInputFormatter(
+                                              length - phonePrefix.length)
+                                          : LengthLimitingTextInputFormatter(
+                                              100)
+                                      : LengthLimitingTextInputFormatter(100),
                                 ],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
-                                  color: Colors.black, fontSize: 15
-                                ),
+                                    color: Colors.black, fontSize: 15),
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
@@ -221,7 +222,14 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-                          Text('$loginError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 12), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$loginError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           _space(30),
                           Row(
                             children: <Widget>[
@@ -236,26 +244,35 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: InputDecoration(
                               hintText: '•••••••',
                               suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _obscureText = !_obscureText;
-                                    });
-                                  },
-                                  child: Container(
-                                          padding: EdgeInsets.symmetric( horizontal: 10),
-                                          child: Image(
-                                            image: AssetImage(
-                                              _obscureText ? 'assets/images/eyeClose.png' : 'assets/images/eyeOpen.png',
-                                            ),
-                                            height: 20,
-                                            width: 20,
-                                          ),
-                                        ),
-                                        ),
+                                onTap: () {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  child: Image(
+                                    image: AssetImage(
+                                      _obscureText
+                                          ? 'assets/images/eyeClose.png'
+                                          : 'assets/images/eyeOpen.png',
+                                    ),
+                                    height: 20,
+                                    width: 20,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                           _space(10),
-                          Text('$passwordError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 12), overflow: TextOverflow.ellipsis,),
+                          Text(
+                            '$passwordError',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
                     ),
@@ -265,8 +282,11 @@ class _LoginPageState extends State<LoginPage> {
                         '${localization.forgotPassword}',
                         style: TextStyle(color: Color(0xFF444444)),
                       ),
-                      onPressed: (){
-                        Navigator.push(context,MaterialPageRoute(builder: (context) => RestorePasswordPage()));
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RestorePasswordPage()));
                       },
                     ),
                     _space(20),
@@ -274,50 +294,63 @@ class _LoginPageState extends State<LoginPage> {
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
                         defaultWidget: Text("${localization.next}",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w300)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w300)),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: Color(0xFF0543B8),
                         onPressed: () async {
-                          if(passwordController.text.isEmpty){
+                          if (passwordController.text.isEmpty) {
                             setState(() {
                               passwordError = '${localization.enterPassword}';
                             });
-                          } else{
+                          } else {
                             setState(() {
                               passwordError = '';
                             });
                           }
-                          if(loginController.text.isEmpty || '$phonePrefix${loginController.text}'.length != length){
+                          if (loginController.text.isEmpty ||
+                              '$phonePrefix${loginController.text}'.length !=
+                                  length) {
                             setState(() {
                               loginError = '${localization.enterPhone}';
                             });
-                          } else{
+                          } else {
                             setState(() {
                               loginError = '';
                             });
-                          } 
-                          if(passwordController.text.isNotEmpty && '$phonePrefix${loginController.text}'.length == length){
+                          }
+                          if (passwordController.text.isNotEmpty &&
+                              '$phonePrefix${loginController.text}'.length ==
+                                  length) {
                             setState(() {
                               loginError = '';
                               passwordError = '';
                             });
-                            FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+                            FirebaseMessaging _firebaseMessaging =
+                                FirebaseMessaging();
                             String token = await _firebaseMessaging.getToken();
-                              await api.signIn("$phonePrefix${loginController.text}", passwordController.text, token).then((response) async {
-                                singInResult = response;
-                                if('${response['success']}' == 'true'){
-                                  await api.getBalance();
-                                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs(key: tabPageKey,)),(r) => false);
-                                } else{
-                                  setState(() {
-                                    passwordError = singInResult["message"];
-                                  });
-                                }
-                              });
+                            await api
+                                .signIn("$phonePrefix${loginController.text}",
+                                    passwordController.text, token)
+                                .then((response) async {
+                              singInResult = response;
+                              if ('${response['success']}' == 'true') {
+                                await api.getBalance();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) => Tabs(
+                                              key: tabPageKey,
+                                            )),
+                                    (r) => false);
+                              } else {
+                                setState(() {
+                                  passwordError = singInResult["message"];
+                                });
+                              }
+                            });
                           }
                         },
                       ),
@@ -345,10 +378,9 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _currentCountry = _selectedCountry['title'];
         phonePrefix = _selectedCountry['prefix'];
-        length = _selectedCountry['length']; 
+        length = _selectedCountry['length'];
         passwordController.text = '';
         loginController.text = '';
-
       });
   }
 
@@ -357,7 +389,6 @@ class _LoginPageState extends State<LoginPage> {
       height: h,
     );
   }
-
 }
 
 class Countries extends StatelessWidget {

@@ -10,6 +10,7 @@ import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/chat/ui/replyMessage.dart';
 import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/widgets/constants.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:video_player/video_player.dart';
 
@@ -82,9 +83,9 @@ class Received extends StatelessWidget {
               time: time('${m['time']}'),
               name: '${m['user_name']}',
               image: (m["avatar"] == null || m["avatar"] == "")
-                  ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
+                  ? "${avatarUrl}noAvatar.png"
                   : m["avatar_url"] == null
-                      ? "https://indigo24.xyz/uploads/avatars/${m["avatar"].toString().replaceAll("AxB", "200x200")}"
+                      ? "${avatarUrl}${m["avatar"].toString().replaceAll("AxB", "200x200")}"
                       : "${m["avatar_url"]}${m["avatar"].toString().replaceAll("AxB", "200x200")}",
               type: "${m["type"]}",
               media: (a==false || a==null)? null : "${m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
@@ -183,7 +184,7 @@ class ReceivedMessageWidget extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl: image,
                 errorWidget: (context, url, error) => CachedNetworkImage(
-                  imageUrl: "https://media.indigo24.com/avatars/noAvatar.png"
+                  imageUrl: "${avatarUrl}noAvatar.png"
                 )
               ),
             ),

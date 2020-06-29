@@ -175,32 +175,32 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         children: <Widget>[
                           Image.asset(
                             'assets/images/background_little.png',
+                            fit: BoxFit.fill,
                           ),
-                          Positioned(
-                            child: AppBar(
-                              centerTitle: true,
-                              title: Text("${localization.payments}"),
-                              leading: IconButton(
-                                icon: Container(
-                                  padding: EdgeInsets.all(10),
-                                  child: Image(
-                                    image: AssetImage(
-                                      'assets/images/backWhite.png',
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              backgroundColor: Colors.transparent,
-                              elevation: 0,
-                            ),
-                          ),
+                          
                           Column(
                             children: <Widget>[
+                              AppBar(
+                                centerTitle: true,
+                                title: Text("${localization.payments}"),
+                                leading: IconButton(
+                                  icon: Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/images/backWhite.png',
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                              ),
                               Container(
-                                margin: EdgeInsets.only(top: 45, left: 0, right: 20),
+                                margin: EdgeInsets.only(left: 0, right: 20),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -225,7 +225,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             '${user.balance} ₸',
                                             style: fS18(c: 'FFFFFF'),
                                           ),
-
+                                          SizedBox(height: 40),
                                         ],
                                       ),
                                     ),

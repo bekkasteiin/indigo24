@@ -12,6 +12,7 @@ import 'package:indigo24/pages/auth/intro.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/widgets/constants.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -265,8 +266,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           height: 100.0,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: CachedNetworkImageProvider(
-                  'https://indigo24.xyz/uploads/avatars/${user.avatar.toString().replaceAll("AxB", "200x200")}'),
+              image: CachedNetworkImageProvider('$avatarUrl${user.avatar.toString().replaceAll("AxB", "200x200")}'),
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(80.0),
@@ -454,7 +454,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                         description:
                                             "Уверены, что хотите выйти?",
                                         buttonText: "Okay",
-                                        image: CachedNetworkImage(imageUrl: 'https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+                                        image: CachedNetworkImage(imageUrl: '$avatarUrl${user.avatar}'),
                                       ),
                                 );
                                 // SharedPreferences preferences =

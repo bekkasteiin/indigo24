@@ -8,6 +8,7 @@ import 'package:indigo24/pages/chat/chat_contacts.dart';
 import 'package:indigo24/pages/chat/chat_group_selection.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/widgets/constants.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -49,12 +50,17 @@ class _ChatsListPageState extends State<ChatsListPage>
 
     // items.add((items.length+1).toString());
     print("_onLoading");
-    if (mounted)
-      setState(() {
-        // print("_onLoading CHATS with page $chatsPage");
-        // ChatRoom.shared.forceGetChat(page: chatsPage);
-      });
-    _refreshController.loadComplete();
+    // print(myList.length);
+    // if(myList.length % 20 == 0){
+    //   chatsPage++;
+    //   if (mounted)
+    //     setState(() {
+    //       // print("_onLoading CHATS with page $chatsPage");
+    //       ChatRoom.shared.forceGetChat(page: chatsPage);
+    //     });
+    //   _refreshController.loadComplete();
+    // }
+
   }
 
   @override
@@ -250,12 +256,6 @@ class _ChatsListPageState extends State<ChatsListPage>
                         // ChatRoom.shared.checkUserOnline(ids);
                         print('get message');
                         ChatRoom.shared.getMessages(myList[i]['id']);
-                        print('___');
-                        print('___');
-                        print(myList[i]);
-                        print('___');
-                        print('___');
-                        print('___');
                         goToChat(myList[i]['name'], myList[i]['id'],
                             phone: myList[i]
                                 ['another_user_phone'], //@TODO ADIL CHECK DIS
@@ -268,28 +268,33 @@ class _ChatsListPageState extends State<ChatsListPage>
                                 .replaceAll("AxB", "200x200"),
                             avatarUrl: myList[i]['avatar_url']);
                       },
-                      leading: CircleAvatar(
-                        radius: 25.0,
-                        child: ClipOval(
-                            child: CachedNetworkImage(
-                          imageUrl: (myList[i]["avatar"] == null ||
-                                  myList[i]["avatar"] == '' ||
-                                  myList[i]["avatar"] == false)
-                              ? "https://indigo24.xyz/uploads/avatars/noAvatar.png"
-                              : 'https://indigo24.xyz/uploads/avatars/${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              CachedNetworkImage(
-                            imageUrl:
-                                "https://indigo24.xyz/uploads/avatars/noAvatar.png",
-                          ),
-                        )),
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(25.0),
+                        child: Container(
+                          height: 50,
+                          width: 50,
+                          child: ClipOval(
+                              child: CachedNetworkImage(
+                            imageUrl: (myList[i]["avatar"] == null ||
+                                    myList[i]["avatar"] == '' ||
+                                    myList[i]["avatar"] == false)
+                                ? "${avatarUrl}noAvatar.png"
+                                : '${avatarUrl}${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                CachedNetworkImage(
+                              imageUrl:
+                                  "${avatarUrl}noAvatar.png",
+                            ),
+                          )),
+                        ),
                       ),
                       title: Text(
                         myList[i]["name"].length != 0
                             ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
                             : "",
+                            maxLines: 1,
                         style: TextStyle(
                             color: Color(0xFF001D52),
                             fontWeight: FontWeight.w400),

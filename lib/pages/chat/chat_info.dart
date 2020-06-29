@@ -15,6 +15,7 @@ import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/constants.dart';
 
 
 class ChatProfileInfo extends StatefulWidget {
@@ -36,6 +37,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   File _image;
   @override
   void initState() {
+
     _chatTitle = '${widget.chatName}';
     listen();
     ChatRoom.shared.chatMembers(widget.chatId);
@@ -133,6 +135,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
+  var another_user_object;
+
   Widget _buildProfileImage() {
     return InkWell(
       onTap: () {
@@ -142,9 +146,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           //   // action(widget.chatId, membersList[i]);
           // }
         } else{
-          membersList.forEach((element){
-           
-          });
+          if(membersList.length == 2){
+            membersList.forEach((member){
+              if(member['user_id'].toString() != '${user.id}'){
+                memberAction(member);
+              }
+            });
+          }
+          
         }
 
         // Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(membersList[0])));
@@ -180,12 +189,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           width: 100.0,
           height: 100.0,
           decoration: BoxDecoration(
-            // image: DecorationImage(
-            //   image: NetworkImage(
-                  // widget.chatAvatar==null?'https://indigo24.xyz/uploads/avatars/noAvatar.png':
-                  // 'https://indigo24.xyz/uploads/avatars/${widget.chatAvatar}'),
-            //   fit: BoxFit.cover,
-            // ),
             borderRadius: BorderRadius.circular(80.0),
             border: Border.all(
               color: Color(0xFF001D52),
@@ -195,11 +198,11 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           child: ClipOval(
             child: CachedNetworkImage(
               imageUrl: widget.chatAvatar==null?
-                'https://indigo24.xyz/uploads/avatars/noAvatar.png'
+                '${avatarUrl}noAvatar.png'
                 :
-                'https://indigo24.xyz/uploads/avatars/${widget.chatAvatar}',
+                '$avatarUrl${widget.chatAvatar}',
               errorWidget: (context, url, error) => CachedNetworkImage(
-                imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
+                imageUrl: "${avatarUrl}noAvatar.png",
               ),
             ),
           ),
@@ -447,6 +450,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         Flexible(
                           child: InkWell(
                             onTap: () {
+                             if(myPrivilege == '0' && widget.chatType != 0)
                               setState(() {
                                 isEditing = !isEditing;
                               });
@@ -479,7 +483,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         ),
                         IconButton(
                           icon: Icon(Icons.more_vert),
-                          color: Colors.white,
+                          color: widget.chatType != 0 ? Colors.white : Colors.transparent,
                           onPressed: () {
                             widget.chatType == 1 
                             ? addMembers(widget.chatId) 
@@ -502,7 +506,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.only(left: 20),
                       child: Text(
-                        '${localization.members}',
+                        '${localization.members} ${membersList.length}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -565,8 +569,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                         }
                                       }
 
-
-
                                       // ChatRoom.shared.checkUserOnline(ids);
                                       // ChatRoom.shared
                                       //     .getMessages(membersList[i]['id']);
@@ -581,23 +583,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                                       membersList[i]["avatar"] == '' ||
                                                       membersList[i]["avatar"] == false)
                                                   ? CachedNetworkImageProvider(
-                                                      "https://indigo24.xyz/uploads/avatars/noAvatar.png")
+                                                      "${avatarUrl}noAvatar.png")
                                                   : 
                                                   CachedNetworkImageProvider(
-                                                      'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}'),
-                                            child: ClipOval(
-                                              child: CachedNetworkImage(
-                                                imageUrl: (membersList[i]["avatar"] == null ||
-                                                      membersList[i]["avatar"] == '' ||
-                                                      membersList[i]["avatar"] == false)?
-                                                      "https://indigo24.xyz/uploads/avatars/noAvatar.png"
-                                                      :
-                                                      'https://indigo24.xyz/uploads/avatars/${membersList[i]["avatar"]}',
-                                                errorWidget: (context, url, error) => CachedNetworkImage(
-                                                  imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
-                                                ),
-                                              ),
-                                            ),
+                                                      '${avatarUrl}${membersList[i]["avatar"]}'),
                                           ),
                                           Align(
                                             alignment: Alignment.bottomRight,

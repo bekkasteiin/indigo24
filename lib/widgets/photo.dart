@@ -244,40 +244,40 @@ class FullScreenWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            iconTheme: IconThemeData(
-              color: Colors.black,
-            ),
-            leading: IconButton(
-              icon: Container(
-                padding: EdgeInsets.all(10),
-                child: Image(
-                  image: AssetImage(
-                    'assets/images/back.png',
-                  ),
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
                 ),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
             ),
-            brightness: Brightness.light,
-            title: Text(
-              "Фотография",
-              style: TextStyle(
-                color: Color(0xFF001D52),
-                fontSize: 22,
-                fontWeight: FontWeight.w400,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            backgroundColor: Colors.white,
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          body: ClipRect(
+          brightness: Brightness.light,
+          title: Text(
+            "Фотография",
+            style: TextStyle(
+              color: Color(0xFF001D52),
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+        ),
+        body: SafeArea(
+          bottom: false,
+          child: ClipRect(
             child: Container(
               color: Colors.white,
               constraints: BoxConstraints.expand(

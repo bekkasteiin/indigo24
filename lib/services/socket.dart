@@ -325,7 +325,7 @@ class ChatRoom {
       "data": {
         "user_id": "${user.id}",
         "userToken": "${user.unique}",
-        "page": '1',
+        "page": page == null ? 1 : page,
       }
     };
     channel.sink.add(jsonEncode(data));

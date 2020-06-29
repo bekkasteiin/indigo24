@@ -3,16 +3,12 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/widgets/full_photo.dart';
-import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
-
-import 'chat.dart';
 
 var parser = EmojiParser();
 
@@ -41,15 +37,11 @@ class DeviderMessageWidget extends StatelessWidget {
     );
   }
 }
+
 File uploadingImage;
 
-
-  List imageCount = [];
-  var test;
-
-
-
-
+List imageCount = [];
+var test;
 
 class AudioMessage extends StatelessWidget {
   final url;
@@ -69,30 +61,33 @@ class ImageMessage extends StatelessWidget {
   final imageCount;
   ImageMessage(this.imageUrl, this.fullImageUrl, {this.imageCount});
 
-  Widget placeholder(context){
+  Widget placeholder(context) {
     return Container(
-      child: uploadingImage!=null?
-            Stack(
+      child: uploadingImage != null
+          ? Stack(
               children: [
                 Container(
-                  width: MediaQuery.of(context).size.width*0.7,
-                  height: MediaQuery.of(context).size.width*0.7,
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: MediaQuery.of(context).size.width * 0.7,
                   child: Image.file(uploadingImage, fit: BoxFit.cover),
                 ),
                 Container(
-                  width: MediaQuery.of(context).size.width*0.7,
-                  height: MediaQuery.of(context).size.width*0.7,
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: MediaQuery.of(context).size.width * 0.7,
                   color: Colors.grey.withOpacity(0.5),
                 ),
                 Center(
-                  child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
+                  child: Image.asset("assets/preloader.gif",
+                      width: MediaQuery.of(context).size.width * 0.3),
                 ),
               ],
-            ) : Center(
-          child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
-        ),
-      width: MediaQuery.of(context).size.width*0.7,
-      height: MediaQuery.of(context).size.width*0.7,
+            )
+          : Center(
+              child: Image.asset("assets/preloader.gif",
+                  width: MediaQuery.of(context).size.width * 0.3),
+            ),
+      width: MediaQuery.of(context).size.width * 0.7,
+      height: MediaQuery.of(context).size.width * 0.7,
       // padding: EdgeInsets.all(70.0),
       decoration: BoxDecoration(
         color: Colors.transparent,
@@ -102,6 +97,7 @@ class ImageMessage extends StatelessWidget {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -122,8 +118,8 @@ class ImageMessage extends StatelessWidget {
             errorWidget: (context, url, error) => Material(
               child: Image.asset(
                 'assets/preloader.gif',
-                width: MediaQuery.of(context).size.width*0.7,
-                height: MediaQuery.of(context).size.width*0.7,
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.of(context).size.width * 0.7,
                 fit: BoxFit.contain,
               ),
               borderRadius: BorderRadius.all(
@@ -132,8 +128,8 @@ class ImageMessage extends StatelessWidget {
               clipBehavior: Clip.hardEdge,
             ),
             imageUrl: imageUrl,
-            width: MediaQuery.of(context).size.width*0.7,
-            height: MediaQuery.of(context).size.width*0.7,
+            width: MediaQuery.of(context).size.width * 0.7,
+            height: MediaQuery.of(context).size.width * 0.7,
             // width: 200.0,
             // height: 200.0,
             fit: BoxFit.cover,
@@ -143,7 +139,9 @@ class ImageMessage extends StatelessWidget {
         ),
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => FullPhoto(url: fullImageUrl)));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => FullPhoto(url: fullImageUrl)));
         },
         padding: EdgeInsets.all(0),
       ),
@@ -151,7 +149,6 @@ class ImageMessage extends StatelessWidget {
     );
   }
 }
-
 
 class VideoMessage extends StatefulWidget {
   final url;
@@ -167,9 +164,7 @@ class _VideoMessageState extends State<VideoMessage> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-      widget.url
-    );
+    _controller = VideoPlayerController.network(widget.url);
 
     _controller.addListener(() {
       setState(() {});
@@ -184,25 +179,23 @@ class _VideoMessageState extends State<VideoMessage> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return _controller.value.initialized
-            ? AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  VideoPlayer(_controller),
-                  ClosedCaption(text: _controller.value.caption.text),
-                  _PlayPauseOverlay(controller: _controller),
-                  VideoProgressIndicator(_controller, allowScrubbing: true),
-                ],
-              ),
-            )
-            : Container();
+        ? AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                VideoPlayer(_controller),
+                ClosedCaption(text: _controller.value.caption.text),
+                _PlayPauseOverlay(controller: _controller),
+                VideoProgressIndicator(_controller, allowScrubbing: true),
+              ],
+            ),
+          )
+        : Container();
   }
-
 }
 
 class _PlayPauseOverlay extends StatelessWidget {
@@ -240,7 +233,6 @@ class _PlayPauseOverlay extends StatelessWidget {
   }
 }
 
-
 var dio = Dio();
 
 class FileMessage extends StatefulWidget {
@@ -254,7 +246,6 @@ class FileMessage extends StatefulWidget {
 
 class _FileMessageState extends State<FileMessage> {
   var percent = '';
-
 
   Future download2(Dio dio, String url, String savePath) async {
     try {
@@ -276,7 +267,7 @@ class _FileMessageState extends State<FileMessage> {
       var raf = file.openSync(mode: FileMode.write);
       // response.data is List<int> type
       raf.writeFromSync(response.data);
-   
+
       // Navigator.push(
       //   context,
       //   MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
@@ -299,24 +290,22 @@ class _FileMessageState extends State<FileMessage> {
   @override
   Widget build(BuildContext context) {
     return RaisedButton.icon(
-      onPressed: () async {
-        var tempDir = await getTemporaryDirectory();
-        String fullPath = tempDir.path + "/boo2.pdf'";
-        print('full path ${fullPath}');
-        
-        download2(dio, widget.url, fullPath);
-      },
-      icon: Icon(
-        Icons.file_download,
-        color: Colors.white,
-      ),
-      color: Colors.green,
-      textColor: Colors.white,
-      label: Text('Dowload $percent')
-    );
+        onPressed: () async {
+          var tempDir = await getTemporaryDirectory();
+          String fullPath = tempDir.path + "/boo2.pdf'";
+          print('full path ${fullPath}');
+
+          download2(dio, widget.url, fullPath);
+        },
+        icon: Icon(
+          Icons.file_download,
+          color: Colors.white,
+        ),
+        color: Colors.green,
+        textColor: Colors.white,
+        label: Text('Dowload $percent'));
   }
 }
-
 
 class PDFViewer extends StatefulWidget {
   final file;
@@ -332,9 +321,7 @@ class _PDFViewerState extends State<PDFViewer> {
 
   @override
   void initState() {
-    _pdfController = PdfController(
-      document: PdfDocument.openFile(widget.file)
-    );
+    _pdfController = PdfController(document: PdfDocument.openFile(widget.file));
     super.initState();
   }
 
