@@ -11,6 +11,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/circle.dart';
+import 'package:indigo24/widgets/constants.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 
@@ -32,6 +33,7 @@ class _TransferPageState extends State<TransferPage> {
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
+        Navigator.pop(context);
       },
     );
 
@@ -46,11 +48,13 @@ class _TransferPageState extends State<TransferPage> {
     // show the dialog
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return alert;
       },
     );
   }
+  
 
   final receiverController = TextEditingController();
   final sumController = TextEditingController();
@@ -336,7 +340,7 @@ class _TransferPageState extends State<TransferPage> {
                   child: ClipOval(
                     child: CachedNetworkImage(
                       imageUrl:
-                          "https://indigo24.xyz/uploads/avatars/noAvatar.png",
+                          "${avatarUrl}noAvatar.png",
                     ),
                   ),
                 ),

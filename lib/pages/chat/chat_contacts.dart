@@ -100,6 +100,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                       memberCount: 2,
                       userIds: e.json['data']['user_id'],
                       avatar: '${e.json['data']['avatar']}',
+                      chatType: 0,
                       avatarUrl: '${e.json['data']['avatar_url']}')),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
@@ -136,6 +137,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                       '${e.json['data']['chat_name']}',
                       e.json['data']['chat_id'],
                       memberCount: 2,
+                      chatType: 0,
                       userIds: e.json['data']['user_id'])),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
@@ -269,7 +271,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                     onPressed: () {
                       print('update contacts');
                       setState((){
-                        actualList.clear();
                         getContacts(context).then((getContactsResult){
                           if('$getContactsResult' == 'false'){
                             Widget okButton = CupertinoDialogAction(
@@ -293,6 +294,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                               },
                             );
                           } else{
+                            actualList.clear();
                             actualList.addAll(getContactsResult);
                           }
                         });
@@ -373,17 +375,11 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                         children: <Widget>[
                                                           Text(
                                                             index != 0
-                                                                ? actualList[index][
-                                                                            'name'] ==
-                                                                        actualList[
-                                                                                index -
-                                                                                    1]
-                                                                            ['name']
-                                                                    ? '${actualList[index]['name']} | Другой номер'
+                                                                ? actualList[index]['name'] == actualList[index -1]['name']
+                                                                    ? '${actualList[index]['name']} ${actualList[index]['label']}'
                                                                     : '${actualList[index]['name']}'
                                                                 : '${actualList[index]['name']}',
-                                                            overflow: TextOverflow
-                                                                .ellipsis,
+                                                            overflow: TextOverflow.ellipsis,
                                                             style: TextStyle(
                                                                 fontSize: 14),
                                                             textAlign:
@@ -422,8 +418,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                   ),
                                 );
                               },
-                            ) : Center(
-                              child: CircularProgressIndicator()),
+                            ) : Center(),
                           ),
                         ],
                       ),

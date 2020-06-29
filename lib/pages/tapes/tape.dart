@@ -4,6 +4,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/constants.dart';
 
 class TapePage extends StatefulWidget {
   final tape;
@@ -134,7 +135,7 @@ class _TapePageState extends State<TapePage>
                                             children: <Widget>[
                                               CircleAvatar(
                                                 radius: 15.0,
-                                                backgroundImage: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+                                                backgroundImage: NetworkImage('${avatarUrl}${user.avatar}'),
                                                 backgroundColor: Colors.red,
                                               ),
                                               
@@ -225,7 +226,7 @@ class _TapePageState extends State<TapePage>
               children: <Widget>[
                 CircleAvatar(
                   radius: 20.0,
-                  backgroundImage: NetworkImage('https://indigo24.xyz/uploads/avatars/${user.avatar}'),
+                  backgroundImage: NetworkImage('${avatarUrl}${user.avatar}'),
                   backgroundColor: Colors.red,
                 ),
                 Expanded(
@@ -310,7 +311,7 @@ class _TapePageState extends State<TapePage>
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
-                      top: 10, left: 10, bottom: 0, right: 10),
+                      top: 10, left: 10, bottom: 10, right: 10),
                   child: Text('$letterCount'),
                 ),
               ],

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/widgets/constants.dart';
 
 enum PlayerState { stopped, playing, paused }
 enum PlayingRouteState { speakers, earpiece }
@@ -183,7 +184,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             title: 'Indigo24',
             artist: 'Username',
             albumTitle: 'Голосовое сообщение',
-            imageUrl: 'https://indigo24.xyz/uploads/avatars/noAvatar.png',
+            imageUrl: '${avatarUrl}noAvatar.png',
             forwardSkipInterval: const Duration(seconds: 5), // default is 30s
             backwardSkipInterval: const Duration(seconds: 5), // default is 30s
             duration: duration,

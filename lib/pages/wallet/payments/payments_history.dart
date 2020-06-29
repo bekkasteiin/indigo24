@@ -110,7 +110,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       alignment: Alignment.topCenter,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
-        child: Image.network('$logo', width: 50.0),
+        child: Image.network('${logo.replaceAll("AxB", "200x200")}', width: 50.0, height: 50,),
       ),
     );
   }

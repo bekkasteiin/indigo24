@@ -342,7 +342,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                             padding: const EdgeInsets.only(
                                 top: 10.0, left: 10.0, right: 10, bottom: 0),
                             child: TextField(
-                              decoration: new InputDecoration(
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(40),
+                              ],
+                              decoration: InputDecoration(
                                 hintText: "${localization.chatName}",
                                 fillColor: Colors.white,
                               ),

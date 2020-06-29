@@ -30,7 +30,7 @@ class _PreviewMediaState extends State<PreviewMedia> {
     return Container(
       // color: Colors.white,
       decoration: BoxDecoration(
-        image: DecorationImage(image: previewBackgoundProvider)
+        image: DecorationImage(image: previewBackgoundProvider, fit: BoxFit.fitWidth)
       ),
       child: ClipRect(
         child: Scaffold(

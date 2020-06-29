@@ -23,6 +23,7 @@ import 'package:indigo24/services/helper.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/widgets/circle.dart';
+import 'package:indigo24/widgets/constants.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -63,16 +64,18 @@ getContacts(context) async {
           el.phones.forEach((phone) {
             if (!contacts.contains(formatPhone(phone.value))) {
               phone.value = formatPhone(phone.value);
-              // print('name: ${el.displayName } phone:${phone.value}');
-              contacts.add({
-                'name': el.displayName,
-                'phone': phone.value,
-              });
+              if(contacts.every((user) => user['phone'] != phone.value)){
+                contacts.add({
+                  'name': el.displayName,
+                  'phone': phone.value,
+                  'label': phone.label,
+                });
+              }
             }
           });
         }
       });
-      return contacts;
+      return contacts.toSet().toList();
     } else {
       return false;
     }
@@ -88,6 +91,7 @@ permissionForPush() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // await ContactsService.addContact(Contact(displayName: "Name $i", givenName: 'Givenname $i', middleName: 'Middlename $i', phones: [ Item(label: 'home', value: '${87020000000+i}')]));  
   SharedPreferences preferences = await SharedPreferences.getInstance();
   String languageCode = preferences.getString('languageCode');
   localization.setLanguage(languageCode);
@@ -165,6 +169,8 @@ class Tabs extends StatefulWidget {
   _TabsState createState() => _TabsState();
 }
 
+List<MyContact> myContacts = [];
+
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   bool isAuthenticated = false;
   TabController tabController;
@@ -182,7 +188,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   String _sharedText;
 
   var contactsDB = ContactsDB();
-  List<MyContact> myContacts = [];
 
   share() async {
     await contactsDB.getAll().then((value) => myContacts = value);
@@ -207,7 +212,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
         _sharedFiles = value;
       });
-      if (value != null) shareModal();
+      if (value == null) shareModal();
     });
 
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
@@ -368,6 +373,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+
+
+
+
+    
     share();
 
     Timer.run(() {
@@ -511,7 +521,17 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         case 'chats:get':
           setState(() {
             // chatsPage += 1;
-            myList = e.json['data'].toList();
+            print(e.json);
+            // if(myList.isEmpty){
+              myList = e.json['data'].toList();
+            // } else{
+            //   // myList.addAll(e.json['data'].toList());
+            //   e.json['data'].toList().forEach((element){
+            //     myList.add(element);
+            //   });
+            // }
+            print(e.json['data'].toList().length);
+
             // chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
           });
           break;
@@ -519,7 +539,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           var data = e.json["data"];
           // print("USER CHECK ${data['status']}");
           if (data['status'].toString() == 'true') {
-            setState(() async {
               MyContact contact = MyContact(
                   phone: data['phone'],
                   id: data['user_id'],
@@ -528,7 +547,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   chatId: data['chat_id'],
                   online: data['online']);
               await contactsDB.updateOrInsert(contact);
-            });
           }
           break;
         default:
@@ -573,7 +591,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 size: const Size(40, 40),
                 child: ClipOval(
                     child: CachedNetworkImage(
-                  imageUrl: "https://indigo24.xyz/uploads/avatars/noAvatar.png",
+                  imageUrl: "$avatarUrl+noAvatar.png",
                 ))),
             title: Text("${m['user_name']}"),
             subtitle: Text("${m["text"]}"),
@@ -766,7 +784,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                                 return ListTile(
                                   leading: CircleAvatar(
                                     backgroundImage: CachedNetworkImageProvider(
-                                        "https://indigo24.xyz/uploads/avatars/noAvatar.png"),
+                                        "$avatarUrl+noAvatar.png"),
                                     // child: Text('${myContacts[i].name[0]}'),
                                   ),
                                   title: Text("${myContacts[i].name}"),
