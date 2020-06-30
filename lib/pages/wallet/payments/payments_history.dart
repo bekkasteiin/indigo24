@@ -131,8 +131,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
              ClipRRect(
                 borderRadius: BorderRadius.circular(25),
                 child: Container(
-                    height: 20,
-                    width: 20,
+                    height: 15,
+                    width: 15,
                     color: status == '4' ?  Colors.green : status == '3' ?  Colors.orange :  status == '2' ? Colors.red : (status == '1') || (status == '0') ? Colors.yellow : Colors.grey),
               ),
         ],
@@ -279,26 +279,28 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         ),
         controller: _refreshController,
         onLoading: _onLoading,
-        child: ListView.builder(
-          padding: const EdgeInsets.only(bottom: 10),
-          itemCount: snapshot != null ? snapshot.length : 0,
-          itemBuilder: (BuildContext context, int index) {
-            return Container(
-              padding: const EdgeInsets.only(top: 10),
-              height: 65.2,
-              child: _historyBuilder(
-                context,
-                "$logoUrl${snapshot[index]['logo']}",
-                "${snapshot[index]['account']}",
-                "${snapshot[index]['amount']}",
-                "${snapshot[index]['title']}",
-                "${snapshot[index]['data']}",
-                "${snapshot[index]['status']}",
-                index,
-                "${snapshot[index]['pdf']}"
-              ),
-            );
-          },
+        child: Center(
+          child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 10),
+            itemCount: snapshot != null ? snapshot.length : 0,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                padding: const EdgeInsets.only(top: 10),
+                height: 65.2,
+                child: _historyBuilder(
+                  context,
+                  "$logoUrl${snapshot[index]['logo']}",
+                  "${snapshot[index]['account']}",
+                  "${snapshot[index]['amount']}",
+                  "${snapshot[index]['title']}",
+                  "${snapshot[index]['data']}",
+                  "${snapshot[index]['status']}",
+                  index,
+                  "${snapshot[index]['pdf']}"
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

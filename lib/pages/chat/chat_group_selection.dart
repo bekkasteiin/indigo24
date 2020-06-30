@@ -226,7 +226,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 iconSize: 30,
                 color: Color(0xFF001D52),
                 onPressed: () {
-                  if (_saved2.length > 1) {
+                  if (_saved2.length > 2) {
                     if (_titleController.text.isNotEmpty) {
                       String user_ids = '';
                       _saved2.removeAt(0);

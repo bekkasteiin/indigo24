@@ -91,7 +91,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Response response;
   ProgressBar _sendingMsgProgressBar;
   BaseOptions options = new BaseOptions(
-    baseUrl: "https://api.indigo24.xyz/api/v2.1",
+    baseUrl: "https://api.indigo24.com/api/v2.1",
     connectTimeout: 5000,
     receiveTimeout: 3000,
   );

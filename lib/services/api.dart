@@ -9,7 +9,7 @@ class Api {
   Response response;
 
   static BaseOptions options = new BaseOptions(
-    baseUrl: "https://api.indigo24.xyz/api/v2.1",
+    baseUrl: "https://api.indigo24.com/api/v2.1",
     connectTimeout: 15000,
     receiveTimeout: 3000,
   );
@@ -46,6 +46,7 @@ class Api {
   var _configToken = "D@Xo8b56r#7e1iZElhH39xK!WkB_42vYAG0p";
 
   getConfig() async {
+    print('Getting configs');
     try {
       response = await dio.post("/get/config", data: {
         "customerID": "${user.id}", 
@@ -110,6 +111,8 @@ class Api {
         "phone": "$phone",
         "_token": "$checkPhoneToken",
       });
+      print(response.request.data);
+      print(response.data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -533,9 +536,10 @@ class Api {
 
   getExchangeRate() async {
     print("Getting exchanges for ${user.id} with ${user.unique}");
+    String exchangeToken = '#8kX1xtDr4qSY8_C9!N@cC9bvT0Pilk85DS32';
     try {
       response = await dio.post("/get/exchanges", data: {
-        "_token": "#8kX1xtDr4qSY8_C9!N@cC9bvT0Pilk85DS32",
+        "_token": "$exchangeToken",
         "customerID": "${user.id}",
         "unique": "${user.unique}"
       });
@@ -697,7 +701,7 @@ class Api {
 
       print("Uploading media with data ${formData.fields}");
 
-      response = await dio.post("https://media.chat.indigo24.xyz/upload", data: formData);
+      response = await dio.post("https://media.chat.indigo24.com/upload", data: formData);
       print("Getting response from media upload ${response.data}");
 
       return response.data;

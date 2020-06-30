@@ -341,9 +341,7 @@ class _LoginPageState extends State<LoginPage> {
                                 await api.getBalance();
                                 Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
-                                        builder: (context) => Tabs(
-                                              key: tabPageKey,
-                                            )),
+                                        builder: (context) => Tabs()),
                                     (r) => false);
                               } else {
                                 setState(() {

@@ -196,15 +196,27 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
             ),
           ),
           child: ClipOval(
-            child: CachedNetworkImage(
-              imageUrl: widget.chatAvatar==null?
-                '${avatarUrl}noAvatar.png'
-                :
-                '$avatarUrl${widget.chatAvatar}',
-              errorWidget: (context, url, error) => CachedNetworkImage(
-                imageUrl: "${avatarUrl}noAvatar.png",
-              ),
+            child: Center(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: List.generate(4, (index) {
+                    return CachedNetworkImage(
+                      imageUrl: 
+                      // widget.chatAvatar==null? 
+                      
+                      membersList.length > index 
+                        ? '${avatarUrl}${membersList[0]['avatar']}'
+                        : '${avatarUrl}noAvatar.png',
+                        // :
+                        // '$avatarUrl${widget.chatAvatar}',
+                      errorWidget: (context, url, error) => CachedNetworkImage(
+                        imageUrl: "${avatarUrl}noAvatar.png",
+                      ),
+                    );
+                  }),
             ),
+              ),
           ),
         ),
       ),
@@ -546,7 +558,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                 itemBuilder: (context, i) {
                                   // print(membersList[i]);
                                   return ListTile(
-                                    
                                     onTap: () {
                                       if(membersList[i]['user_id'].toString() == '${user.id}'){
                                         print(membersList[i]['user_id'].toString() == '${user.id}');
@@ -568,7 +579,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                           default:
                                         }
                                       }
-
                                       // ChatRoom.shared.checkUserOnline(ids);
                                       // ChatRoom.shared
                                       //     .getMessages(membersList[i]['id']);

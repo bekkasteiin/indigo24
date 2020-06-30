@@ -145,7 +145,7 @@ class _TransferPageState extends State<TransferPage> {
                   ),
                   mainPaymentsDetailMobile(),
                   transferButton(),
-                  SizedBox(height: 10,),
+                  SizedBox(height: 20,),
                 ],
               ),
             ),
@@ -277,11 +277,13 @@ class _TransferPageState extends State<TransferPage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
-            _showLockScreen(
-              context,
-              '${localization.enterPin}',
-              opaque: false,
-              cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+            if(receiverController.text.isNotEmpty && sumController.text.isNotEmpty){
+              _showLockScreen(
+                context,
+                '${localization.enterPin}',
+                opaque: false,
+                cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+            }
           },
           child: Container(
             height: 50,

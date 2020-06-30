@@ -270,19 +270,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         color: Color(0xFF0543B8),
                         onPressed: () async {
                           if (loginController.text.isNotEmpty) {
-                            var temp = loginController.text
-                                .replaceAll(' ', '')
-                                .replaceAll('+', '');
-                            print(length);
-                            print(temp.length);
+                            var temp = loginController.text.replaceAll(' ', '').replaceAll('+', '');
                             if (temp.length == length) {
-                              await api
-                                  .checkRegistration(temp)
-                                  .then((checkPhoneResult) async {
-                                // print('phone check result $checkPhoneResult');
-                                print(
-                                    'empty check Registration $checkPhoneResult');
-                                if (checkPhoneResult['success'] == true) {
+                              await api.checkRegistration(temp).then((checkPhoneResult) async {
+                                print('empty check Registration $checkPhoneResult');
+                                if (checkPhoneResult['success'] == false)  {
                                   await api.sendSms(temp).then((sendSmsResult) {
                                     print('smsSendResult $sendSmsResult');
                                     if (sendSmsResult['success'] == true) {

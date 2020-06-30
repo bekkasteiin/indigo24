@@ -102,6 +102,7 @@ Future<void> main() async {
   print(phone);
   print(unique);
   print(customerID);
+
   Api api = Api();
   bool authenticated = false;
 
@@ -111,14 +112,19 @@ Future<void> main() async {
       return false;
     }
   }
-
   await api.checkUnique(unique, customerID).then((r) async {
+    print('$r');
+    print('$r');
+    print('$r');
+    print('$r');
+    print('Cheking unique');
     if (r['success'] != null) {
       authenticated = r['success'].toString() == 'true';
       await api.getConfig();
     } else if (r['result'] != null) {
       print('this is else if ${r['result']}');
       authenticated = r['result']['success'].toString() == 'true';
+      await api.getConfig();
     }
   });
 
@@ -155,14 +161,13 @@ class MyApp extends StatelessWidget {
         ),
         home: (phone == 'null' || authenticated == false)
             ? IntroPage()
-            : Tabs(key: tabPageKey),
+            : Tabs(),
       ),
     );
   }
 }
 
 class Tabs extends StatefulWidget {
-  const Tabs({Key key}) : super(key: key);
 
   @override
   _TabsState createState() => _TabsState();
@@ -878,7 +883,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   Response response;
   BaseOptions options = new BaseOptions(
-    baseUrl: "https://api.indigo24.xyz/api/v2.1",
+    baseUrl: "https://api.indigo24.com/api/v2.1",
     connectTimeout: 25000,
     receiveTimeout: 3000,
   );
@@ -901,7 +906,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       print("Uploading media with data ${formData.fields}");
 
       response = await dio.post(
-        "https://media.chat.indigo24.xyz/upload",
+        "https://media.chat.indigo24.com/upload",
         data: formData,
         onSendProgress: (int sent, int total) {
           String p = (sent / total * 100).toStringAsFixed(2);

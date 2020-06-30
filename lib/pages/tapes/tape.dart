@@ -24,6 +24,7 @@ class _TapePageState extends State<TapePage>
         logOut(context);
         return true;
       } else {
+        print('Get tape result $result');
         commentCount = result['result']['comments'].length;
         return setTape(result);
       }
@@ -195,7 +196,7 @@ class _TapePageState extends State<TapePage>
                               },
                             ),
                             SizedBox(
-                              height: 100,
+                              height: 60,
                             ),
                             
                           ],
@@ -248,6 +249,7 @@ class _TapePageState extends State<TapePage>
                                 "avatar": "${user.avatar}",
                                 "comment": "${_commentController.text}",
                                 "name": "${user.name}",
+                                "date": "${v['result']['date']}"
                               };
                               setState(() {
                                 com.add(result);
@@ -287,12 +289,12 @@ class _TapePageState extends State<TapePage>
                                 });
                                 letterCount = 100;
                                 await api.addCommentToTape('${_commentController.text}','${widget.tape['id']}',).then((v) {
+                                  print('addCommentResult $v');
                                   var result = {
                                     "avatar": "${user.avatar}",
                                     "comment": "${_commentController.text}",
                                     "name": "${user.name}",
                                     "date": "${v['result']['date']}"
-                                    // TODO add date from v
                                   };
                                   setState(() {
                                     com.add(result);

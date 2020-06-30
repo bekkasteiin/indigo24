@@ -36,10 +36,12 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         // ? Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => PaymentHistoryPage()),(r) => false) 
         // : 
         SystemChannels.textInput.invokeMethod('TextInput.hide');
-        if(withPop){
+        if(withPop != null){
           Navigator.pop(context);
           Navigator.pop(context);
           Navigator.pop(context);
+          Navigator.pop(context);
+        } else{
           Navigator.pop(context);
         }
 
@@ -47,6 +49,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     );
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         print('showed dialog');
         return ConstrainedBox( 
@@ -139,7 +142,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   _onPasscodeCancelled() {
     Navigator.pop(context);
   }
-
+  var temp;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -149,17 +152,21 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           body: FutureBuilder(
             future: api.getService(widget.serviceID).then((getServiceResult) {
               getServiceResult['result'].forEach((element){
-                if(element['name'] == 'account'){
+                print('forEach element ${element['name']}');
+                if('${element['name']}' == 'account'){
                   accauntMask = element['mask'];
-                  loginFormatter = MaskTextInputFormatter(mask: '${element['mask']}', filter: { "*" : RegExp(r'[0-9]') });
+                  if(element['mask'] != ' '){
+                    print('if');
+                    temp = 'false';
+                  } else{
+                    print('else else');
+                    loginFormatter = MaskTextInputFormatter(mask: '${element['mask']}', filter: { "*" : RegExp(r'[0-9]') });
+                  }
                 }
-              });
+              });              
               return getServiceResult;
             }),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if(snapshot.hasData){
-                print(snapshot.data);
-              }
+            builder: (context, snapshot) {
               return snapshot.hasData ? 
                 GestureDetector(
                 onTap: () {
@@ -177,7 +184,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                             'assets/images/background_little.png',
                             fit: BoxFit.fill,
                           ),
-                          
                           Column(
                             children: <Widget>[
                               AppBar(
@@ -225,7 +231,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             '${user.balance} ₸',
                                             style: fS18(c: 'FFFFFF'),
                                           ),
-                                          SizedBox(height: 40),
                                         ],
                                       ),
                                     ),
@@ -333,10 +338,12 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     Container(
                       child: TextFormField(
                         keyboardType: TextInputType.number,
-                        inputFormatters: [
+                        inputFormatters: temp == 'false' ? [
+                          LengthLimitingTextInputFormatter(25),
+                        ] : [
                           loginFormatter,  
                           LengthLimitingTextInputFormatter(25),
-                        ],
+                        ] ,
                         decoration: InputDecoration.collapsed(
                           hintText: '${localization.phoneNumber}',
                         ),

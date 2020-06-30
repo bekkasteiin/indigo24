@@ -131,7 +131,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         return Scaffold(
           appBar: buildAppBar(),
           body: snapshot.hasData == true
-              ? Container(
+              ? Scrollbar(
                 child: ListView.builder(
                   padding: EdgeInsets.only(bottom: 20),
                   shrinkWrap: true,

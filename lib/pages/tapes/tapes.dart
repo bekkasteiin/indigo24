@@ -313,10 +313,7 @@ class _TapesPageState extends State<TapesPage>
                                                         .toString()
                                                         .endsWith("mpeg"))
                                                 ? new ChewieVideo(
-                                                    controller:
-                                                        VideoPlayerController
-                                                            .network(
-                                                                "https://indigo24.xyz/uploads/tapes/${result[index]['media']}"),
+                                                    controller:VideoPlayerController.network("https://indigo24.com/uploads/tapes/${result[index]['media']}"),
                                                   )
                                                 : AspectRatio(
                                                     aspectRatio: 1 / 1,
@@ -326,7 +323,7 @@ class _TapesPageState extends State<TapesPage>
                                                       child: PhotoView(
                                                         imageProvider:
                                                             CachedNetworkImageProvider(
-                                                          'https://indigo24.xyz/uploads/tapes/${result[index]['media']}',
+                                                          'https://indigo24.com/uploads/tapes/${result[index]['media']}',
                                                         ),
                                                         backgroundDecoration:
                                                             BoxDecoration(

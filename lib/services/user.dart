@@ -7,7 +7,7 @@ var phone = "";
 var balance = "";
 var balanceInBlock = "";
 var pin = "false";
-var avatarUrl = "https://indigo24.xyz/uploads/avatars/";
+var avatarUrl = "https://indigo24.com/uploads/avatars/";
 
 void delete() {
   id = "";

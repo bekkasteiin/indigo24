@@ -31,22 +31,24 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
           return Scaffold(
             appBar: buildAppBar(),
             body: snapshot.hasData == true
-                ? ListView.builder(
-                    padding: EdgeInsets.only(bottom: 20),
-                    shrinkWrap: true,
-                    itemCount: snapshot.data["services"] != null ? snapshot.data["services"].length : 0,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: _paymentsList(
-                          context,
-                          "https://api.indigo24.xyz/logos/${snapshot.data["services"][index]['logo']}",
-                          "${snapshot.data["services"][index]['title']}",
-                          snapshot.data["services"][index]['id'],
-                        ),
-                      );
-                    },
-                  )
+                ? Scrollbar(
+                  child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: 20),
+                      shrinkWrap: true,
+                      itemCount: snapshot.data["services"] != null ? snapshot.data["services"].length : 0,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: _paymentsList(
+                            context,
+                            "https://api.indigo24.com/logos/${snapshot.data["services"][index]['logo']}",
+                            "${snapshot.data["services"][index]['title']}",
+                            snapshot.data["services"][index]['id'],
+                          ),
+                        );
+                      },
+                    ),
+                )
                 : Center(child: CircularProgressIndicator()),
           );
         });

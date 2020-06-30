@@ -174,6 +174,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                     onPressed: () async {
                       if(amountController.text.isNotEmpty){
                         api.withdraw(amountController.text).then((withdrawResult){
+                          print('Withdraw result $withdrawResult');
                           if(withdrawResult['success'].toString() == 'true'){
                             Navigator.push(context, MaterialPageRoute(builder: (context) => buildWebviewScaffold(withdrawResult['redirectURL'])));
                           } else{
