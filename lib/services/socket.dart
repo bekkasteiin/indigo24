@@ -7,7 +7,7 @@ import 'package:indigo24/services/user.dart' as user;
 
 class ChatRoom {
   static var shared = ChatRoom();
-  var channel = new IOWebSocketChannel.connect('wss://chat.indigo24.com:9205');
+  var channel = new IOWebSocketChannel.connect('ws://chat.indigo24.com:9205');
 
   var changeController;
   var cabinetController;
@@ -332,7 +332,7 @@ class ChatRoom {
   }
 
   connect() {
-    channel = new IOWebSocketChannel.connect('wss://chat.indigo24.com:9502');
+    channel = new IOWebSocketChannel.connect('ws://chat.indigo24.com:9502');
     listen();
   }
 
