@@ -512,9 +512,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       if (e.json["cmd"] != 'user:check')
-        print("LISTENING EVENT ${e.json["cmd"]}");
+      print("LISTENING EVENT ${e.json["cmd"]}");
       var cmd = e.json["cmd"];
-      // print(e.json);
+      print(e.json);
       switch (cmd) {
         case 'message:create':
           print(e.json["data"]);
@@ -525,7 +525,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           break;
         case 'chats:get':
           setState(() {
-                          // this is bool for check load more is needed or not
+            // this is bool for check load more is needed or not
             if(globalBoolForForGetChat){
               e.json['data'].toList().forEach((element){
                 myList.add(element);
@@ -573,7 +573,69 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
+  switchType(type){
+
+
+    // const TEXT_MESSAGE_TYPE = 0;
+    // const IMAGE_MESSAGE_TYPE = 1;
+    // const DOCUMENT_MESSAGE_TYPE = 2;
+    // const VOICE_MESSAGE_TYPE = 3;
+    // const VIDEO_MESSAGE_TYPE = 4;
+    // const SYSTEM_MESSAGE_TYPE = 7;
+    // const SYSTEM_MESSAGE_DIVIDER_TYPE = 8;
+    // const GEO_POINT_MESSAGE_TYPE = 9;
+    // const REPLY_MESSAGE_TYPE = 10;
+    // const MONEY_MESSAGE_TYPE = 11;
+    // const LINK_MESSAGE_TYPE = 12;
+    // const FORWARD_MESSAGE_TYPE = 13;
+
+    switch ('$type') {
+      case '0':
+        return 'Текстовое сообщение';
+        break;
+      case '1':
+        return 'Фотография';
+        break;
+      case '2':
+        return 'Документ';
+        break;
+      case '3':
+        return 'Голосовое сообщение';
+        break;
+      case '4':
+        return 'Видео';
+        break;
+      case '7':
+        return 'Системное сообщение';
+        break;
+      // case '8':
+        // return 'Дивайдер сообщение';
+        // break;
+      case '9':
+        return 'Местоположение';
+        break;
+      case '10':
+        return 'Ответ';
+        break;
+      case '11':
+        return 'Деньги';
+        break;
+      case '12':
+        return 'Ссылка';
+        break;
+      case '13':
+        return 'Переотправленное сообщение';
+        break;
+      default:
+        return 'Сообщение';
+    }
+  }
+
+  
   inAppPush(m) {
+    print('_________________In App Push $m');
+    // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:243, user_id: 113626, time: 1593593566, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, attachments: [{"filename":"NQet2z6UFBunjjrn25mm7cKd48L9g2Vi.mp3"}], attachment_url: https://media.chat.indigo24.xyz/media/voice/, type: 3}
+    // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:244, user_id: 113626, time: 1593593587, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, text: asvs, type: 0}
     ChatRoom.shared.inSound();
     showOverlayNotification((context) {
       return Card(
@@ -592,10 +654,15 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 size: const Size(40, 40),
                 child: ClipOval(
                     child: CachedNetworkImage(
-                  imageUrl: "$avatarUrl+noAvatar.png",
+                  imageUrl: "${avatarUrl}noAvatar.png",
                 ))),
             title: Text("${m['user_name']}"),
-            subtitle: Text("${m["text"]}"),
+            subtitle: Text(
+              
+              m['attachments'] == null 
+              ? "${m["text"]}"
+              : switchType(m['type']),
+              ),
             trailing: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {

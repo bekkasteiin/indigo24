@@ -415,8 +415,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                     ],
                                   ),
                                   onPressed: () {
-                                    print(
-                                        "${actualList[index]['name']} ${actualList[index]['phone']} pressed");
+                                    print("${actualList[index]['name']} ${actualList[index]['phone']} pressed");
                                     ChatRoom.shared
                                         .userCheck(actualList[index]['phone']);
                                   },

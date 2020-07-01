@@ -610,12 +610,11 @@ class _ChatPageState extends State<ChatPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => TransferPage(
-                                              phone: widget.phone,
+                                              phone: '${widget.phone}',
                                             ),
                                           ))
                                       // showBottomModalSheet(context,
                                       //   private: true)
-
                                       : showBottomModalSheet(context);
                                 },
                               ),
@@ -915,7 +914,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ).whenComplete(() {
                 setState(() {
-                  ChatRoom.shared.getMessages(widget.chatID);
+                  ChatRoom.shared.getMessages('${widget.chatID}');
                 });
               });
             },
@@ -1216,7 +1215,6 @@ class _ChatPageState extends State<ChatPage> {
                   Container(
                     color: Colors.white,
                     width: MediaQuery.of(context).size.width,
-                    height: 48,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5, right: 5),
                       child: Column(
