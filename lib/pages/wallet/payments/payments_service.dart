@@ -295,7 +295,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 }
               }
               else{
-                showAlertDialog(context, '0', 'Введите сумму выше мнимальной отметки');
+                showAlertDialog(context, '0', 'Введите сумму выше минимальной отметки');
               }
             }
           },

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/configs.dart' as configs;
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 
 import 'helper.dart';
@@ -9,7 +10,7 @@ class Api {
   Response response;
 
   static BaseOptions options = new BaseOptions(
-    baseUrl: "https://api.indigo24.com/api/v2.1",
+    baseUrl: "$baseUrl",
     connectTimeout: 15000,
     receiveTimeout: 3000,
   );
@@ -701,7 +702,7 @@ class Api {
 
       print("Uploading media with data ${formData.fields}");
 
-      response = await dio.post("https://media.chat.indigo24.com/upload", data: formData);
+      response = await dio.post("$mediaChat", data: formData);
       print("Getting response from media upload ${response.data}");
 
       return response.data;

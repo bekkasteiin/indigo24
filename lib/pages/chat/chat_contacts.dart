@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/pages/chat/chat_list.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
@@ -99,6 +100,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                       chatType: 0,
                       avatarUrl: '${e.json['data']['avatar_url']}')),
             ).whenComplete(() {
+              // this is bool for check load more is needed or not
+              globalBoolForForGetChat = false;
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
             });
@@ -136,6 +139,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                       chatType: 0,
                       userIds: e.json['data']['user_id'])),
             ).whenComplete(() {
+              // this is bool for check load more is needed or not
+              globalBoolForForGetChat = false;
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
             });

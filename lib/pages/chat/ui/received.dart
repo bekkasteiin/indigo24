@@ -10,7 +10,7 @@ import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/chat/ui/replyMessage.dart';
 import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/services/socket.dart';
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:video_player/video_player.dart';
 

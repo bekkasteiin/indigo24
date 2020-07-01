@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:audioplayers/audio_cache.dart';
+import 'package:indigo24/pages/chat/chat_list.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/user.dart' as user;
 
 class ChatRoom {
   static var shared = ChatRoom();
-  var channel = new IOWebSocketChannel.connect('ws://chat.indigo24.com:9205');
+  var channel = new IOWebSocketChannel.connect('$socket');
 
   var changeController;
   var cabinetController;
@@ -332,7 +334,7 @@ class ChatRoom {
   }
 
   connect() {
-    channel = new IOWebSocketChannel.connect('ws://chat.indigo24.com:9502');
+    channel = new IOWebSocketChannel.connect('$socket');
     listen();
   }
 
@@ -442,6 +444,8 @@ class ChatRoom {
             print(data);
             if (data['status'].toString() == 'true') {
               print("INIT status is ${data['status']}");
+              // this is bool for check load more is needed or not
+              globalBoolForForGetChat = false;
               forceGetChat();
             }
             break;
@@ -452,6 +456,8 @@ class ChatRoom {
             cabinetController.add(new MyCabinetEvent(json));
             break;
           case "message:create":
+            // this is bool for check load more is needed or not
+            globalBoolForForGetChat = false;
             forceGetChat();
             if (cabinetController == null) {
               // inSound();
@@ -488,6 +494,8 @@ class ChatRoom {
             cabinetController.add(new MyCabinetEvent(json));
             break;
           case "chat:create":
+            // this is bool for check load more is needed or not
+            globalBoolForForGetChat = false;
             forceGetChat();
             contactController.add(new MyContactEvent(json));
             break;
@@ -526,7 +534,6 @@ class ChatRoom {
       onDone: () {
         print("ON DONE IS CALLED");
         Future.delayed(const Duration(milliseconds: 15000), () {
-          print('tis is wainti secodn');
           connect();
           init();
         });

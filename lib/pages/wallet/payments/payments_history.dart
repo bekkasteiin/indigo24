@@ -96,7 +96,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           // },
         ),
         Container(
-          margin: EdgeInsets.only(top: 5, right: 20, left: 20),
+          margin: EdgeInsets.only(top: 10, right: 20, left: 20),
           height: 0.2,
           color: Color(0xFF7D8E9B),
         ),
@@ -128,6 +128,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             ),
             overflow: TextOverflow.ellipsis,
           ),
+          SizedBox(height: 5),
              ClipRRect(
                 borderRadius: BorderRadius.circular(25),
                 child: Container(
@@ -286,7 +287,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             itemBuilder: (BuildContext context, int index) {
               return Container(
                 padding: const EdgeInsets.only(top: 10),
-                height: 65.2,
                 child: _historyBuilder(
                   context,
                   "$logoUrl${snapshot[index]['logo']}",

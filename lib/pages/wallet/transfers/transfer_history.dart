@@ -137,8 +137,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: 20, right: 20, left: 20),
-            height: 0.6,
+            margin: EdgeInsets.only(top: 10, right: 20, left: 20),
+            height: 0.2,
             color: Color(0xFF7D8E9B),
           ),
         ],
@@ -183,10 +183,10 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         onLoading: _onLoading,
         child: ListView.builder(
           itemCount: snapshot != null ? snapshot.length : 0,
-          padding: EdgeInsets.only(top: 20),
+          padding: const EdgeInsets.only(bottom: 10),
           itemBuilder: (BuildContext context, int index) {
             return Container(
-              padding: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.only(top: 10),
               child: _historyBuilder(
                 context,
                 "${avatarUrl + snapshot[index]['avatar']}",

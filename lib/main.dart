@@ -23,7 +23,7 @@ import 'package:indigo24/services/helper.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/widgets/circle.dart';
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -525,19 +525,15 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           break;
         case 'chats:get':
           setState(() {
-            // chatsPage += 1;
-            print(e.json);
-            // if(myList.isEmpty){
-            myList = e.json['data'].toList();
-            // } else{
-            //   // myList.addAll(e.json['data'].toList());
-            //   e.json['data'].toList().forEach((element){
-            //     myList.add(element);
-            //   });
-            // }
-            print(e.json['data'].toList().length);
-
-            // chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
+                          // this is bool for check load more is needed or not
+            if(globalBoolForForGetChat){
+              e.json['data'].toList().forEach((element){
+                myList.add(element);
+              });
+            } else{
+              myList = e.json['data'].toList();
+            }
+            chatsPage += 1;
           });
           break;
         case 'user:check':
@@ -626,6 +622,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 avatarUrl: avatarUrl,
               )),
     ).whenComplete(() {
+      // this is bool for check load more is needed or not
+      globalBoolForForGetChat = false;
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
@@ -883,7 +881,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   Response response;
   BaseOptions options = new BaseOptions(
-    baseUrl: "https://api.indigo24.com/api/v2.1",
+    baseUrl: "$baseUrl",
     connectTimeout: 25000,
     receiveTimeout: 3000,
   );
@@ -906,7 +904,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       print("Uploading media with data ${formData.fields}");
 
       response = await dio.post(
-        "https://media.chat.indigo24.com/upload",
+        "$mediaChat",
         data: formData,
         onSendProgress: (int sent, int total) {
           String p = (sent / total * 100).toStringAsFixed(2);

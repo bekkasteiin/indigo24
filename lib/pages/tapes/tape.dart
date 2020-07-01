@@ -4,7 +4,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 
 class TapePage extends StatefulWidget {
   final tape;

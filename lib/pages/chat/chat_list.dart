@@ -8,7 +8,7 @@ import 'package:indigo24/pages/chat/chat_contacts.dart';
 import 'package:indigo24/pages/chat/chat_group_selection.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/socket.dart';
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -26,6 +26,8 @@ List myList = [];
 List<ChatsModel> chatsModel = [];
 int chatsPage = 1;
 
+
+bool globalBoolForForGetChat = false;
 class _ChatsListPageState extends State<ChatsListPage>
     with AutomaticKeepAliveClientMixin {
   bool isOffline = false;
@@ -50,16 +52,17 @@ class _ChatsListPageState extends State<ChatsListPage>
 
     // items.add((items.length+1).toString());
     print("_onLoading");
-    // print(myList.length);
-    // if(myList.length % 20 == 0){
-    //   chatsPage++;
-    //   if (mounted)
-    //     setState(() {
-    //       // print("_onLoading CHATS with page $chatsPage");
-    //       ChatRoom.shared.forceGetChat(page: chatsPage);
-    //     });
-    //   _refreshController.loadComplete();
-    // }
+    print(myList.length);
+    if(myList.length % 20 == 0){
+      globalBoolForForGetChat = true;
+      chatsPage++;
+      if (mounted)
+        setState(() {
+          print("_onLoading CHATS with page $chatsPage");
+          ChatRoom.shared.forceGetChat(page: chatsPage);
+        });
+      _refreshController.loadComplete();
+    }
 
   }
 
@@ -93,6 +96,10 @@ class _ChatsListPageState extends State<ChatsListPage>
       setState(() {
         uploadingImage = null;
       });
+
+      // this is bool for check load more is needed or not
+      globalBoolForForGetChat = false;
+
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
@@ -131,6 +138,8 @@ class _ChatsListPageState extends State<ChatsListPage>
                           builder: (context) => ChatContactsPage()))
                   .whenComplete(() {
                 ChatRoom.shared.contactController.close();
+                // this is bool for check load more is needed or not
+                globalBoolForForGetChat = false;
                 ChatRoom.shared.forceGetChat();
                 ChatRoom.shared.closeContactsStream();
               });
@@ -206,6 +215,8 @@ class _ChatsListPageState extends State<ChatsListPage>
                           builder: (context) => ChatContactsPage()))
                   .whenComplete(() {
                 ChatRoom.shared.contactController.close();
+                // this is bool for check load more is needed or not
+                globalBoolForForGetChat = false;
                 ChatRoom.shared.forceGetChat();
                 ChatRoom.shared.closeContactsStream();
               });

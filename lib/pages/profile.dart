@@ -12,7 +12,7 @@ import 'package:indigo24/pages/auth/intro.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -91,7 +91,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Response response;
   ProgressBar _sendingMsgProgressBar;
   BaseOptions options = new BaseOptions(
-    baseUrl: "https://api.indigo24.com/api/v2.1",
+    baseUrl: "$baseUrl",
     connectTimeout: 5000,
     receiveTimeout: 3000,
   );

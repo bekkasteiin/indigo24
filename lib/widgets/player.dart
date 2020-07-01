@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 
 enum PlayerState { stopped, playing, paused }
 enum PlayingRouteState { speakers, earpiece }

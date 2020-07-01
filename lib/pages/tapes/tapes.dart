@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/tapes/add_tape.dart';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -313,7 +313,7 @@ class _TapesPageState extends State<TapesPage>
                                                         .toString()
                                                         .endsWith("mpeg"))
                                                 ? new ChewieVideo(
-                                                    controller:VideoPlayerController.network("https://indigo24.com/uploads/tapes/${result[index]['media']}"),
+                                                    controller:VideoPlayerController.network("$uploadTapes${result[index]['media']}"),
                                                   )
                                                 : AspectRatio(
                                                     aspectRatio: 1 / 1,
@@ -323,7 +323,7 @@ class _TapesPageState extends State<TapesPage>
                                                       child: PhotoView(
                                                         imageProvider:
                                                             CachedNetworkImageProvider(
-                                                          'https://indigo24.com/uploads/tapes/${result[index]['media']}',
+                                                          '$uploadTapes${result[index]['media']}',
                                                         ),
                                                         backgroundDecoration:
                                                             BoxDecoration(

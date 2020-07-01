@@ -12,7 +12,7 @@ import 'package:indigo24/pages/chat/ui/sended.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/test_timer.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/keyboard_dismisser.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:indigo24/widgets/preview.dart';

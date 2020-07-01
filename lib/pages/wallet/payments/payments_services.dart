@@ -4,6 +4,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'payments_service.dart';
+import 'package:indigo24/services/constants.dart';
 
 class PaymentsGroupPage extends StatefulWidget {
   final int categoryID;
@@ -15,6 +16,7 @@ class PaymentsGroupPage extends StatefulWidget {
 }
 
 class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
+  var test = logos;
   Api api = Api();
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                           padding: const EdgeInsets.only(top: 10),
                           child: _paymentsList(
                             context,
-                            "https://api.indigo24.com/logos/${snapshot.data["services"][index]['logo']}",
+                            "${logos}${snapshot.data["services"][index]['logo']}",
                             "${snapshot.data["services"][index]['title']}",
                             snapshot.data["services"][index]['id'],
                           ),

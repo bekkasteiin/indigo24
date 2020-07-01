@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_contacts.dart';
+import 'package:indigo24/pages/chat/chat_list.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:photo_view/photo_view.dart';
@@ -72,6 +73,8 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
                       avatar: '${e.json['data']['avatar']}',
                       avatarUrl: '${e.json['data']['avatar_url']}')),
             ).whenComplete(() {
+              // this is bool for check load more is needed or not
+              globalBoolForForGetChat = false;
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
             });

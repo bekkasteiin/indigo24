@@ -15,7 +15,7 @@ import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/widgets/constants.dart';
+import 'package:indigo24/services/constants.dart';
 
 
 class ChatProfileInfo extends StatefulWidget {
@@ -37,7 +37,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   File _image;
   @override
   void initState() {
-
     _chatTitle = '${widget.chatName}';
     listen();
     ChatRoom.shared.chatMembers(widget.chatId);
@@ -197,25 +196,39 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           ),
           child: ClipOval(
             child: Center(
-                child: GridView.count(
+                child: 
+                widget.chatType.toString() == '1' 
+                ? GridView.count(
                   crossAxisCount: 2,
                   physics: NeverScrollableScrollPhysics(),
                   children: List.generate(4, (index) {
-                    return CachedNetworkImage(
-                      imageUrl: 
-                      // widget.chatAvatar==null? 
-                      
-                      membersList.length > index 
-                        ? '${avatarUrl}${membersList[0]['avatar']}'
-                        : '${avatarUrl}noAvatar.png',
-                        // :
-                        // '$avatarUrl${widget.chatAvatar}',
-                      errorWidget: (context, url, error) => CachedNetworkImage(
-                        imageUrl: "${avatarUrl}noAvatar.png",
+                    var tempAvatar;
+                    membersList.length > index 
+                    ? tempAvatar = '$avatarUrl${membersList[index]["avatar"]}'
+                    : tempAvatar = '${avatarUrl}noAvatar.png';
+                    return AspectRatio(
+                      aspectRatio: 450 / 450,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            image: DecorationImage(
+                            fit: BoxFit.fitWidth,
+                            alignment: FractionalOffset.topCenter,
+                            image: NetworkImage('$tempAvatar'),
+                          )
+                        ),
                       ),
                     );
                   }),
-            ),
+                )
+                :   CachedNetworkImage(
+                  imageUrl: widget.chatAvatar!=null
+                  ? '$avatarUrl${widget.chatAvatar}' 
+                  : '${avatarUrl}noAvatar.png',
+                  errorWidget: (context, url, error) => CachedNetworkImage(
+                    imageUrl: "${avatarUrl}noAvatar.png",
+                  ),
+                ),
               ),
           ),
         ),
@@ -490,7 +503,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                 ),
                                 Icon(Icons.edit, color: Colors.white)
                               ],
-                            ) : Text('$_chatTitle', style: fS26(c: 'ffffff'), maxLines: 1, overflow: TextOverflow.ellipsis,)
+                            ) : Text('${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}', style: fS26(c: 'ffffff'), maxLines: 1, overflow: TextOverflow.ellipsis,)
                             )
                         ),
                         IconButton(
