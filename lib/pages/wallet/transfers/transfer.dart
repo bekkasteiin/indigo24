@@ -347,6 +347,87 @@ class _TransferPageState extends State<TransferPage> {
                   ),
                 ),
                 onTap: () {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return SafeArea(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: 40.0,
+                maxHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Container(
+                // height: 120,
+                // width: 100,
+                child: ListView.builder(
+                  itemCount: myContacts.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, i) {
+                    // print(temp);
+                    // print(temp.length);
+                    return Center(
+                      child: InkWell(
+                        onTap: () {
+                          // myContacts
+                          Navigator.pop(context);
+                          setState(() {
+                            receiverController.text = myContacts[i].phone;
+                          });
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => TransferPage(
+                          //       phone: myContacts[i].phone,
+                          //     ),
+                          //   ),
+                          // );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                          child: Row(
+                            children: <Widget>[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(25.0),
+                                child: Image.network(
+                                  '$avatarUrl${myContacts[i].avatar}',
+                                  width: 35,
+                                  height: 35,
+                                ),
+                              ),
+                              SizedBox(width: 20,),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Text(
+                                        '${myContacts[i].name}',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                    Container(
+                                      child: Text(
+                                        '${myContacts[i].phone}',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          );
+        });
                   print('transfer avatar is pressed');
                 },
               ),

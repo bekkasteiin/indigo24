@@ -40,7 +40,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     _chatTitle = '${widget.chatName}';
     listen();
     ChatRoom.shared.chatMembers(widget.chatId);
-    chatTitleController.text = '${widget.chatName}';
+    chatTitleController.text = '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}';
     super.initState();
     memberCount = 0;
 
@@ -475,10 +475,12 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         Flexible(
                           child: InkWell(
                             onTap: () {
-                             if(myPrivilege == '0' && widget.chatType != 0)
-                              setState(() {
-                                isEditing = !isEditing;
-                              });
+                             if(myPrivilege.toString() == '0' && widget.chatType != 0){
+                               print('$myPrivilege my privilege, ${widget.chatType} chat type');
+                                setState(() {
+                                  isEditing = !isEditing;
+                                });
+                             }
                             },
                             child: isEditing ? Row(
                               children: <Widget>[
@@ -556,14 +558,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     membersList.isEmpty
                         ? Center(child: CircularProgressIndicator())
                         :
-                        widget.chatType == 0 ?
-                        Center(
-                          child: Text("Статус", style: TextStyle(
-                            fontSize: 24,
-                            // fontFamily: ""
-                          )),
-                        )
-                        : Flexible(
+                        widget.chatType == 1 ?
+                        Flexible(
                             child: ScrollConfiguration(
                               behavior: MyBehavior(),
                               child: ListView.builder(
@@ -638,7 +634,13 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                 },
                               ),
                             ),
-                          ),
+                          )
+                         : Center(
+                          child: Text("Статус", style: TextStyle(
+                            fontSize: 24,
+                            // fontFamily: ""
+                          )),
+                        ),
                   ],
                 ),
               ],

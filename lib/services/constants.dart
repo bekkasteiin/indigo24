@@ -5,8 +5,8 @@ String avatarUrl = 'https://media.indigo24.com/avatars/';
 
 String uploadTapes = 'https://indigo24.$domen/uploads/tapes/';
 
-// String socket = 'wss://chat2.indigo24.com:443';
-String socket = 'wss://chat.indigo24.$domen:9502';
+String socket = 'wss://chat2.indigo24.com:443';
+// String socket = 'wss://chat.indigo24.$domen:9502';
 
  
 String baseUrl = 'https://api.indigo24.$domen/api/v2.1';

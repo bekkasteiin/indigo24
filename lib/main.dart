@@ -271,6 +271,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.getMessages(m['chat_id']);
     goToChat("${m['user_name']}", "${m['chat_id']}",
         memberCount: "${m['type']}" == "0" ? 2 : 3,
+        chatType: "${m['type']}",
         avatar: "${m['avatar']}",
         userIds: "${m['user_id']}");
   }
@@ -647,6 +648,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               ChatRoom.shared.getMessages(m['chat_id']);
               goToChat("${m['user_name']}", "${m['chat_id']}",
                   memberCount: "${m['type']}" == "0" ? 2 : 3,
+                  chatType: "${m['type']}",
                   avatar: "${m['avatar']}",
                   userIds: "${m['user_id']}");
             },
@@ -674,7 +676,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }, duration: Duration(milliseconds: 4000));
   }
 
-  goToChat(name, chatID, {memberCount, userIds, avatar, avatarUrl}) {
+  goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
     ChatRoom.shared.setCabinetStream();
     ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
@@ -683,6 +685,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           builder: (context) => ChatPage(
                 name,
                 chatID,
+                chatType: chatType,
                 memberCount: memberCount,
                 userIds: userIds,
                 avatar: avatar,
@@ -969,7 +972,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       });
 
       print("Uploading media with data ${formData.fields}");
-
       response = await dio.post(
         "$mediaChat",
         data: formData,

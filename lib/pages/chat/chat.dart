@@ -59,6 +59,9 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
+  var temp;
+
+
 class _ChatPageState extends State<ChatPage> {
   Dependencies dependencies = Dependencies();
   List myList = [];
@@ -128,7 +131,6 @@ class _ChatPageState extends State<ChatPage> {
     _refreshController.loadComplete();
   }
 
-  var temp;
   @override
   initState() {
     controller = new ScrollController()..addListener(_scrollListener);
@@ -139,7 +141,7 @@ class _ChatPageState extends State<ChatPage> {
         myContacts.toList().forEach((element) {
           if ('${element.phone}' == '${memberElement['phone']}') {
             print('match ${element.phone}');
-            temp.add(element);
+            temp.add(memberElement);
           }
         });
       });
@@ -763,9 +765,15 @@ class _ChatPageState extends State<ChatPage> {
                   itemCount: temp.length,
                   shrinkWrap: true,
                   itemBuilder: (context, i) {
+                    // print(temp);
+                    // print(temp.length);
                     return Center(
                       child: InkWell(
                         onTap: () {
+                          print(json.decode(json.encode(temp[i])));
+                          print(temp[i]['phone']);
+                     
+                          // myContacts
                           Navigator.pop(context);
                           Navigator.push(
                             context,

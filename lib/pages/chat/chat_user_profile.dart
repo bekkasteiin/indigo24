@@ -49,7 +49,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
 
   listen() {
     ChatRoom.shared.onCabinetInfoChange.listen((e) {
-      print("CHAT INFO EVENT");
+      print("CHAT USER INFO EVENT");
       print(e.json);
       var cmd = e.json['cmd'];
       var message = e.json['data'];
@@ -158,6 +158,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
                 child: Text('Перейти в чат'),
                 onPressed: () {
                   print(widget.phone);
+                  ChatRoom.shared.setContactsStream();
                   ChatRoom.shared.userCheck(widget.phone);
                   // Navigator.pop(context);
                 },
