@@ -55,18 +55,18 @@ class _AddTapePageState extends State<AddTapePage> {
 
   action(){
     final act = CupertinoActionSheet(
-    title: Text('Выберите вариант'),
+    title: Text('${localization.selectOption}'),
     // message: Text('Which option?'),
     actions: <Widget>[
       CupertinoActionSheetAction(
-        child: Text('Камера'),
+        child: Text('${localization.camera}'),
         onPressed: () {
           _onImageButtonPressed(ImageSource.camera);
           Navigator.pop(context);
         },
       ),
       CupertinoActionSheetAction(
-        child: Text('Галерея'),
+        child: Text('${localization.gallery}'),
         onPressed: () {
           _onImageButtonPressed(ImageSource.gallery);
           Navigator.pop(context);
@@ -74,7 +74,7 @@ class _AddTapePageState extends State<AddTapePage> {
       )
     ],
     cancelButton: CupertinoActionSheetAction(
-      child: Text('Назад'),
+      child: Text('${localization.back}'),
       onPressed: () {
         Navigator.pop(context);
       },
@@ -134,7 +134,7 @@ class _AddTapePageState extends State<AddTapePage> {
       },
     );
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text("${localization.error}"),
       content: Text(message),
       actions: [
         okButton,
@@ -202,7 +202,7 @@ class _AddTapePageState extends State<AddTapePage> {
       );
     } else {
       return Container(
-        child: Text("Ошибка"),
+        child: Text("${localization.error}"),
       );
     }
   }
@@ -312,9 +312,9 @@ class _AddTapePageState extends State<AddTapePage> {
                }
                print("Pressed with $_currentFile");
                 if(descriptionController.text == '' || titleController.text == ''){
-                  showAlertDialog(context, "Заполните все поля");
+                  showAlertDialog(context, "${localization.fillAllFields}");
                 } else if(_currentFile == null){
-                  showAlertDialog(context, "Выберите файл");
+                  showAlertDialog(context, "${localization.selectFile}");
                 } else {
                   print("Current file $_currentFile");
                   await addTape(context);
@@ -344,7 +344,7 @@ class _AddTapePageState extends State<AddTapePage> {
                     margin: EdgeInsets.all(10),
                     child: TextField(
                         controller: titleController,
-                        decoration: InputDecoration(labelText: 'Название')),
+                        decoration: InputDecoration(labelText: '${localization.title}')),
                   ),
                   Container(
                     margin: EdgeInsets.all(10),
@@ -352,7 +352,7 @@ class _AddTapePageState extends State<AddTapePage> {
                         minLines: 1,
                         maxLines: 4,
                         controller: descriptionController,
-                        decoration: InputDecoration(labelText: 'Описание')),
+                        decoration: InputDecoration(labelText: '${localization.description}')),
                   ),
                 ],
               ),

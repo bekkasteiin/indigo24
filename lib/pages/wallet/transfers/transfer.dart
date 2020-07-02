@@ -38,7 +38,7 @@ class _TransferPageState extends State<TransferPage> {
     );
 
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text(type == '0' ? "Внимание" : type == '1' ? 'Успешно' : 'Ошибка' ),
+      title: Text(type == '0' ? "${localization.alert}" : type == '1' ? '${localization.success}' : '${localization.error}' ),
       content: Text(message),
       actions: [
         okButton,
@@ -173,7 +173,7 @@ class _TransferPageState extends State<TransferPage> {
       ),
       brightness: Brightness.light,
       title: Text(
-        "Клиенту Indigo24",
+        "${localization.toIndigo24Client}",
         style: TextStyle(
           color: Color(0xFF001D52),
           fontSize: 22,
@@ -219,7 +219,7 @@ class _TransferPageState extends State<TransferPage> {
             }
           });
       } else{
-        showAlertDialog(context, '0', 'Заполните все поля');
+        showAlertDialog(context, '0', '${localization.fillAllFields}');
       }
     }
   }

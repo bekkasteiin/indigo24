@@ -533,10 +533,11 @@ class ChatRoom {
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        Future.delayed(const Duration(milliseconds: 15000), () {
-          connect();
+        connect();
           init();
-        });
+        // Future.delayed(const Duration(milliseconds: 15000), () {
+          
+        // });
       },
     );
   }

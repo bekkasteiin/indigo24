@@ -231,7 +231,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                     Image.asset("assets/chat_animation.gif"),
                     Container(
                         child: Text(
-                      "Нажмите чтобы начать чат",
+                      "${localization.tapToStartChat}",
                       style: TextStyle(fontSize: 20),
                     ))
                   ],

@@ -10,6 +10,7 @@ import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:video_player/video_player.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class Sended extends StatelessWidget {
   final m;
@@ -30,8 +31,8 @@ class Sended extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text('Удалить', style: TextStyle(color:Colors.red, fontSize: 14),),
-                      const Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
+                      Text('${localization.delete}', style: TextStyle(color:Colors.red, fontSize: 14),),
+                      Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
                     ],
                   ),
                   onPressed: () {
@@ -45,8 +46,8 @@ class Sended extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text('Редактировать', style: TextStyle(fontSize: 14)),
-                        const Icon(CupertinoIcons.pen, size: 20,)
+                        Text('${localization.edit}', style: TextStyle(fontSize: 14)),
+                        Icon(CupertinoIcons.pen, size: 20,)
                       ],
                     ),
                   ),
@@ -60,8 +61,8 @@ class Sended extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text('Ответить', style: TextStyle(fontSize: 14)),
-                      const Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                      Text('${localization.reply}', style: TextStyle(fontSize: 14)),
+                      Icon(CupertinoIcons.reply_thick_solid, size: 20)
                     ],
                   ),
                   onPressed: () {

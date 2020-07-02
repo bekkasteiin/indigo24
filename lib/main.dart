@@ -411,15 +411,15 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       var result = getContactsResult is List ? false : !getContactsResult;
       if (result) {
         Widget okButton = CupertinoDialogAction(
-          child: Text("Открыть настройки"),
+          child: Text("${localization.openSettings}"),
           onPressed: () {
             Navigator.pop(context);
             AppSettings.openAppSettings();
           },
         );
         CupertinoAlertDialog alert = CupertinoAlertDialog(
-          title: Text("Ошибка"),
-          content: Text('Разрешите доступ к контактам'),
+          title: Text("${localization.error}"),
+          content: Text('${localization.allowContacts}'),
           actions: [
             okButton,
           ],
@@ -588,43 +588,43 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
     switch ('$type') {
       case '0':
-        return 'Текстовое сообщение';
+        return '${localization.textMessage}';
         break;
       case '1':
-        return 'Фотография';
+        return '${localization.photo}';
         break;
       case '2':
-        return 'Документ';
+        return '${localization.document}';
         break;
       case '3':
-        return 'Голосовое сообщение';
+        return '${localization.voiceMessage}';
         break;
       case '4':
-        return 'Видео';
+        return '${localization.video}';
         break;
       case '7':
-        return 'Системное сообщение';
+        return '${localization.systemMessage}';
         break;
       // case '8':
       // return 'Дивайдер сообщение';
       // break;
       case '9':
-        return 'Местоположение';
+        return '${localization.location}';
         break;
       case '10':
-        return 'Ответ';
+        return '${localization.reply}';
         break;
       case '11':
-        return 'Деньги';
+        return '${localization.money}';
         break;
       case '12':
-        return 'Ссылка';
+        return '${localization.link}';
         break;
       case '13':
-        return 'Переотправленное сообщение';
+        return '${localization.forwardedMessage}';
         break;
       default:
-        return 'Сообщение';
+        return '${localization.message}';
     }
   }
 
@@ -890,7 +890,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               ),
               cancelButton: CupertinoActionSheetAction(
                 isDefaultAction: true,
-                child: Text('Отмена'),
+                child: Text('${localization.cancel}'),
                 onPressed: () {
                   Navigator.pop(context);
                   // setState(() {
@@ -1009,7 +1009,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       },
     );
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text("${localization.error}"),
       content: Text(message),
       actions: [
         okButton,
@@ -1041,8 +1041,8 @@ logOut(BuildContext context) async {
     },
   );
   CupertinoAlertDialog alert = CupertinoAlertDialog(
-    title: Text("Ошибка"),
-    content: Text('Сеанс завершен'),
+    title: Text("${localization.error}"),
+    content: Text('${localization.sessionDone}'),
     actions: [
       okButton,
     ],

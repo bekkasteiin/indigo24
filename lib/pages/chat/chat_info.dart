@@ -159,7 +159,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       },
       // onTap: () => PlatformActionSheet().displaySheet(
       //     context: context,
-      //     message: Text("Выберите опцию"),
+      //     message: Text("${localization.selectOption}"),
       //     actions: [
       //       ActionSheetAction(
       //         text: "Сфотографировать",
@@ -205,7 +205,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     var tempAvatar;
                     membersList.length > index 
                     ? tempAvatar = '$avatarUrl${membersList[index]["avatar"]}'
-                    : tempAvatar = '${avatarUrl}noAvatar.png';
+                    : tempAvatar = '';
                     return AspectRatio(
                       aspectRatio: 450 / 450,
                         child: Container(
@@ -238,10 +238,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
 
   adminAction(chatId, member){
     final act = CupertinoActionSheet(
-    title: Text('Выберите вариант'),
+    title: Text('${localization.selectOption}'),
     actions: <Widget>[
       CupertinoActionSheetAction(
-        child: Text('Профиль'),
+        child: Text('${localization.profile}'),
         onPressed: () {
           Navigator.pop(context);
           ChatRoom.shared.cabinetController.close();
@@ -259,7 +259,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ),
       member['role'] == '2' ? CupertinoActionSheetAction(
         isDestructiveAction: true,
-        child: Text('Удалить'),
+        child: Text('${localization.delete}'),
         onPressed: () {
           ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
           Navigator.pop(context);
@@ -267,7 +267,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ) : Center()
     ],
     cancelButton: CupertinoActionSheetAction(
-      child: Text('Назад'),
+      child: Text('${localization.back}'),
       onPressed: () {
         Navigator.pop(context);
       },
@@ -279,10 +279,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
 
   memberAction(member){
     final act = CupertinoActionSheet(
-    title: Text('Выберите вариант'),
+    title: Text('${localization.selectOption}'),
     actions: <Widget>[
       CupertinoActionSheetAction(
-        child: Text('Профиль'),
+        child: Text('${localization.profile}'),
         onPressed: () {
           Navigator.pop(context);
           ChatRoom.shared.cabinetController.close();
@@ -300,7 +300,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ),
     ],
     cancelButton: CupertinoActionSheetAction(
-      child: Text('Назад'),
+      child: Text('${localization.back}'),
       onPressed: () {
         Navigator.pop(context);
       },
@@ -312,10 +312,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
 
   addMembers(chatId){
   final act = CupertinoActionSheet(
-    title: Text('Выберите вариант'),
+    title: Text('${localization.selectOption}'),
     actions: <Widget>[
       myPrivilege == '0' ? CupertinoActionSheetAction(
-        child: Text('Добавить в группу'),
+        child: Text('${localization.addToGroup}'),
         onPressed: () {
           Navigator.pop(context);
           Navigator.push(context,MaterialPageRoute(builder: (context) => ChatMembersSelection(chatId, membersList))).whenComplete(() {
@@ -327,25 +327,25 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ) : Container(),
       CupertinoActionSheetAction(
         isDestructiveAction: true,
-        child: Text('Покинуть беседу'),
+        child: Text('${localization.exitGroup}'),
         onPressed: () {
           Widget okButton = CupertinoDialogAction(
             isDestructiveAction: true,
-            child: Text("Да"),
+            child: Text("${localization.yes}"),
             onPressed: () {
               Navigator.pop(context);
               ChatRoom.shared.leaveChat(widget.chatId);
             },
           );
           Widget noButton = CupertinoDialogAction(
-            child: Text("Нет"),
+            child: Text("${localization.no}"),
             onPressed: () {
               Navigator.pop(context);
             },
           );
           CupertinoAlertDialog alert = CupertinoAlertDialog(
-            title: Text("Внимание"),
-            content: Text('Вы точно хотите покинуть беседу?'),
+            title: Text("${localization.alert}"),
+            content: Text('${localization.sureExitGroup}'),
             actions: [
               noButton,
               okButton,
@@ -362,7 +362,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ),
     ],
     cancelButton: CupertinoActionSheetAction(
-      child: Text('Назад'),
+      child: Text('${localization.back}'),
       onPressed: () {
         Navigator.pop(context);
       },
@@ -374,10 +374,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
 
   action(chatId, member){
     final act = CupertinoActionSheet(
-    title: Text('Выберите вариант'),
+    title: Text('${localization.selectOption}'),
     actions: <Widget>[
       CupertinoActionSheetAction(
-        child: Text('Профиль'),
+        child: Text('${localization.watch}'),
         onPressed: () {
           Navigator.pop(context);
           ChatRoom.shared.cabinetController.close();
@@ -394,7 +394,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         },
       ),
       CupertinoActionSheetAction(
-        child: member['role'] == '2' ? Text('Назначить администратором') : member['role'] ==  '1' ? Text('Сделать участником') : Text(''),
+        child: member['role'] == '2' ? Text('${localization.makeAdmin}') : member['role'] ==  '1' ? Text('${localization.makeMember}') : Text(''),
         onPressed: () {
            switch (member['role']) {
             case '2':
@@ -413,7 +413,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       ),
       CupertinoActionSheetAction(
         isDestructiveAction: true,
-        child: Text('Удалить'),
+        child: Text('${localization.delete}'),
         onPressed: () {
           ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
           Navigator.pop(context);
@@ -421,7 +421,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       )
     ],
     cancelButton: CupertinoActionSheetAction(
-      child: Text('Назад'),
+      child: Text('${localization.back}'),
       onPressed: () {
         Navigator.pop(context);
       },
@@ -636,7 +636,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                             ),
                           )
                          : Center(
-                          child: Text("Статус", style: TextStyle(
+                          child: Text("${localization.status}", style: TextStyle(
                             fontSize: 24,
                             // fontFamily: ""
                           )),
@@ -657,7 +657,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         return Text('${localization.creator}');
         break;
       case '1':
-        return Text('Администратор');
+        return Text('${localization.admin}');
         break;
       case '2':
         return Text('${localization.member}');

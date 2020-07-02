@@ -5,6 +5,7 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class UserRegistrationPage extends StatefulWidget {
   final phone;
@@ -45,7 +46,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Ошибка'),
+          title: Text('${localization.error}'),
           content: Text('$m'),
           actions: <Widget>[
             CupertinoDialogAction(
@@ -185,7 +186,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Фамилия",
+                              Text("${localization.surname}",
                                   style: TextStyle(
                                       color: Color(0xff0543B8), fontSize: 16)),
                               SizedBox(
@@ -395,7 +396,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                       //   ),
                       // ),
                       child: ProgressButton(
-                        defaultWidget: Text("Далее",
+                        defaultWidget: Text("${localization.next}",
                             style:
                                 TextStyle(color: Colors.white, fontSize: 22)),
                         progressWidget: CircularProgressIndicator(),
@@ -458,16 +459,15 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             } else {
                               print('different passwords');
                               setState(() {
-                                firstPasswordError =
-                                    'Пароли должны быть идентичными';
-                                secondPasswordError =
-                                    'Пароли должны быть идентичными';
+                                firstPasswordError = '${localization.passwordsIdentical}';
+                                secondPasswordError = '${localization.passwordsIdentical}';
                               });
                             }
                           } else {
                             print('empty');
                             setState(() {
-                              globalError = 'Заполните все нужные поля';
+                              globalError = '${localization.fillAllFields}';
+                              // Заполните все нужные поля';
                             });
                           }
                         },

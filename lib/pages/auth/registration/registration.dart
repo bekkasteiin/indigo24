@@ -87,7 +87,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Ошибка'),
+          title: Text('${localization.error}'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(

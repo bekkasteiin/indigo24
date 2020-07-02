@@ -550,7 +550,7 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                     FittedBox(
                                       fit: BoxFit.fitWidth,
-                                      child: Text('Камера',
+                                      child: Text('${localization.camera}',
                                           style: TextStyle(
                                               color: Color(0xFF001D52),
                                               fontWeight: FontWeight.w500)),
@@ -595,7 +595,7 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                     FittedBox(
                                       fit: BoxFit.fitWidth,
-                                      child: Text('Деньги',
+                                      child: Text('${localization.money}',
                                           style: TextStyle(
                                               color: Color(0xFF001D52),
                                               fontWeight: FontWeight.w500)),
@@ -645,7 +645,7 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                     FittedBox(
                                       fit: BoxFit.fitWidth,
-                                      child: Text('Галерея',
+                                      child: Text('${localization.gallery}',
                                           style: TextStyle(
                                               color: Color(0xFF001D52),
                                               fontWeight: FontWeight.w500)),
@@ -683,7 +683,7 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                     FittedBox(
                                       fit: BoxFit.fitWidth,
-                                      child: Text('Видео',
+                                      child: Text('${localization.video}',
                                           style: TextStyle(
                                               color: Color(0xFF001D52),
                                               fontWeight: FontWeight.w500)),
@@ -721,7 +721,7 @@ class _ChatPageState extends State<ChatPage> {
                                     ),
                                     FittedBox(
                                       fit: BoxFit.fitWidth,
-                                      child: Text('Файлы',
+                                      child: Text('${localization.files}',
                                           style: TextStyle(
                                               color: Color(0xFF001D52),
                                               fontWeight: FontWeight.w500)),
@@ -898,7 +898,7 @@ class _ChatPageState extends State<ChatPage> {
                                 ('$online' == 'online' ||
                                         '$online' == 'offline')
                                     ? '$online'
-                                    : 'был в сети $online',
+                                    : '${localization.wasOnline} $online',
                                 style: TextStyle(
                                     color: Color(0xFF001D52),
                                     fontSize: 14,
@@ -965,6 +965,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ).whenComplete(() {
+                  ChatRoom.shared.getMessages('${widget.chatID}');
                   setState(() {});
                 });
               },
@@ -1070,7 +1071,7 @@ class _ChatPageState extends State<ChatPage> {
                                                           Flexible(
                                                               child: Container(
                                                                   child: Text(
-                                                                      "Редактирование",
+                                                                      "${localization.edit}",
                                                                       style: TextStyle(
                                                                           color: Color(
                                                                               0xff0543B8)),
@@ -1537,7 +1538,7 @@ class _ChatPageState extends State<ChatPage> {
       },
     );
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text("${localization.error}"),
       content: Text(message),
       actions: [
         okButton,

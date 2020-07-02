@@ -13,6 +13,7 @@ import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:video_player/video_player.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 var parser = EmojiParser();
 
@@ -65,8 +66,8 @@ class Received extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text('Ответить', style: TextStyle(fontSize: 14)),
-                      const Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                      Text('${localization.reply}', style: TextStyle(fontSize: 14)),
+                      Icon(CupertinoIcons.reply_thick_solid, size: 20)
                     ],
                   ),
                   onPressed: () {
@@ -272,7 +273,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                           children: [
                             edit == '1'?
                             Text(
-                              "ред. ",
+                              "${localization.editedMessage}. ",
                               style: TextStyle(
                                 fontSize: 10,
                                 color: Colors.black.withOpacity(0.6),

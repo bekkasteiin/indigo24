@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class FullScreenPhoto extends StatelessWidget {
   @override
@@ -265,7 +266,7 @@ class FullScreenWrapper extends StatelessWidget {
           ),
           brightness: Brightness.light,
           title: Text(
-            "Фотография",
+            "${localization.photo}",
             style: TextStyle(
               color: Color(0xFF001D52),
               fontSize: 22,

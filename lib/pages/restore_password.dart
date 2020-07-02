@@ -75,7 +75,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: type == 0 ? Text('Ошибка') : Text('Успешно'),
+          title: type == 0 ? Text('${localization.error}') : Text('${localization.success}'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(

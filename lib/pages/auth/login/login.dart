@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Ошибка'),
+          title: Text('${localization.error}'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(
@@ -413,7 +413,7 @@ class Countries extends StatelessWidget {
         ),
         brightness: Brightness.light,
         title: Text(
-          "Страна",
+          "${localization.country}",
           style: TextStyle(
             color: Color(0xFF001D52),
             fontSize: 22,

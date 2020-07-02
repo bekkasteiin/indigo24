@@ -28,7 +28,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
       },
     );
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text("${localization.error}"),
       content: Text(message),
       actions: [
         okButton,
@@ -49,17 +49,18 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     ChatRoom.shared.setContactsStream();
     listen();
     getContacts(context).then((getContactsResult) {
-      if (!getContactsResult) {
+      var result = getContactsResult is List ? false : !getContactsResult;
+      if (result) {
         Widget okButton = CupertinoDialogAction(
-          child: Text("Открыть настройки"),
+          child: Text("${localization.openSettings}"),
           onPressed: () {
             Navigator.pop(context);
             AppSettings.openAppSettings();
           },
         );
         CupertinoAlertDialog alert = CupertinoAlertDialog(
-          title: Text("Ошибка"),
-          content: Text('Разрешите доступ к контактам'),
+          title: Text("${localization.error}"),
+          content: Text('${localization.allowContacts}'),
           actions: [
             okButton,
           ],
@@ -273,17 +274,18 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   print('update contacts');
                   setState(() {
                     getContacts(context).then((getContactsResult) {
-                      if ('$getContactsResult' == 'false') {
+                      var result = getContactsResult is List ? false : !getContactsResult;
+                      if (result) {
                         Widget okButton = CupertinoDialogAction(
-                          child: Text("Открыть настройки"),
+                          child: Text("${localization.openSettings}"),
                           onPressed: () {
                             Navigator.pop(context);
                             AppSettings.openAppSettings();
                           },
                         );
                         CupertinoAlertDialog alert = CupertinoAlertDialog(
-                          title: Text("Ошибка"),
-                          content: Text('Разрешите доступ к контактам'),
+                          title: Text("${localization.error}"),
+                          content: Text('${localization.allowContacts}'),
                           actions: [
                             okButton,
                           ],

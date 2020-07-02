@@ -9,6 +9,7 @@ import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share/share.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 class FullPhoto extends StatelessWidget {
   final String url;
@@ -120,7 +121,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                     child: Row(
                       children: [
                         Text(
-                          "Сохранить ",
+                          "${localization.save} ",
                           style: TextStyle(color: Colors.white),
                           maxLines: 1,
                           softWrap: false,
@@ -140,7 +141,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                     child: Row(
                       children: [
                         Text(
-                          "Поделиться ",
+                          "${localization.share} ",
                           style: TextStyle(color: Colors.white),
                           maxLines: 1,
                           softWrap: false,
@@ -154,7 +155,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                     ),
                     onPressed: () {
                       Share.share(currentIndex == null ? url : url1,
-                          subject: 'Изображение');
+                          subject: '${localization.photo}');
                     },
                   ),
                 ],
@@ -227,11 +228,11 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
     GallerySaver.saveImage(url).then((bool success) {
       if (success)
         setState(() {
-          showAlertDialog(context, "Успешно", "Загружено");
+          showAlertDialog(context, "${localization.success}", "${localization.uploaded}");
           print('Image is saved');
         });
       else
-        showAlertDialog(context, "Ошибка", "Что-то пошло не так");
+        showAlertDialog(context, "${localization.error}", "${localization.somethingWentWrong}");
     });
   }
 

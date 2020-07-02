@@ -40,7 +40,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Ошибка'),
+          title: Text('${localization.error}'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(
@@ -115,7 +115,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text("Код из SMS",
+                          Text("${localization.keyFromSms}",
                               style: TextStyle(
                                   color: Color(0xFF001D52), fontSize: 16))
                         ],
@@ -133,7 +133,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
                   child: Text(
-                    'Мы отправили на Ваш номер SMS ключ, который поступит в течение 10 секунд',
+                    '${localization.weSentToEmail}',
                     style: TextStyle(
                       color: Color(0xff898DA5),
                       fontSize: 12,
@@ -145,7 +145,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                 Container(
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: ProgressButton(
-                    defaultWidget: Text("Далее",
+                    defaultWidget: Text("${localization.next}",
                         style: TextStyle(color: Colors.white, fontSize: 22)),
                     progressWidget: CircularProgressIndicator(),
                     borderRadius: 10.0,

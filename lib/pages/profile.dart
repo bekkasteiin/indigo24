@@ -158,7 +158,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       },
     );
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text("${localization.error}"),
       content: Text(message),
       actions: [
         okButton,
@@ -188,11 +188,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return InkWell(
       onTap: () {
         final act = CupertinoActionSheet(
-    title: Text('Выберите опцию'),
+    title: Text('${localization.selectOption}'),
     // message: Text('Which option?'),
     actions: <Widget>[
       CupertinoActionSheetAction(
-        child: Text('Посмотреть'),
+        child: Text('${localization.watch}'),
         onPressed: () {
           print("посмотреть ${user.avatarUrl}${user.avatar}");
           Navigator.pop(context);
@@ -210,14 +210,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
         },
       ),
       CupertinoActionSheetAction(
-        child: Text('Камера'),
+        child: Text('${localization.camera}'),
         onPressed: () {
           getImage(ImageSource.camera);
           Navigator.pop(context);
         },
       ),
       CupertinoActionSheetAction(
-        child: Text('Галерея'),
+        child: Text('${localization.gallery}'),
         onPressed: () {
           getImage(ImageSource.gallery);
           Navigator.pop(context);
@@ -225,7 +225,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       )
     ],
     cancelButton: CupertinoActionSheetAction(
-      child: Text('Назад'),
+      child: Text('${localization.back}'),
       onPressed: () {
         Navigator.pop(context);
       },
@@ -236,7 +236,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       },
       // PlatformActionSheet().displaySheet(
       //     context: context,
-      //     message: Text("Выберите опцию"),
+      //     message: Text("${localization.selectOption}"),
       //     actions: [
       //       ActionSheetAction(
       //         text: "Сфотографировать",
@@ -452,7 +452,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   builder: (BuildContext context) => CustomDialog(
                                         title: null,
                                         description:
-                                            "Уверены, что хотите выйти?",
+                                            "${localization.sureLogout}?",
                                         buttonText: "Okay",
                                         image: CachedNetworkImage(imageUrl: '$avatarUrl${user.avatar}'),
                                       ),
@@ -647,7 +647,7 @@ class CustomDialog extends StatelessWidget {
                         },
                         child: Container(
                           height: 50,
-                          child: Center(child: Text("ДА", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
+                          child: Center(child: Text("${localization.yes}", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
                         ),
                       ),
                     ),
@@ -659,7 +659,7 @@ class CustomDialog extends StatelessWidget {
                         },
                         child: Container(
                           height: 50,
-                          child: Center(child: Text("НЕТ", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
+                          child: Center(child: Text("${localization.no}", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
                         ),
                       ),
                     ),

@@ -31,7 +31,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
       },
     );
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text("${localization.error}"),
       content: Text(message),
       actions: [
         okButton,
@@ -97,7 +97,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
           } else if (e.json['data']['status'] == 'true') {
             // ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
           } else {
-            _showError(context, 'Данного пользователя нет в системе');
+            _showError(context, '${localization.cannotFindUser}');
           }
           break;
         case "chat:members:add":
@@ -119,7 +119,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Ошибка'),
+          title: Text('${localization.error}'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(
@@ -198,7 +198,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
           centerTitle: true,
           brightness: Brightness.light,
           title: Text(
-            "Добавить в группу",
+            "${localization.addToGroup}",
             style: TextStyle(
               color: Color(0xFF001D52),
               fontWeight: FontWeight.w400,

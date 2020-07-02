@@ -9,6 +9,7 @@ import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 var parser = EmojiParser();
 
@@ -337,7 +338,7 @@ class _PDFViewerState extends State<PDFViewer> {
         home: Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            title: Text('Файл'),
+            title: Text('${localization.file}'),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.navigate_before),

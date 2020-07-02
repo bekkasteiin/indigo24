@@ -73,7 +73,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                                   style: TextStyle(fontSize: 15),
                                 ),
                                 Text(
-                                  "Аккаунт $account",
+                                  "${localization.account} $account",
                                   style: TextStyle(fontSize: 12),
                                 ),
                                 Text(

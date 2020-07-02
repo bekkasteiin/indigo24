@@ -125,11 +125,11 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     return InkWell(
       onTap: () {
         final act = CupertinoActionSheet(
-            title: Text('Выберите опцию'),
+            title: Text('${localization.selectOption}'),
             // message: Text('Which option?'),
             actions: <Widget>[
               CupertinoActionSheetAction(
-                child: Text('Посмотреть'),
+                child: Text('${localization.watch}'),
                 onPressed: () {
                   print("посмотреть");
                   Navigator.pop(context);
@@ -155,7 +155,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
               //   },
               // ),
               CupertinoActionSheetAction(
-                child: Text('Перейти в чат'),
+                child: Text('${localization.goToChat}'),
                 onPressed: () {
                   print(widget.phone);
                   ChatRoom.shared.setContactsStream();
@@ -165,7 +165,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
               )
             ],
             cancelButton: CupertinoActionSheetAction(
-              child: Text('Назад'),
+              child: Text('${localization.back}'),
               onPressed: () {
                 Navigator.pop(context);
               },

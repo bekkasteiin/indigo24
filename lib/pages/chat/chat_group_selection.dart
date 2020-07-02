@@ -27,7 +27,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
       },
     );
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("Ошибка"),
+      title: Text("${localization.error}"),
       content: Text(message),
       actions: [
         okButton,
@@ -88,7 +88,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
           } else if (e.json['data']['status'] == 'true') {
             // ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
           } else {
-            _showError(context, 'Данного пользователя нет в системе');
+            _showError(context, '${localization.cannotFindUser}');
           }
           break;
         case "chat:create":
@@ -132,7 +132,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Ошибка'),
+          title: Text('${localization.error}'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(
@@ -240,12 +240,12 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                           title: _titleController.text);
                     } else {
                       print('chat name is empty');
-                      _showError(context, 'Отсутствует название чата');
+                      _showError(context, '${localization.noChatName}');
                     }
                   } else {
                     print('member count less than 3');
                     _showError(
-                        context, 'Минимальное количество участников : 3');
+                        context, '${localization.minCountOfGroup}');
                   }
                 })
           ],
