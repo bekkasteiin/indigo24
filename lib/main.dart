@@ -159,16 +159,14 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: (phone == 'null' || authenticated == false)
-            ? IntroPage()
-            : Tabs(),
+        home:
+            (phone == 'null' || authenticated == false) ? IntroPage() : Tabs(),
       ),
     );
   }
 }
 
 class Tabs extends StatefulWidget {
-
   @override
   _TabsState createState() => _TabsState();
 }
@@ -410,8 +408,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       for (int i = 0; i < getContactsResult.length; i++) {
         ChatRoom.shared.userCheck(getContactsResult[i]['phone']);
       }
-
-      if (!getContactsResult) {
+      var result = getContactsResult is List ? false : !getContactsResult;
+      if (result) {
         Widget okButton = CupertinoDialogAction(
           child: Text("Открыть настройки"),
           onPressed: () {
@@ -513,7 +511,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       if (e.json["cmd"] != 'user:check')
-      print("LISTENING EVENT ${e.json["cmd"]}");
+        print("LISTENING EVENT ${e.json["cmd"]}");
       var cmd = e.json["cmd"];
       print(e.json);
       switch (cmd) {
@@ -527,11 +525,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         case 'chats:get':
           setState(() {
             // this is bool for check load more is needed or not
-            if(globalBoolForForGetChat){
-              e.json['data'].toList().forEach((element){
+            if (globalBoolForForGetChat) {
+              e.json['data'].toList().forEach((element) {
                 myList.add(element);
               });
-            } else{
+            } else {
               myList = e.json['data'].toList();
             }
             chatsPage += 1;
@@ -574,9 +572,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  switchType(type){
-
-
+  switchType(type) {
     // const TEXT_MESSAGE_TYPE = 0;
     // const IMAGE_MESSAGE_TYPE = 1;
     // const DOCUMENT_MESSAGE_TYPE = 2;
@@ -610,8 +606,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         return 'Системное сообщение';
         break;
       // case '8':
-        // return 'Дивайдер сообщение';
-        // break;
+      // return 'Дивайдер сообщение';
+      // break;
       case '9':
         return 'Местоположение';
         break;
@@ -632,7 +628,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
   }
 
-  
   inAppPush(m) {
     print('_________________In App Push $m');
     // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:243, user_id: 113626, time: 1593593566, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, attachments: [{"filename":"NQet2z6UFBunjjrn25mm7cKd48L9g2Vi.mp3"}], attachment_url: https://media.chat.indigo24.xyz/media/voice/, type: 3}
@@ -660,11 +655,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 ))),
             title: Text("${m['user_name']}"),
             subtitle: Text(
-              
-              m['attachments'] == null 
-              ? "${m["text"]}"
-              : switchType(m['type']),
-              ),
+              m['attachments'] == null ? "${m["text"]}" : switchType(m['type']),
+            ),
             trailing: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
