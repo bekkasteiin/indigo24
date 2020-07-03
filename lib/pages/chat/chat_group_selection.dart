@@ -228,15 +228,15 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 onPressed: () {
                   if (_saved2.length > 2) {
                     if (_titleController.text.isNotEmpty) {
-                      String user_ids = '';
+                      String userIds = '';
                       _saved2.removeAt(0);
                       _saved2.forEach((element) {
-                        user_ids += '${element['user_id']}' + ',';
+                        userIds += '${element['user_id']}' + ',';
                         print(element);
                       });
-                      print(user_ids);
-                      user_ids = user_ids.substring(0, user_ids.length - 1);
-                      ChatRoom.shared.cabinetCreate(user_ids, 1,
+                      print(userIds);
+                      userIds = userIds.substring(0, userIds.length - 1);
+                      ChatRoom.shared.cabinetCreate(userIds, 1,
                           title: _titleController.text);
                     } else {
                       print('chat name is empty');

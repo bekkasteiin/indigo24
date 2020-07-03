@@ -86,7 +86,7 @@ class Received extends StatelessWidget {
               image: (m["avatar"] == null || m["avatar"] == "")
                   ? "${avatarUrl}noAvatar.png"
                   : m["avatar_url"] == null
-                      ? "${avatarUrl}${m["avatar"].toString().replaceAll("AxB", "200x200")}"
+                      ? "$avatarUrl${m["avatar"].toString().replaceAll("AxB", "200x200")}"
                       : "${m["avatar_url"]}${m["avatar"].toString().replaceAll("AxB", "200x200")}",
               type: "${m["type"]}",
               media: (a==false || a==null)? null : "${m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
@@ -259,6 +259,11 @@ class ReceivedMessageWidget extends StatelessWidget {
                             :
                             (type=="10")?
                             ReplyMessage(content, replyData)
+                            :
+                            // TODO CHANGE 
+                            type=='11'?
+                            Text('${localization.money} $content')
+                            // MoneyMessage(content)
                             :
                             Text(
                               content,

@@ -59,8 +59,7 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
-  var temp;
-
+var temp;
 
 class _ChatPageState extends State<ChatPage> {
   Dependencies dependencies = Dependencies();
@@ -87,11 +86,11 @@ class _ChatPageState extends State<ChatPage> {
   bool isReplying = false;
   var replyMessage;
 
-  String _fileName;
+  String fileName;
   String _path;
   Map<String, String> _paths;
   String _extension;
-  bool _loadingPath = false;
+  bool loadingPath = false;
   bool _multiPick = false;
   FileType _pickingType = FileType.any;
   var myFileUrl;
@@ -131,22 +130,42 @@ class _ChatPageState extends State<ChatPage> {
     _refreshController.loadComplete();
   }
 
+
+
+  RefreshController _memberRefreshController = RefreshController(initialRefresh: false);
+
+  void _onMemberRefresh() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    print("_onRefresh");
+    _refreshController.refreshCompleted();
+  }
+
+  int chatMembersPage = 1;
+
+  void _onMemberLoading() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    if(temp.length % 20 == 0){
+      chatMembersPage++;
+      if (mounted)
+        setState(() {
+          print("_onLoading chat members with page $chatMembersPage");
+          ChatRoom.shared.chatMembers(widget.chatID, page: chatMembersPage);
+
+          // for(int i = 0; i < 20; i++){
+          //   membersList.add({'name' : 'test'});
+          //   print(membersList.length);
+          // }
+
+        });
+      _refreshController.loadComplete();
+    }
+  }
+
   @override
   initState() {
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
-    if (widget.members != null) {
-      temp = [];
-      widget.members.forEach((memberElement) {
-        myContacts.toList().forEach((element) {
-          if ('${element.phone}' == '${memberElement['phone']}') {
-            print('match ${element.phone}');
-            temp.add(memberElement);
-          }
-        });
-      });
-    }
-
+    ChatRoom.shared.chatMembers(widget.chatID);
     // widget.members.forEach((element){
     // element ==  myContacts;
     // });
@@ -198,6 +217,18 @@ class _ChatPageState extends State<ChatPage> {
             });
           }
           break;
+        case "chat:members":
+          print(e.json);
+          temp = [];
+          e.json['data'].forEach((memberElement) {
+            myContacts.toList().forEach((element) {
+              if ('${element.phone}' == '${memberElement['phone']}') {
+                print('match ${element.phone}');
+                temp.add(memberElement);
+              }
+            });
+          });
+          break;
         case "message:create":
           var message = e.json['data'];
           print("Message created with data $message");
@@ -223,7 +254,12 @@ class _ChatPageState extends State<ChatPage> {
               });
             }
           }
-
+          var senderId = e.json["data"]['user_id'].toString();
+          var userId = user.id.toString();
+          if (senderId != userId &&
+              '${widget.chatID}' != '${e.json['data']['chat_id']}') {
+            inAppPush(e.json["data"]);
+          }
           break;
         case "chat:create":
           ChatRoom.shared.getMessages(widget.chatID);
@@ -437,7 +473,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _openFileExplorer() async {
-    setState(() => _loadingPath = true);
+    setState(() => loadingPath = true);
     try {
       if (_multiPick) {
         _path = null;
@@ -461,8 +497,8 @@ class _ChatPageState extends State<ChatPage> {
     }
     if (!mounted) return;
     setState(() {
-      _loadingPath = false;
-      _fileName = _path != null
+      loadingPath = false;
+      fileName = _path != null
           ? _path.split('/').last
           : _paths != null ? _paths.keys.toString() : '...';
 
@@ -613,6 +649,7 @@ class _ChatPageState extends State<ChatPage> {
                                           MaterialPageRoute(
                                             builder: (context) => TransferPage(
                                               phone: '${widget.phone}',
+                                              transferChat: '${widget.chatID}'
                                             ),
                                           ))
                                       // showBottomModalSheet(context,
@@ -760,62 +797,80 @@ class _ChatPageState extends State<ChatPage> {
               child: Container(
                 // height: 120,
                 // width: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: temp.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, i) {
-                    // print(temp);
-                    // print(temp.length);
-                    return Center(
-                      child: InkWell(
-                        onTap: () {
-                          print(json.decode(json.encode(temp[i])));
-                          print(temp[i]['phone']);
-                     
-                          // myContacts
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TransferPage(
-                                phone: temp[i]['phone'],
+                child: SmartRefresher(
+                  enablePullDown: false,
+                  enablePullUp: true,
+                  // header: WaterDropHeader(),
+                  footer: CustomFooter(
+                    builder: (BuildContext context, LoadStatus mode) {
+                      Widget body;
+                      return Container(
+                        height: 55.0,
+                        child: Center(child: body),
+                      );
+                    },
+                  ),
+                  controller: _memberRefreshController,
+                  onRefresh: _onMemberRefresh,
+                  onLoading: _onMemberLoading,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: temp.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, i) {
+                      // print(temp);
+                      // print(temp.length);
+                      return Center(
+                        child: InkWell(
+                          onTap: () {
+                            print(json.decode(json.encode(temp[i])));
+                            print(temp[i]['phone']);
+
+                            // myContacts
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TransferPage(
+                                  phone: temp[i]['phone'],
+                                  transferChat: '${widget.chatID}'
+                                ),
                               ),
+                            );
+                          },
+                          child: Container(
+                            width: 80,
+                            padding: EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(25.0),
+                                  child: Image.network(
+                                    '$avatarUrl${temp[i]['avatar']}',
+                                    width: 35,
+                                    height: 35,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  child: Text(
+                                    '${temp[i]['user_name']}',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                // Text("${_saved2[index][0]}")
+                              ],
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: 80,
-                          padding: EdgeInsets.all(10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(25.0),
-                                child: Image.network(
-                                  '$avatarUrl${widget.members[i]['avatar']}',
-                                  width: 35,
-                                  height: 35,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                child: Text(
-                                  '${widget.members[i]['name']}',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              // Text("${_saved2[index][0]}")
-                            ],
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -915,6 +970,7 @@ class _ChatPageState extends State<ChatPage> {
                   builder: (context) => ChatProfileInfo(
                     chatType: widget.chatType,
                     chatName: widget.name,
+                    memberCount: widget.memberCount,
                     chatAvatar:
                         widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatId: widget.chatID,
@@ -958,6 +1014,7 @@ class _ChatPageState extends State<ChatPage> {
                     builder: (context) => ChatProfileInfo(
                       chatType: widget.chatType,
                       chatName: widget.name,
+                      memberCount: widget.memberCount,
                       chatAvatar: widget.avatar == null
                           ? 'noAvatar.png'
                           : widget.avatar,
@@ -998,11 +1055,7 @@ class _ChatPageState extends State<ChatPage> {
                     child: Container(
                       child: Container(
                         child: myList.isEmpty
-                            ? Center(
-                                child: Image.asset(
-                                "assets/empty.gif",
-                                height: MediaQuery.of(context).size.width / 2,
-                              ))
+                            ? Center()
                             : Column(
                                 children: [
                                   Expanded(

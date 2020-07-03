@@ -43,7 +43,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                           padding: const EdgeInsets.only(top: 10),
                           child: _paymentsList(
                             context,
-                            "${logos}${snapshot.data["services"][index]['logo']}",
+                            "$logos${snapshot.data["services"][index]['logo']}",
                             "${snapshot.data["services"][index]['title']}",
                             snapshot.data["services"][index]['id'],
                           ),

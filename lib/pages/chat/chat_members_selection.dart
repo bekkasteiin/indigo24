@@ -102,10 +102,6 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
           break;
         case "chat:members:add":
           print('______CHAT MEMBERS ADD______');
-          print('______CHAT MEMBERS ADD______');
-          print('______CHAT MEMBERS ADD______');
-          print('______CHAT MEMBERS ADD______');
-          print('e.json ${e.json}');
           Navigator.pop(context);
           break;
         default:
@@ -213,13 +209,13 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                 color: Color(0xFF001D52),
                 onPressed: () {
                   print(_saved2);
-                  String user_ids = '';
+                  String userIds = '';
                   _saved2.forEach((element) {
-                    user_ids += '${element['user_id']}' + ',';
+                    userIds += '${element['user_id']}' + ',';
                   });
-                  user_ids = user_ids.substring(0, user_ids.length - 1);
-                  print('$user_ids');
-                  ChatRoom.shared.addMembers('${widget.chatId}', '$user_ids');
+                  userIds = userIds.substring(0, userIds.length - 1);
+                  print('$userIds');
+                  ChatRoom.shared.addMembers('${widget.chatId}', '$userIds');
                 })
           ],
           backgroundColor: Colors.white,

@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/widgets/backgrounds.dart';

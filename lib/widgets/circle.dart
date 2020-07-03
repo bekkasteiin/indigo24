@@ -11,6 +11,7 @@ class CircleUIConfig {
       {this.borderColor = const Color(0xFF001D52), this.borderWidth = 1, this.fillColor = const Color(0xFF001D52), this.circleSize = 20});
 }
 
+// ignore: must_be_immutable
 class Circle extends StatelessWidget {
   final bool filled;
   final CircleUIConfig circleUIConfig;

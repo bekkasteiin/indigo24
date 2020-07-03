@@ -64,9 +64,9 @@ class _WalletTabState extends State<WalletTab> {
             passwordEnteredCallback: _onPasscodeEntered,
             cancelButton: cancelButton,
             deleteButton: Text(
-              'Delete',
+              '${localization.delete}',
               style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
-              semanticsLabel: 'Delete',
+              semanticsLabel: '${localization.delete}',
             ),
             shouldTriggerVerification: _verificationNotifier.stream,
             backgroundColor: Color(0xFFF7F7F7),
@@ -103,21 +103,24 @@ class _WalletTabState extends State<WalletTab> {
       },
     );
     }
-    if('${user.pin}'.toString() == 'false'){
+    if('${user.pin}' == 'false'){
       user.pin = 'waiting';
       temp = enteredPasscode;
       print('first set pin $temp');
     } 
 
-    bool isValid = '${user.pin}' == enteredPasscode;
-    _verificationNotifier.add(isValid);
-    if (isValid) {
-      print(' is really valid ');
-      setState(() {
-        this.isAuthenticated = isValid;
-      });
-    }
-    
+      bool isValid = '${user.pin}' == enteredPasscode;
+      if(isValid){
+        Future.delayed(const Duration(milliseconds: 250), () {
+          print(' is really valid ');
+          _verificationNotifier.add(isValid);
+          setState(() {
+            this.isAuthenticated = isValid;
+          });
+        });
+      } else{
+        _verificationNotifier.add(isValid);
+      }
     // if (!isValid){
     // return showDialog<void>(
     //   context: context,
@@ -168,12 +171,12 @@ class _WalletTabState extends State<WalletTab> {
         '${localization.createPin}',
         withPin : withPin,
         opaque: false,
-        cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'))
+        cancelButton: Text('${localization.cancel}', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: '${localization.cancel}'))
     : _showLockScreen(
         context,
         '${localization.enterPin}',
         opaque: false,
-        cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+        cancelButton: Text('${localization.cancel}',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: '${localization.cancel}'));
       });
 
     _symbol = '₸';

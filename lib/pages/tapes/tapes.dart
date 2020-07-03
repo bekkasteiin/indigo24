@@ -123,6 +123,7 @@ class _TapesPageState extends State<TapesPage>
       RefreshController(initialRefresh: false);
 
   @override
+  // ignore: must_call_super
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -224,7 +225,7 @@ class _TapesPageState extends State<TapesPage>
                                               borderRadius:
                                                   BorderRadius.circular(25.0),
                                               child: Image.network(
-                                                '${avatarUrl}${result[index]['avatar']}',
+                                                '$avatarUrl${result[index]['avatar']}',
                                                 width: 35,
                                                 height: 35,
                                               ),

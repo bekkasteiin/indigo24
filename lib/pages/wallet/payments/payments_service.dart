@@ -15,9 +15,9 @@ import 'package:indigo24/widgets/pin_code.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class PaymentsServicePage extends StatefulWidget {
-  String _logo;
-  int serviceID;
-  String title;
+  final String _logo;
+  final int serviceID;
+  final String title;
 
   PaymentsServicePage(this.serviceID, this._logo, this.title);
 

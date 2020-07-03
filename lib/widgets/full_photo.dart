@@ -196,8 +196,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                 if (tempList[i]['type'].toString() == '1') {
                   var a = jsonDecode(tempList[i]['attachments']);
 
-                  var url1 =
-                      '${tempList[i]['attachment_url']}${a[0]['filename']}';
+                  var url1 ='${tempList[i]['attachment_url']}${a[0]['filename']}';
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -217,6 +216,8 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                         // ),
                         ),
                   );
+                } else{
+                  return Center();
                 }
               },
             ))

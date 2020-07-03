@@ -56,6 +56,7 @@ class _TapePageState extends State<TapePage>
   var commentCount;
   int maxLine = 5;
   @override
+  // ignore: must_call_super
   Widget build(BuildContext context) {
     bool keyboardIsOpened = MediaQuery.of(context).viewInsets.bottom != 0.0;
     if(_commentController.text.isEmpty)
@@ -136,7 +137,7 @@ class _TapePageState extends State<TapePage>
                                             children: <Widget>[
                                               CircleAvatar(
                                                 radius: 15.0,
-                                                backgroundImage: NetworkImage('${avatarUrl}${user.avatar}'),
+                                                backgroundImage: NetworkImage('$avatarUrl${user.avatar}'),
                                                 backgroundColor: Colors.red,
                                               ),
                                               
@@ -227,7 +228,7 @@ class _TapePageState extends State<TapePage>
               children: <Widget>[
                 CircleAvatar(
                   radius: 20.0,
-                  backgroundImage: NetworkImage('${avatarUrl}${user.avatar}'),
+                  backgroundImage: NetworkImage('$avatarUrl${user.avatar}'),
                   backgroundColor: Colors.red,
                 ),
                 Expanded(
@@ -331,6 +332,5 @@ class _TapePageState extends State<TapePage>
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }

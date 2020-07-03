@@ -226,7 +226,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
     DateTime selectedDate = DateTime.now();
 
-   Future<Null> _selectDate(BuildContext context) async {
+   Future<Null> selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
@@ -238,7 +238,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       });
   }
 
-  void _onRefresh(){
+  void onRefresh(){
     print("_onRefresh ");
     _refreshController.refreshCompleted();
   }

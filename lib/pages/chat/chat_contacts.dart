@@ -110,11 +110,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             print('____________________');
             print('else if e.jsonDataStatus == true');
             print({e.json['data']['user_id']});
-            print({e.json['data']['user_id']});
-            print({e.json['data']['user_id']});
-            print({e.json['data']['user_id']});
-            print({e.json['data']['user_id']});
-            print({e.json['data']['user_id']});
             print('____________________');
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
@@ -127,7 +122,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
             Navigator.pop(context);
             print('_________________________________');
-            print('chat contacts user ids ${e.json['data']['user_id']}');
             print('chat contacts user ids ${e.json['data']['user_id']}');
             print('_________________________________');
             Navigator.push(

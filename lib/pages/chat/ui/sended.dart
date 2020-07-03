@@ -190,6 +190,10 @@ class SendedMessageWidget extends StatelessWidget {
                   (type=="10")?
                   ReplyMessage(content, replyData)
                   :
+                  type=='11'?
+                  Text('${localization.money} $content')
+                  // MoneyMessage(content)
+                  :
                   (type=="uploading")?
                   Container(
                     width: MediaQuery.of(context).size.width*0.7,

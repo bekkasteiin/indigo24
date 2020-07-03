@@ -27,7 +27,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   var phonePrefix = '77';
   var smsCode = 0;
   List _titles = [];
-  List<DropdownMenuItem<String>> _dropDownMenuItems;
+  List<DropdownMenuItem<String>> dropDownMenuItems;
   String _currentCountry = "Казахстан";
 
   _getCountries() async {
@@ -41,7 +41,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
           _titles.add(_countries[i]['title']);
         }
         country = _countries[countryId];
-        _dropDownMenuItems = getDropDownMenuItems(_titles);
+        dropDownMenuItems = getDropDownMenuItems(_titles);
         _currentCountry = _titles[0];
       });
     });

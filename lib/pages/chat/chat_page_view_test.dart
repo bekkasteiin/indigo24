@@ -294,7 +294,7 @@ class _FileMessageState extends State<FileMessage> {
         onPressed: () async {
           var tempDir = await getTemporaryDirectory();
           String fullPath = tempDir.path + "/boo2.pdf'";
-          print('full path ${fullPath}');
+          print('full path $fullPath');
 
           download2(dio, widget.url, fullPath);
         },

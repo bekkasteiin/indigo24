@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:heic_to_jpg/heic_to_jpg.dart';
+// ignore: implementation_imports
 import 'package:image_picker_flutter/src/image/asset_data_image.dart';
+// ignore: implementation_imports
 import 'package:image_picker_flutter/src/image_picker.dart';
+// ignore: implementation_imports
 import 'package:image_picker_flutter/src/model/asset_data.dart';
+// ignore: implementation_imports
 import 'package:image_picker_flutter/src/page/ui/dialog_loading.dart';
+// ignore: implementation_imports
 import 'package:image_picker_flutter/src/page/ui/image_picker_app_bar.dart';
+// ignore: implementation_imports
 import 'package:image_picker_flutter/src/utils.dart';
 
 import 'drop_header_popup.dart';

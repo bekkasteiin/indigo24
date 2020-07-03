@@ -16,6 +16,7 @@ import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 
 class ChatProfileInfo extends StatefulWidget {
@@ -23,14 +24,20 @@ class ChatProfileInfo extends StatefulWidget {
   final chatAvatar;
   final chatId;
   final chatType;
-
-  ChatProfileInfo(
-      {this.chatType, this.chatId, this.chatName, this.chatAvatar});
+  final memberCount;
+  ChatProfileInfo({
+    this.chatType, 
+    this.chatId, 
+    this.chatName, 
+    this.chatAvatar,
+    this.memberCount,
+  });
   @override
   _ChatProfileInfoState createState() => _ChatProfileInfoState();
 }
 
 class _ChatProfileInfoState extends State<ChatProfileInfo> {
+
   List membersList = [];
   String _chatTitle;
 
@@ -39,7 +46,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   void initState() {
     _chatTitle = '${widget.chatName}';
     listen();
-    ChatRoom.shared.chatMembers(widget.chatId);
+    ChatRoom.shared.chatMembers(widget.chatId, page: chatMembersPage);
     chatTitleController.text = '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}';
     super.initState();
     memberCount = 0;
@@ -62,13 +69,17 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         case "chat:members":
           setState(() {
             memberCount = 0;
-            membersList = message;
+            if(chatMembersPage.toString() == '1') {
+              membersList = message;
+            } else{
+              membersList.addAll(message);
+            }
             if(membersList.isNotEmpty){
               membersList.forEach((member){
-                if(member['user_id'].toString() == '${user.id}'){
+                if(member['user_id'].toString() == '${user.id}') {
                   myPrivilege = member['role'].toString();
                 }
-                if(member['online'] == 'online'){
+                if(member['online'] == 'online') {
                   memberCount++;
                 }
               });
@@ -87,16 +98,39 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           MaterialPageRoute(builder: (context) => Tabs()),(r) => false);
           break;
         default:
-          print(message);
-          print('no');
-          print(cmd);
-          print('no');
-          print('no');
-          print('no');
-          print('no');
-          print('no');
+          print('Default of chat info $message');
       }
     });
+  }
+
+
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    print("_onRefresh");
+    _refreshController.refreshCompleted();
+  }
+
+  int chatMembersPage = 1;
+
+  void _onLoading() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    if(membersList.length % 20 == 0){
+      chatMembersPage++;
+      if (mounted)
+        setState(() {
+          print("_onLoading chat members with page $chatMembersPage");
+          ChatRoom.shared.chatMembers(widget.chatId, page: chatMembersPage);
+
+          // for(int i = 0; i < 20; i++){
+          //   membersList.add({'name' : 'test'});
+          //   print(membersList.length);
+          // }
+
+        });
+      _refreshController.loadComplete();
+    }
   }
 
   Future getImage(ImageSource imageSource) async {
@@ -134,7 +168,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  var another_user_object;
+  var anotherUserObject;
 
   Widget _buildProfileImage() {
     return InkWell(
@@ -257,7 +291,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           });
         },
       ),
-      member['role'] == '2' ? CupertinoActionSheetAction(
+      member['role'] == '$memberRole' ? CupertinoActionSheetAction(
         isDestructiveAction: true,
         child: Text('${localization.delete}'),
         onPressed: () {
@@ -314,7 +348,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   final act = CupertinoActionSheet(
     title: Text('${localization.selectOption}'),
     actions: <Widget>[
-      myPrivilege == '0' ? CupertinoActionSheetAction(
+      myPrivilege == '$ownerRole' ? CupertinoActionSheetAction(
         child: Text('${localization.addToGroup}'),
         onPressed: () {
           Navigator.pop(context);
@@ -394,16 +428,17 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         },
       ),
       CupertinoActionSheetAction(
-        child: member['role'] == '2' ? Text('${localization.makeAdmin}') : member['role'] ==  '1' ? Text('${localization.makeMember}') : Text(''),
+        child: member['role'] == '$memberRole' ? Text('${localization.makeAdmin}') : member['role'] ==  '$adminRole' ? Text('${localization.makeMember}') : Text('${localization.error}'),
         onPressed: () {
-           switch (member['role']) {
-            case '2':
+          print('${member['role']} $memberRole $adminRole $ownerRole');
+           switch (member['role'].toString()) {
+            case '$memberRole':
               print('toAdmin');
-              ChatRoom.shared.changePrivileges(chatId, member['user_id'], 1);
+              ChatRoom.shared.changePrivileges(chatId, member['user_id'], '$adminRole');
               break;
-            case '1':
+            case '$adminRole':
               print('toMember');
-              ChatRoom.shared.changePrivileges(chatId, member['user_id'], 2);
+              ChatRoom.shared.changePrivileges(chatId, member['user_id'], '$memberRole');
               break;
              default:
            }
@@ -475,7 +510,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         Flexible(
                           child: InkWell(
                             onTap: () {
-                             if(myPrivilege.toString() == '0' && widget.chatType != 0){
+                             if(myPrivilege.toString() == '$ownerRole' && widget.chatType != 0){
                                print('$myPrivilege my privilege, ${widget.chatType} chat type');
                                 setState(() {
                                   isEditing = !isEditing;
@@ -514,7 +549,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                           onPressed: () {
                             widget.chatType == 1 
                             ? addMembers(widget.chatId) 
-                            : print('Change this action to private functions'); // TODO
+                            : print('Change this action to private functions');
                             // ChatRoom.shared.addMembers(widget.chatId, )
                           },
                         ),
@@ -533,7 +568,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.only(left: 20),
                       child: Text(
-                        '${localization.members} ${membersList.length}',
+                        '${localization.members} ${widget.memberCount}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -562,76 +597,93 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         Flexible(
                             child: ScrollConfiguration(
                               behavior: MyBehavior(),
-                              child: ListView.builder(
-                                itemCount: membersList.length,
-                                itemBuilder: (context, i) {
-                                  // print(membersList[i]);
-                                  return ListTile(
-                                    onTap: () {
-                                      if(membersList[i]['user_id'].toString() == '${user.id}'){
-                                        print(membersList[i]['user_id'].toString() == '${user.id}');
-                                        // memberAction(membersList[i]);
-                                      } else{
-                                        switch (myPrivilege) {
-                                          case '0':
-                                              print('ownerAction');
-                                              action(widget.chatId, membersList[i]);
-                                            break;
-                                          case '1':
-                                              print('adminAction');
-                                              adminAction(widget.chatId, membersList[i]);
-                                            break;
-                                          case '2':
-                                              print('memberAction');
-                                              memberAction(membersList[i]);
-                                            break;
-                                          default:
+                              child: SmartRefresher(
+                                enablePullDown: false,
+                                enablePullUp: true,
+                                // header: WaterDropHeader(),
+                                footer: CustomFooter(
+                                  builder: (BuildContext context, LoadStatus mode) {
+                                    Widget body;
+                                    return Container(
+                                      height: 55.0,
+                                      child: Center(child: body),
+                                    );
+                                  },
+                                ),
+                                controller: _refreshController,
+                                onRefresh: _onRefresh,
+                                onLoading: _onLoading,
+                                child: ListView.builder(
+                                  itemCount: membersList.length,
+                                  itemBuilder: (context, i) {
+                                    // print(membersList[i]);
+                                    return ListTile(
+                                      onTap: () {
+                                        if(membersList[i]['user_id'].toString() == '${user.id}'){
+                                          print(membersList[i]['user_id'].toString() == '${user.id}');
+                                          // memberAction(membersList[i]);
+                                        } else{
+                                          switch (myPrivilege.toString()) {
+                                            case '$ownerRole':
+                                                print('ownerAction');
+                                                action(widget.chatId, membersList[i]);
+                                              break;
+                                            case '$adminRole':
+                                                print('adminAction');
+                                                adminAction(widget.chatId, membersList[i]);
+                                              break;
+                                            case '$memberRole':
+                                                print('memberAction');
+                                                memberAction(membersList[i]);
+                                              break;
+                                            default:
+                                          }
                                         }
-                                      }
-                                      // ChatRoom.shared.checkUserOnline(ids);
-                                      // ChatRoom.shared
-                                      //     .getMessages(membersList[i]['id']);
-                                    },
-                                    leading: Container(
-                                      height: 42,
-                                      width: 42,
-                                      child: Stack(
-                                        children: <Widget>[
-                                          CircleAvatar(
-                                              backgroundImage: (membersList[i]["avatar"] == null ||
-                                                      membersList[i]["avatar"] == '' ||
-                                                      membersList[i]["avatar"] == false)
-                                                  ? CachedNetworkImageProvider(
-                                                      "${avatarUrl}noAvatar.png")
-                                                  : 
-                                                  CachedNetworkImageProvider(
-                                                      '${avatarUrl}${membersList[i]["avatar"]}'),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.bottomRight,
-                                            child: Container(
-                                              padding: EdgeInsets.all(2),
-                                              decoration:  BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  color: membersList[i]['online'] == 'online' ? Colors.white: Colors.transparent
-                                                ),
+                                        // ChatRoom.shared.checkUserOnline(ids);
+                                        // ChatRoom.shared
+                                        //     .getMessages(membersList[i]['id']);
+                                      },
+                                      leading: Container(
+                                        height: 42,
+                                        width: 42,
+                                        child: Stack(
+                                          children: <Widget>[
+                                            CircleAvatar(
+                                                backgroundImage: (membersList[i]["avatar"] == null ||
+                                                        membersList[i]["avatar"] == '' ||
+                                                        membersList[i]["avatar"] == false)
+                                                    ? CachedNetworkImageProvider(
+                                                        "${avatarUrl}noAvatar.png")
+                                                    : 
+                                                    CachedNetworkImageProvider(
+                                                        '$avatarUrl${membersList[i]["avatar"]}'),
+                                            ),
+                                            Align(
+                                              alignment: Alignment.bottomRight,
                                               child: Container(
+                                                padding: EdgeInsets.all(2),
                                                 decoration:  BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  color: membersList[i]['online'] == 'online' ? Color(0xFF00cc00) : Colors.transparent
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    color: membersList[i]['online'] == 'online' ? Colors.white: Colors.transparent
+                                                  ),
+                                                child: Container(
+                                                  decoration:  BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    color: membersList[i]['online'] == 'online' ? Color(0xFF00cc00) : Colors.transparent
+                                                  ),
+                                                  height: 15, 
+                                                  width: 15, 
                                                 ),
-                                                height: 15, 
-                                                width: 15, 
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    title: Text("${membersList[i]["user_name"]}"),
-                                    subtitle: memberName(membersList[i])
-                                  );
-                                },
+                                      title: Text("${membersList[i]["user_name"]}"),
+                                      subtitle: memberName(membersList[i])
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           )
@@ -653,17 +705,17 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
 
   Text memberName(member) {
     switch ('${member["role"]}') {
-      case '0':
+      case '100':
         return Text('${localization.creator}');
         break;
-      case '1':
+      case '50':
         return Text('${localization.admin}');
         break;
       case '2':
         return Text('${localization.member}');
         break;
       default:
-        return Text('hi');
+        return Text('');
     }
   } 
 }

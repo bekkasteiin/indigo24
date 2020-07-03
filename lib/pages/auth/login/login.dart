@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
     _getCountries();
   }
 
-  Future<void> _showError(BuildContext context, m) {
+  Future<void> showError(BuildContext context, m) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -332,17 +332,11 @@ class _LoginPageState extends State<LoginPage> {
                             FirebaseMessaging _firebaseMessaging =
                                 FirebaseMessaging();
                             String token = await _firebaseMessaging.getToken();
-                            await api
-                                .signIn("$phonePrefix${loginController.text}",
-                                    passwordController.text, token)
-                                .then((response) async {
+                            await api.signIn("$phonePrefix${loginController.text}",passwordController.text, token).then((response) async {
                               singInResult = response;
                               if ('${response['success']}' == 'true') {
                                 await api.getBalance();
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => Tabs()),
-                                    (r) => false);
+                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs()),(r) => false);
                               } else {
                                 setState(() {
                                   passwordError = singInResult["message"];

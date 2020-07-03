@@ -28,12 +28,10 @@ int chatsPage = 1;
 
 
 bool globalBoolForForGetChat = false;
-class _ChatsListPageState extends State<ChatsListPage>
-    with AutomaticKeepAliveClientMixin {
+class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveClientMixin {
   bool isOffline = false;
 
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   void _onRefresh() async {
     // monitor network fetch
@@ -63,7 +61,6 @@ class _ChatsListPageState extends State<ChatsListPage>
         });
       _refreshController.loadComplete();
     }
-
   }
 
   @override
@@ -86,7 +83,7 @@ class _ChatsListPageState extends State<ChatsListPage>
       MaterialPageRoute(
           builder: (context) => ChatPage(
                 name, chatID,
-                phone: phone, // TODO CHECK IT ADIL
+                phone: phone,
                 members: members,
                 chatType: chatType,
                 memberCount: memberCount, userIds: userIds,
@@ -106,6 +103,7 @@ class _ChatsListPageState extends State<ChatsListPage>
   }
 
   @override
+  // ignore: must_call_super
   Widget build(BuildContext context) {
     String string = '${localization.chats}';
     return Scaffold(
@@ -132,16 +130,13 @@ class _ChatsListPageState extends State<ChatsListPage>
             iconSize: 30,
             color: Color(0xFF001D52),
             onPressed: () {
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChatContactsPage()))
-                  .whenComplete(() {
-                ChatRoom.shared.contactController.close();
-                // this is bool for check load more is needed or not
-                globalBoolForForGetChat = false;
-                ChatRoom.shared.forceGetChat();
-                ChatRoom.shared.closeContactsStream();
+              Navigator.push(context,MaterialPageRoute(builder: (context) => ChatContactsPage()))
+                .whenComplete(() {
+                  ChatRoom.shared.contactController.close();
+                  // this is bool for check load more is needed or not
+                  globalBoolForForGetChat = false;
+                  ChatRoom.shared.forceGetChat();
+                  ChatRoom.shared.closeContactsStream();
               });
             },
           )
@@ -207,20 +202,20 @@ class _ChatsListPageState extends State<ChatsListPage>
         // ? dbChats.isNotEmpty
         //     ? localChatBuilder(dbChats)
         ? InkWell(
-            onTap: () {
-              print("чат");
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChatContactsPage()))
-                  .whenComplete(() {
-                ChatRoom.shared.contactController.close();
-                // this is bool for check load more is needed or not
-                globalBoolForForGetChat = false;
-                ChatRoom.shared.forceGetChat();
-                ChatRoom.shared.closeContactsStream();
-              });
-            },
+            // onTap: () {
+            //   print("чат");
+            //   Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (context) => ChatContactsPage()))
+            //       .whenComplete(() {
+            //     ChatRoom.shared.contactController.close();
+            //     // this is bool for check load more is needed or not
+            //     globalBoolForForGetChat = false;
+            //     ChatRoom.shared.forceGetChat();
+            //     ChatRoom.shared.closeContactsStream();
+            //   });
+            // },
             child: Container(
               color: Colors.white,
               child: Center(
@@ -229,11 +224,11 @@ class _ChatsListPageState extends State<ChatsListPage>
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: <Widget>[
                     Image.asset("assets/chat_animation.gif"),
-                    Container(
-                        child: Text(
-                      "${localization.tapToStartChat}",
-                      style: TextStyle(fontSize: 20),
-                    ))
+                    // Container(
+                    //     child: Text(
+                    //   "${localization.tapToStartChat}",
+                    //   style: TextStyle(fontSize: 20),
+                    // ))
                   ],
                 ),
               ),
@@ -259,7 +254,6 @@ class _ChatsListPageState extends State<ChatsListPage>
             child: ListView.builder(
               itemCount: myList.length,
               itemBuilder: (context, i) {
-                // print(myList[i]);
                 return Column(
                   children: <Widget>[
                     ListTile(
@@ -268,15 +262,12 @@ class _ChatsListPageState extends State<ChatsListPage>
                         print('get message');
                         ChatRoom.shared.getMessages(myList[i]['id']);
                         goToChat(myList[i]['name'], myList[i]['id'],
-                            phone: myList[i]
-                                ['another_user_phone'], //@TODO ADIL CHECK DIS
+                            phone: myList[i]['another_user_phone'], //@TODO CHECK DIS
                             members: myList[i]['members'],
                             memberCount: myList[i]['members_count'],
                             chatType: myList[i]['type'],
                             userIds: myList[i]['another_user_id'],
-                            avatar: myList[i]['avatar']
-                                .toString()
-                                .replaceAll("AxB", "200x200"),
+                            avatar: myList[i]['avatar'].toString().replaceAll("AxB", "200x200"),
                             avatarUrl: myList[i]['avatar_url']);
                       },
                       leading: ClipRRect(
@@ -285,40 +276,31 @@ class _ChatsListPageState extends State<ChatsListPage>
                           height: 50,
                           width: 50,
                           child: ClipOval(
-                              child: CachedNetworkImage(
-                            imageUrl: (myList[i]["avatar"] == null ||
-                                    myList[i]["avatar"] == '' ||
-                                    myList[i]["avatar"] == false)
-                                ? "${avatarUrl}noAvatar.png"
-                                : '${avatarUrl}${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
-                            placeholder: (context, url) =>
-                                const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) =>
-                                CachedNetworkImage(
-                              imageUrl:
-                                  "${avatarUrl}noAvatar.png",
+                            child: CachedNetworkImage(
+                              imageUrl: (myList[i]["avatar"] == null || myList[i]["avatar"] == '' || myList[i]["avatar"] == false)
+                                  ? "${avatarUrl}noAvatar.png"
+                                  : '$avatarUrl${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
+                              placeholder: (context, url) => CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "${avatarUrl}noAvatar.png"),
                             ),
-                          )),
+                          ),
                         ),
                       ),
                       title: Text(
                         myList[i]["name"].length != 0
-                            ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
-                            : "",
-                            maxLines: 1,
+                          ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
+                          : "",
+                          maxLines: 1,
                         style: TextStyle(
-                            color: Color(0xFF001D52),
-                            fontWeight: FontWeight.w400),
+                          color: Color(0xFF001D52),
+                          fontWeight: FontWeight.w400),
                       ),
                       subtitle: Text(
                         myList[i]["last_message"].length != 0
                             ? myList[i]["last_message"]['text'].length != 0
                                 ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"
-                                : myList[i]["last_message"]
-                                            ['message_for_type'] !=
-                                        null
-                                    ? myList[i]["last_message"]
-                                        ['message_for_type']
+                                : myList[i]["last_message"]['message_for_type'] != null
+                                    ? myList[i]["last_message"]['message_for_type']
                                     : ""
                             : "",
                         overflow: TextOverflow.ellipsis,
@@ -342,20 +324,16 @@ class _ChatsListPageState extends State<ChatsListPage>
                               // myList[i]['unread_messages'].toString().startsWith('-')?
                               // Container()
                               : Container(
-                                  // width: 20,
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFFA9C7D2),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Text(
-                                      " ${myList[i]['unread_messages']} ",
-                                      style: TextStyle(color: Colors.white)))
+                                  decoration: BoxDecoration(color: Color(0xFFA9C7D2),borderRadius: BorderRadius.circular(10)),
+                                  child: Text(" ${myList[i]['unread_messages']} ",style: TextStyle(color: Colors.white)),
+                                )
                         ],
                       ),
                     ),
                     Container(
-                        margin: EdgeInsets.only(left: 80, right: 20),
-                        height: 1,
-                        color: Colors.grey.shade300)
+                      margin: EdgeInsets.only(left: 80, right: 20),
+                      height: 1,
+                      color: Colors.grey.shade300)
                   ],
                 );
               },

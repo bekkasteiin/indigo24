@@ -33,7 +33,7 @@ class _AddTapePageState extends State<AddTapePage> {
   TextEditingController descriptionController = new TextEditingController();
   var api = Api();
   final picker = ImagePicker();
-  PickedFile _myFile;
+  PickedFile myFile;
   bool isNotPicked = true;
   
   Future<void> _playVideo(File file) async {
@@ -464,7 +464,7 @@ class _AddTapePageState extends State<AddTapePage> {
     );
   }
 
-  void _settingModalBottomSheet(context){
+  void settingModalBottomSheet(context){
     showModalBottomSheet(
       context: context,
       builder: (BuildContext bc){

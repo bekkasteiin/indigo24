@@ -1,16 +1,19 @@
-String domen = 'com';
-// String domen = 'xyz';
+// const String domen = 'com';
+const String domen = 'xyz';
 
-String avatarUrl = 'https://media.indigo24.com/avatars/';
+// const String avatarUrl = 'https://media.indigo24.com/avatars/'; // PROD
+const String avatarUrl = 'https://indigo24.xyz/uploads/avatars/'; // DEV
 
-String uploadTapes = 'https://indigo24.$domen/uploads/tapes/';
+const String uploadTapes = 'https://indigo24.$domen/uploads/tapes/';
 
-String socket = 'wss://chat2.indigo24.com:443';
-// String socket = 'wss://chat.indigo24.$domen:9502';
+const String socket = 'wss://chat.indigo24.$domen:9502';
 
- 
-String baseUrl = 'https://api.indigo24.$domen/api/v2.1';
+const String baseUrl = 'https://api.indigo24.$domen/api/v2.1';
 
-String mediaChat = 'https://media.chat.indigo24.$domen/upload';
+const String mediaChat = 'https://media.chat.indigo24.$domen/upload';
 
-String logos = 'https://api.indigo24.$domen/logos/';
+const String logos = 'https://api.indigo24.$domen/logos/';
+
+const String ownerRole = '100';
+const String adminRole = '50';
+const String memberRole = '2';

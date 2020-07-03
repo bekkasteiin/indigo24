@@ -29,7 +29,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   PlayerMode mode;
 
   AudioPlayer _audioPlayer;
-  AudioPlayerState _audioPlayerState;
+  AudioPlayerState audioPlayerState;
   Duration _duration;
   Duration _position;
 
@@ -42,12 +42,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   StreamSubscription _playerStateSubscription;
 
   get _isPlaying => _playerState == PlayerState.playing;
-  get _isPaused => _playerState == PlayerState.paused;
+  get isPaused => _playerState == PlayerState.paused;
   get _durationText => _duration?.toString()?.split('.')?.first ?? '';
   get _positionText => _position?.toString()?.split('.')?.first ?? '';
 
-  get _isPlayingThroughEarpiece =>
-      _playingRouteState == PlayingRouteState.earpiece;
+  get isPlayingThroughEarpiece => _playingRouteState == PlayingRouteState.earpiece;
 
   _PlayerWidgetState(this.url, this.mode);
 
@@ -137,9 +136,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       children: [
                         Slider(
                           onChanged: (v) {
+                            // ignore: non_constant_identifier_names
                             final Position = v * _duration.inMilliseconds;
-                            _audioPlayer
-                                .seek(Duration(milliseconds: Position.round()));
+                            _audioPlayer.seek(Duration(milliseconds: Position.round()));
                           },
                           value: (_position != null &&
                                   _duration != null &&
@@ -175,7 +174,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _durationSubscription = _audioPlayer.onDurationChanged.listen((duration) {
       setState(() => _duration = duration);
 
-      // TODO implemented for iOS, waiting for android impl
       if (Theme.of(context).platform == TargetPlatform.iOS) {
         // (Optional) listen for notification updates in the background
         _audioPlayer.startHeadlessService();
@@ -218,13 +216,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _audioPlayer.onPlayerStateChanged.listen((state) {
       if (!mounted) return;
       setState(() {
-        _audioPlayerState = state;
+        audioPlayerState = state;
       });
     });
 
     _audioPlayer.onNotificationPlayerStateChanged.listen((state) {
       if (!mounted) return;
-      setState(() => _audioPlayerState = state);
+      setState(() => audioPlayerState = state);
     });
 
     _playingRouteState = PlayingRouteState.speakers;
@@ -281,7 +279,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return result;
   }
 
-  Future<int> _earpieceOrSpeakersToggle() async {
+  Future<int> earpieceOrSpeakersToggle() async {
     final result = await _audioPlayer.earpieceOrSpeakersToggle();
     if (result == 1)
       setState(() => _playingRouteState =
@@ -291,7 +289,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return result;
   }
 
-  Future<int> _stop() async {
+  Future<int> stop() async {
     final result = await _audioPlayer.stop();
     if (result == 1) {
       setState(() {

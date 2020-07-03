@@ -150,7 +150,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
               //   child: Text('Перейти в чат с ${widget.member['user_name']}'),
               //   onPressed: () {
               //     // Navigator.pop(context);
-              //     // TODO check user online
               //     // Navigator.push(context,MaterialPageRoute(builder: (context) => ChatPage(name, chatID, userIds: widget.member['user_id'], avatar: widget.member['avatar'], avatarUrl: widget.member['avatar_url'],)));
               //   },
               // ),
@@ -206,7 +205,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     );
   }
 
-  Widget _buildEmailSection(Size screenSize) {
+  Widget buildEmailSection(Size screenSize) {
     return Container(
       width: screenSize.width / 1.3,
       child: Column(

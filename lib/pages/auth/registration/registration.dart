@@ -30,9 +30,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String _currentCountry = "Казахстан";
   String loginError = "";
 
-  var _mask;
+  var mask;
   var loginFormatter;
-  String _prefix = '';
+  String prefix = '';
   List _response = [];
   String _hintText = '';
   var length;
@@ -52,7 +52,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _currentCountry = _titles[0];
         loginFormatter = MaskTextInputFormatter(
             mask: '${_countries[0]['mask']}', filter: {"*": RegExp(r'[0-9]')});
-        _prefix = _countries[0]['prefix'];
+        prefix = _countries[0]['prefix'];
         _hintText = _countries[0]['mask'];
         length = _countries[0]['length'];
       });
@@ -82,7 +82,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  Future<void> _showError(BuildContext context, m) {
+  Future<void> showError(BuildContext context, m) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -146,7 +146,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _currentCountry = _selectedCountry['title'];
         phonePrefix = _selectedCountry['prefix'];
         _hintText = _selectedCountry['mask'];
-        _prefix = _selectedCountry['prefix'];
+        prefix = _selectedCountry['prefix'];
         _hintText = _selectedCountry['mask'];
         loginFormatter = MaskTextInputFormatter(
             mask: '${_selectedCountry['mask']}',

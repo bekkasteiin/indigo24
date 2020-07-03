@@ -12,6 +12,7 @@ typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();
 typedef CancelCallback = void Function();
 
+// ignore: must_be_immutable
 class PasscodeScreen extends StatefulWidget {
   String title;
   final int passwordDigits;
@@ -72,7 +73,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                 )
       ..addStatusListener((status) {
         passCodeError = widget.withPin == null ? '${localization.passcodeError}' : '';
-        widget.withPin == null ? Vibration.vibrate() : '';
+        widget.withPin == null ?? Vibration.vibrate();
         if (status == AnimationStatus.completed) {
           setState(() {
             enteredPasscode = '';

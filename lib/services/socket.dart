@@ -223,25 +223,26 @@ class ChatRoom {
     }
   }
 
-  chatMembers(chatId) {
+  chatMembers(chatId, {page}) {
     var data = json.encode({
       "cmd": "chat:members",
       "data": {
         "userToken": "${user.unique}",
         "chat_id": chatId,
         "user_id": '${user.id}',
+        'page' : '$page' != 'null' ? '$page' : '1',
       }
     });
-    print('checked members');
+    print('chat members');
     channel.sink.add(data);
   }
 
-  deleteChatMember(chatId, member_id) {
+  deleteChatMember(chatId, memberId) {
     var data = json.encode({
       "cmd": "chat:members:delete",
       "data": {
         "userToken": "${user.unique}",
-        "member_id": "$member_id",
+        "member_id": "$memberId",
         "chat_id": '$chatId',
         "user_id": '${user.id}',
       }
@@ -405,6 +406,23 @@ class ChatRoom {
     }
   }
 
+
+
+  
+  sendMoney(token, chatId){
+    var data = json.encode({
+      "cmd": "message:create",
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "payment_chat_token": '$token',
+        "chat_id": '$chatId',
+        "message_type": '11',
+      }
+    });
+    print('send money to chat created $data');
+    channel.sink.add(data);
+  }
   replyMessage(message, chatID, type, mId) {
     outSound();
 
@@ -453,7 +471,9 @@ class ChatRoom {
             changeController.add(new MyEvent(json));
             break;
           case "chat:get":
+            if (!cabinetController.isClosed) {
             cabinetController.add(new MyCabinetEvent(json));
+            }
             break;
           case "message:create":
             // this is bool for check load more is needed or not
@@ -501,7 +521,12 @@ class ChatRoom {
             break;
           case "chat:members":
             print('added to chatInfoController');
-            chatInfoController.add(new MyChatInfoEvent(json));
+            if(chatInfoController != null){
+              chatInfoController.add(new MyChatInfoEvent(json));
+            } 
+            if(cabinetController != null){
+              cabinetController.add(new MyCabinetEvent(json));
+            }
             break;
           case "chat:members:privileges":
             print('added to chatInfoController');
@@ -533,11 +558,10 @@ class ChatRoom {
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        connect();
+        Future.delayed(const Duration(milliseconds: 15000), () {
+          connect();
           init();
-        // Future.delayed(const Duration(milliseconds: 15000), () {
-          
-        // });
+        });
       },
     );
   }

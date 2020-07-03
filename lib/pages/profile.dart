@@ -89,7 +89,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
   
   Response response;
-  ProgressBar _sendingMsgProgressBar;
+  ProgressBar sendingMsgProgressBar;
   BaseOptions options = new BaseOptions(
     baseUrl: "$baseUrl",
     connectTimeout: 5000,
@@ -102,7 +102,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   bool isUploading = false;
 
   uploadAvatar(_path) async {
-    _sendingMsgProgressBar = ProgressBar();
+    sendingMsgProgressBar = ProgressBar();
     dio = new Dio(options);
 
     try {

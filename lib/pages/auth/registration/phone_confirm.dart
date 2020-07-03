@@ -35,7 +35,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  Future<void> _showError(BuildContext context, m) {
+  Future<void> showError(BuildContext context, m) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {

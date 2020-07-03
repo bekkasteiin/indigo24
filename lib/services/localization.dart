@@ -54,7 +54,7 @@ String sound = 'Sound';
 String passcodeError = 'Incorrect pin code';
 String success = 'Success';
 String processing = 'Processing';
-String _new = 'New';
+String wordNew = 'New';
 String language = 'Language';
 String settings = 'Settings';
 String enterPhone = 'Enter phone';
@@ -67,7 +67,7 @@ String wasOnline = 'Last seen';
 String video = 'Video';
 String selectOption = 'Select option';
 String gallery = 'Gallery';
-String sureLogout = 'Уверены, что хотите выйти?';
+String sureLogout = 'Are you sure want to logout';
 String uploaded = 'Uploaded';
 String somethingWentWrong = 'Somethin went wrong';
 String save = 'Save';
@@ -116,7 +116,7 @@ String keyFromSms = 'SMS code';
 String country = 'Country';
 String status = 'Status';
 String selectFile = 'Select file';
-
+String userNotFound = 'User not found';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russian", "code": "ru"},

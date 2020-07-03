@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/socket.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
@@ -18,8 +19,8 @@ import 'package:indigo24/widgets/pin_code.dart';
 
 class TransferPage extends StatefulWidget {
   final phone;
-
-  const TransferPage({this.phone});
+  final transferChat;
+  const TransferPage({this.phone, this.transferChat});
   @override
   _TransferPageState createState() => _TransferPageState();
 }
@@ -201,11 +202,12 @@ class _TransferPageState extends State<TransferPage> {
               return result;
             } else {
               if (result["success"].toString() == 'true') {
-                api.doTransfer(result["toID"], sumController.text).then((res) {
+                api.doTransfer(result["toID"], sumController.text, transferChat: widget.transferChat).then((res) {
                   if(res['success'].toString() == 'false') 
                     showAlertDialog(context, '0', res['message']); 
                   else{
                     showAlertDialog(context, '1', res['message']);
+                    ChatRoom.shared.sendMoney(res['transfer_money_chat_token'], widget.transferChat);
                     api.getBalance().then((result){
                       setState(() {
                       });
@@ -306,7 +308,8 @@ class _TransferPageState extends State<TransferPage> {
       ),
     );
   }
-
+  String toName = '';
+  String toAvatar = '';
   Container mainPaymentsDetailMobile() {
     return Container(
       height: 170,
@@ -321,7 +324,8 @@ class _TransferPageState extends State<TransferPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
-                      child: TextFormField(
+                      child: TextField(
+                       
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(25),
@@ -331,105 +335,131 @@ class _TransferPageState extends State<TransferPage> {
                         ),
                         controller: receiverController,
                         style: TextStyle(fontSize: 20),
+                        onChanged: (value) {
+                          if(receiverController.text.length > 10){
+                            api.checkPhoneForSendMoney('$value').then((r) {
+                              print(r);
+                              if(r['success'].toString() == 'true'){
+                                setState(() {
+                                  toName = r['name'];
+                                  toAvatar = r['avatar'];
+                                });
+                              } else{
+                                setState(() {
+                                  toName = '${localization.userNotFound}';
+                                  toAvatar = '';
+                                });
+                              }
+                            });
+                          }
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
-              InkWell(
-                child: CircleAvatar(
-                  radius: 20,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl:
-                          "${avatarUrl}noAvatar.png",
-                    ),
-                  ),
-                ),
-                onTap: () {
-      showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SafeArea(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: 40.0,
-                maxHeight: MediaQuery.of(context).size.height,
-              ),
-              child: Container(
-                // height: 120,
-                // width: 100,
-                child: ListView.builder(
-                  itemCount: myContacts.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, i) {
-                    // print(temp);
-                    // print(temp.length);
-                    return Center(
-                      child: InkWell(
-                        onTap: () {
-                          // myContacts
-                          Navigator.pop(context);
-                          setState(() {
-                            receiverController.text = myContacts[i].phone;
-                          });
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => TransferPage(
-                          //       phone: myContacts[i].phone,
-                          //     ),
-                          //   ),
-                          // );
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-                          child: Row(
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(25.0),
-                                child: Image.network(
-                                  '$avatarUrl${myContacts[i].avatar}',
-                                  width: 35,
-                                  height: 35,
-                                ),
-                              ),
-                              SizedBox(width: 20,),
-                              Flexible(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text(
-                                        '${myContacts[i].name}',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                    Container(
-                                      child: Text(
-                                        '${myContacts[i].phone}',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  InkWell(
+                    child: CircleAvatar(
+                      radius: 20,
+                      child: ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: 
+                          toAvatar == '' 
+                          ? "${avatarUrl}noAvatar.png"
+                          : '$avatarUrl$toAvatar'
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          );
-        });
-                  print('transfer avatar is pressed');
-                },
+                    ),
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return SafeArea(
+                            child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minHeight: 40.0,
+                                    maxHeight: MediaQuery.of(context).size.height,
+                                  ),
+                                  child: Container(
+                                    // height: 120,
+                                    // width: 100,
+                                    child: ListView.builder(
+                                      itemCount: myContacts.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, i) {
+                                        // print(temp);
+                                        // print(temp.length);
+                                        return Center(
+                                          child: InkWell(
+                                            onTap: () {
+                                              // myContacts
+                                              Navigator.pop(context);
+                                              setState(() {
+                                                receiverController.text = myContacts[i].phone;
+                                              });
+                                              // Navigator.push(
+                                              //   context,
+                                              //   MaterialPageRoute(
+                                              //     builder: (context) => TransferPage(
+                                              //       phone: myContacts[i].phone,
+                                              //     ),
+                                              //   ),
+                                              // );
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                                              child: Row(
+                                                children: <Widget>[
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.circular(25.0),
+                                                    child: Image.network(
+                                                      '$avatarUrl${myContacts[i].avatar}',
+                                                      width: 35,
+                                                      height: 35,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 20,),
+                                                  Flexible(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: <Widget>[
+                                                        Container(
+                                                          child: Text(
+                                                            '${myContacts[i].name}',
+                                                            overflow: TextOverflow.ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          child: Text(
+                                                            '${myContacts[i].phone}',
+                                                            overflow: TextOverflow.ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                            ),
+                          );
+                        });
+                      print('transfer avatar is pressed');
+                    },
+                  ),
+                  Text('$toName')
+                ],
               ),
             ],
           ),
