@@ -240,16 +240,17 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     membersList.length > index 
                     ? tempAvatar = '$avatarUrl${membersList[index]["avatar"]}'
                     : tempAvatar = '';
-                    return AspectRatio(
-                      aspectRatio: 450 / 450,
+                    return  Center(
+                      child: AspectRatio(
+                        aspectRatio: 1,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             image: DecorationImage(
-                            fit: BoxFit.fitWidth,
-                            alignment: FractionalOffset.topCenter,
-                            image: NetworkImage('$tempAvatar'),
-                          )
+                              fit: BoxFit.fitHeight,
+                              alignment: FractionalOffset.topCenter,
+                              image: NetworkImage('$tempAvatar'),
+                            )
+                          ),
                         ),
                       ),
                     );
@@ -545,7 +546,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         ),
                         IconButton(
                           icon: Icon(Icons.more_vert),
-                          color: widget.chatType != 0 ? Colors.white : Colors.transparent,
+                          color: widget.chatType == 1 ? Colors.white : Colors.transparent,
                           onPressed: () {
                             widget.chatType == 1 
                             ? addMembers(widget.chatId) 
@@ -616,7 +617,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                 child: ListView.builder(
                                   itemCount: membersList.length,
                                   itemBuilder: (context, i) {
-                                    // print(membersList[i]);
+                                    print(membersList[i]);
                                     return ListTile(
                                       onTap: () {
                                         if(membersList[i]['user_id'].toString() == '${user.id}'){

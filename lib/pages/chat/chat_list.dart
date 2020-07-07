@@ -27,7 +27,7 @@ List<ChatsModel> chatsModel = [];
 int chatsPage = 1;
 
 
-bool globalBoolForForGetChat = false;
+bool globalBoolForForceGetChat = false;
 class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveClientMixin {
   bool isOffline = false;
 
@@ -52,7 +52,7 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
     print("_onLoading");
     print(myList.length);
     if(myList.length % 20 == 0){
-      globalBoolForForGetChat = true;
+      globalBoolForForceGetChat = true;
       chatsPage++;
       if (mounted)
         setState(() {
@@ -95,7 +95,7 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
       });
 
       // this is bool for check load more is needed or not
-      globalBoolForForGetChat = false;
+      globalBoolForForceGetChat = false;
 
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
@@ -134,7 +134,7 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
                 .whenComplete(() {
                   ChatRoom.shared.contactController.close();
                   // this is bool for check load more is needed or not
-                  globalBoolForForGetChat = false;
+                  globalBoolForForceGetChat = false;
                   ChatRoom.shared.forceGetChat();
                   ChatRoom.shared.closeContactsStream();
               });

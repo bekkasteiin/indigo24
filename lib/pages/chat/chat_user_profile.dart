@@ -74,7 +74,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
                       avatarUrl: '${e.json['data']['avatar_url']}')),
             ).whenComplete(() {
               // this is bool for check load more is needed or not
-              globalBoolForForGetChat = false;
+              globalBoolForForceGetChat = false;
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeCabinetStream();
             });

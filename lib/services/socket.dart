@@ -463,7 +463,7 @@ class ChatRoom {
             if (data['status'].toString() == 'true') {
               print("INIT status is ${data['status']}");
               // this is bool for check load more is needed or not
-              globalBoolForForGetChat = false;
+              globalBoolForForceGetChat = false;
               forceGetChat();
             }
             break;
@@ -477,7 +477,7 @@ class ChatRoom {
             break;
           case "message:create":
             // this is bool for check load more is needed or not
-            globalBoolForForGetChat = false;
+            globalBoolForForceGetChat = false;
             forceGetChat();
             if (cabinetController == null) {
               // inSound();
@@ -515,7 +515,7 @@ class ChatRoom {
             break;
           case "chat:create":
             // this is bool for check load more is needed or not
-            globalBoolForForGetChat = false;
+            globalBoolForForceGetChat = false;
             forceGetChat();
             contactController.add(new MyContactEvent(json));
             break;
@@ -524,7 +524,7 @@ class ChatRoom {
             if(chatInfoController != null){
               chatInfoController.add(new MyChatInfoEvent(json));
             } 
-            if(cabinetController != null){
+            if(cabinetController != null && !cabinetController.isClosed){
               cabinetController.add(new MyCabinetEvent(json));
             }
             break;

@@ -219,7 +219,7 @@ class MyApp extends StatelessWidget {
               )),
     ).whenComplete(() {
       // this is bool for check load more is needed or not
-      globalBoolForForGetChat = false;
+      globalBoolForForceGetChat = false;
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
@@ -646,7 +646,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         case 'chats:get':
           setState(() {
             // this is bool for check load more is needed or not
-            if (globalBoolForForGetChat) {
+            if (globalBoolForForceGetChat) {
               e.json['data'].toList().forEach((element) {
                 myList.add(element);
               });
@@ -714,7 +714,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               )),
     ).whenComplete(() {
       // this is bool for check load more is needed or not
-      globalBoolForForGetChat = false;
+      globalBoolForForceGetChat = false;
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
