@@ -48,26 +48,25 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>This app need to access your calendar events</string>
 	<key>NSCameraUsageDescription</key>
-	<string>This app requires camera.</string>
+	<string>This app requires camera to share photos from your library and save photos to your Camera Roll.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>This app requires contacts access to function properly.</string>
+	<string>This app requires contacts access to display contacts for chat.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Your explanation</string>
+	<string>Your location is required for chat.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is required for xyz benefits for you</string>
+	<string>Your location is required for chat.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>This app requires microphone.</string>
+	<string>This app requires microphone for voice messages.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>This app needs to be able to access your motion use</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app requires photos.</string>
+	<string>This app requires photos to share photos from your library and save photos to your Camera Roll.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires photos.</string>
+	<string>This app requires photos to share photos from your library and save photos to your Camera Roll.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>recognize speech</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>audio</string>
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>

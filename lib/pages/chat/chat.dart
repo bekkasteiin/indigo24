@@ -130,9 +130,8 @@ class _ChatPageState extends State<ChatPage> {
     _refreshController.loadComplete();
   }
 
-
-
-  RefreshController _memberRefreshController = RefreshController(initialRefresh: false);
+  RefreshController _memberRefreshController =
+      RefreshController(initialRefresh: false);
 
   void _onMemberRefresh() async {
     await Future.delayed(Duration(milliseconds: 1000));
@@ -144,7 +143,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void _onMemberLoading() async {
     await Future.delayed(Duration(milliseconds: 1000));
-    if(temp.length % 20 == 0){
+    if (temp.length % 20 == 0) {
       chatMembersPage++;
       if (mounted)
         setState(() {
@@ -155,7 +154,6 @@ class _ChatPageState extends State<ChatPage> {
           //   membersList.add({'name' : 'test'});
           //   print(membersList.length);
           // }
-
         });
       _refreshController.loadComplete();
     }
@@ -647,9 +645,9 @@ class _ChatPageState extends State<ChatPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => TransferPage(
-                                              phone: '${widget.phone}',
-                                              transferChat: '${widget.chatID}'
-                                            ),
+                                                phone: '${widget.phone}',
+                                                transferChat:
+                                                    '${widget.chatID}'),
                                           ))
                                       // showBottomModalSheet(context,
                                       //   private: true)
@@ -831,9 +829,8 @@ class _ChatPageState extends State<ChatPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => TransferPage(
-                                  phone: temp[i]['phone'],
-                                  transferChat: '${widget.chatID}'
-                                ),
+                                    phone: temp[i]['phone'],
+                                    transferChat: '${widget.chatID}'),
                               ),
                             );
                           },
@@ -847,7 +844,7 @@ class _ChatPageState extends State<ChatPage> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(25.0),
                                   child: Image.network(
-                                    '$avatarUrl${temp[i]['avatar']}',
+                                    '$avatarUrl${temp[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
                                     width: 35,
                                     height: 35,
                                   ),

@@ -8,7 +8,6 @@ import 'package:indigo24/services/constants.dart';
 enum PlayerState { stopped, playing, paused }
 enum PlayingRouteState { speakers, earpiece }
 
-
 class PlayerWidget extends StatefulWidget {
   final String url;
   final PlayerMode mode;
@@ -22,7 +21,8 @@ class PlayerWidget extends StatefulWidget {
     return _PlayerWidgetState(url, mode);
   }
 }
-  List<AudioPlayer> audioPlayers = [];
+
+List<AudioPlayer> audioPlayers = [];
 
 class _PlayerWidgetState extends State<PlayerWidget> {
   String url;
@@ -43,10 +43,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   get _isPlaying => _playerState == PlayerState.playing;
   get isPaused => _playerState == PlayerState.paused;
-  get _durationText => _duration?.toString()?.split('.')?.first ?? '';
-  get _positionText => _position?.toString()?.split('.')?.first ?? '';
+  get _durationText =>
+      _duration?.toString()?.replaceFirst('0:', '')?.split('.')?.first ?? '';
+  get _positionText =>
+      _position?.toString()?.replaceFirst('0:', '')?.split('.')?.first ?? '';
 
-  get isPlayingThroughEarpiece => _playingRouteState == PlayingRouteState.earpiece;
+  get isPlayingThroughEarpiece =>
+      _playingRouteState == PlayingRouteState.earpiece;
 
   _PlayerWidgetState(this.url, this.mode);
 
@@ -86,20 +89,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             //       icon: Icon(Icons.play_arrow),
             //       color: Colors.cyan,
             //     ),
-                // IconButton(
-                //   key: Key('pause_button'),
-                //   onPressed: _isPlaying ? () => _pause() : null,
-                //   iconSize: 40.0,
-                //   icon: Icon(Icons.pause),
-                //   color: Colors.cyan,
-                // ),
-                // IconButton(
-                //   key: Key('stop_button'),
-                //   onPressed: _isPlaying || _isPaused ? () => _stop() : null,
-                //   iconSize: 40.0,
-                //   icon: Icon(Icons.stop),
-                //   color: Colors.cyan,
-                // ),
+            // IconButton(
+            //   key: Key('pause_button'),
+            //   onPressed: _isPlaying ? () => _pause() : null,
+            //   iconSize: 40.0,
+            //   icon: Icon(Icons.pause),
+            //   color: Colors.cyan,
+            // ),
+            // IconButton(
+            //   key: Key('stop_button'),
+            //   onPressed: _isPlaying || _isPaused ? () => _stop() : null,
+            //   iconSize: 40.0,
+            //   icon: Icon(Icons.stop),
+            //   color: Colors.cyan,
+            // ),
             //     IconButton(
             //       onPressed: _earpieceOrSpeakersToggle,
             //       iconSize: 40.0,
@@ -110,50 +113,54 @@ class _PlayerWidgetState extends State<PlayerWidget> {
             //     ),
             //   ],
             // ),
-            _isPlaying ?
-            IconButton(
-              key: Key('pause_button'),
-              onPressed: _isPlaying ? () => _pause() : null,
-              iconSize: 35.0,
-              icon: Icon(Icons.pause),
-              color: Colors.cyan,
-            )
-            :
-            IconButton(
-              key: Key('play_button'),
-              onPressed: _isPlaying ? null : () => _play(),
-              iconSize: 35.0,
-              icon: Icon(Icons.play_arrow),
-              color: Colors.cyan,
-            ),
-            Flexible(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    // padding: EdgeInsets.all(12.0),
-                    child: Stack(
-                      children: [
-                        Slider(
-                          onChanged: (v) {
-                            // ignore: non_constant_identifier_names
-                            final Position = v * _duration.inMilliseconds;
-                            _audioPlayer.seek(Duration(milliseconds: Position.round()));
-                          },
-                          value: (_position != null &&
-                                  _duration != null &&
-                                  _position.inMilliseconds > 0 &&
-                                  _position.inMilliseconds < _duration.inMilliseconds)
-                              ? _position.inMilliseconds / _duration.inMilliseconds
-                              : 0.0,
-                        ),
-                      ],
+            // _isPlaying
+            //     ? IconButton(
+            //         key: Key('pause_button'),
+            //         onPressed: _isPlaying ? () => _pause() : null,
+            //         iconSize: 35.0,
+            //         icon: Icon(Icons.pause),
+            //         color: Colors.cyan,
+            //       )
+            //     : IconButton(
+            //         key: Key('play_button'),
+            //         onPressed: _isPlaying ? null : () => _play(),
+            //         iconSize: 35.0,
+            //         icon: Icon(Icons.play_arrow),
+            //         color: Colors.cyan,
+            //       ),
+            Padding(
+              padding: EdgeInsets.all(0),
+              child: _isPlaying
+                  ? InkWell(
+                      onTap: _isPlaying ? () => _pause() : null,
+                      child: Icon(
+                        Icons.pause,
+                        color: Colors.cyan,
+                        size: 35,
+                      ),
+                    )
+                  : InkWell(
+                      onTap: _isPlaying ? null : () => _play(),
+                      child: Icon(
+                        Icons.play_arrow,
+                        color: Colors.cyan,
+                        size: 35,
+                      ),
                     ),
-                  ),
-                ],
-              ),
             ),
-            
+            Slider(
+              onChanged: (v) {
+                final p = v * _duration.inMilliseconds;
+                _audioPlayer.seek(Duration(milliseconds: p.round()));
+              },
+              value: (_position != null &&
+                      _duration != null &&
+                      _position.inMilliseconds > 0 &&
+                      _position.inMilliseconds < _duration.inMilliseconds)
+                  ? _position.inMilliseconds / _duration.inMilliseconds
+                  : 0.0,
+            ),
+
             // Text('State: $_audioPlayerState')
           ],
         ),
@@ -161,7 +168,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           _position != null
               ? '${_positionText ?? ''} / ${_durationText ?? ''}'
               : _duration != null ? _durationText : '',
-          style: TextStyle(fontSize: 12.0),
+          style: TextStyle(fontSize: 10.0),
         ),
         // Text("${_durationText}")
       ],
@@ -173,22 +180,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     _durationSubscription = _audioPlayer.onDurationChanged.listen((duration) {
       setState(() => _duration = duration);
-
-      if (Theme.of(context).platform == TargetPlatform.iOS) {
-        // (Optional) listen for notification updates in the background
-        _audioPlayer.startHeadlessService();
-
-        // set at least title to see the notification bar on ios.
-        _audioPlayer.setNotification(
-            title: 'Indigo24',
-            artist: 'Username',
-            albumTitle: 'Голосовое сообщение',
-            imageUrl: '${avatarUrl}noAvatar.png',
-            forwardSkipInterval: const Duration(seconds: 5), // default is 30s
-            backwardSkipInterval: const Duration(seconds: 5), // default is 30s
-            duration: duration,
-            elapsedTime: Duration(seconds: 0));
-      }
     });
 
     _positionSubscription =
@@ -231,7 +222,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Future<int> _play() async {
     print("Play position $_position");
     audioPlayers.forEach((audioPlayer) {
-      if(audioPlayer != null){
+      if (audioPlayer != null) {
         audioPlayer.pause();
       }
     });
@@ -247,27 +238,27 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ? _position
         : null;
     _audioPlayer.setPlaybackRate(playbackRate: 1);
-    if( _position == null || _position.inMilliseconds == 0 || 
-    _position.inMilliseconds == null || _position == _duration){ 
+    if (_position == null ||
+        _position.inMilliseconds == 0 ||
+        _position.inMilliseconds == null ||
+        _position == _duration) {
+      print("123 test");
 
+      // playerStates.add(_playerState);
       result = await _audioPlayer.play(url, position: playPosition);
       if (result == 1) setState(() => _playerState = PlayerState.playing);
 
       return result;
-    } else{
+    } else {
       result = await _audioPlayer.resume();
       if (result == 1) setState(() => _playerState = PlayerState.playing);
 
       return result;
     }
-    
 
     // default playback rate is 1.0
     // this should be called after _audioPlayer.play() or _audioPlayer.resume()
     // this can also be called everytime the user wants to change playback rate in the UI
-    
-
-    
   }
 
   Future<int> _pause() async {

@@ -1,4 +1,4 @@
-const String domen = 'com';
+const String domen = 'com'; 
 // const String domen = 'xyz';
 
 const String avatarUrl = 'https://media.indigo24.com/avatars/'; // PROD

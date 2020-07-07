@@ -50,9 +50,7 @@ class AudioMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: PlayerWidget(url: url),
-    );
+    return PlayerWidget(url: url);
   }
 }
 
