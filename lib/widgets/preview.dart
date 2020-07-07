@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
+import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 
@@ -15,7 +15,6 @@ class PreviewMedia extends StatefulWidget {
 }
 
 class _PreviewMediaState extends State<PreviewMedia> {
-
   File file;
 
   @override
@@ -23,13 +22,14 @@ class _PreviewMediaState extends State<PreviewMedia> {
     super.initState();
     file = File(widget.filePath);
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       // color: Colors.white,
       decoration: BoxDecoration(
-        image: DecorationImage(image: previewBackgoundProvider, fit: BoxFit.fitWidth)
-      ),
+          image: DecorationImage(
+              image: previewBackgoundProvider, fit: BoxFit.fitWidth)),
       child: ClipRect(
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -42,25 +42,23 @@ class _PreviewMediaState extends State<PreviewMedia> {
             child: Column(
               children: [
                 Expanded(
-                  flex: 11,
-                  child: 
-                  widget.type=='video'?
-                  ChewieVideo(
-                    controller: VideoPlayerController.file(file),
-                  )
-                  :
-                  PhotoView(
-                    imageProvider: FileImage(file),
-                    minScale: PhotoViewComputedScale.contained,
-                    maxScale: PhotoViewComputedScale.contained*3,
-                    backgroundDecoration: BoxDecoration(
-                      color: Colors.transparent
+                    flex: 11,
+                    child: widget.type == 'video'
+                        ? VideoPlayerWidget(widget.filePath, "file")
+                        // ChewieVideo(
+                        //     controller: VideoPlayerController.file(file),
+                        //   )
+                        : PhotoView(
+                            imageProvider: FileImage(file),
+                            minScale: PhotoViewComputedScale.contained,
+                            maxScale: PhotoViewComputedScale.contained * 3,
+                            backgroundDecoration:
+                                BoxDecoration(color: Colors.transparent),
+                          )
+                    // Container(
+                    //   child: Image.file(file),
+                    // ),
                     ),
-                  )
-                  // Container(
-                  //   child: Image.file(file),
-                  // ),
-                ),
                 Expanded(
                   flex: 1,
                   child: Container(
@@ -78,15 +76,18 @@ class _PreviewMediaState extends State<PreviewMedia> {
               ],
             ),
           ),
-          
           floatingActionButton: Container(
-            padding: EdgeInsets.only(bottom:10),
+            padding: EdgeInsets.only(bottom: 10),
             width: 70,
             height: 70,
             child: FittedBox(
               child: FloatingActionButton(
+                heroTag: "btn1",
                 backgroundColor: Colors.white,
-                child: Image.asset('assets/images/send.png', width: 30,),
+                child: Image.asset(
+                  'assets/images/send.png',
+                  width: 30,
+                ),
                 onPressed: () {
                   Navigator.of(context).pop("sending");
                 },

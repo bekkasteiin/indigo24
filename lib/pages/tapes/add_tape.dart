@@ -11,7 +11,6 @@ import 'package:indigo24/widgets/picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-
 class AddTapePage extends StatefulWidget {
   AddTapePage({Key key, this.title}) : super(key: key);
 
@@ -35,7 +34,7 @@ class _AddTapePageState extends State<AddTapePage> {
   final picker = ImagePicker();
   PickedFile myFile;
   bool isNotPicked = true;
-  
+
   Future<void> _playVideo(File file) async {
     if (file != null && mounted) {
       await _disposeVideoController();
@@ -47,50 +46,49 @@ class _AddTapePageState extends State<AddTapePage> {
       setState(() {});
     }
   }
-    
+
   @override
   void initState() {
     super.initState();
   }
 
-  action(){
+  action() {
     final act = CupertinoActionSheet(
-    title: Text('${localization.selectOption}'),
-    // message: Text('Which option?'),
-    actions: <Widget>[
-      CupertinoActionSheetAction(
-        child: Text('${localization.camera}'),
-        onPressed: () {
-          _onImageButtonPressed(ImageSource.camera);
-          Navigator.pop(context);
-        },
-      ),
-      CupertinoActionSheetAction(
-        child: Text('${localization.gallery}'),
-        onPressed: () {
-          _onImageButtonPressed(ImageSource.gallery);
-          Navigator.pop(context);
-        },
-      )
-    ],
-    cancelButton: CupertinoActionSheetAction(
-      child: Text('${localization.back}'),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    ));
+        title: Text('${localization.selectOption}'),
+        // message: Text('Which option?'),
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            child: Text('${localization.camera}'),
+            onPressed: () {
+              _onImageButtonPressed(ImageSource.camera);
+              Navigator.pop(context);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Text('${localization.gallery}'),
+            onPressed: () {
+              _onImageButtonPressed(ImageSource.gallery);
+              Navigator.pop(context);
+            },
+          )
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text('${localization.back}'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ));
     showCupertinoModalPopup(
-    context: context,
-    builder: (BuildContext context) => act);
+        context: context, builder: (BuildContext context) => act);
   }
-  
+
   void _onImageButtonPressed(ImageSource source) async {
     if (_controller != null) {
       await _controller.setVolume(0.0);
     }
     if (isVideo) {
       final pickedFile = await picker.getVideo(source: source);
-      
+
       // final File file = await ImagePicker.pickVideo(source: source);
       // _videoFile = file;
       // _currentFile = file;
@@ -104,7 +102,6 @@ class _AddTapePageState extends State<AddTapePage> {
         print("video file from $_videoFile");
         await _playVideo(_videoFile);
       }
-      
     } else {
       try {
         // _imageFile = await ImagePicker.pickImage(source: source);
@@ -119,12 +116,11 @@ class _AddTapePageState extends State<AddTapePage> {
           print("image file from $_imageFile");
           setState(() {});
         }
-        
       } catch (e) {
         _pickImageError = e;
       }
     }
-  } 
+  }
 
   showAlertDialog(BuildContext context, String message) {
     Widget okButton = CupertinoDialogAction(
@@ -147,7 +143,6 @@ class _AddTapePageState extends State<AddTapePage> {
       },
     );
   }
-  
 
   @override
   void deactivate() {
@@ -189,12 +184,12 @@ class _AddTapePageState extends State<AddTapePage> {
     }
     if (_currentFile != null) {
       return Container(
-            height: MediaQuery.of(context).size.width,
-            width: MediaQuery.of(context).size.width,
-            child: Image(
-              image: FileImage(_currentFile),
-            ),
-          );
+        height: MediaQuery.of(context).size.width,
+        width: MediaQuery.of(context).size.width,
+        child: Image(
+          image: FileImage(_currentFile),
+        ),
+      );
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
@@ -229,9 +224,12 @@ class _AddTapePageState extends State<AddTapePage> {
 
   Future addTape(context) async {
     print("MY current file ${_currentFile.path}");
-    api.addTape(_currentFile.path, titleController.text, descriptionController.text, context
-    ).then((r) {
-      if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
+    api
+        .addTape(_currentFile.path, titleController.text,
+            descriptionController.text, context)
+        .then((r) {
+      if (r['message'] == 'Not authenticated' &&
+          r['success'].toString() == 'false') {
         logOut(context);
         return r;
       } else {
@@ -242,156 +240,157 @@ class _AddTapePageState extends State<AddTapePage> {
           Navigator.pop(context);
         } else {
           print("false false false ");
-          showAlertDialog(context, r["message"]?? "");
+          showAlertDialog(context, r["message"] ?? "");
         }
-      return r;
+        return r;
       }
-      
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
       child: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          appBar: AppBar(
+            centerTitle: true,
+            leading: IconButton(
+              icon: Container(
+                padding: EdgeInsets.all(10),
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/back.png',
+                  ),
                 ),
               ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          iconTheme: IconThemeData(
-            color: Colors.black,
-          ),
-          brightness: Brightness.light,
-          title: Text('${localization.newTape}',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w400,
-              ),
-              textAlign: TextAlign.center),
-          actions: <Widget>[
-            IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(5),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/add.png',
-                ),
-              ),
-            ),
-             onPressed: () async {
-               print(singleFile);
-
-               if(singleFile != null){
-                // var json = singleFile.toJson();
-                // print(json['path']);
-                setState(() {
-                  // _currentFile = File(json['path']);
-                  _currentFile = File(singleFile);
-                  singleFile = null;
-                  isNotPicked = false;
-                });
-               }
-               print("Pressed with $_currentFile");
-                if(descriptionController.text == '' || titleController.text == ''){
-                  showAlertDialog(context, "${localization.fillAllFields}");
-                } else if(_currentFile == null){
-                  showAlertDialog(context, "${localization.selectFile}");
-                } else {
-                  print("Current file $_currentFile");
-                  await addTape(context);
-                }
-                
+              onPressed: () {
+                Navigator.pop(context);
               },
             ),
-            
-          ],
-          backgroundColor: Colors.white,
-        ),
-        body: 
-        // Center(
-        //   child: Container(
-        //     child: Center(
-        //       child: Text("test"),
-        //     ),
-        //   ),
-        // ),
-        Center(
-          child: ListView(
-            children: [
- 
-              Column(
-                children: [
-                  Container(
-                    margin: EdgeInsets.all(10),
-                    child: TextField(
-                        controller: titleController,
-                        decoration: InputDecoration(labelText: '${localization.title}')),
-                  ),
-                  Container(
-                    margin: EdgeInsets.all(10),
-                    child: TextField(
-                        minLines: 1,
-                        maxLines: 4,
-                        controller: descriptionController,
-                        decoration: InputDecoration(labelText: '${localization.description}')),
-                  ),
-                ],
-              ),
-            
-            isNotPicked?Container():isVideo? _previewVideo() : _previewImage(),
-              
-              // Image(
-              //   image: AssetDataImage(
-              //     singleFile,
-              //     targetWidth: Utils.width2px(context, ratio: 3),
-              //     targetHeight: Utils.width2px(context, ratio: 3),
-              //   ),
-              //   fit: BoxFit.cover,
-              //   width: double.infinity,
-              //   height: double.infinity,
-              // ),
-              
-            ],
-          ),
-        ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: FloatingActionButton(
-                backgroundColor: Colors.white,
-                onPressed: () {
-                  isVideo = false;
-                  action();
-                  // _settingModalBottomSheet(context);
-                  // MY COMMENT
-                  // _onImageButtonPressed(ImageSource.camera);
-                },
-                heroTag: 'image',
-                tooltip: 'Pick Image from camera',
-                child: Image.asset("assets/images/camera.png", width: 30),
-              ),
+            iconTheme: IconThemeData(
+              color: Colors.black,
             ),
+            brightness: Brightness.light,
+            title: Text('${localization.newTape}',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center),
+            actions: <Widget>[
+              IconButton(
+                icon: Container(
+                  padding: EdgeInsets.all(5),
+                  child: Image(
+                    image: AssetImage(
+                      'assets/images/add.png',
+                    ),
+                  ),
+                ),
+                onPressed: () async {
+                  print(singleFile);
+
+                  if (singleFile != null) {
+                    // var json = singleFile.toJson();
+                    // print(json['path']);
+                    setState(() {
+                      // _currentFile = File(json['path']);
+                      _currentFile = File(singleFile);
+                      singleFile = null;
+                      isNotPicked = false;
+                    });
+                  }
+                  print("Pressed with $_currentFile");
+                  if (descriptionController.text == '' ||
+                      titleController.text == '') {
+                    showAlertDialog(context, "${localization.fillAllFields}");
+                  } else if (_currentFile == null) {
+                    showAlertDialog(context, "${localization.selectFile}");
+                  } else {
+                    print("Current file $_currentFile");
+                    await addTape(context);
+                  }
+                },
+              ),
+            ],
+            backgroundColor: Colors.white,
+          ),
+          body:
+              // Center(
+              //   child: Container(
+              //     child: Center(
+              //       child: Text("test"),
+              //     ),
+              //   ),
+              // ),
+              Center(
+            child: ListView(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      child: TextField(
+                          controller: titleController,
+                          decoration: InputDecoration(
+                              labelText: '${localization.title}')),
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      child: TextField(
+                          minLines: 1,
+                          maxLines: 4,
+                          controller: descriptionController,
+                          decoration: InputDecoration(
+                              labelText: '${localization.description}')),
+                    ),
+                  ],
+                ),
+
+                isNotPicked
+                    ? Container()
+                    : isVideo ? _previewVideo() : _previewImage(),
+
+                // Image(
+                //   image: AssetDataImage(
+                //     singleFile,
+                //     targetWidth: Utils.width2px(context, ratio: 3),
+                //     targetHeight: Utils.width2px(context, ratio: 3),
+                //   ),
+                //   fit: BoxFit.cover,
+                //   width: double.infinity,
+                //   height: double.infinity,
+                // ),
+              ],
+            ),
+          ),
+          floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  onPressed: () {
+                    isVideo = false;
+                    action();
+                    // _settingModalBottomSheet(context);
+                    // MY COMMENT
+                    // _onImageButtonPressed(ImageSource.camera);
+                  },
+                  heroTag: 'image',
+                  tooltip: 'Pick Image from camera',
+                  child: Image.asset("assets/images/camera.png", width: 30),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: FloatingActionButton(
@@ -399,79 +398,78 @@ class _AddTapePageState extends State<AddTapePage> {
                   onPressed: () {
                     isVideo = true;
                     action();
-                  // _onImageButtonPressed(ImageSource.camera);
+                    // _onImageButtonPressed(ImageSource.camera);
                   },
                   heroTag: 'video',
                   tooltip: 'Pick Video from camera',
                   child: Image.asset("assets/images/video.png", width: 30),
                 ),
               ),
-          ],
-        )
-        // Column(
-        //   mainAxisAlignment: MainAxisAlignment.end,
-        //   children: <Widget>[
-            // FloatingActionButton(
-            //   onPressed: () {
-            //     isVideo = false;
-            //     _onImageButtonPressed(ImageSource.gallery);
-            //   },
-            //   heroTag: 'image0',
-            //   tooltip: 'Pick Image from gallery',
-            //   child: const Icon(Icons.photo_library),
-            // ),
-        //     Padding(
-        //       padding: const EdgeInsets.only(top: 16.0),
-        //       child: FloatingActionButton(
-        //         onPressed: () {
-        //           isVideo = false;
-        //           _onImageButtonPressed(ImageSource.camera);
-        //         },
-        //         heroTag: 'image1',
-        //         tooltip: 'Take a Photo',
-        //         child: const Icon(Icons.camera_alt),
-        //       ),
-        //     ),
-        //     Padding(
-        //       padding: const EdgeInsets.only(top: 16.0),
-        //       child: FloatingActionButton(
-        //         backgroundColor: Colors.red,
-        //         onPressed: () {
-        //           isVideo = true;
-        //           _onImageButtonPressed(ImageSource.gallery);
-        //         },
-        //         heroTag: 'video0',
-        //         tooltip: 'Pick Video from gallery',
-        //         child: const Icon(Icons.video_library),
-        //       ),
-        //     ),
-        //     Padding(
-        //       padding: const EdgeInsets.only(top: 16.0),
-        //       child: FloatingActionButton(
-        //         backgroundColor: Colors.red,
-        //         onPressed: () {
-                  // isVideo = true;
-                  // _onImageButtonPressed(ImageSource.camera);
-        //         },
-        //         heroTag: 'video1',
-        //         tooltip: 'Take a Video',
-        //         child: const Icon(Icons.videocam),
-        //       ),
-        //     ),
-        //   ],
-        // ),
-      ),
+            ],
+          )
+          // Column(
+          //   mainAxisAlignment: MainAxisAlignment.end,
+          //   children: <Widget>[
+          // FloatingActionButton(
+          //   onPressed: () {
+          //     isVideo = false;
+          //     _onImageButtonPressed(ImageSource.gallery);
+          //   },
+          //   heroTag: 'image0',
+          //   tooltip: 'Pick Image from gallery',
+          //   child: const Icon(Icons.photo_library),
+          // ),
+          //     Padding(
+          //       padding: const EdgeInsets.only(top: 16.0),
+          //       child: FloatingActionButton(
+          //         onPressed: () {
+          //           isVideo = false;
+          //           _onImageButtonPressed(ImageSource.camera);
+          //         },
+          //         heroTag: 'image1',
+          //         tooltip: 'Take a Photo',
+          //         child: const Icon(Icons.camera_alt),
+          //       ),
+          //     ),
+          //     Padding(
+          //       padding: const EdgeInsets.only(top: 16.0),
+          //       child: FloatingActionButton(
+          //         backgroundColor: Colors.red,
+          //         onPressed: () {
+          //           isVideo = true;
+          //           _onImageButtonPressed(ImageSource.gallery);
+          //         },
+          //         heroTag: 'video0',
+          //         tooltip: 'Pick Video from gallery',
+          //         child: const Icon(Icons.video_library),
+          //       ),
+          //     ),
+          //     Padding(
+          //       padding: const EdgeInsets.only(top: 16.0),
+          //       child: FloatingActionButton(
+          //         backgroundColor: Colors.red,
+          //         onPressed: () {
+          // isVideo = true;
+          // _onImageButtonPressed(ImageSource.camera);
+          //         },
+          //         heroTag: 'video1',
+          //         tooltip: 'Take a Video',
+          //         child: const Icon(Icons.videocam),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          ),
     );
   }
 
-  void settingModalBottomSheet(context){
+  void settingModalBottomSheet(context) {
     showModalBottomSheet(
-      context: context,
-      builder: (BuildContext bc){
+        context: context,
+        builder: (BuildContext bc) {
           return SingleImagePickerPage();
-      }
-    );
-}
+        });
+  }
 
   Text _getRetrieveErrorWidget() {
     if (_retrieveDataError != null) {
@@ -509,14 +507,14 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
   @override
   void initState() {
     super.initState();
-    
+
     controller.addListener(_onVideoControllerUpdate);
   }
 
   @override
   void dispose() {
     controller.removeListener(_onVideoControllerUpdate);
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+
     super.dispose();
   }
 

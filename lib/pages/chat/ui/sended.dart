@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -9,6 +7,7 @@ import 'package:indigo24/pages/chat/ui/replyMessage.dart';
 import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
+import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -18,73 +17,95 @@ class Sended extends StatelessWidget {
   Sended(this.m, {this.chatId});
   @override
   Widget build(BuildContext context) {
-    var a = (m['attachments']==false || m['attachments']==null)?false:jsonDecode(m['attachments']);
-    var replyData = (m['reply_data']==false || m['reply_data']==null)? false: m['reply_data'];
+    var a = (m['attachments'] == false || m['attachments'] == null)
+        ? false
+        : jsonDecode(m['attachments']);
+    var replyData = (m['reply_data'] == false || m['reply_data'] == null)
+        ? false
+        : m['reply_data'];
 
     return Align(
         alignment: Alignment(1, 0),
         child: Container(
           child: CupertinoContextMenu(
             actions: [
-                CupertinoContextMenuAction(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('${localization.delete}', style: TextStyle(color:Colors.red, fontSize: 14),),
-                      Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
-                    ],
-                  ),
-                  onPressed: () {
-                    ChatRoom.shared.deleteFromAll(chatId, m['id']==null?m['message_id']:m['id']);
-                    Navigator.pop(context);
-                  },
-                ),
-                CupertinoContextMenuAction(
-                  child: Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text('${localization.edit}', style: TextStyle(fontSize: 14)),
-                        Icon(CupertinoIcons.pen, size: 20,)
-                      ],
+              CupertinoContextMenuAction(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${localization.delete}',
+                      style: TextStyle(color: Colors.red, fontSize: 14),
                     ),
-                  ),
-                  onPressed: () {
-                    ChatRoom.shared.editingMessage(m);
-                    Navigator.pop(context);
-                  },
+                    Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
+                  ],
                 ),
-                CupertinoContextMenuAction(
+                onPressed: () {
+                  ChatRoom.shared.deleteFromAll(
+                      chatId, m['id'] == null ? m['message_id'] : m['id']);
+                  Navigator.pop(context);
+                },
+              ),
+              CupertinoContextMenuAction(
+                child: Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text('${localization.reply}', style: TextStyle(fontSize: 14)),
-                      Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                      Text('${localization.edit}',
+                          style: TextStyle(fontSize: 14)),
+                      Icon(
+                        CupertinoIcons.pen,
+                        size: 20,
+                      )
                     ],
                   ),
-                  onPressed: () {
-                    ChatRoom.shared.replyingMessage(m);
-                    Navigator.pop(context);
-                  },
                 ),
-                
+                onPressed: () {
+                  ChatRoom.shared.editingMessage(m);
+                  Navigator.pop(context);
+                },
+              ),
+              CupertinoContextMenuAction(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('${localization.reply}',
+                        style: TextStyle(fontSize: 14)),
+                    Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                  ],
+                ),
+                onPressed: () {
+                  ChatRoom.shared.replyingMessage(m);
+                  Navigator.pop(context);
+                },
+              ),
             ],
             child: Material(
               color: Colors.transparent,
               child: SendedMessageWidget(
-                content: '${m['text']}',
-                time: time('${m['time']}'),
-                write: '${m['write']}',
-                type: "${m["type"]}",
-                media: (a==false || a==null)? null : "${m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
-                rMedia: (a==false || a==null)? null : a[0]['r_filename']==null?a[0]['filename']:a[0]['r_filename'],
-                mediaUrl: (a==false || a==null)? null : m['attachment_url'],
-                edit: "${m["edit"]}",
-                replyData: (replyData==false || replyData==null)? null : replyData
-              ),
+                  content: '${m['text']}',
+                  time: time('${m['time']}'),
+                  write: '${m['write']}',
+                  type: "${m["type"]}",
+                  media: (a == false || a == null)
+                      ? null
+                      : "${m["type"]}" == '12'
+                          ? a[0]['link']
+                          : a[0]['filename'],
+                  rMedia: (a == false || a == null)
+                      ? null
+                      : a[0]['r_filename'] == null
+                          ? a[0]['filename']
+                          : a[0]['r_filename'],
+                  mediaUrl:
+                      (a == false || a == null) ? null : m['attachment_url'],
+                  edit: "${m["edit"]}",
+                  replyData: (replyData == false || replyData == null)
+                      ? null
+                      : replyData),
             ),
           ),
         ));
@@ -107,8 +128,6 @@ class Sended extends StatelessWidget {
   }
 }
 
-
-
 class SendedMessageWidget extends StatelessWidget {
   final String content;
   final String time;
@@ -120,29 +139,27 @@ class SendedMessageWidget extends StatelessWidget {
   final String edit;
   final replyData;
 
-  const SendedMessageWidget({
-    Key key,
-    this.content,
-    this.time,
-    this.write,
-    this.media,
-    this.mediaUrl,
-    this.rMedia,
-    this.type,
-    this.edit,
-    this.replyData
-  }) : super(key: key);
-
-  
+  const SendedMessageWidget(
+      {Key key,
+      this.content,
+      this.time,
+      this.write,
+      this.media,
+      this.mediaUrl,
+      this.rMedia,
+      this.type,
+      this.edit,
+      this.replyData})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var a = parser.unemojify(content);
-    int l = a.length-1;
+    int l = a.length - 1;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        minWidth: edit=='1'?140.0:120.0,
+        minWidth: edit == '1' ? 140.0 : 120.0,
       ),
       child: Container(
         child: Padding(
@@ -158,73 +175,80 @@ class SendedMessageWidget extends StatelessWidget {
               color: Colors.white,
               child: Stack(children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.only(
-                      right: 12.0, left: 8.0, top: 8.0, bottom: 15.0),
-                  child: 
-                  (type=="12")?
-                    LinkMessage("$media")
-                  :
-                  (a[0]==":" && a[l]==":" && content.length<9)?
-                    Text(content, style: TextStyle(fontSize: 40))
-                  :
-                  (a[0]==":" && a[l]==":" && content.length>8)?
-                    Text(content, style: TextStyle(fontSize: 24))
-                  :
-                  (type=="1")?
-                  ImageMessage("$mediaUrl$rMedia", "$mediaUrl$media")
-                  :
-                  (type=="2")?
-                  FileMessage(url:"$mediaUrl$media")
-                  :
-                  (type=="3")?
-                  new AudioMessage("$mediaUrl$media")
-                  :
-                  (type=="4")?
-                  Container(
-                    width: MediaQuery.of(context).size.width*0.7,
-                    height: MediaQuery.of(context).size.width*0.7,
-                    child: new ChewieVideo(controller: VideoPlayerController.network("$mediaUrl$media"), 
-                      size: MediaQuery.of(context).size.width*0.7,),
-                  )
-                  :
-                  (type=="10")?
-                  ReplyMessage(content, replyData)
-                  :
-                  type=='11'?
-                  Text('${localization.money} $content')
-                  // MoneyMessage(content)
-                  :
-                  (type=="uploading")?
-                  Container(
-                    width: MediaQuery.of(context).size.width*0.7,
-                    height: MediaQuery.of(context).size.width*0.7,
-                    child: uploadingImage!=null?
-                    Stack(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width*0.7,
-                          height: MediaQuery.of(context).size.width*0.7,
-                          child: Image.file(uploadingImage, fit: BoxFit.cover,),
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width*0.7,
-                          height: MediaQuery.of(context).size.width*0.7,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        Center(
-                          child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
-                        ),
-                      ],
-                    )
-                    :
-                    Center(
-                      child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width*0.3),
-                    ),
-                  )
-                  :
-                  Text(
-                    content,
-                  ),
+                  padding: EdgeInsets.only(
+                      right: (type == "3") ? 5 : 12.0,
+                      left: (type == "3") ? 2 : 8.0,
+                      top: (type == "3") ? 2 : 8.0,
+                      bottom: (type == "3") ? 1.0 : 15.0),
+                  child: (type == "12")
+                      ? LinkMessage("$media")
+                      : (a[0] == ":" && a[l] == ":" && content.length < 9)
+                          ? Text(content, style: TextStyle(fontSize: 40))
+                          : (a[0] == ":" && a[l] == ":" && content.length > 8)
+                              ? Text(content, style: TextStyle(fontSize: 24))
+                              : (type == "1")
+                                  ? ImageMessage(
+                                      "$mediaUrl$rMedia", "$mediaUrl$media")
+                                  : (type == "2")
+                                      ? FileMessage(url: "$mediaUrl$media")
+                                      : (type == "3")
+                                          ? new AudioMessage("$mediaUrl$media")
+                                          : (type == "4")
+                                              ? Container(
+                                                  child: VideoPlayerWidget(
+                                                      "$mediaUrl$media",
+                                                      "network"))
+                                              : (type == "10")
+                                                  ? ReplyMessage(
+                                                      content, replyData)
+                                                  : type == '11'
+                                                      ? Text(
+                                                          '${localization.money} $content')
+                                                      // MoneyMessage(content)
+                                                      : (type == "uploading")
+                                                          ? Container(
+                                                              width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width *
+                                                                  0.7,
+                                                              height: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width *
+                                                                  0.7,
+                                                              child:
+                                                                  uploadingImage !=
+                                                                          null
+                                                                      ? Stack(
+                                                                          children: [
+                                                                            Container(
+                                                                              width: MediaQuery.of(context).size.width * 0.7,
+                                                                              height: MediaQuery.of(context).size.width * 0.7,
+                                                                              child: Image.file(
+                                                                                uploadingImage,
+                                                                                fit: BoxFit.cover,
+                                                                              ),
+                                                                            ),
+                                                                            Container(
+                                                                              width: MediaQuery.of(context).size.width * 0.7,
+                                                                              height: MediaQuery.of(context).size.width * 0.7,
+                                                                              color: Colors.grey.withOpacity(0.5),
+                                                                            ),
+                                                                            Center(
+                                                                              child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width * 0.3),
+                                                                            ),
+                                                                          ],
+                                                                        )
+                                                                      : Center(
+                                                                          child: Image.asset(
+                                                                              "assets/preloader.gif",
+                                                                              width: MediaQuery.of(context).size.width * 0.3),
+                                                                        ),
+                                                            )
+                                                          : Text(
+                                                              content,
+                                                            ),
                 ),
                 Positioned(
                   bottom: -1,
@@ -244,17 +268,21 @@ class SendedMessageWidget extends StatelessWidget {
                 Positioned(
                   bottom: 1,
                   left: 10,
-                  child: Row(children: [
-                    Text(
-                      time,
-                      style: TextStyle(
-                          fontSize: 10, color: Colors.black.withOpacity(0.6)),
-                    ), 
-                    edit=='1'?
-                    Text(" ред.", style:TextStyle(fontSize: 10, color: Colors.black.withOpacity(0.6)))
-                    :
-                    Container()
-                  ],),
+                  child: Row(
+                    children: [
+                      Text(
+                        time,
+                        style: TextStyle(
+                            fontSize: 10, color: Colors.black.withOpacity(0.6)),
+                      ),
+                      edit == '1'
+                          ? Text(" ред.",
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black.withOpacity(0.6)))
+                          : Container()
+                    ],
+                  ),
                 )
               ]),
             ),
