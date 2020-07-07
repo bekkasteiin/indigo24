@@ -177,14 +177,16 @@ class SendedMessageWidget extends StatelessWidget {
                   FileMessage(url:"$mediaUrl$media")
                   :
                   (type=="3")?
-                  new AudioMessage("$mediaUrl$media")
+                  AudioMessage("$mediaUrl$media")
                   :
                   (type=="4")?
                   Container(
                     width: MediaQuery.of(context).size.width*0.7,
                     height: MediaQuery.of(context).size.width*0.7,
-                    child: new ChewieVideo(controller: VideoPlayerController.network("$mediaUrl$media"), 
-                      size: MediaQuery.of(context).size.width*0.7,),
+                    child: new ChewieVideo(
+                      controller: VideoPlayerController.network("$mediaUrl$media"), 
+                      size: MediaQuery.of(context).size.width*0.7,
+                    ),
                   )
                   :
                   (type=="10")?

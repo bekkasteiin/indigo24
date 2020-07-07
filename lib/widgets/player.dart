@@ -234,10 +234,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       if(audioPlayer != null){
         audioPlayer.pause();
       }
-      print('player state forEeach $audioPlayer');
     });
     print('_____________ audioPlayers length ${audioPlayers.length}');
-    audioPlayers.add(_audioPlayer);
+    if(!audioPlayers.contains(_audioPlayer)){
+      audioPlayers.add(_audioPlayer);
+    }
     int result = 0;
     final playPosition = (_position != null &&
             _duration != null &&
@@ -248,10 +249,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _audioPlayer.setPlaybackRate(playbackRate: 1);
     if( _position == null || _position.inMilliseconds == 0 || 
     _position.inMilliseconds == null || _position == _duration){ 
-      print("123 test");
 
-
-    // playerStates.add(_playerState);
       result = await _audioPlayer.play(url, position: playPosition);
       if (result == 1) setState(() => _playerState = PlayerState.playing);
 

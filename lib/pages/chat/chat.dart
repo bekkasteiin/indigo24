@@ -256,8 +256,7 @@ class _ChatPageState extends State<ChatPage> {
           }
           var senderId = e.json["data"]['user_id'].toString();
           var userId = user.id.toString();
-          if (senderId != userId &&
-              '${widget.chatID}' != '${e.json['data']['chat_id']}') {
+          if (senderId != userId && '${widget.chatID}' != '${e.json['data']['chat_id']}') {
             inAppPush(e.json["data"]);
           }
           break;
@@ -971,8 +970,7 @@ class _ChatPageState extends State<ChatPage> {
                     chatType: widget.chatType,
                     chatName: widget.name,
                     memberCount: widget.memberCount,
-                    chatAvatar:
-                        widget.avatar == null ? 'noAvatar.png' : widget.avatar,
+                    chatAvatar: widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatId: widget.chatID,
                   ),
                 ),
@@ -1525,7 +1523,7 @@ class _ChatPageState extends State<ChatPage> {
       dependencies = new Dependencies();
 
       api.uploadMedia(recordFilePath, 3).then((r) async {
-        print("RRRRR ${r["message"]}");
+        print("RRRRR $r");
         if (r["status"]) {
           var a = [
             {

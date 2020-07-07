@@ -131,7 +131,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
               CupertinoActionSheetAction(
                 child: Text('${localization.watch}'),
                 onPressed: () {
-                  print("посмотреть");
+                  print("посмотреть ${widget.image}");
                   Navigator.pop(context);
                   Navigator.push(
                       context,

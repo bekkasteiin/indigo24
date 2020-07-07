@@ -187,8 +187,6 @@ class _TransferPageState extends State<TransferPage> {
   final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
   bool checked = false;
   _onPasscodeEntered(String enteredPasscode) {
-
-
     bool isValid = '${user.pin}' == enteredPasscode;
     _verificationNotifier.add(isValid);
     if(enteredPasscode == user.pin){
