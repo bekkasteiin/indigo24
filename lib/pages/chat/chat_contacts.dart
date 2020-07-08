@@ -107,10 +107,10 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               ChatRoom.shared.closeCabinetStream();
             });
           } else if (e.json['data']['status'].toString() == 'true') {
-            print('____________________');
-            print('else if e.jsonDataStatus == true');
-            print({e.json['data']['user_id']});
-            print('____________________');
+            // print('____________________');
+            // print('else if e.jsonDataStatus == true');
+            // print({e.json['data']['user_id']});
+            // print('____________________');
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
           }
@@ -121,9 +121,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             ChatRoom.shared.setCabinetStream();
             ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
             Navigator.pop(context);
-            print('_________________________________');
-            print('chat contacts user ids ${e.json['data']['user_id']}');
-            print('_________________________________');
+            // print('_________________________________');
+            // print('chat contacts user ids ${e.json['data']['user_id']}');
+            // print('_________________________________');
             Navigator.push(
               context,
               MaterialPageRoute(

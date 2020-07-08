@@ -290,8 +290,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                             :
                                                             // TODO CHANGE
                                                             type == '11'
-                                                                ? Text(
-                                                                    '${localization.money} $content')
+                                                                ? Text('${localization.youReceived} $content KZT', style: TextStyle(fontWeight: FontWeight.w600),)
                                                                 // MoneyMessage(content)
                                                                 : Text(
                                                                     content,

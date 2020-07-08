@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:audioplayers/audio_cache.dart';
+import 'package:flutter/material.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat_list.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:web_socket_channel/io.dart';
@@ -334,9 +336,9 @@ class ChatRoom {
     channel.sink.add(jsonEncode(data));
   }
 
-  connect() {
+  connect(context) {
     channel = new IOWebSocketChannel.connect('$socket');
-    listen();
+    listen(context);
   }
 
   editingMessage(m) {
@@ -449,117 +451,122 @@ class ChatRoom {
     }
   }
 
-  listen() {
+  listen(BuildContext context) {
     channel.stream.listen(
       (event) {
         var json = jsonDecode(event);
-
-        var cmd = json['cmd'];
-        var data = json['data'];
-        switch (cmd) {
-          case "init":
-            print(user.id);
-            print(data);
-            if (data['status'].toString() == 'true') {
-              print("INIT status is ${data['status']}");
+        if(json['logout'] != null && json['logout'] == true){
+          logOut(context);
+        } else{
+          var cmd = json['cmd'];
+          var data = json['data'];
+          print(json);
+          switch (cmd) {
+            case "init":
+              print(user.id);
+              print(data);
+              if (data['status'].toString() == 'true') {
+                print("INIT status is ${data['status']}");
+                // this is bool for check load more is needed or not
+                globalBoolForForceGetChat = false;
+                forceGetChat();
+              }
+              break;
+            case "chats:get":
+              changeController.add(new MyEvent(json));
+              break;
+            case "chat:get":
+              if (!cabinetController.isClosed) {
+              cabinetController.add(new MyCabinetEvent(json));
+              }
+              break;
+            case "message:create":
               // this is bool for check load more is needed or not
               globalBoolForForceGetChat = false;
               forceGetChat();
-            }
-            break;
-          case "chats:get":
-            changeController.add(new MyEvent(json));
-            break;
-          case "chat:get":
-            if (!cabinetController.isClosed) {
-            cabinetController.add(new MyCabinetEvent(json));
-            }
-            break;
-          case "message:create":
-            // this is bool for check load more is needed or not
-            globalBoolForForceGetChat = false;
-            forceGetChat();
-            if (cabinetController == null) {
-              // inSound();
-              changeController.add(new MyEvent(json));
-              print("new message in CHATS null page");
-            } else {
-              if (!cabinetController.isClosed) {
-                print("new message in CHAT page");
-                // inSound();
-                cabinetController.add(new MyCabinetEvent(json));
-              } else {
+              if (cabinetController == null) {
                 // inSound();
                 changeController.add(new MyEvent(json));
-                print("new message in CHATS page");
+                print("new message in CHATS null page");
+              } else {
+                if (!cabinetController.isClosed) {
+                  print("new message in CHAT page");
+                  // inSound();
+                  cabinetController.add(new MyCabinetEvent(json));
+                } else {
+                  // inSound();
+                  changeController.add(new MyEvent(json));
+                  print("new message in CHATS page");
+                }
               }
-            }
-            break;
-          case "user:check":
-            if (contactController != null) {
+              break;
+            case "user:check":
+              if (contactController != null) {
+                contactController.add(new MyContactEvent(json));
+              }
+              if (cabinetInfoController != null) {
+                print('added to cabinet info');
+                cabinetInfoController.add(new MyCabinetInfoEvent(json));
+              }
+              if (changeController != null) {
+                changeController.add(new MyEvent(json));
+              }
+              break;
+            case "chat:members:add":
               contactController.add(new MyContactEvent(json));
-            }
-            if (cabinetInfoController != null) {
-              print('added to cabinet info');
-              cabinetInfoController.add(new MyCabinetInfoEvent(json));
-            }
-            if (changeController != null) {
-              changeController.add(new MyEvent(json));
-            }
-            break;
-          case "chat:members:add":
-            contactController.add(new MyContactEvent(json));
-            break;
-          case "user:check:online":
-            cabinetController.add(new MyCabinetEvent(json));
-            break;
-          case "chat:create":
-            // this is bool for check load more is needed or not
-            globalBoolForForceGetChat = false;
-            forceGetChat();
-            contactController.add(new MyContactEvent(json));
-            break;
-          case "chat:members":
-            print('added to chatInfoController');
-            if(chatInfoController != null){
+              break;
+            case "user:check:online":
+              cabinetController.add(new MyCabinetEvent(json));
+              break;
+            case "chat:create":
+              // this is bool for check load more is needed or not
+              globalBoolForForceGetChat = false;
+              forceGetChat();
+              contactController.add(new MyContactEvent(json));
+              break;
+            case "chat:members":
+              print('added to chatInfoController');
+              if(chatInfoController != null){
+                chatInfoController.add(new MyChatInfoEvent(json));
+              } 
+              if(cabinetController != null && !cabinetController.isClosed){
+                cabinetController.add(new MyCabinetEvent(json));
+              }
+              break;
+            case "chat:members:privileges":
+              print('added to chatInfoController');
               chatInfoController.add(new MyChatInfoEvent(json));
-            } 
-            if(cabinetController != null && !cabinetController.isClosed){
-              cabinetController.add(new MyCabinetEvent(json));
-            }
-            break;
-          case "chat:members:privileges":
-            print('added to chatInfoController');
-            chatInfoController.add(new MyChatInfoEvent(json));
-            break;
-          case "user:writing":
-            if (cabinetController != null)
-              cabinetController.add(new MyCabinetEvent(json));
-            break;
-          case "message:deleted:all":
-            if (cabinetController != null)
-              cabinetController.add(new MyCabinetEvent(json));
-            break;
-          case "message:edit":
-            if (cabinetController != null)
-              cabinetController.add(new MyCabinetEvent(json));
-            break;
-          case "chat:members:delete":
-            print('added to chatInfoController');
-            chatInfoController.add(new MyChatInfoEvent(json));
-            break;
-          case "chat:member:leave":
-            print('added to chatInfoController');
-            chatInfoController.add(new MyChatInfoEvent(json));
-            break;
-          default:
-            print('default print cmd: $cmd json: $json');
+              break;
+            case "user:writing":
+              if (cabinetController != null)
+                cabinetController.add(new MyCabinetEvent(json));
+              break;
+            case "message:deleted:all":
+              if (cabinetController != null)
+                cabinetController.add(new MyCabinetEvent(json));
+              break;
+            case "message:edit":
+              if (cabinetController != null)
+                cabinetController.add(new MyCabinetEvent(json));
+              break;
+            case "chat:members:delete":
+              print('added to chatInfoController');
+              chatInfoController.add(new MyChatInfoEvent(json));
+              break;
+            case "chat:member:leave":
+              print('added to chatInfoController');
+              chatInfoController.add(new MyChatInfoEvent(json));
+              break;
+            default:
+              print('default print cmd: $cmd json: $json');
+          }
         }
+
       },
       onDone: () {
         print("ON DONE IS CALLED");
         Future.delayed(const Duration(milliseconds: 15000), () {
-          connect();
+          connect(context);
           init();
         });
       },

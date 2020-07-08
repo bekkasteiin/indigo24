@@ -144,7 +144,7 @@ class _RefillPageState extends State<RefillPage> {
                       // }
                       if(int.parse(amountController.text) < int.parse(configs.refillMax))
                         setState(() {
-                          commission = (int.parse(text) * 2.2 / 100).toStringAsFixed(2);
+                          commission = (int.parse(text) * int.parse(configs.refillCommission) / 100).toStringAsFixed(2);
                           if(double.parse(commission) < 350.00 )
                             commission = '350';
                         });

@@ -235,7 +235,15 @@ class _WalletTabState extends State<WalletTab> {
                         _balanceAmount(),
                         _exchangeButtons(),
                         _symbol == _tengeSymbol  
-                        ? Text('')
+                        ? Container(
+                            width: size.width,
+                            color: Color(0xFF033083),
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            child: Text(
+                              '',
+                            ),
+                          )
                         : _exchangeCurrency(size),
                         _blockedBalance(size),
                         Container(

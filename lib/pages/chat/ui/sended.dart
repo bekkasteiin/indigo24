@@ -202,8 +202,7 @@ class SendedMessageWidget extends StatelessWidget {
                                                   ? ReplyMessage(
                                                       content, replyData)
                                                   : type == '11'
-                                                      ? Text(
-                                                          '${localization.money} $content')
+                                                      ? Text('${localization.youSended} $content KZT', style: TextStyle(fontWeight: FontWeight.w600),)
                                                       // MoneyMessage(content)
                                                       : (type == "uploading")
                                                           ? Container(

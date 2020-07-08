@@ -127,6 +127,27 @@ class Api {
       }
     }
   }
+  
+  getHistoryBalance(page) async {
+    try {
+      response = await dio.post("/get/balance/history", data: {
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
+        "page": "$page",
+      });
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
 
   sendSms(phone) async {
     try {
@@ -362,7 +383,7 @@ class Api {
           "unique": "${user.unique}",
           "toID": "$toID",
           "amount": "$amount",
-          'chatTransfer': '$transferChat'
+          'chatTransfer': '1',
         });
       }
 

@@ -117,6 +117,9 @@ String country = 'Country';
 String status = 'Status';
 String selectFile = 'Select file';
 String userNotFound = 'User not found';
+String history = 'History';
+String youSended = 'You have sended';
+String youReceived = 'You have received';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Russian", "code": "ru"},

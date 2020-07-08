@@ -16,7 +16,7 @@ class PaymentHistoryPage extends StatefulWidget {
   _PaymentHistoryPageState createState() => _PaymentHistoryPageState();
 }
 
-class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
+class _PaymentHistoryPageState extends State<PaymentHistoryPage> with TickerProviderStateMixin {
   String logoUrl = "";
   @override
   void initState() {
@@ -29,8 +29,28 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           if(page == 1) 
             test = histories['payments'].toList();
         });
+        page++;
       }
     });
+
+    api.getHistoryBalance(balanceHistoryPage).then((histories) {
+      if (histories['message'] == 'Not authenticated' && histories['success'].toString() == 'false') {
+        logOut(context);
+      } else {
+        setState(() {
+          historyBalanceList.addAll(histories['result']);
+        });
+        // setState((){
+        //   logoUrl = histories['logoURL'];
+        //   if(balanceHistoryPage == 1) 
+        //     test = histories['payments'].toList();
+        // });
+        balanceHistoryPage++;
+      }
+    });
+
+    _controller = TabController(vsync: this, length: 2);
+
     super.initState();
   }
   Api api = Api();
@@ -73,6 +93,39 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   
   Dio dio = Dio();
 
+  Widget _historyBalanceBuilder(BuildContext context, snapshot) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        InkWell(
+          child: Row(
+            children: <Widget>[
+              SizedBox(width: 20),
+              _paymentLogo('https://api.indigo24.com/logos/${snapshot['logo']}'),
+              _historyBalanceInfo(snapshot['description'], snapshot['date']),
+              _paymentAmount('${snapshot['amount']}', '${snapshot['status']}', type: '${snapshot['type']}'),
+              // _paymentLogo(logo),
+              // _paymentInfo(title, account, date),
+              // _paymentAmount(amount,status),
+              SizedBox(width: 20),
+            ],
+          ),
+          // onTap: () async{
+          //   var tempDir = await getTemporaryDirectory();
+          //   String fullPath = tempDir.path + "/boo2.pdf'";
+          //   print('full path ${fullPath}');
+            
+          //   download2(dio, url, fullPath);
+          // },
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10, right: 20, left: 20),
+          height: 0.2,
+          color: Color(0xFF7D8E9B),
+        ),
+      ],
+    );
+  }
   Widget _historyBuilder(BuildContext context, String logo, String account, String amount, String title, String date, String status, int index, String url) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -115,13 +168,13 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     );
   }
 
-  Container _paymentAmount(String amount,String status) {
+  Container _paymentAmount(String amount, String status, {type}) {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Text(
-            "$amount KZT",
+            type != null ? '$type' == 'out' ?  "-$amount KZT" :  "+$amount KZT" : "$amount KZT",
             style: TextStyle(
               fontSize: 18,
               color: Color(0xFF001D52),
@@ -145,6 +198,34 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+  Expanded _historyBalanceInfo(String title, String date) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            "$title",
+            style: TextStyle(
+              fontSize: 14  ,
+              color: Color(0xFF636973),
+              fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            "$date",
+            style: TextStyle(
+              fontSize: 10,
+              color: Color(0xFF001D52),
+              fontWeight: FontWeight.w300,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
   }
 
   Expanded _paymentInfo(String title, String account, String date) {
@@ -188,6 +269,13 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   AppBar buildAppBar() {
     return AppBar(
       centerTitle: true,
+      bottom: TabBar(
+        controller: _controller,
+        tabs: [
+          Tab(child: Text('${localization.payments}', style: TextStyle(color: Color(0xFF001D52),),),),
+          Tab(child: Text('${localization.history}', style: TextStyle(color: Color(0xFF001D52),),),),
+        ],
+      ),
       leading: IconButton(
         icon: Container(
           padding: EdgeInsets.all(10),
@@ -215,12 +303,22 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     );
   }
   List test = [];
+  List historyBalanceList = [];
+  TabController _controller;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
       body: test.isNotEmpty 
-        ? _paymentHistroyBody(test)
+        // ? _paymentHistroyBody(test)
+        ? TabBarView(
+          controller: _controller,
+            children: [
+              _paymentHistroyBody(test),
+              _paymentHistroyBalance(historyBalanceList)
+            ],
+          )
         : Center(child: CircularProgressIndicator())
     );
   }
@@ -243,6 +341,14 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     _refreshController.refreshCompleted();
   }
 
+
+
+  void _onBalanceLoading() async {
+    print("_onBalanceLoading ");
+    _loadBalanceData();
+    _balanceRefreshController.loadComplete();
+  }
+
   void _onLoading() async {
     print("_onLoading ");
     _loadData();
@@ -250,20 +356,74 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
   bool isLoaded = false;
   int page = 1;
+  int balanceHistoryPage = 1;
+
+
+  Future _loadBalanceData() async {
+    api.getHistoryBalance(balanceHistoryPage).then((balanceHistory){
+      print(balanceHistory);
+      if(balanceHistory['result'].isNotEmpty){
+        balanceHistoryPage++;
+        List temp = balanceHistory['result'].toList();
+        setState((){
+          historyBalanceList.addAll(temp);
+        });
+        print(balanceHistoryPage);
+      }
+    });
+  }
 
   Future _loadData() async {
     api.getHistories(page).then((histories){
-      List temp = histories['payments'].toList();
-      setState((){
-        test.addAll(temp);
-      });
-      page++;
+      print(histories);
+      if(histories['payments'].isNotEmpty){
+        List temp = histories['payments'].toList();
+        setState((){
+          test.addAll(temp);
+        });
+        page++;
+        print(page);
+      }
+     
     });
   }
 
 
   RefreshController _refreshController = RefreshController(initialRefresh: false);
-  
+  RefreshController _balanceRefreshController = RefreshController(initialRefresh: false);
+
+  SafeArea _paymentHistroyBalance(snapshot) {
+    return SafeArea(
+      child: SmartRefresher(
+        enablePullDown: false,
+        enablePullUp: true,
+        footer: CustomFooter(
+          builder:(BuildContext context, LoadStatus mode) {
+            Widget body;
+            return Container(
+              height: 55.0,
+              child: Center(child: body),
+            );
+          },
+        ),
+        controller: _balanceRefreshController,
+        onLoading: _onBalanceLoading,
+        child: ListView.builder(
+          padding: const EdgeInsets.only(bottom: 10),
+          itemCount: snapshot != null ? snapshot.length : 0,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              padding: const EdgeInsets.only(top: 10),
+              child: _historyBalanceBuilder(
+                context,
+                snapshot[index],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
   SafeArea _paymentHistroyBody(snapshot) {
     return SafeArea(
       child: SmartRefresher(
@@ -280,27 +440,25 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         ),
         controller: _refreshController,
         onLoading: _onLoading,
-        child: Center(
-          child: ListView.builder(
-            padding: const EdgeInsets.only(bottom: 10),
-            itemCount: snapshot != null ? snapshot.length : 0,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                padding: const EdgeInsets.only(top: 10),
-                child: _historyBuilder(
-                  context,
-                  "$logoUrl${snapshot[index]['logo']}",
-                  "${snapshot[index]['account']}",
-                  "${snapshot[index]['amount']}",
-                  "${snapshot[index]['title']}",
-                  "${snapshot[index]['data']}",
-                  "${snapshot[index]['status']}",
-                  index,
-                  "${snapshot[index]['pdf']}"
-                ),
-              );
-            },
-          ),
+        child: ListView.builder(
+          padding: const EdgeInsets.only(bottom: 10),
+          itemCount: snapshot != null ? snapshot.length : 0,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              padding: const EdgeInsets.only(top: 10),
+              child: _historyBuilder(
+                context,
+                "$logoUrl${snapshot[index]['logo']}",
+                "${snapshot[index]['account']}",
+                "${snapshot[index]['amount']}",
+                "${snapshot[index]['title']}",
+                "${snapshot[index]['data']}",
+                "${snapshot[index]['status']}",
+                index,
+                "${snapshot[index]['pdf']}"
+              ),
+            );
+          },
         ),
       ),
     );

@@ -492,7 +492,7 @@ class _TapesPageState extends State<TapesPage>
                                             '${result[index]['description']}',
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(fontSize: 16),
-                                            maxLines: 2,
+                                            maxLines: 3,
                                           ),
                                         ),
                                         Padding(
