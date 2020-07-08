@@ -12,6 +12,7 @@ import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
+import 'package:indigo24/widgets/video/default_player.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -279,10 +280,24 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                     ? new AudioMessage(
                                                         "$mediaUrl$media")
                                                     : (type == "4")
-                                                        ? Container(
-                                                            child: VideoPlayerWidget(
-                                                                "$mediaUrl$media",
-                                                                "network"))
+                                                        ?
+                                                        // Container(
+                                                        //     width: MediaQuery.of(
+                                                        //                 context)
+                                                        //             .size
+                                                        //             .width *
+                                                        //         0.7,
+                                                        //     height: MediaQuery.of(
+                                                        //                 context)
+                                                        //             .size
+                                                        //             .width *
+                                                        //         0.7,
+                                                        //     child: DefaultPlayer(
+                                                        //         url:
+                                                        //             "$mediaUrl$media")
+                                                        VideoPlayerWidget(
+                                                            "$mediaUrl$media",
+                                                            "network")
                                                         : (type == "10")
                                                             ? ReplyMessage(
                                                                 content,

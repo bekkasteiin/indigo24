@@ -11,7 +11,7 @@ import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-var parser = EmojiParser();
+var parserChat = EmojiParser();
 
 class DeviderMessageWidget extends StatelessWidget {
   final date;

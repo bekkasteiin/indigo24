@@ -39,7 +39,7 @@ class _TapesPageState extends State<TapesPage>
     super.initState();
   }
 
-  rebuildTage() {
+  rebuildTape() {
     setState(() {
       flickMultiManager = FlickMultiManager();
     });
@@ -50,7 +50,7 @@ class _TapesPageState extends State<TapesPage>
         logOut(context);
         return true;
       } else {
-        return setTapes(tapes);
+        return rebuild(tapes);
       }
     });
   }
@@ -75,6 +75,18 @@ class _TapesPageState extends State<TapesPage>
       var r = tapes["result"].toList();
       result.addAll(r);
       isLoaded = false;
+    });
+  }
+
+  Future rebuild(tapes) async {
+    setState(() {
+      result = tapes["result"].toList();
+      _listFuture = Future(foo);
+      result.forEach((el) async {
+        if (el['myLike'] == true) {
+          _saved.add(el['id']);
+        }
+      });
     });
   }
 
@@ -126,7 +138,7 @@ class _TapesPageState extends State<TapesPage>
   final Set _saved = Set();
 
   void _onRefresh() {
-    rebuildTage();
+    rebuildTape();
     setState(() {});
     _refreshController.refreshCompleted();
   }
@@ -161,17 +173,26 @@ class _TapesPageState extends State<TapesPage>
                   ),
                 ),
               ),
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final response = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => AddTapePage(),
                   ),
-                ).whenComplete(() {
-                  print("GET TAPES AFTER ADDING");
-                  flickMultiManager.removeAll();
-                  getTapes();
-                });
+                );
+                // .whenComplete(() {
+                //   print("GET TAPES AFTER ADDING");
+                //   flickMultiManager.removeAll();
+                //   rebuildTape();
+                // });
+                if (response != null) {
+                  print("RESULT $response");
+                  setState(() {
+                    result.insert(0, response);
+                    flickMultiManager = new FlickMultiManager();
+                  });
+                  print("Result index 0: ${result[0]}");
+                }
               },
             )
           ],
@@ -339,6 +360,9 @@ class _TapesPageState extends State<TapesPage>
                                                           .endsWith("MOV") ||
                                                       result[index]['media']
                                                           .toString()
+                                                          .endsWith("mov") ||
+                                                      result[index]['media']
+                                                          .toString()
                                                           .endsWith("mp4") ||
                                                       result[index]['media']
                                                           .toString()
@@ -351,8 +375,12 @@ class _TapesPageState extends State<TapesPage>
                                                           "$uploadTapes${result[index]['media']}",
                                                       flickMultiManager:
                                                           flickMultiManager,
-                                                      image:
-                                                          'assets/preloader.gif',
+                                                      image: result[index]
+                                                                  ['frame'] !=
+                                                              null
+                                                          ? result[index]
+                                                              ['frame']
+                                                          : 'assets/preloader.gif',
                                                     )
                                                   // new ChewieVideo(
                                                   //     controller:

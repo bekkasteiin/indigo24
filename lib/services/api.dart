@@ -44,16 +44,17 @@ class Api {
       }
     }
   }
+
   var _configToken = "D@Xo8b56r#7e1iZElhH39xK!WkB_42vYAG0p";
 
   getConfig() async {
     print('Getting configs');
     try {
       response = await dio.post("/get/config", data: {
-        "customerID": "${user.id}", 
+        "customerID": "${user.id}",
         "unique": "${user.unique}",
         "_token": "$_configToken",
-        });
+      });
       var commission = response.data['commissions'];
       var withdrawConfig = commission['withdraw'];
       var refillConfig = commission['refill'];
@@ -81,13 +82,10 @@ class Api {
 
   updateFCM(token, id, unique) async {
     try {
-      response = await dio.post("/token/fcm/update", data: {
-        "customerID": "$id",
-        "token": "$token",
-        "unique": "$unique"
-      });
+      response = await dio.post("/token/fcm/update",
+          data: {"customerID": "$id", "token": "$token", "unique": "$unique"});
       if (response.data['success'] == true) {
-        print("Token updated to $token");
+        print("Token updated to $token ${response.data}");
         return true;
       } else {
         return response.data;
@@ -104,7 +102,6 @@ class Api {
       }
     }
   }
-  
 
   checkRegistration(phone) async {
     try {
@@ -151,7 +148,7 @@ class Api {
   restorePassword(phone) async {
     try {
       response = await dio.post("/restore", data: {"phone": "$phone"});
-        return response.data;
+      return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print('e response is ${e.response}');
@@ -169,13 +166,12 @@ class Api {
 
   getService(serviceID) async {
     try {
-      response = await dio.post("/get/payments", 
-      data: {
-        "customerID": "${user.id}", 
+      response = await dio.post("/get/payments", data: {
+        "customerID": "${user.id}",
         "unique": "${user.unique}",
-        "serviceID" : "$serviceID"
+        "serviceID": "$serviceID"
       });
-        return response.data;
+      return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print('e response is sms ${e.response}');
@@ -193,8 +189,9 @@ class Api {
 
   checkSms(phone, code) async {
     try {
-      response = await dio.post("/check/sms", data: {"phone": "$phone", "code": "$code"});
-        return response.data;
+      response = await dio
+          .post("/check/sms", data: {"phone": "$phone", "code": "$code"});
+      return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print('e response is sms ${e.response}');
@@ -212,11 +209,15 @@ class Api {
 
   createPin(pinCode) async {
     try {
-      response = await dio.post("/create/pin", data: {"customerID": "${user.id}", "unique": "${user.unique}", "pinCode": "$pinCode"});
+      response = await dio.post("/create/pin", data: {
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
+        "pinCode": "$pinCode"
+      });
       if (response.data['success'] == true) {
         SharedPreferencesHelper.setString('pin', '$pinCode');
         user.pin = '$pinCode';
-      } 
+      }
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -232,13 +233,16 @@ class Api {
       return e.response.data;
     }
   }
-  
+
   getBalance() async {
     try {
-      response = await dio.post("/get/balance", data: {"customerID": "${user.id}", "unique": "${user.unique}"});
+      response = await dio.post("/get/balance",
+          data: {"customerID": "${user.id}", "unique": "${user.unique}"});
       if (response.data['success'] == true) {
-        SharedPreferencesHelper.setString('balance', '${response.data['result']['balance']}');
-        SharedPreferencesHelper.setString('balanceInBlock', '${response.data['result']['balanceInBlock']}');
+        SharedPreferencesHelper.setString(
+            'balance', '${response.data['result']['balance']}');
+        SharedPreferencesHelper.setString(
+            'balanceInBlock', '${response.data['result']['balanceInBlock']}');
         user.balance = '${response.data['result']['balance']}';
         user.balanceInBlock = '${response.data['result']['balanceInBlock']}';
 
@@ -269,12 +273,15 @@ class Api {
         "password": "$password",
       });
       if (response.data['success'] == true) {
-        SharedPreferencesHelper.setString('customerID', '${response.data['ID']}');
+        SharedPreferencesHelper.setString(
+            'customerID', '${response.data['ID']}');
         SharedPreferencesHelper.setString('phone', '+$phone');
         SharedPreferencesHelper.setString('name', '${response.data['name']}');
         SharedPreferencesHelper.setString('email', '${response.data['email']}');
-        SharedPreferencesHelper.setString('avatar', '${response.data['avatar']}');
-        SharedPreferencesHelper.setString('unique', '${response.data['unique']}');
+        SharedPreferencesHelper.setString(
+            'avatar', '${response.data['avatar']}');
+        SharedPreferencesHelper.setString(
+            'unique', '${response.data['unique']}');
         SharedPreferencesHelper.setString('pin', '${response.data['pin']}');
         user.id = '${response.data['ID']}';
         user.phone = '+$phone}';
@@ -283,7 +290,8 @@ class Api {
         user.avatar = '${response.data['avatar']}';
         user.unique = '${response.data['unique']}';
         user.pin = '${response.data['pin']}';
-        await updateFCM(token, '${response.data['ID']}', '${response.data['unique']}');
+        await updateFCM(
+            token, '${response.data['ID']}', '${response.data['unique']}');
         return response.data;
       } else {
         return response.data;
@@ -320,7 +328,6 @@ class Api {
         // print(e.response.statusCode);
         return e.response.data;
       }
-      
     }
   }
 
@@ -349,14 +356,14 @@ class Api {
 
   doTransfer(toID, amount, {transferChat}) async {
     try {
-      if(transferChat == null){
-          response = await dio.post("/check/send/money", data: {
+      if (transferChat == null) {
+        response = await dio.post("/check/send/money", data: {
           "customerID": "${user.id}",
           "unique": "${user.unique}",
           "toID": "$toID",
           "amount": "$amount",
         });
-      } else{
+      } else {
         response = await dio.post("/check/send/money", data: {
           "customerID": "${user.id}",
           "unique": "${user.unique}",
@@ -472,7 +479,11 @@ class Api {
 
   getHistories(page) async {
     try {
-      response = await dio.post("/get/histories", data: {"customerID": "${user.id}", "unique": "${user.unique}" , "page" : "$page"});
+      response = await dio.post("/get/histories", data: {
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
+        "page": "$page"
+      });
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -633,6 +644,7 @@ class Api {
       }
     }
   }
+
   ProgressBar _sendingMsgProgressBar;
 
   addTape(_path, title, description, context) async {
@@ -648,16 +660,17 @@ class Api {
         "description": description
       });
 
-      print("Adding tape with data ${formData.files[0].value.length}\n    FIEDLS ${formData.fields}");
-      
+      print(
+          "Adding tape with data ${formData.files[0].value.length}\n    FIEDLS ${formData.fields}");
+
       _sendingMsgProgressBar.show(context, "$p");
 
-      response = await dio.post("/tape/add", 
+      response = await dio.post(
+        "/tape/add",
         data: formData,
         onSendProgress: (int sent, int total) {
-          String percent = (sent/total*100).toStringAsFixed(2);
-          print("$percent%");
-
+          String percent = (sent / total * 100).toStringAsFixed(2);
+          print("$percent% $total");
         },
       );
 
@@ -677,7 +690,6 @@ class Api {
     }
   }
 
-  
   uploadAvatar(_path) async {
     try {
       FormData formData = FormData.fromMap({
@@ -717,18 +729,17 @@ class Api {
       print("Getting response from media upload ${response.data}");
 
       return response.data;
-      
-    } on DioError catch(e) {
-      if(e.response != null) {
+    } on DioError catch (e) {
+      if (e.response != null) {
         print(e.response.data);
         print(e.response);
-      } else{
+      } else {
         print("ERROR $e");
         print(e.request.data);
         print(e.message);
       }
       return e.response.data;
-    } 
+    }
   }
 
   addCommentToTape(String comment, String tapeID) async {

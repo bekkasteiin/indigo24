@@ -88,8 +88,6 @@ permissionForPush() async {
   await Permission.notification.request();
 }
 
-
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await ContactsService.addContact(Contact(displayName: "Name $i", givenName: 'Givenname $i', middleName: 'Middlename $i', phones: [ Item(label: 'home', value: '${87020000000+i}')]));
@@ -161,125 +159,128 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-  inAppPush(m) {
-    print('_________________In App Push $m');
-    // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:243, user_id: 113626, time: 1593593566, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, attachments: [{"filename":"NQet2z6UFBunjjrn25mm7cKd48L9g2Vi.mp3"}], attachment_url: https://media.chat.indigo24.xyz/media/voice/, type: 3}
-    // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:244, user_id: 113626, time: 1593593587, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, text: asvs, type: 0}
-    ChatRoom.shared.inSound();
-    showOverlayNotification((context) {
-      return Card(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        child: SafeArea(
-          child: ListTile(
-            onTap: () {
-              OverlaySupportEntry.of(context).dismiss();
-              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
-              ChatRoom.shared.getMessages(m['chat_id']);
-              goToChat("${m['user_name']}", "${m['chat_id']}", context,
-                  memberCount: "${m['type']}" == "0" ? 2 : 3,
-                  chatType: "${m['type']}",
-                  avatar: "${m['avatar']}",
-                  userIds: "${m['user_id']}");
-            },
-            leading: SizedBox.fromSize(
-                size: const Size(40, 40),
-                child: ClipOval(
-                    child: CachedNetworkImage(
-                  imageUrl: "${avatarUrl}noAvatar.png",
-                ))),
-            title: Text("${m['user_name']}"),
-            subtitle: Text(
-              m['attachments'] == null ? "${m["text"]}" : switchType(m['type']),
-            ),
-            trailing: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  OverlaySupportEntry.of(context).dismiss();
-                }),
+inAppPush(m) {
+  print('_________________In App Push $m');
+  // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:243, user_id: 113626, time: 1593593566, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, attachments: [{"filename":"NQet2z6UFBunjjrn25mm7cKd48L9g2Vi.mp3"}], attachment_url: https://media.chat.indigo24.xyz/media/voice/, type: 3}
+  // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:244, user_id: 113626, time: 1593593587, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, text: asvs, type: 0}
+  ChatRoom.shared.inSound();
+  showOverlayNotification((context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: SafeArea(
+        child: ListTile(
+          onTap: () {
+            OverlaySupportEntry.of(context).dismiss();
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
+            ChatRoom.shared.getMessages(m['chat_id']);
+            goToChat("${m['user_name']}", "${m['chat_id']}", context,
+                memberCount: "${m['type']}" == "0" ? 2 : 3,
+                chatType: "${m['type']}",
+                avatar: "${m['avatar']}",
+                userIds: "${m['user_id']}");
+          },
+          leading: SizedBox.fromSize(
+              size: const Size(40, 40),
+              child: ClipOval(
+                  child: CachedNetworkImage(
+                imageUrl: "${avatarUrl}noAvatar.png",
+              ))),
+          title: Text("${m['user_name']}"),
+          subtitle: Text(
+            m['attachments'] == null ? "${m["text"]}" : switchType(m['type']),
           ),
+          trailing: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                OverlaySupportEntry.of(context).dismiss();
+              }),
         ),
-      );
-    }, duration: Duration(milliseconds: 4000));
-  }
-  goToChat(name, chatID, context, {chatType, memberCount, userIds, avatar, avatarUrl}) {
-    ChatRoom.shared.setCabinetStream();
-    ChatRoom.shared.checkUserOnline(userIds);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ChatPage(
-                name,
-                chatID,
-                chatType: chatType,
-                memberCount: memberCount,
-                userIds: userIds,
-                avatar: avatar,
-                avatarUrl: avatarUrl,
-              )),
-    ).whenComplete(() {
-      // this is bool for check load more is needed or not
-      globalBoolForForceGetChat = false;
-      ChatRoom.shared.forceGetChat();
-      ChatRoom.shared.closeCabinetStream();
-    });
-  }
+      ),
+    );
+  }, duration: Duration(milliseconds: 4000));
+}
 
-  switchType(type) {
-    // const TEXT_MESSAGE_TYPE = 0;
-    // const IMAGE_MESSAGE_TYPE = 1;
-    // const DOCUMENT_MESSAGE_TYPE = 2;
-    // const VOICE_MESSAGE_TYPE = 3;
-    // const VIDEO_MESSAGE_TYPE = 4;
-    // const SYSTEM_MESSAGE_TYPE = 7;
-    // const SYSTEM_MESSAGE_DIVIDER_TYPE = 8;
-    // const GEO_POINT_MESSAGE_TYPE = 9;
-    // const REPLY_MESSAGE_TYPE = 10;
-    // const MONEY_MESSAGE_TYPE = 11;
-    // const LINK_MESSAGE_TYPE = 12;
-    // const FORWARD_MESSAGE_TYPE = 13;
+goToChat(name, chatID, context,
+    {chatType, memberCount, userIds, avatar, avatarUrl}) {
+  ChatRoom.shared.setCabinetStream();
+  ChatRoom.shared.checkUserOnline(userIds);
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+        builder: (context) => ChatPage(
+              name,
+              chatID,
+              chatType: chatType,
+              memberCount: memberCount,
+              userIds: userIds,
+              avatar: avatar,
+              avatarUrl: avatarUrl,
+            )),
+  ).whenComplete(() {
+    // this is bool for check load more is needed or not
+    globalBoolForForceGetChat = false;
+    ChatRoom.shared.forceGetChat();
+    ChatRoom.shared.closeCabinetStream();
+  });
+}
 
-    switch ('$type') {
-      case '0':
-        return '${localization.textMessage}';
-        break;
-      case '1':
-        return '${localization.photo}';
-        break;
-      case '2':
-        return '${localization.document}';
-        break;
-      case '3':
-        return '${localization.voiceMessage}';
-        break;
-      case '4':
-        return '${localization.video}';
-        break;
-      case '7':
-        return '${localization.systemMessage}';
-        break;
-      // case '8':
-      // return 'Дивайдер сообщение';
-      // break;
-      case '9':
-        return '${localization.location}';
-        break;
-      case '10':
-        return '${localization.reply}';
-        break;
-      case '11':
-        return '${localization.money}';
-        break;
-      case '12':
-        return '${localization.link}';
-        break;
-      case '13':
-        return '${localization.forwardedMessage}';
-        break;
-      default:
-        return '${localization.message}';
-    }
+switchType(type) {
+  // const TEXT_MESSAGE_TYPE = 0;
+  // const IMAGE_MESSAGE_TYPE = 1;
+  // const DOCUMENT_MESSAGE_TYPE = 2;
+  // const VOICE_MESSAGE_TYPE = 3;
+  // const VIDEO_MESSAGE_TYPE = 4;
+  // const SYSTEM_MESSAGE_TYPE = 7;
+  // const SYSTEM_MESSAGE_DIVIDER_TYPE = 8;
+  // const GEO_POINT_MESSAGE_TYPE = 9;
+  // const REPLY_MESSAGE_TYPE = 10;
+  // const MONEY_MESSAGE_TYPE = 11;
+  // const LINK_MESSAGE_TYPE = 12;
+  // const FORWARD_MESSAGE_TYPE = 13;
+
+  switch ('$type') {
+    case '0':
+      return '${localization.textMessage}';
+      break;
+    case '1':
+      return '${localization.photo}';
+      break;
+    case '2':
+      return '${localization.document}';
+      break;
+    case '3':
+      return '${localization.voiceMessage}';
+      break;
+    case '4':
+      return '${localization.video}';
+      break;
+    case '7':
+      return '${localization.systemMessage}';
+      break;
+    // case '8':
+    // return 'Дивайдер сообщение';
+    // break;
+    case '9':
+      return '${localization.location}';
+      break;
+    case '10':
+      return '${localization.reply}';
+      break;
+    case '11':
+      return '${localization.money}';
+      break;
+    case '12':
+      return '${localization.link}';
+      break;
+    case '13':
+      return '${localization.forwardedMessage}';
+      break;
+    default:
+      return '${localization.message}';
   }
+}
+
 class Tabs extends StatefulWidget {
   @override
   _TabsState createState() => _TabsState();
@@ -426,7 +427,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
-    if(isValid){
+    if (isValid) {
       Future.delayed(const Duration(milliseconds: 250), () {
         print(' is really valid ');
         _verificationNotifier.add(isValid);
@@ -434,10 +435,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           this.isAuthenticated = isValid;
         });
       });
-    } else{
+    } else {
       _verificationNotifier.add(isValid);
     }
-
 
     // if (!isValid){
     // return showDialog<void>(
@@ -524,10 +524,12 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       // Future.delayed(Duration(seconds: 5)).then((value) {
       // ChatRoom.shared.userCheck(getContactsResult[306]['phone']);
       // });
+      var result = getContactsResult is List ? false : !getContactsResult;
+
       for (int i = 0; i < getContactsResult.length; i++) {
         ChatRoom.shared.userCheck(getContactsResult[i]['phone']);
       }
-      var result = getContactsResult is List ? false : !getContactsResult;
+
       if (result) {
         Widget okButton = CupertinoDialogAction(
           child: Text("${localization.openSettings}"),
@@ -553,7 +555,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
     _firebaseMessaging.getToken().then((value) async {
       print("MY FCM TOKEN $value");
-      await api.updateFCM(value, user.id, user.unique);
+      await api.updateFCM(value, user.id, user.unique).then((val) {
+        print("VALUE VALUE $val");
+      });
     });
 
     _firebaseMessaging.configure(
@@ -692,10 +696,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       // await chatsDB.insertChats(chatsModel);
     });
   }
-
-
-
-
 
   goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
     ChatRoom.shared.setCabinetStream();

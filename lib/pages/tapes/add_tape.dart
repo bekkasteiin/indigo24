@@ -47,12 +47,26 @@ class _AddTapePageState extends State<AddTapePage> {
     }
   }
 
+  Future<void> _pauseVideo() async {
+    await _controller.setVolume(0.0);
+    await _controller.initialize();
+    await _controller.setLooping(false);
+    await _controller.pause();
+    setState(() {
+      _controller = null;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
   }
 
   action() {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
     final act = CupertinoActionSheet(
         title: Text('${localization.selectOption}'),
         // message: Text('Which option?'),
@@ -88,6 +102,12 @@ class _AddTapePageState extends State<AddTapePage> {
     }
     if (isVideo) {
       final pickedFile = await picker.getVideo(source: source);
+      print(File(pickedFile.path).lengthSync());
+
+      if (File(pickedFile.path).lengthSync() > 104857600) {
+        showAlertDialog(context, "Файл превышает 100 Мб");
+        return;
+      }
 
       // final File file = await ImagePicker.pickVideo(source: source);
       // _videoFile = file;
@@ -161,7 +181,6 @@ class _AddTapePageState extends State<AddTapePage> {
 
   Future<void> _disposeVideoController() async {
     if (_controller != null) {
-      await _controller.dispose();
       _controller = null;
     }
   }
@@ -224,6 +243,7 @@ class _AddTapePageState extends State<AddTapePage> {
 
   Future addTape(context) async {
     print("MY current file ${_currentFile.path}");
+    _disposeVideoController();
     api
         .addTape(_currentFile.path, titleController.text,
             descriptionController.text, context)
@@ -237,7 +257,8 @@ class _AddTapePageState extends State<AddTapePage> {
           titleController.text = "";
           descriptionController.text = "";
           isNotPicked = true;
-          Navigator.pop(context);
+          // Navigator.pop(context, r['result']);
+          Navigator.of(context).pop(r['result']);
         } else {
           print("false false false ");
           showAlertDialog(context, r["message"] ?? "");
@@ -316,6 +337,7 @@ class _AddTapePageState extends State<AddTapePage> {
                     showAlertDialog(context, "${localization.selectFile}");
                   } else {
                     print("Current file $_currentFile");
+                    _pauseVideo();
                     await addTape(context);
                   }
                 },

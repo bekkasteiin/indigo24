@@ -230,7 +230,7 @@ class ChatRoom {
         "userToken": "${user.unique}",
         "chat_id": chatId,
         "user_id": '${user.id}',
-        'page' : '$page' != 'null' ? '$page' : '1',
+        'page': '$page' != 'null' ? '$page' : '1',
       }
     });
     print('chat members');
@@ -406,10 +406,7 @@ class ChatRoom {
     }
   }
 
-
-
-  
-  sendMoney(token, chatId){
+  sendMoney(token, chatId) {
     var data = json.encode({
       "cmd": "message:create",
       "data": {
@@ -423,6 +420,7 @@ class ChatRoom {
     print('send money to chat created $data');
     channel.sink.add(data);
   }
+
   replyMessage(message, chatID, type, mId) {
     outSound();
 
@@ -472,7 +470,7 @@ class ChatRoom {
             break;
           case "chat:get":
             if (!cabinetController.isClosed) {
-            cabinetController.add(new MyCabinetEvent(json));
+              cabinetController.add(new MyCabinetEvent(json));
             }
             break;
           case "message:create":
@@ -521,10 +519,10 @@ class ChatRoom {
             break;
           case "chat:members":
             print('added to chatInfoController');
-            if(chatInfoController != null){
+            if (chatInfoController != null) {
               chatInfoController.add(new MyChatInfoEvent(json));
-            } 
-            if(cabinetController != null && !cabinetController.isClosed){
+            }
+            if (cabinetController != null && !cabinetController.isClosed) {
               cabinetController.add(new MyCabinetEvent(json));
             }
             break;
@@ -558,7 +556,7 @@ class ChatRoom {
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        Future.delayed(const Duration(milliseconds: 15000), () {
+        Future.delayed(const Duration(seconds: 15), () {
           connect();
           init();
         });

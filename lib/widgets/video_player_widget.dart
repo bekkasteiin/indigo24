@@ -48,7 +48,7 @@ class GradientFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var fab = FloatingActionButton(
-      heroTag: "btn2",
+      heroTag: null,
       elevation: elevation != null ? elevation : 6,
       child: Container(
         constraints: BoxConstraints.expand(),

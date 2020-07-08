@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:indigo24/services/constants.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import './flick_multi_manager.dart';
@@ -51,22 +55,30 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
         }
       },
       child: Container(
+        color: Colors.transparent,
         child: FlickVideoPlayer(
           flickManager: flickManager,
           flickVideoWithControls: FlickVideoWithControls(
+            backgroundColor: Colors.transparent,
             playerLoadingFallback: Positioned.fill(
               child: Stack(
                 children: <Widget>[
                   Positioned.fill(
-                    child: Image.asset(
-                      widget.image,
-                      fit: BoxFit.cover,
-                    ),
+                    child: widget.image.startsWith('assets')
+                        ? Image.asset(
+                            widget.image,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.network(
+                            "$uploadTapes${widget.image}",
+                            fit: BoxFit.cover,
+                          ),
                   ),
                   Positioned(
                     right: 10,
                     top: 10,
                     child: Container(
+                      color: Colors.transparent,
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -86,8 +98,8 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
           flickVideoWithControlsFullscreen: FlickVideoWithControls(
             playerLoadingFallback: Center(
                 child: Image.network(
-              widget.image,
-              fit: BoxFit.fitWidth,
+              "$uploadTapes${widget.image}",
+              fit: BoxFit.cover,
             )),
             controls: FlickLandscapeControls(),
             iconThemeData: IconThemeData(

@@ -2,14 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/pages/chat/ui/replyMessage.dart';
-import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
-import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+
+var parser = EmojiParser();
 
 class Sended extends StatelessWidget {
   final m;
@@ -187,8 +189,17 @@ class SendedMessageWidget extends StatelessWidget {
                           : (a[0] == ":" && a[l] == ":" && content.length > 8)
                               ? Text(content, style: TextStyle(fontSize: 24))
                               : (type == "1")
-                                  ? ImageMessage(
-                                      "$mediaUrl$rMedia", "$mediaUrl$media")
+                                  ? (() {
+                                      listMessages.forEach((element) {
+                                        if (element['type'].toString() == '1') {
+                                          imageCount.add(element);
+                                          test = element;
+                                        }
+                                      });
+                                      return ImageMessage(
+                                          "$mediaUrl$rMedia", "$mediaUrl$media",
+                                          imageCount: imageCount.indexOf(test));
+                                    }())
                                   : (type == "2")
                                       ? FileMessage(url: "$mediaUrl$media")
                                       : (type == "3")
