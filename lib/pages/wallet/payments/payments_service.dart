@@ -154,10 +154,12 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               getServiceResult['result'].forEach((element){
                 print('forEach element ${element['name']}');
                 if('${element['name']}' == 'account'){
-                  accauntMask = element['mask'];
-                  if(element['mask'] != ' '){
+                  print(element);
+                  accountMask = element['mask'];
+                  if(element['mask'] == ' '){
                     print('if');
-                    temp = 'false';
+                    // temp = 'false';
+                    // loginFormatter = MaskTextInputFormatter(filter: { "*" : RegExp(r'[0-9]') });
                   } else{
                     print('else else');
                     loginFormatter = MaskTextInputFormatter(mask: '${element['mask']}', filter: { "*" : RegExp(r'[0-9]') });
@@ -320,7 +322,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       ),
     );
   }
-  String accauntMask = '';
+  String accountMask = '';
   Container mainPaymentsDetailMobile(snapshot) {
     return Container(
       height: 170,

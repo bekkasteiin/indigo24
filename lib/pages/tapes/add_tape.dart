@@ -362,6 +362,9 @@ class _AddTapePageState extends State<AddTapePage> {
                       margin: EdgeInsets.all(10),
                       child: TextField(
                           controller: titleController,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(40),
+                          ],
                           decoration: InputDecoration(
                               labelText: '${localization.title}')),
                     ),
@@ -369,6 +372,10 @@ class _AddTapePageState extends State<AddTapePage> {
                       margin: EdgeInsets.all(10),
                       child: TextField(
                           minLines: 1,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(80),
+                          ],
+                          keyboardType: TextInputType.text,
                           maxLines: 4,
                           controller: descriptionController,
                           decoration: InputDecoration(

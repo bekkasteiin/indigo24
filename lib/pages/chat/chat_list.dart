@@ -300,7 +300,7 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
                             ? myList[i]["last_message"]['text'].length != 0
                                 ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"
                                 : myList[i]["last_message"]['message_for_type'] != null
-                                    ? myList[i]["last_message"]['message_for_type']
+                                    ? "${myList[i]["last_message"]['message_for_type'][0].toUpperCase() + myList[i]["last_message"]['message_for_type'].substring(1)}"
                                     : ""
                             : "",
                         overflow: TextOverflow.ellipsis,

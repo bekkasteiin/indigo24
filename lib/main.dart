@@ -583,9 +583,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
     setUser().then((result) async {
       print("result: $result");
-      print('user: ${user.id}');
-      print('user: ${user.name}');
-      print('user: ${user.balance}');
+      print('user id: ${user.id}');
+      print('user name: ${user.name}');
+      print('user balance: ${user.balance}');
 
       _connectivity.initialise();
       _connectivity.myStream.listen((source) {
@@ -620,7 +620,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   _init() {
     if (initIsCalling == 1) {
-      ChatRoom.shared.connect();
+      ChatRoom.shared.connect(context);
       ChatRoom.shared.setStream();
       _connect();
       ChatRoom.shared.init();
@@ -634,9 +634,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       if (e.json["cmd"] != 'user:check')
-        print("LISTENING EVENT ${e.json["cmd"]}");
+      print("LISTENING EVENT ${e.json["cmd"]}");
       var cmd = e.json["cmd"];
-      print(e.json);
+      // print('user check : ${e.json}');
       switch (cmd) {
         case 'message:create':
           print(e.json["data"]);
