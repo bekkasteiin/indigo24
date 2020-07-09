@@ -8,13 +8,10 @@ import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/chat/ui/replyMessage.dart';
-import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
-import 'package:indigo24/widgets/video/default_player.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
-import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
 var parser = EmojiParser();
@@ -303,7 +300,6 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                                 content,
                                                                 replyData)
                                                             :
-                                                            // TODO CHANGE
                                                             type == '11'
                                                                 ? Text('$content KZT', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),)
                                                                 // MoneyMessage(content)

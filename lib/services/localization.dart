@@ -120,6 +120,9 @@ String history = 'History';
 String youSended = 'You have sended';
 String youReceived = 'You have received';
 String online = 'online';
+String enterValidAccount = 'Enter the correct account number';
+String enterBelowMax = 'Enter the amount below the maximum mark';
+String enterAboveMin = 'Enter the amount above the minimum mark';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -250,6 +253,9 @@ setLanguage(code) {
       youSended = 'You have sended';
       youReceived = 'You have received';
       online = 'online';
+      enterValidAccount = 'Enter the correct account number';
+      enterBelowMax = 'Enter the amount below the maximum mark';
+      enterAboveMin = 'Enter the amount above the minimum mark';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -369,6 +375,9 @@ setLanguage(code) {
       youSended = 'Вы отправили';
       youReceived = 'Вы получили';
       online = 'онлайн';
+      enterValidAccount = 'Введите корректный номер аккаунта';
+      enterBelowMax = 'Введите сумму ниже максимальной отметки';
+      enterAboveMin = 'Введите сумму выше минимальной отметки';
       print('ru');
       break;
     case 'kz':
@@ -489,6 +498,9 @@ setLanguage(code) {
       youSended = 'Сіз жібердіңіз';
       youReceived = 'Сіз алдыңыз';
       online = 'онлайн';
+      enterValidAccount = 'Дұрыс тіркелгі нөмірін енгізіңіз';
+      enterBelowMax = 'Ең жоғарғы белгіден төмен соманы енгізіңіз';
+      enterAboveMin = 'Ең төменгі белгіден жоғары соманы енгізіңіз';
       print('kz');
       break;
     case 'uz':
@@ -499,7 +511,7 @@ setLanguage(code) {
       password = 'Махфий сўз';
       forgotPassword = 'Махфий сўзни унутдингизми?';
       next = 'Сўнгра';
-      currentLanguage = 'Ҳозирги тил';
+      currentLanguage = 'O\'zbekcha';
       email = 'Электрон почта';
       exit = 'Чиқиш';
       support = 'ҚЎЛЛАБ-ҚУВВАТЛАШ ХИЗМАТИ';
@@ -609,6 +621,9 @@ setLanguage(code) {
       youSended = 'Сиз юборган';
       youReceived = 'Сиз олган';
       online = 'onlayn';
+      enterValidAccount = 'Тўғри ҳисоб рақамини киритинг';
+      enterBelowMax = 'Максимал белгидан паст миқдорни киритинг';
+      enterAboveMin = 'Minimal белгидан юқори миқдорни киритинг';
       print('uz');
       break;
  case 'uzb':
@@ -619,7 +634,7 @@ setLanguage(code) {
       password = 'Maxfiy so\'z';
       forgotPassword = 'Maxfiy so\'zni unutdingizmi?';
       next = 'So\'ngra';
-      currentLanguage = 'Joriy til';
+      currentLanguage = 'Ўзбекча';
       email = 'Elektron pochta';
       exit = 'Chiqish';
       support = 'QO\'LLAB-QUVVATLASH XIZMATI';
@@ -729,6 +744,9 @@ setLanguage(code) {
       youSended = 'Siz yuborgan';
       youReceived = 'Siz bor';
       online = 'onlayn';
+      enterValidAccount = 'To\'g\'ri hisob raqamini kiriting';
+      enterBelowMax = 'Maksimal belgidan past miqdorni kiriting';
+      enterAboveMin = 'Eng kam belgidan yuqori miqdorni kiriting';
       print('uzb');
       break;
     default:

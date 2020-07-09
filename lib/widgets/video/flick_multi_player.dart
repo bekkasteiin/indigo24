@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:indigo24/services/constants.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import './flick_multi_manager.dart';
