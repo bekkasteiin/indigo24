@@ -218,7 +218,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                       topLeft: Radius.circular(15),
                       topRight: Radius.circular(15)),
                   child: Container(
-                    color: Color(0xFFFFFFFF),
+                    color: type == '11' ? Color(0xFF0543B8) : Colors.white,
                     child: Stack(children: <Widget>[
                       Column(
                         mainAxisSize: MainAxisSize.min,
@@ -305,7 +305,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                             :
                                                             // TODO CHANGE
                                                             type == '11'
-                                                                ? Text('${localization.youReceived} $content KZT', style: TextStyle(fontWeight: FontWeight.w600),)
+                                                                ? Text('$content KZT', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),)
                                                                 // MoneyMessage(content)
                                                                 : Text(
                                                                     content,
@@ -331,7 +331,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                               time,
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.black.withOpacity(0.6),
+                                color: type == '11' ? Colors.white : Colors.black.withOpacity(0.6),
                               ),
                             ),
                           ],

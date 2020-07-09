@@ -97,7 +97,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
           } else if (e.json['data']['status'] == 'true') {
             // ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
           } else {
-            _showError(context, '${localization.cannotFindUser}');
+            _showError(context, '${localization.userNotInSystem}');
           }
           break;
         case "chat:members:add":

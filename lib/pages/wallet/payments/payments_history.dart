@@ -360,7 +360,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> with TickerProv
 
 
   Future _loadBalanceData() async {
-    api.getHistoryBalance(balanceHistoryPage).then((balanceHistory){
+    api.getHistoryBalance(balanceHistoryPage+1).then((balanceHistory){
       print(balanceHistory);
       if(balanceHistory['result'].isNotEmpty){
         balanceHistoryPage++;

@@ -72,7 +72,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                   curve: Curves.bounceInOut
                 )
       ..addStatusListener((status) {
-        passCodeError = widget.withPin == null ? '${localization.passcodeError}' : '';
+        passCodeError = widget.withPin == null ? '${localization.incorrectPin}' : '';
         widget.withPin == null ?? Vibration.vibrate();
         if (status == AnimationStatus.completed) {
           setState(() {
@@ -183,7 +183,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
         enteredPasscode += text;
         if (enteredPasscode.length == widget.passwordDigits) {
           if(widget.title == '${localization.createPin}'){
-            widget.title = '${localization.replyPin}';
+            widget.title = '${localization.repeatPin}';
           }
           widget.passwordEnteredCallback(enteredPasscode);
         }

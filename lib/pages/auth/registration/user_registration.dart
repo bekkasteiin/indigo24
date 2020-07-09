@@ -459,8 +459,8 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             } else {
                               print('different passwords');
                               setState(() {
-                                firstPasswordError = '${localization.passwordsIdentical}';
-                                secondPasswordError = '${localization.passwordsIdentical}';
+                                firstPasswordError = '${localization.passwordNotMatch}';
+                                secondPasswordError = '${localization.passwordNotMatch}';
                               });
                             }
                           } else {

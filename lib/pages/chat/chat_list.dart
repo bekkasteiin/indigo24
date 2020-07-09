@@ -130,6 +130,7 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
             iconSize: 30,
             color: Color(0xFF001D52),
             onPressed: () {
+              ChatRoom.shared.setCabinetInfoStream();
               Navigator.push(context,MaterialPageRoute(builder: (context) => ChatContactsPage()))
                 .whenComplete(() {
                   ChatRoom.shared.contactController.close();

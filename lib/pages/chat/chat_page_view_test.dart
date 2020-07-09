@@ -76,14 +76,14 @@ class ImageMessage extends StatelessWidget {
                   color: Colors.grey.withOpacity(0.5),
                 ),
                 Center(
-                  child: Image.asset("assets/preloader.gif",
-                      width: MediaQuery.of(context).size.width * 0.3),
+                  // child: Image.asset("assets/preloader.gif",
+                  //     width: MediaQuery.of(context).size.width * 0.3),
                 ),
               ],
             )
           : Center(
-              child: Image.asset("assets/preloader.gif",
-                  width: MediaQuery.of(context).size.width * 0.3),
+              // child: Image.asset("assets/preloader.gif",
+              //     width: MediaQuery.of(context).size.width * 0.3),
             ),
       width: MediaQuery.of(context).size.width * 0.7,
       height: MediaQuery.of(context).size.width * 0.7,

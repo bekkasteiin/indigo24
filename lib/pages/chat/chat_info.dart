@@ -385,7 +385,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                 },
               );
               CupertinoAlertDialog alert = CupertinoAlertDialog(
-                title: Text("${localization.alert}"),
+                title: Text("${localization.attention}"),
                 content: Text('${localization.sureExitGroup}'),
                 actions: [
                   noButton,
@@ -438,7 +438,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           ),
           CupertinoActionSheetAction(
             child: member['role'] == '$memberRole'
-                ? Text('${localization.makeAdmin}')
+                ? Text('${localization.setAdmin}')
                 : member['role'] == '$adminRole'
                     ? Text('${localization.makeMember}')
                     : Text('${localization.error}'),
@@ -610,7 +610,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.only(left: 20),
                             child: Text(
-                              '$memberCount online',
+                              '$memberCount ${localization.online}',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -645,7 +645,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                     child: ListView.builder(
                                       itemCount: membersList.length,
                                       itemBuilder: (context, i) {
-                                        print(membersList[i]);
                                         return ListTile(
                                             onTap: () {
                                               if (membersList[i]['user_id']
@@ -686,16 +685,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                               child: Stack(
                                                 children: <Widget>[
                                                   CircleAvatar(
-                                                    backgroundImage: (membersList[
-                                                                        i][
-                                                                    "avatar"] ==
-                                                                null ||
-                                                            membersList[i][
-                                                                    "avatar"] ==
-                                                                '' ||
-                                                            membersList[i][
-                                                                    "avatar"] ==
-                                                                false)
+                                                    backgroundImage: (membersList[i]["avatar"] == null || membersList[i]["avatar"] == '' || membersList[i][ "avatar"] == false)
                                                         ? CachedNetworkImageProvider(
                                                             "${avatarUrl}noAvatar.png")
                                                         : CachedNetworkImageProvider(

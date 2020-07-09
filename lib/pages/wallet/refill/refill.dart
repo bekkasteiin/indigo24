@@ -200,7 +200,7 @@ class _RefillPageState extends State<RefillPage> {
                               },
                             );
                             CupertinoAlertDialog alert = CupertinoAlertDialog(
-                              title: Text("${localization.alert}"),
+                              title: Text("${localization.attention}"),
                               content: Text('${refillResult['message']}'),
                               actions: [
                                 okButton,

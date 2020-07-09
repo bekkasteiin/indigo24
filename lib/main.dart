@@ -56,24 +56,25 @@ getContacts(context) async {
   try {
     contacts.clear();
     if (await Permission.contacts.request().isGranted) {
-      Iterable<Contact> phonebook =
-          await ContactsService.getContacts(withThumbnails: false);
-      phonebook.forEach((el) {
-        if (el.displayName != null) {
-          el.phones.forEach((phone) {
-            if (!contacts.contains(formatPhone(phone.value))) {
-              phone.value = formatPhone(phone.value);
-              if (contacts.every((user) => user['phone'] != phone.value)) {
-                contacts.add({
-                  'name': el.displayName,
-                  'phone': phone.value,
-                  'label': phone.label,
-                });
+      Iterable<Contact> phonebook = await ContactsService.getContacts(withThumbnails: false);
+      if(phonebook!=null){
+        phonebook.forEach((el) {
+          if (el.displayName != null) {
+            el.phones.forEach((phone) {
+              if (!contacts.contains(formatPhone(phone.value))) {
+                phone.value = formatPhone(phone.value);
+                if (contacts.every((user) => user['phone'] != phone.value)) {
+                  contacts.add({
+                    'name': el.displayName,
+                    'phone': phone.value,
+                    'label': phone.label,
+                  });
+                }
               }
-            }
-          });
-        }
-      });
+            });
+          }
+        });
+      }
       return contacts.toSet().toList();
     } else {
       return false;
@@ -1070,7 +1071,7 @@ logOut(BuildContext context) async {
   );
   CupertinoAlertDialog alert = CupertinoAlertDialog(
     title: Text("${localization.error}"),
-    content: Text('${localization.sessionDone}'),
+    content: Text('${localization.sessionIsOver}'),
     actions: [
       okButton,
     ],
