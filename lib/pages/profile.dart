@@ -452,7 +452,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   builder: (BuildContext context) => CustomDialog(
                                         title: null,
                                         description:
-                                            "${localization.sureLogout}?",
+                                            "${localization.wantToExit}?",
                                         buttonText: "Okay",
                                         image: CachedNetworkImage(imageUrl: '$avatarUrl${user.avatar}'),
                                       ),

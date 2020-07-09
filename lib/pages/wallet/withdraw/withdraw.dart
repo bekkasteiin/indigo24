@@ -185,7 +185,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                               },
                             );
                             CupertinoAlertDialog alert = CupertinoAlertDialog(
-                              title: Text("${localization.alert}"),
+                              title: Text("${localization.attention}"),
                               content: Text(withdrawResult['message']),
                               actions: [
                                 okButton,

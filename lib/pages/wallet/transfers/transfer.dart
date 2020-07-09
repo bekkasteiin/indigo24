@@ -39,7 +39,7 @@ class _TransferPageState extends State<TransferPage> {
     );
 
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text(type == '0' ? "${localization.alert}" : type == '1' ? '${localization.success}' : '${localization.error}' ),
+      title: Text(type == '0' ? "${localization.attention}" : type == '1' ? '${localization.success}' : '${localization.error}' ),
       content: Text(message),
       actions: [
         okButton,

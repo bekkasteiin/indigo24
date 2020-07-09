@@ -505,8 +505,10 @@ class ChatRoom {
                 contactController.add(new MyContactEvent(json));
               }
               if (cabinetInfoController != null) {
-                print('added to cabinet info');
-                cabinetInfoController.add(new MyCabinetInfoEvent(json));
+                if(!cabinetInfoController.isClosed){
+                  print('added to cabinet info');
+                  cabinetInfoController.add(new MyCabinetInfoEvent(json));
+                }
               }
               if (changeController != null) {
                 changeController.add(new MyEvent(json));

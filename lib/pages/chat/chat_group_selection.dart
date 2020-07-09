@@ -88,7 +88,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
           } else if (e.json['data']['status'] == 'true') {
             // ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
           } else {
-            _showError(context, '${localization.cannotFindUser}');
+            _showError(context, '${localization.userNotInSystem}');
           }
           break;
         case "chat:create":
@@ -104,6 +104,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
               context,
               MaterialPageRoute(
                   builder: (context) => ChatPage(name, chatID,
+                      avatarUrl: 'https://indigo24.com/uploads/avatars/' ,
                       chatType: e.json['data']['type'],
                       memberCount: e.json["data"]['members_count'])),
             ).whenComplete(() {
@@ -245,7 +246,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                   } else {
                     print('member count less than 3');
                     _showError(
-                        context, '${localization.minCountOfGroup}');
+                        context, '${localization.minMembersCount}');
                   }
                 })
           ],

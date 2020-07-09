@@ -55,7 +55,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         return ConstrainedBox( 
           constraints: BoxConstraints(maxHeight: 1.0),
           child: CupertinoAlertDialog(
-            title: Text(type == '0' ? "${localization.alert}" : type == '1' ? '${localization.success}' : '${localization.error}' ),
+            title: Text(type == '0' ? "${localization.attention}" : type == '1' ? '${localization.success}' : '${localization.error}' ),
             content: Text(message),
             actions: [
               okButton,

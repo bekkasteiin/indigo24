@@ -172,7 +172,7 @@ class SendedMessageWidget extends StatelessWidget {
                 topLeft: Radius.circular(15),
                 topRight: Radius.circular(15)),
             child: Container(
-              color: Colors.white,
+              color: type == '11' ? Color(0xFF0543B8) : Colors.white,
               child: Stack(children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
@@ -202,7 +202,7 @@ class SendedMessageWidget extends StatelessWidget {
                                                   ? ReplyMessage(
                                                       content, replyData)
                                                   : type == '11'
-                                                      ? Text('${localization.youSended} $content KZT', style: TextStyle(fontWeight: FontWeight.w600),)
+                                                      ? Text('$content KZT', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),)
                                                       // MoneyMessage(content)
                                                       : (type == "uploading")
                                                           ? Container(
@@ -235,14 +235,14 @@ class SendedMessageWidget extends StatelessWidget {
                                                                               color: Colors.grey.withOpacity(0.5),
                                                                             ),
                                                                             Center(
-                                                                              child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width * 0.3),
+                                                                              // child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width * 0.3),
                                                                             ),
                                                                           ],
                                                                         )
                                                                       : Center(
-                                                                          child: Image.asset(
-                                                                              "assets/preloader.gif",
-                                                                              width: MediaQuery.of(context).size.width * 0.3),
+                                                                        //   child: Image.asset(
+                                                                        //       "assets/preloader.gif",
+                                                                        //       width: MediaQuery.of(context).size.width * 0.3),
                                                                         ),
                                                             )
                                                           : Text(
@@ -256,12 +256,12 @@ class SendedMessageWidget extends StatelessWidget {
                       ? Icon(
                           Icons.done_all,
                           size: 16,
-                          color: Colors.blue,
+                          color: type == '11' ? Colors.white : Colors.blue,
                         )
                       : Icon(
                           Icons.done,
                           size: 16,
-                          color: Colors.grey[500],
+                          color: type == '11' ? Colors.white : Colors.grey[500],
                         ),
                 ),
                 Positioned(
@@ -272,7 +272,7 @@ class SendedMessageWidget extends StatelessWidget {
                       Text(
                         time,
                         style: TextStyle(
-                            fontSize: 10, color: Colors.black.withOpacity(0.6)),
+                            fontSize: 10, color: type == '11' ? Colors.white : Colors.black.withOpacity(0.6)),
                       ),
                       edit == '1'
                           ? Text(" ред.",

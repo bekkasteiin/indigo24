@@ -949,7 +949,7 @@ class _ChatPageState extends State<ChatPage> {
                                 ('$online' == 'online' ||
                                         '$online' == 'offline')
                                     ? '$online'
-                                    : '${localization.wasOnline} $online',
+                                    : '${localization.lastSeen} $online',
                                 style: TextStyle(
                                     color: Color(0xFF001D52),
                                     fontSize: 14,
@@ -986,17 +986,14 @@ class _ChatPageState extends State<ChatPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(25.0),
                 child: ClipOval(
-                    child: CachedNetworkImage(
-                        height: 50,
-                        width: 50,
-                        imageUrl: widget.avatar == null
-                            ? "${avatarUrl}noAvatar.png"
-                            : widget.avatarUrl == null
-                                ? avatarUrl + widget.avatar
-                                : '${widget.avatarUrl}${widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                        errorWidget: (context, url, error) =>
-                            CachedNetworkImage(
-                                imageUrl: "${avatarUrl}noAvatar.png"))),
+                    child: Image.network('${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}')
+                  // child: CachedNetworkImage(
+                  //   height: 50,
+                  //   width: 50,
+                  //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                  //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
+                  // ),
+                ),
               ),
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
@@ -1353,16 +1350,20 @@ class _ChatPageState extends State<ChatPage> {
                                         },
                                         // onTap: () {
                                         //   startRecord();
-                                        // },
+                                        // }, 
                                         // onDoubleTap: () {
                                         //   stopRecord();
                                         // },
                                         child: Center(
                                             child: !isRecording
-                                                ? Icon(
-                                                    Icons.mic,
-                                                    size: 30,
-                                                  )
+                                                ? Container(
+                                                  height: 50,
+                                                  width: 50,
+                                                  child: Icon(
+                                                      Icons.mic,
+                                                      size: 50,
+                                                    ),
+                                                )
                                                 : Container()),
                                       ),
                                     )
@@ -1373,56 +1374,60 @@ class _ChatPageState extends State<ChatPage> {
                                   //     print("audio pressed");
                                   //   },
                                   // )
-                                  : IconButton(
-                                      icon: Icon(Icons.send),
-                                      onPressed: () {
-                                        print(
-                                            "new message or editing? editing: $isEditing");
-                                        if (isEditing) {
-                                          print("Edit message is called");
-                                          var mId = editMessage['id'] == null
-                                              ? editMessage['message_id']
-                                              : editMessage['id'];
-                                          var type = editMessage['type'];
-                                          var time = editMessage['time'];
-                                          ChatRoom.shared.editMessage(
-                                              _text.text,
-                                              widget.chatID,
-                                              type,
-                                              time,
-                                              mId);
-                                          setState(() {
-                                            isTyping = false;
-                                            _text.text = '';
-                                            isEditing = false;
-                                            editMessage = null;
-                                          });
-                                        } else if (isReplying) {
-                                          print("Reply message is called");
-                                          var mId = replyMessage['id'] == null
-                                              ? replyMessage['message_id']
-                                              : replyMessage['id'];
-                                          ChatRoom.shared.replyMessage(
-                                              _text.text,
-                                              widget.chatID,
-                                              10,
-                                              mId);
-                                          setState(() {
-                                            isTyping = false;
-                                            _text.text = '';
-                                            isReplying = false;
-                                            replyMessage = null;
-                                          });
-                                        } else {
-                                          ChatRoom.shared.sendMessage(
-                                              '${widget.chatID}', _text.text);
-                                          setState(() {
-                                            isTyping = false;
-                                            _text.text = '';
-                                          });
-                                        }
-                                      },
-                                    ),
+                                  : Container(
+                                    height: 50,
+                                    width: 50,
+                                    child: IconButton(
+                                        icon: Icon(Icons.send),
+                                        onPressed: () {
+                                          print(
+                                              "new message or editing? editing: $isEditing");
+                                          if (isEditing) {
+                                            print("Edit message is called");
+                                            var mId = editMessage['id'] == null
+                                                ? editMessage['message_id']
+                                                : editMessage['id'];
+                                            var type = editMessage['type'];
+                                            var time = editMessage['time'];
+                                            ChatRoom.shared.editMessage(
+                                                _text.text,
+                                                widget.chatID,
+                                                type,
+                                                time,
+                                                mId);
+                                            setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                              isEditing = false;
+                                              editMessage = null;
+                                            });
+                                          } else if (isReplying) {
+                                            print("Reply message is called");
+                                            var mId = replyMessage['id'] == null
+                                                ? replyMessage['message_id']
+                                                : replyMessage['id'];
+                                            ChatRoom.shared.replyMessage(
+                                                _text.text,
+                                                widget.chatID,
+                                                10,
+                                                mId);
+                                            setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                              isReplying = false;
+                                              replyMessage = null;
+                                            });
+                                          } else {
+                                            ChatRoom.shared.sendMessage(
+                                                '${widget.chatID}', _text.text);
+                                            setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                            });
+                                          }
+                                        },
+                                      ),
+                                  ),
                             ],
                           ),
                         ],

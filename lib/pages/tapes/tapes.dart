@@ -351,8 +351,7 @@ class _TapesPageState extends State<TapesPage>
                                                           "$uploadTapes${result[index]['media']}",
                                                       flickMultiManager:
                                                           flickMultiManager,
-                                                      image:
-                                                          'assets/preloader.gif',
+                                                      image:'',
                                                     )
                                                   // new ChewieVideo(
                                                   //     controller:
