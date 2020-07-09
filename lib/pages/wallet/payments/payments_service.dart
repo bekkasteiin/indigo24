@@ -143,6 +143,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     Navigator.pop(context);
   }
   var temp;
+  var accountRegex;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -154,8 +155,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               getServiceResult['result'].forEach((element){
                 print('forEach element ${element['name']}');
                 if('${element['name']}' == 'account'){
-                  print(element);
                   accountMask = element['mask'];
+                  accountRegex = new RegExp(r'' + element['regex']);
                   if(element['mask'] == ' '){
                     print('if');
                     // temp = 'false';
@@ -281,23 +282,21 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         child: RaisedButton(
           onPressed: () async {
             if(receiverController.text.isNotEmpty & sumController.text.isNotEmpty){
-              RegExp exp = new RegExp(r"^7[0-9]{10}$");
               String str = "${receiverController.text.replaceAll(' ','').replaceAll('+','')}";
-              bool matches = exp.hasMatch(str);
-              print(matches);
+              bool matches = accountRegex.hasMatch(str);
               if(int.parse(sumController.text) >= snapshot.data['service']['min']){
                 if(int.parse(sumController.text) <= snapshot.data['service']['max']){
                   if(matches){
                     await _showLockScreen(context,'${localization.enterPin}',opaque: false, cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'));
                   } else{
-                    showAlertDialog(context, '0', 'Введите корректный номер аккаунта');
+                    showAlertDialog(context, '0', '${localization.enterValidAccount}');
                   }
                 } else{
-                  showAlertDialog(context, '0', 'Введите сумму ниже максимальной отметки');
+                  showAlertDialog(context, '0', '${localization.enterBelowMax}');
                 }
               }
               else{
-                showAlertDialog(context, '0', 'Введите сумму выше минимальной отметки');
+                showAlertDialog(context, '0', '${localization.enterAboveMin}');
               }
             }
           },

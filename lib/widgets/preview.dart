@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:video_player/video_player.dart';
 
 class PreviewMedia extends StatefulWidget {
   final filePath;

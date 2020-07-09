@@ -80,10 +80,10 @@ class Api {
     }
   }
 
-  updateFCM(token, id, unique) async {
+  updateFCM(token) async {
     try {
       response = await dio.post("/token/fcm/update",
-          data: {"customerID": "$id", "token": "$token", "unique": "$unique"});
+          data: {"customerID": "${user.id}", "token": "$token", "unique": "${user.unique}"});
       if (response.data['success'] == true) {
         print("Token updated to $token ${response.data}");
         return true;
@@ -311,8 +311,7 @@ class Api {
         user.avatar = '${response.data['avatar']}';
         user.unique = '${response.data['unique']}';
         user.pin = '${response.data['pin']}';
-        await updateFCM(
-            token, '${response.data['ID']}', '${response.data['unique']}');
+        await updateFCM(token);
         return response.data;
       } else {
         return response.data;

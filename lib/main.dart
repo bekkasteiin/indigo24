@@ -556,7 +556,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
     _firebaseMessaging.getToken().then((value) async {
       print("MY FCM TOKEN $value");
-      await api.updateFCM(value, user.id, user.unique).then((val) {
+      await api.updateFCM(value).then((val) {
         print("VALUE VALUE $val");
       });
     });
@@ -1052,9 +1052,12 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     );
   }
 }
+var api = Api();
 
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
+  ChatRoom.shared.channel = null;
+  await api.updateFCM('logoutToken');
   preferences.setString('phone', 'null');
   preferences.setString('pin', 'false');
   Widget okButton = CupertinoDialogAction(

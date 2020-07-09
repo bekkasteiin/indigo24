@@ -254,6 +254,18 @@ class _ChatPageState extends State<ChatPage> {
           }
           var senderId = e.json["data"]['user_id'].toString();
           var userId = user.id.toString();
+          if ('${e.json['data']['chat_id']}' == '${widget.chatID}' &&
+              senderId != userId) {
+            myList.forEach((element) {
+              if (element['write'].toString() == '0')
+                setState(() {
+                  element['write'] = '1';
+                });
+
+              //{id: message:104708:45, user_id: 104708, avatar: 104708.20200708115249_AxB.jpg, phone: 77789442439, avatar_url: https://indigo24.com/uploads/avatars/, user_name: Евгений, text: a, type: 0, chat_id: 45,
+              // time: 1594291093, attachments: null, attachment_url: null, reply_data: null, forward_data: null, write: 1, day: 09-07-2020, edit: 0, another_user_id: null, another_user_avatar: null, another_user_name: null}
+            });
+          }
           if (senderId != userId &&
               '${widget.chatID}' != '${e.json['data']['chat_id']}') {
             inAppPush(e.json["data"]);
