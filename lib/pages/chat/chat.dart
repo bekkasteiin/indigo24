@@ -254,7 +254,8 @@ class _ChatPageState extends State<ChatPage> {
           }
           var senderId = e.json["data"]['user_id'].toString();
           var userId = user.id.toString();
-          if (senderId != userId && '${widget.chatID}' != '${e.json['data']['chat_id']}') {
+          if (senderId != userId &&
+              '${widget.chatID}' != '${e.json['data']['chat_id']}') {
             inAppPush(e.json["data"]);
           }
           break;
@@ -271,7 +272,8 @@ class _ChatPageState extends State<ChatPage> {
           break;
         case "user:writing":
           print("PRINT PRINT ${e.json['data']}");
-          if (e.json['data'][0]['chat_id'].toString() ==
+          if (e.json['data'] != null) if (e.json['data'][0]['chat_id']
+                  .toString() ==
               widget.chatID.toString()) {
             setState(() {
               typingName = [];
@@ -967,7 +969,8 @@ class _ChatPageState extends State<ChatPage> {
                     chatType: widget.chatType,
                     chatName: widget.name,
                     memberCount: widget.memberCount,
-                    chatAvatar: widget.avatar == null ? 'noAvatar.png' : widget.avatar,
+                    chatAvatar:
+                        widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatId: widget.chatID,
                   ),
                 ),
@@ -986,14 +989,15 @@ class _ChatPageState extends State<ChatPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(25.0),
                 child: ClipOval(
-                    child: Image.network('${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}')
-                  // child: CachedNetworkImage(
-                  //   height: 50,
-                  //   width: 50,
-                  //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                  //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
-                  // ),
-                ),
+                    child: Image.network(
+                        '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}')
+                    // child: CachedNetworkImage(
+                    //   height: 50,
+                    //   width: 50,
+                    //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                    //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
+                    // ),
+                    ),
               ),
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
@@ -1350,20 +1354,20 @@ class _ChatPageState extends State<ChatPage> {
                                         },
                                         // onTap: () {
                                         //   startRecord();
-                                        // }, 
+                                        // },
                                         // onDoubleTap: () {
                                         //   stopRecord();
                                         // },
                                         child: Center(
                                             child: !isRecording
                                                 ? Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(
                                                       Icons.mic,
                                                       size: 50,
                                                     ),
-                                                )
+                                                  )
                                                 : Container()),
                                       ),
                                     )
@@ -1375,9 +1379,9 @@ class _ChatPageState extends State<ChatPage> {
                                   //   },
                                   // )
                                   : Container(
-                                    height: 50,
-                                    width: 50,
-                                    child: IconButton(
+                                      height: 50,
+                                      width: 50,
+                                      child: IconButton(
                                         icon: Icon(Icons.send),
                                         onPressed: () {
                                           print(
@@ -1427,7 +1431,7 @@ class _ChatPageState extends State<ChatPage> {
                                           }
                                         },
                                       ),
-                                  ),
+                                    ),
                             ],
                           ),
                         ],
