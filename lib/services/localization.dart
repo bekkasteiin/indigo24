@@ -123,6 +123,7 @@ String online = 'online';
 String enterValidAccount = 'Enter the correct account number';
 String enterBelowMax = 'Enter the amount below the maximum mark';
 String enterAboveMin = 'Enter the amount above the minimum mark';
+String appVersion = 'App version';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -256,6 +257,7 @@ setLanguage(code) {
       enterValidAccount = 'Enter the correct account number';
       enterBelowMax = 'Enter the amount below the maximum mark';
       enterAboveMin = 'Enter the amount above the minimum mark';
+      appVersion = 'App version';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -378,6 +380,7 @@ setLanguage(code) {
       enterValidAccount = 'Введите корректный номер аккаунта';
       enterBelowMax = 'Введите сумму ниже максимальной отметки';
       enterAboveMin = 'Введите сумму выше минимальной отметки';
+      appVersion = 'Версия приложения';
       print('ru');
       break;
     case 'kz':
@@ -501,6 +504,7 @@ setLanguage(code) {
       enterValidAccount = 'Дұрыс тіркелгі нөмірін енгізіңіз';
       enterBelowMax = 'Ең жоғарғы белгіден төмен соманы енгізіңіз';
       enterAboveMin = 'Ең төменгі белгіден жоғары соманы енгізіңіз';
+      appVersion = 'Мобильді қосымшаның нұсқасы';
       print('kz');
       break;
     case 'uz':
@@ -624,6 +628,7 @@ setLanguage(code) {
       enterValidAccount = 'Тўғри ҳисоб рақамини киритинг';
       enterBelowMax = 'Максимал белгидан паст миқдорни киритинг';
       enterAboveMin = 'Minimal белгидан юқори миқдорни киритинг';
+      appVersion = 'Mobil дастур версияси';
       print('uz');
       break;
  case 'uzb':
@@ -747,6 +752,7 @@ setLanguage(code) {
       enterValidAccount = 'To\'g\'ri hisob raqamini kiriting';
       enterBelowMax = 'Maksimal belgidan past miqdorni kiriting';
       enterAboveMin = 'Eng kam belgidan yuqori miqdorni kiriting';
+      appVersion = 'Mobil ilova versiyasi';
       print('uzb');
       break;
     default:

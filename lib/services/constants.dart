@@ -1,8 +1,7 @@
 const String domen = 'com'; 
 // const String domen = 'xyz';
 
-const String avatarUrl = 'https://media.indigo24.com/avatars/'; // PROD
-// const String avatarUrl = 'https://indigo24.xyz/uploads/avatars/'; // DEV
+const String avatarUrl = domen == 'com' ? 'https://media.indigo24.com/avatars/' : 'https://indigo24.xyz/uploads/avatars/'; 
 
 const String uploadTapes = 'https://indigo24.$domen/uploads/tapes/';
 

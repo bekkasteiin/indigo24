@@ -146,6 +146,41 @@ class Api {
     }
   }
 
+  logOutHttp() async {
+    try {
+      response = await dio.post("/logout", data: {
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
+      });
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      print(response.data);
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
+
   sendSms(phone) async {
     try {
       response = await dio.post("/sms/send", data: {

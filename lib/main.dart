@@ -1057,7 +1057,7 @@ var api = Api();
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   ChatRoom.shared.channel = null;
-  await api.updateFCM('logoutToken');
+  // await api.updateFCM('logoutToken');
   preferences.setString('phone', 'null');
   preferences.setString('pin', 'false');
   Widget okButton = CupertinoDialogAction(

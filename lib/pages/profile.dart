@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +17,7 @@ import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
+import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:photo_view/photo_view.dart';
@@ -35,7 +37,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
-
+  @override
+  void initState() { 
+    super.initState();
+    _initPackageInfo();
+  }
+   PackageInfo _packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: 'Unknown',
+    buildNumber: 'Unknown',
+  );
+  Future<void> _initPackageInfo() async {
+    final PackageInfo info = await PackageInfo.fromPlatform();
+    setState(() {
+      _packageInfo = info;
+    });
+  }
   final String _fullName = '${user.name}';
 
   File _image;
@@ -406,11 +424,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     Column(
                       children: <Widget>[
                         Container(
-                          padding: EdgeInsets.only(bottom: 30),
+                          padding: EdgeInsets.only(bottom: 10),
                           child: Material(
                             color: Colors.transparent,
-                            child: InkWell(
-                                onTap: () async {
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  10.0,
+                                ),
+                              ),
+                              color: Color(0xFFFFFFFF),
+                                onPressed: () async {
                                   if (await canLaunch(
                                       'https://indigo24.com/contacts.html')) {
                                     await launch(
@@ -429,11 +453,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   child: Container(
                                     padding: EdgeInsets.all(5),
                                     child: Text("${localization.support}",
-                                        style: TextStyle(color: Colors.grey)),
+                                        style: TextStyle(color: Colors.grey[700])),
                                   ),
                                 )),
                           ),
                         ),
+                        Text('${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',style: TextStyle(color: Colors.grey)),
+                        SizedBox(height: 20,),
                         Container(
                           decoration: BoxDecoration(boxShadow: [
                             BoxShadow(
@@ -560,6 +586,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
 var api = Api();
 
+final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 class CustomDialog extends StatelessWidget {
   final String title, description, buttonText;
@@ -642,12 +669,19 @@ class CustomDialog extends StatelessWidget {
                     Expanded(
                       child: FlatButton(
                         onPressed: () async{
-                          Navigator.of(context).pop(); // To close the dialog
                           var preferences =await SharedPreferences.getInstance();
-                          await api.updateFCM('logoutToken');
+
+                          // await api.updateFCM('logoutToken');
                           preferences.setString('phone', 'null');
                           ChatRoom.shared.channel = null;
-                          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => IntroPage()),(r) => false);
+                          await api.logOutHttp().then((result){
+                            if(result['success'] == true){
+                              _firebaseMessaging.deleteInstanceID();
+                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => IntroPage()),(r) => false);
+                            } else{
+                              print('else because we cannot log out with no reason');
+                            }
+                          });
                         },
                         child: Container(
                           height: 50,

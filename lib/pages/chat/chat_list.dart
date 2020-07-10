@@ -100,8 +100,17 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeCabinetStream();
     });
-  }
-
+  }final TextStyle initialStyle = TextStyle(
+  fontSize: 20.0,
+  color: Colors.blue,
+  fontWeight: FontWeight.bold,
+);
+final TextStyle finalStyle = TextStyle(
+  fontSize: 22.0,
+  color: Colors.red,
+  fontWeight: FontWeight.bold,
+);
+  bool isTapped = false;
   @override
   // ignore: must_call_super
   Widget build(BuildContext context) {
@@ -111,9 +120,21 @@ class _ChatsListPageState extends State<ChatsListPage> with AutomaticKeepAliveCl
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
-        title: Text(
-          string,
-          style: TextStyle(color: Color(0xFF001D52)),
+        title: GestureDetector(
+          onTap:() {
+            setState(() {
+              isTapped = !isTapped;
+              print('hi $isTapped');
+            });
+          },
+          child: AnimatedDefaultTextStyle(
+            style: isTapped ? initialStyle : finalStyle,
+            duration: Duration(milliseconds: 500),
+            child: Text(
+              string,
+              style: TextStyle(color: Color(0xFF001D52)),
+            ),
+          ),
         ),
         brightness: Brightness.light,
         actions: <Widget>[
