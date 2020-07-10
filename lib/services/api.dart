@@ -676,8 +676,8 @@ class Api {
         "customerID": "${user.id}",
         "unique": "${user.unique}",
         "file": await MultipartFile.fromFile(_path),
-        "title": title,
-        "description": description
+        "title": "$title",
+        "description": "$description"
       });
 
       print(

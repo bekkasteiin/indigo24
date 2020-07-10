@@ -139,7 +139,12 @@ class _WithdrawPageState extends State<WithdrawPage> {
                       // }
                       if(int.parse(amountController.text) < int.parse(configs.refillMax))
                         setState(() {
-                          commission = (int.parse(text) * int.parse(configs.withdrawCommission) / 100).toStringAsFixed(2);
+                          print(configs.withdrawCommission);
+                          print(configs.withdrawCommission);
+                          print(configs.withdrawCommission);
+                          print(configs.withdrawCommission);
+                          print(configs.withdrawCommission);
+                          commission = (int.parse(text) * double.parse('${configs.withdrawCommission}') / 100).toStringAsFixed(2);
                           if(double.parse(commission) < 350.00 )
                             commission = '350';
                         });

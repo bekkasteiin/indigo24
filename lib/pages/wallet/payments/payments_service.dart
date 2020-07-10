@@ -144,6 +144,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   }
   var temp;
   var accountRegex;
+  String amountPlaceholder = '';
+  String accountPlaceholder = '';
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -153,8 +155,12 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           body: FutureBuilder(
             future: api.getService(widget.serviceID).then((getServiceResult) {
               getServiceResult['result'].forEach((element){
-                print('forEach element ${element['name']}');
+                print('forEach element ${element}');
+                if('${element['name']}' == 'amount'){
+                  amountPlaceholder = element['placeholder'];
+                }
                 if('${element['name']}' == 'account'){
+                  accountPlaceholder  = element['placeholder'];
                   accountMask = element['mask'];
                   accountRegex = new RegExp(r'' + element['regex']);
                   if(element['mask'] == ' '){
@@ -346,7 +352,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           LengthLimitingTextInputFormatter(25),
                         ] ,
                         decoration: InputDecoration.collapsed(
-                          hintText: '${localization.phoneNumber}',
+                          // hintText: '${localization.phoneNumber}',
+                          hintText:  accountPlaceholder,
                         ),
                         controller: receiverController,
                         style: TextStyle(fontSize: 20),
@@ -372,7 +379,10 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     controller: sumController,
-                    decoration: InputDecoration.collapsed(hintText: '${localization.amount}'),
+                    decoration: InputDecoration.collapsed(
+                      // hintText: '${localization.amount}',
+                      hintText: amountPlaceholder
+                    ),
                     style: TextStyle(fontSize: 20),
                     inputFormatters: [
                           BlacklistingTextInputFormatter(new RegExp(r"^(?!(0))$")),

@@ -310,16 +310,13 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> with TickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: test.isNotEmpty 
-        // ? _paymentHistroyBody(test)
-        ? TabBarView(
+      body: TabBarView(
           controller: _controller,
             children: [
               _paymentHistroyBody(test),
               _paymentHistroyBalance(historyBalanceList)
             ],
           )
-        : Center(child: CircularProgressIndicator())
     );
   }
     DateTime selectedDate = DateTime.now();
@@ -393,39 +390,40 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> with TickerProv
   RefreshController _balanceRefreshController = RefreshController(initialRefresh: false);
 
   SafeArea _paymentHistroyBalance(snapshot) {
-    return SafeArea(
-      child: SmartRefresher(
-        enablePullDown: false,
-        enablePullUp: true,
-        footer: CustomFooter(
-          builder:(BuildContext context, LoadStatus mode) {
-            Widget body;
-            return Container(
-              height: 55.0,
-              child: Center(child: body),
-            );
-          },
+    return historyBalanceList.isNotEmpty 
+      ? SafeArea(
+        child: SmartRefresher(
+          enablePullDown: false,
+          enablePullUp: true,
+          footer: CustomFooter(
+            builder:(BuildContext context, LoadStatus mode) {
+              Widget body;
+              return Container(
+                height: 55.0,
+                child: Center(child: body),
+              );
+            },
+          ),
+          controller: _balanceRefreshController,
+          onLoading: _onBalanceLoading,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 10),
+            itemCount: snapshot != null ? snapshot.length : 0,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                padding: const EdgeInsets.only(top: 10),
+                child: _historyBalanceBuilder(
+                  context,
+                  snapshot[index],
+                ),
+              );
+            },
+          ),
         ),
-        controller: _balanceRefreshController,
-        onLoading: _onBalanceLoading,
-        child: ListView.builder(
-          padding: const EdgeInsets.only(bottom: 10),
-          itemCount: snapshot != null ? snapshot.length : 0,
-          itemBuilder: (BuildContext context, int index) {
-            return Container(
-              padding: const EdgeInsets.only(top: 10),
-              child: _historyBalanceBuilder(
-                context,
-                snapshot[index],
-              ),
-            );
-          },
-        ),
-      ),
-    );
+      ) : SafeArea(child: Container(),);
   }
   SafeArea _paymentHistroyBody(snapshot) {
-    return SafeArea(
+    return test.isNotEmpty  ? SafeArea(
       child: SmartRefresher(
         enablePullDown: false,
         enablePullUp: true,
@@ -461,6 +459,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> with TickerProv
           },
         ),
       ),
-    );
+    ): SafeArea(child: Container(),);
   }
 }
