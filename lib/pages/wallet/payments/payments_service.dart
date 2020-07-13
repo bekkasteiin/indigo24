@@ -155,7 +155,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           body: FutureBuilder(
             future: api.getService(widget.serviceID).then((getServiceResult) {
               getServiceResult['result'].forEach((element){
-                print('forEach element ${element}');
+                print('forEach element $element');
                 if('${element['name']}' == 'amount'){
                   amountPlaceholder = element['placeholder'];
                 }

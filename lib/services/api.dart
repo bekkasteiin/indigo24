@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/configs.dart' as configs;
 import 'package:indigo24/services/constants.dart';
@@ -151,21 +152,7 @@ class Api {
       response = await dio.post("/logout", data: {
         "customerID": "${user.id}",
         "unique": "${user.unique}",
-      });
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
-      print(response.data);
+      }); 
       print(response.data);
       return response.data;
     } on DioError catch (e) {
@@ -322,7 +309,7 @@ class Api {
     }
   }
 
-  signIn(phone, password, token) async {
+  signIn(phone, password) async {
     try {
       response = await dio.post("/check/authentication", data: {
         "phone": "$phone",
@@ -346,6 +333,8 @@ class Api {
         user.avatar = '${response.data['avatar']}';
         user.unique = '${response.data['unique']}';
         user.pin = '${response.data['pin']}';
+        FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+        String token = await _firebaseMessaging.getToken();
         await updateFCM(token);
         return response.data;
       } else {
@@ -379,9 +368,11 @@ class Api {
         print(e.response.request.data);
         return e.response.data;
       } else {
+        print('$e this dio error');
+        return false;
         // print(response.statusCode);
         // print(e.response.statusCode);
-        return e.response.data;
+        // return e.response.data;
       }
     }
   }
@@ -607,6 +598,7 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
+        return false;
         // print(e.response.statusCode);
       }
     }
