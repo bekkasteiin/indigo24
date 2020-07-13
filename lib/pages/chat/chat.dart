@@ -221,8 +221,10 @@ class _ChatPageState extends State<ChatPage> {
           e.json['data'].forEach((memberElement) {
             myContacts.toList().forEach((element) {
               if ('${element.phone}' == '${memberElement['phone']}') {
-                print('match ${element.phone}');
-                temp.add(memberElement);
+                if(!temp.contains(memberElement)){
+                  print('match ${element.phone}');
+                  temp.add(memberElement);
+                }
               }
             });
           });
@@ -1001,7 +1003,9 @@ class _ChatPageState extends State<ChatPage> {
                 borderRadius: BorderRadius.circular(25.0),
                 child: ClipOval(
                     child: Image.network(
-                        '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}')
+                        '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                        width: 35,
+                        height: 35,)
                     // child: CachedNetworkImage(
                     //   height: 50,
                     //   width: 50,
@@ -1317,8 +1321,8 @@ class _ChatPageState extends State<ChatPage> {
                                   showAttachmentBottomSheet(context);
                                 },
                               ),
-                              // !isRecording
-                              //     ?
+                              !isRecording
+                                  ?
                               Flexible(
                                 child: TextField(
                                   maxLines: 6,
@@ -1338,58 +1342,58 @@ class _ChatPageState extends State<ChatPage> {
                                     }
                                   },
                                 ),
-                              ),
-                              // : Row(
-                              //     mainAxisAlignment:
-                              //         MainAxisAlignment.start,
-                              //     children: <Widget>[
-                              //       Image.asset("assets/record.gif",
-                              //           width: 10, height: 10),
-                              //       Container(width: 5),
-                              //       TimerText(dependencies: dependencies),
-                              //     ],
-                              //   ),
-                              // !isTyping
-                              //     ? ClipOval(
-                              //         child: GestureDetector(
-                              //           onLongPress: () async {
-                              //             print("long press");
-                              //             bool p = await checkPermission();
-                              //             if (p) {
-                              //               startRecord();
-                              //             }
-                              //           },
-                              //           onLongPressUp: () {
-                              //             print("long press UP");
-                              //             stopRecord();
-                              //           },
-                              //           // onTap: () {
-                              //           //   startRecord();
-                              //           // },
-                              //           // onDoubleTap: () {
-                              //           //   stopRecord();
-                              //           // },
-                              //           child: Center(
-                              //               child: !isRecording
-                              //                   ? Container(
-                              //                     height: 50,
-                              //                     width: 50,
-                              //                     child: Icon(
-                              //                         Icons.mic,
-                              //                         size: 50,
-                              //                       ),
-                              //                   )
-                              //                   : Container()),
-                              //         ),
-                              //       )
+                              )
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Image.asset("assets/record.gif",
+                                        width: 10, height: 10),
+                                    Container(width: 5),
+                                    TimerText(dependencies: dependencies),
+                                  ],
+                                ),
+                              !isTyping
+                                  ? ClipOval(
+                                      child: GestureDetector(
+                                        onLongPress: () async {
+                                          print("long press");
+                                          bool p = await checkPermission();
+                                          if (p) {
+                                            startRecord();
+                                          }
+                                        },
+                                        onLongPressUp: () {
+                                          print("long press UP");
+                                          stopRecord();
+                                        },
+                                        // onTap: () {
+                                        //   startRecord();
+                                        // },
+                                        // onDoubleTap: () {
+                                        //   stopRecord();
+                                        // },
+                                        child: Center(
+                                            child: !isRecording
+                                                ? Container(
+                                                  height: 50,
+                                                  width: 50,
+                                                  child: Icon(
+                                                      Icons.mic,
+                                                      size: 50,
+                                                    ),
+                                                )
+                                                : Container()),
+                                      ),
+                                    )
 
-                              //     // IconButton(
-                              //     //   icon: Icon(Icons.mic),
-                              //     //   onPressed: () {
-                              //     //     print("audio pressed");
-                              //     //   },
-                              //     // )
-                              //     :
+                                  // IconButton(
+                                  //   icon: Icon(Icons.mic),
+                                  //   onPressed: () {
+                                  //     print("audio pressed");
+                                  //   },
+                                  // )
+                                  :
                               Container(
                                 height: 50,
                                 width: 50,

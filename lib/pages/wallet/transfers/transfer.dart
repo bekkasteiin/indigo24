@@ -334,6 +334,10 @@ class _TransferPageState extends State<TransferPage> {
                         controller: receiverController,
                         style: TextStyle(fontSize: 20),
                         onChanged: (value) {
+                          setState(() {
+                            toName = '';
+                            toAvatar = '';
+                          });
                           if(receiverController.text.length > 10){
                             api.checkPhoneForSendMoney('$value').then((r) {
                               print(r);
@@ -367,7 +371,7 @@ class _TransferPageState extends State<TransferPage> {
                           imageUrl: 
                           toAvatar == '' 
                           ? "${avatarUrl}noAvatar.png"
-                          : '$avatarUrl$toAvatar'
+                          : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}'
                         ),
                       ),
                     ),
@@ -388,12 +392,11 @@ class _TransferPageState extends State<TransferPage> {
                                       itemCount: myContacts.length,
                                       shrinkWrap: true,
                                       itemBuilder: (context, i) {
-                                        // print(temp);
+                                        // print(myContacts[i]);
                                         // print(temp.length);
                                         return Center(
                                           child: InkWell(
                                             onTap: () {
-                                              // myContacts
                                               Navigator.pop(context);
                                               setState(() {
                                                 receiverController.text = myContacts[i].phone;
@@ -414,7 +417,9 @@ class _TransferPageState extends State<TransferPage> {
                                                   ClipRRect(
                                                     borderRadius: BorderRadius.circular(25.0),
                                                     child: Image.network(
-                                                      '$avatarUrl${myContacts[i].avatar}',
+                                                      '${myContacts[i].avatar}' == '' 
+                                                      ? '${avatarUrl}noAvatar.png'
+                                                      : '$avatarUrl${myContacts[i].avatar.replaceAll('AxB', '200x200')}',
                                                       width: 35,
                                                       height: 35,
                                                     ),

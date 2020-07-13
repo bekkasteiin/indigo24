@@ -538,7 +538,7 @@ class ChatRoom {
               chatInfoController.add(new MyChatInfoEvent(json));
               break;
             case "user:writing":
-              if (cabinetController != null)
+              if (cabinetController != null && !cabinetController.isClosed)
                 cabinetController.add(new MyCabinetEvent(json));
               break;
             case "message:deleted:all":
