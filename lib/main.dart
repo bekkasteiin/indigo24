@@ -88,17 +88,17 @@ getContacts(context) async {
 permissionForPush() async {
   await Permission.notification.request();
 }
+final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await ContactsService.addContact(Contact(displayName: "Name $i", givenName: 'Givenname $i', middleName: 'Middlename $i', phones: [ Item(label: 'home', value: '${87020000000+i}')]));
+  // await ContactsService.addContact(Contact(displayName: "Name $i", givenName: 'Givenname $i', middleName: 'Middlename $i', phones: [ Item(label: 'home', value: '${87020000000+i}')])); // To Add Contacts
   SharedPreferences preferences = await SharedPreferences.getInstance();
   String languageCode = preferences.getString('languageCode');
   localization.setLanguage(languageCode);
   var phone = preferences.getString('phone');
   var unique = preferences.getString('unique');
   var customerID = preferences.getString('customerID');
-
   print('phone: $phone');
   print('unuque: $unique');
   print('customerID: $customerID');
@@ -114,14 +114,19 @@ Future<void> main() async {
   }
   await api.checkUnique(unique, customerID).then((r) async {
     print('Cheking unique $r');
-    if (r['success'] != null) {
-      authenticated = r['success'].toString() == 'true';
-      await api.getConfig();
-    } else if (r['result'] != null) {
-      print('this is else if ${r['result']}');
-      authenticated = r['result']['success'].toString() == 'true';
-      await api.getConfig();
+    if(r == false){
+      
+    } else{
+      if (r['success'] != null) {
+        authenticated = r['success'].toString() == 'true';
+        await api.getConfig();
+      } else if (r['result'] != null) {
+        print('this is else if ${r['result']}');
+        authenticated = r['result']['success'].toString() == 'true';
+        await api.getConfig();
+      }
     }
+
   });
 
   permissionForPush();
@@ -145,6 +150,10 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
+		fcmTokenStream.listen((token) async {
+      api.updateFCM(token);
+		});
     return OverlaySupport(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -374,7 +383,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     return user.id;
   }
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   Future<void> _handleNotification(
       Map<dynamic, dynamic> message, bool dialog) async {
@@ -493,10 +501,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   _onPasscodeCancelled() {
     if ('${user.pin}' == 'false') {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
-    } else {
       exit(0);
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
     }
   }
 
@@ -509,10 +516,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           ? _showLockScreen(context, '${localization.createPin}',
               withPin: false,
               opaque: false,
-              cancelButton: Text('Cancel',
-                  style:
-                      const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
-                  semanticsLabel: 'Cancel'))
+              cancelButton: Text('${localization.cancel}',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+                  semanticsLabel: '${localization.cancel}'))
           : Text('');
       // _showLockScreen(
       //     context,
@@ -620,15 +626,10 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   var initIsCalling = 1;
 
   _init() {
-    if (initIsCalling == 1) {
-      ChatRoom.shared.connect(context);
-      ChatRoom.shared.setStream();
-      _connect();
-      ChatRoom.shared.init();
-      setState(() {
-        initIsCalling += 1;
-      });
-    }
+    ChatRoom.shared.connect(context);
+    ChatRoom.shared.setStream();
+    _connect();
+    ChatRoom.shared.init();
   }
 
   _connect() async {
@@ -1053,6 +1054,28 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 }
 var api = Api();
+
+dioError(context) async {
+  Widget okButton = CupertinoDialogAction(
+    child: Text("OK"),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  );
+  CupertinoAlertDialog alert = CupertinoAlertDialog(
+    title: Text("${localization.error}"),
+    content: Text('${localization.httpError}'),
+    actions: [
+      okButton,
+    ],
+  );
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
 
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();

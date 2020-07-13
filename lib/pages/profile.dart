@@ -697,14 +697,13 @@ class CustomDialog extends StatelessWidget {
                           ChatRoom.shared.channel = null;
                           await api.logOutHttp().then((result) {
                             if (result['success'] == true) {
-                              _firebaseMessaging.deleteInstanceID();
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (context) => IntroPage()),
                                   (r) => false);
                             } else {
                               print(
-                                  'else because we cannot log out with no reason');
+                                  'else because we cannot log out with no reason $result');
                             }
                           });
                         },

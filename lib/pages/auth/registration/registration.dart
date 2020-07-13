@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
+import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
@@ -22,7 +23,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var countryId = 0;
   var country;
   var countries = new List<Country>();
-  var _countries;
+  var _countries = [];
   var phonePrefix = '77';
   var smsCode = 0;
   List _titles = [];
@@ -38,24 +39,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var length;
   _getCountries() async {
     await api.getCountries().then((response) {
-      setState(() {
-        Iterable list = response['countries'];
-        List<dynamic> responseJson = response['countries'].toList();
-        countries = list.map((model) => Country.fromJson(model)).toList();
-        _countries = jsonDecode(jsonEncode(responseJson));
-        for (var i = 0; i < _countries.length; i++) {
-          _titles.add(_countries[i]['title']);
-          _response.add(_countries[i]);
-        }
-        country = _countries[countryId];
-        dropDownMenuItems = getDropDownMenuItems(_titles);
-        _currentCountry = _titles[0];
-        loginFormatter = MaskTextInputFormatter(
-            mask: '${_countries[0]['mask']}', filter: {"*": RegExp(r'[0-9]')});
-        prefix = _countries[0]['prefix'];
-        _hintText = _countries[0]['mask'];
-        length = _countries[0]['length'];
-      });
+      if(response == false){
+        dioError(context);
+      } else{
+        setState(() {
+          Iterable list = response['countries'];
+          List<dynamic> responseJson = response['countries'].toList();
+          countries = list.map((model) => Country.fromJson(model)).toList();
+          _countries = jsonDecode(jsonEncode(responseJson));
+          for (var i = 0; i < _countries.length; i++) {
+            _titles.add(_countries[i]['title']);
+            _response.add(_countries[i]);
+          }
+          country = _countries[countryId];
+          dropDownMenuItems = getDropDownMenuItems(_titles);
+          _currentCountry = _titles[0];
+          loginFormatter = MaskTextInputFormatter(
+              mask: '${_countries[0]['mask']}', filter: {"*": RegExp(r'[0-9]')});
+          prefix = _countries[0]['prefix'];
+          _hintText = _countries[0]['mask'];
+          length = _countries[0]['length'];
+        });
+      }
     });
   }
 

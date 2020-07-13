@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,18 +32,22 @@ class _LoginPageState extends State<LoginPage> {
   var length;
   _getCountries() async {
     await api.getCountries().then((response) {
-      setState(() {
-        print("MY RESPONSE $response");
-        Iterable list = response['countries'];
-        List<dynamic> responseJson = response['countries'].toList();
-        countries = list.map((model) => Country.fromJson(model)).toList();
-        _countries = jsonDecode(jsonEncode(responseJson));
-        for (var i = 0; i < _countries.length; i++) {
-          _titles.add(_countries[i]['title']);
-        }
-        country = _countries[countryId];
-        length = country['length'];
-      });
+      if(response == false){
+        dioError(context);
+      } else {
+        setState(() {
+          print("MY RESPONSE $response");
+          Iterable list = response['countries'];
+          List<dynamic> responseJson = response['countries'].toList();
+          countries = list.map((model) => Country.fromJson(model)).toList();
+          _countries = jsonDecode(jsonEncode(responseJson));
+          for (var i = 0; i < _countries.length; i++) {
+            _titles.add(_countries[i]['title']);
+          }
+          country = _countries[countryId];
+          length = country['length'];
+        });
+      }
     });
   }
 
@@ -329,10 +332,8 @@ class _LoginPageState extends State<LoginPage> {
                               loginError = '';
                               passwordError = '';
                             });
-                            FirebaseMessaging _firebaseMessaging =
-                                FirebaseMessaging();
-                            String token = await _firebaseMessaging.getToken();
-                            await api.signIn("$phonePrefix${loginController.text}",passwordController.text, token).then((response) async {
+
+                            await api.signIn("$phonePrefix${loginController.text}",passwordController.text).then((response) async {
                               singInResult = response;
                               if ('${response['success']}' == 'true') {
                                 await api.getBalance();
