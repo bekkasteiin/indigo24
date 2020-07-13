@@ -254,18 +254,20 @@ class _ChatPageState extends State<ChatPage> {
           }
           var senderId = e.json["data"]['user_id'].toString();
           var userId = user.id.toString();
-          if('${e.json['data']['chat_id']}' == '${widget.chatID}' && senderId != userId){
+          if ('${e.json['data']['chat_id']}' == '${widget.chatID}' &&
+              senderId != userId) {
             myList.forEach((element) {
-              if(element['write'].toString() == '0')
+              if (element['write'].toString() == '0')
                 setState(() {
                   element['write'] = '1';
                 });
 
-              //{id: message:104708:45, user_id: 104708, avatar: 104708.20200708115249_AxB.jpg, phone: 77789442439, avatar_url: https://indigo24.com/uploads/avatars/, user_name: Евгений, text: a, type: 0, chat_id: 45, 
+              //{id: message:104708:45, user_id: 104708, avatar: 104708.20200708115249_AxB.jpg, phone: 77789442439, avatar_url: https://indigo24.com/uploads/avatars/, user_name: Евгений, text: a, type: 0, chat_id: 45,
               // time: 1594291093, attachments: null, attachment_url: null, reply_data: null, forward_data: null, write: 1, day: 09-07-2020, edit: 0, another_user_id: null, another_user_avatar: null, another_user_name: null}
             });
           }
-          if (senderId != userId && '${widget.chatID}' != '${e.json['data']['chat_id']}') {
+          if (senderId != userId &&
+              '${widget.chatID}' != '${e.json['data']['chat_id']}') {
             inAppPush(e.json["data"]);
           }
           break;
@@ -978,7 +980,8 @@ class _ChatPageState extends State<ChatPage> {
                     chatType: widget.chatType,
                     chatName: widget.name,
                     memberCount: widget.memberCount,
-                    chatAvatar: widget.avatar == null ? 'noAvatar.png' : widget.avatar,
+                    chatAvatar:
+                        widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatId: widget.chatID,
                   ),
                 ),
@@ -997,14 +1000,15 @@ class _ChatPageState extends State<ChatPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(25.0),
                 child: ClipOval(
-                    child: Image.network('${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}')
-                  // child: CachedNetworkImage(
-                  //   height: 50,
-                  //   width: 50,
-                  //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                  //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
-                  // ),
-                ),
+                    child: Image.network(
+                        '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}')
+                    // child: CachedNetworkImage(
+                    //   height: 50,
+                    //   width: 50,
+                    //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                    //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
+                    // ),
+                    ),
               ),
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
@@ -1313,132 +1317,126 @@ class _ChatPageState extends State<ChatPage> {
                                   showAttachmentBottomSheet(context);
                                 },
                               ),
-                              !isRecording
-                                  ? Flexible(
-                                      child: TextField(
-                                        maxLines: 6,
-                                        minLines: 1,
-                                        controller: _text,
-                                        onChanged: (value) {
-                                          print("Typing: $value");
-                                          if (value == '') {
-                                            setState(() {
-                                              isTyping = false;
-                                            });
-                                          } else {
-                                            ChatRoom.shared
-                                                .typing(widget.chatID);
-                                            setState(() {
-                                              isTyping = true;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        Image.asset("assets/record.gif",
-                                            width: 10, height: 10),
-                                        Container(width: 5),
-                                        TimerText(dependencies: dependencies),
-                                      ],
-                                    ),
-                              !isTyping
-                                  ? ClipOval(
-                                      child: GestureDetector(
-                                        onLongPress: () async {
-                                          print("long press");
-                                          bool p = await checkPermission();
-                                          if (p) {
-                                            startRecord();
-                                          }
-                                        },
-                                        onLongPressUp: () {
-                                          print("long press UP");
-                                          stopRecord();
-                                        },
-                                        // onTap: () {
-                                        //   startRecord();
-                                        // }, 
-                                        // onDoubleTap: () {
-                                        //   stopRecord();
-                                        // },
-                                        child: Center(
-                                            child: !isRecording
-                                                ? Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(
-                                                      Icons.mic,
-                                                      size: 50,
-                                                    ),
-                                                )
-                                                : Container()),
-                                      ),
-                                    )
+                              // !isRecording
+                              //     ?
+                              Flexible(
+                                child: TextField(
+                                  maxLines: 6,
+                                  minLines: 1,
+                                  controller: _text,
+                                  onChanged: (value) {
+                                    print("Typing: $value");
+                                    if (value == '') {
+                                      setState(() {
+                                        isTyping = false;
+                                      });
+                                    } else {
+                                      ChatRoom.shared.typing(widget.chatID);
+                                      setState(() {
+                                        isTyping = true;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                              // : Row(
+                              //     mainAxisAlignment:
+                              //         MainAxisAlignment.start,
+                              //     children: <Widget>[
+                              //       Image.asset("assets/record.gif",
+                              //           width: 10, height: 10),
+                              //       Container(width: 5),
+                              //       TimerText(dependencies: dependencies),
+                              //     ],
+                              //   ),
+                              // !isTyping
+                              //     ? ClipOval(
+                              //         child: GestureDetector(
+                              //           onLongPress: () async {
+                              //             print("long press");
+                              //             bool p = await checkPermission();
+                              //             if (p) {
+                              //               startRecord();
+                              //             }
+                              //           },
+                              //           onLongPressUp: () {
+                              //             print("long press UP");
+                              //             stopRecord();
+                              //           },
+                              //           // onTap: () {
+                              //           //   startRecord();
+                              //           // },
+                              //           // onDoubleTap: () {
+                              //           //   stopRecord();
+                              //           // },
+                              //           child: Center(
+                              //               child: !isRecording
+                              //                   ? Container(
+                              //                     height: 50,
+                              //                     width: 50,
+                              //                     child: Icon(
+                              //                         Icons.mic,
+                              //                         size: 50,
+                              //                       ),
+                              //                   )
+                              //                   : Container()),
+                              //         ),
+                              //       )
 
-                                  // IconButton(
-                                  //   icon: Icon(Icons.mic),
-                                  //   onPressed: () {
-                                  //     print("audio pressed");
-                                  //   },
-                                  // )
-                                  : Container(
-                                    height: 50,
-                                    width: 50,
-                                    child: IconButton(
-                                        icon: Icon(Icons.send),
-                                        onPressed: () {
-                                          print(
-                                              "new message or editing? editing: $isEditing");
-                                          if (isEditing) {
-                                            print("Edit message is called");
-                                            var mId = editMessage['id'] == null
-                                                ? editMessage['message_id']
-                                                : editMessage['id'];
-                                            var type = editMessage['type'];
-                                            var time = editMessage['time'];
-                                            ChatRoom.shared.editMessage(
-                                                _text.text,
-                                                widget.chatID,
-                                                type,
-                                                time,
-                                                mId);
-                                            setState(() {
-                                              isTyping = false;
-                                              _text.text = '';
-                                              isEditing = false;
-                                              editMessage = null;
-                                            });
-                                          } else if (isReplying) {
-                                            print("Reply message is called");
-                                            var mId = replyMessage['id'] == null
-                                                ? replyMessage['message_id']
-                                                : replyMessage['id'];
-                                            ChatRoom.shared.replyMessage(
-                                                _text.text,
-                                                widget.chatID,
-                                                10,
-                                                mId);
-                                            setState(() {
-                                              isTyping = false;
-                                              _text.text = '';
-                                              isReplying = false;
-                                              replyMessage = null;
-                                            });
-                                          } else {
-                                            ChatRoom.shared.sendMessage(
-                                                '${widget.chatID}', _text.text);
-                                            setState(() {
-                                              isTyping = false;
-                                              _text.text = '';
-                                            });
-                                          }
-                                        },
-                                      ),
-                                  ),
+                              //     // IconButton(
+                              //     //   icon: Icon(Icons.mic),
+                              //     //   onPressed: () {
+                              //     //     print("audio pressed");
+                              //     //   },
+                              //     // )
+                              //     :
+                              Container(
+                                height: 50,
+                                width: 50,
+                                child: IconButton(
+                                  icon: Icon(Icons.send),
+                                  onPressed: () {
+                                    print(
+                                        "new message or editing? editing: $isEditing");
+                                    if (isEditing) {
+                                      print("Edit message is called");
+                                      var mId = editMessage['id'] == null
+                                          ? editMessage['message_id']
+                                          : editMessage['id'];
+                                      var type = editMessage['type'];
+                                      var time = editMessage['time'];
+                                      ChatRoom.shared.editMessage(_text.text,
+                                          widget.chatID, type, time, mId);
+                                      setState(() {
+                                        isTyping = false;
+                                        _text.text = '';
+                                        isEditing = false;
+                                        editMessage = null;
+                                      });
+                                    } else if (isReplying) {
+                                      print("Reply message is called");
+                                      var mId = replyMessage['id'] == null
+                                          ? replyMessage['message_id']
+                                          : replyMessage['id'];
+                                      ChatRoom.shared.replyMessage(
+                                          _text.text, widget.chatID, 10, mId);
+                                      setState(() {
+                                        isTyping = false;
+                                        _text.text = '';
+                                        isReplying = false;
+                                        replyMessage = null;
+                                      });
+                                    } else {
+                                      ChatRoom.shared.sendMessage(
+                                          '${widget.chatID}', _text.text);
+                                      setState(() {
+                                        isTyping = false;
+                                        _text.text = '';
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
                             ],
                           ),
                         ],

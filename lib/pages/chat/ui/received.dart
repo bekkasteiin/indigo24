@@ -104,6 +104,13 @@ class Received extends StatelessWidget {
                     (a == false || a == null) ? null : m['attachment_url'],
                 edit: "${m["edit"]}",
                 isGroup: isGroup,
+                anotherUser: "${m["type"]}" == '11'
+                    ? jsonDecode(jsonEncode({
+                        "id": "${m["another_user_id"]}",
+                        "avatar": "${m["another_user_avatar"]}",
+                        "name": "${m["another_user_name"]}"
+                      }))
+                    : null,
                 replyData: (replyData == false || replyData == null)
                     ? null
                     : replyData),
@@ -140,6 +147,7 @@ class ReceivedMessageWidget extends StatelessWidget {
   final String edit;
   final bool isGroup;
   final phone;
+  final anotherUser;
   final replyData;
 
   const ReceivedMessageWidget(
@@ -155,6 +163,7 @@ class ReceivedMessageWidget extends StatelessWidget {
       this.type,
       this.edit,
       this.isGroup,
+      this.anotherUser,
       this.replyData})
       : super(key: key);
 
@@ -299,9 +308,65 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                             ? ReplyMessage(
                                                                 content,
                                                                 replyData)
-                                                            :
-                                                            type == '11'
-                                                                ? Text('$content KZT', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),)
+                                                            : type == '11'
+                                                                ? Container(
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        Row(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.start,
+                                                                          children: [
+                                                                            Container(
+                                                                                width: 30.0,
+                                                                                height: 30.0,
+                                                                                decoration: new BoxDecoration(shape: BoxShape.circle, image: new DecorationImage(fit: BoxFit.fill, image: new NetworkImage("$avatarUrl${anotherUser["avatar"].toString().replaceAll('AxB', '200x200')}")))),
+                                                                            SizedBox(width: 5),
+                                                                            Flexible(
+                                                                              child: Text(
+                                                                                "${anotherUser["name"]}",
+                                                                                maxLines: 1,
+                                                                                overflow: TextOverflow.ellipsis,
+                                                                                style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                        SizedBox(
+                                                                            height:
+                                                                                5),
+                                                                        Flexible(
+                                                                          child:
+                                                                              Text(
+                                                                            '+$content KZT',
+                                                                            maxLines:
+                                                                                1,
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                            style:
+                                                                                TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  )
+                                                                // Text(
+                                                                //     '$content KZT',
+                                                                //     style: TextStyle(
+                                                                //         fontWeight:
+                                                                //             FontWeight
+                                                                //                 .w600,
+                                                                //         color: Colors
+                                                                //             .white),
+                                                                //   )
                                                                 // MoneyMessage(content)
                                                                 : Text(
                                                                     content,
@@ -327,7 +392,9 @@ class ReceivedMessageWidget extends StatelessWidget {
                               time,
                               style: TextStyle(
                                 fontSize: 10,
-                                color: type == '11' ? Colors.white : Colors.black.withOpacity(0.6),
+                                color: type == '11'
+                                    ? Colors.white
+                                    : Colors.black.withOpacity(0.6),
                               ),
                             ),
                           ],

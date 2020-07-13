@@ -6,6 +6,7 @@ import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/pages/chat/ui/replyMessage.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
@@ -105,6 +106,13 @@ class Sended extends StatelessWidget {
                   mediaUrl:
                       (a == false || a == null) ? null : m['attachment_url'],
                   edit: "${m["edit"]}",
+                  anotherUser: "${m["type"]}" == '11'
+                      ? jsonDecode(jsonEncode({
+                          "id": "${m["another_user_id"]}",
+                          "avatar": "${m["another_user_avatar"]}",
+                          "name": "${m["another_user_name"]}"
+                        }))
+                      : null,
                   replyData: (replyData == false || replyData == null)
                       ? null
                       : replyData),
@@ -139,6 +147,7 @@ class SendedMessageWidget extends StatelessWidget {
   final String rMedia;
   final String type;
   final String edit;
+  final anotherUser;
   final replyData;
 
   const SendedMessageWidget(
@@ -151,6 +160,7 @@ class SendedMessageWidget extends StatelessWidget {
       this.rMedia,
       this.type,
       this.edit,
+      this.anotherUser,
       this.replyData})
       : super(key: key);
 
@@ -213,7 +223,82 @@ class SendedMessageWidget extends StatelessWidget {
                                                   ? ReplyMessage(
                                                       content, replyData)
                                                   : type == '11'
-                                                      ? Text('$content KZT', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),)
+                                                      ? Container(
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Container(
+                                                                      width:
+                                                                          30.0,
+                                                                      height:
+                                                                          30.0,
+                                                                      decoration: BoxDecoration(
+                                                                          shape: BoxShape
+                                                                              .circle,
+                                                                          image: DecorationImage(
+                                                                              fit: BoxFit.fill,
+                                                                              image: NetworkImage("$avatarUrl${anotherUser["avatar"].toString().replaceAll('AxB', '200x200')}")))),
+                                                                  SizedBox(
+                                                                      width: 5),
+                                                                  Flexible(
+                                                                    child: Text(
+                                                                      "${anotherUser["name"]}",
+                                                                      maxLines:
+                                                                          1,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .w600,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 5),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  '-$content KZT',
+                                                                  maxLines: 1,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        )
+                                                      // Text(
+                                                      //     '$content KZT',
+                                                      //     style: TextStyle(
+                                                      //         fontWeight:
+                                                      //             FontWeight
+                                                      //                 .w600,
+                                                      //         color:
+                                                      //             Colors.white),
+                                                      //   )
                                                       // MoneyMessage(content)
                                                       : (type == "uploading")
                                                           ? Container(
@@ -227,34 +312,41 @@ class SendedMessageWidget extends StatelessWidget {
                                                                       .size
                                                                       .width *
                                                                   0.7,
-                                                              child:
-                                                                  uploadingImage !=
-                                                                          null
-                                                                      ? Stack(
-                                                                          children: [
-                                                                            Container(
-                                                                              width: MediaQuery.of(context).size.width * 0.7,
-                                                                              height: MediaQuery.of(context).size.width * 0.7,
-                                                                              child: Image.file(
-                                                                                uploadingImage,
-                                                                                fit: BoxFit.cover,
-                                                                              ),
-                                                                            ),
-                                                                            Container(
-                                                                              width: MediaQuery.of(context).size.width * 0.7,
-                                                                              height: MediaQuery.of(context).size.width * 0.7,
-                                                                              color: Colors.grey.withOpacity(0.5),
-                                                                            ),
-                                                                            Center(
-                                                                              // child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width * 0.3),
-                                                                            ),
-                                                                          ],
-                                                                        )
-                                                                      : Center(
-                                                                        //   child: Image.asset(
-                                                                        //       "assets/preloader.gif",
-                                                                        //       width: MediaQuery.of(context).size.width * 0.3),
+                                                              child: uploadingImage !=
+                                                                      null
+                                                                  ? Stack(
+                                                                      children: [
+                                                                        Container(
+                                                                          width:
+                                                                              MediaQuery.of(context).size.width * 0.7,
+                                                                          height:
+                                                                              MediaQuery.of(context).size.width * 0.7,
+                                                                          child:
+                                                                              Image.file(
+                                                                            uploadingImage,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          ),
                                                                         ),
+                                                                        Container(
+                                                                          width:
+                                                                              MediaQuery.of(context).size.width * 0.7,
+                                                                          height:
+                                                                              MediaQuery.of(context).size.width * 0.7,
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .withOpacity(0.5),
+                                                                        ),
+                                                                        Center(
+                                                                            // child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width * 0.3),
+                                                                            ),
+                                                                      ],
+                                                                    )
+                                                                  : Center(
+                                                                      //   child: Image.asset(
+                                                                      //       "assets/preloader.gif",
+                                                                      //       width: MediaQuery.of(context).size.width * 0.3),
+                                                                      ),
                                                             )
                                                           : Text(
                                                               content,
@@ -283,7 +375,10 @@ class SendedMessageWidget extends StatelessWidget {
                       Text(
                         time,
                         style: TextStyle(
-                            fontSize: 10, color: type == '11' ? Colors.white : Colors.black.withOpacity(0.6)),
+                            fontSize: 10,
+                            color: type == '11'
+                                ? Colors.white
+                                : Colors.black.withOpacity(0.6)),
                       ),
                       edit == '1'
                           ? Text(" ред.",
@@ -302,3 +397,9 @@ class SendedMessageWidget extends StatelessWidget {
     );
   }
 }
+// id: message:116222:159, user_id: 116222, avatar: 116222.20200710222515_AxB.jpeg,
+// phone: 77759112603, avatar_url: https://indigo24.com/uploads/avatars/,
+// user_name: Геннадий, text: 1, type: 11, chat_id: 2, time: 1594398083,
+// attachments: null, attachment_url: null, reply_data: null, forward_data: null,
+// write: 1, day: 10-07-2020, edit: 0, another_user_id: 105744, another_user_avatar: 105744.20200702103319_AxB.jpg,
+// another_user_name: A}

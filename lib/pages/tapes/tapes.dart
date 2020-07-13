@@ -491,6 +491,20 @@ class _TapesPageState extends State<TapesPage>
                                                 ).whenComplete(() {});
                                               },
                                             ),
+                                            // IconButton(
+                                            //   icon: Container(
+                                            //     width: 35,
+                                            //     height: 35,
+                                            //     child: Image(
+                                            //       image: AssetImage(
+                                            //         'assets/images/send.png',
+                                            //       ),
+                                            //     ),
+                                            //   ),
+                                            //   onPressed: () {
+                                            //     print("${result[index]['id']}");
+                                            //   },
+                                            // ),
                                             // Container(
                                             //   width: 30,
                                             //   child: Text(
@@ -504,7 +518,7 @@ class _TapesPageState extends State<TapesPage>
                                               padding: const EdgeInsets.only(
                                                   right: 10.0),
                                               child: Text(
-                                                '${result[index]['created']}',
+                                                '${result[index]['created'].toString().replaceAll(".2020", "")}',
                                                 style: TextStyle(
                                                   color: Colors.grey,
                                                   fontWeight: FontWeight.w400,

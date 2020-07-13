@@ -37,12 +37,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
+
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     _initPackageInfo();
   }
-   PackageInfo _packageInfo = PackageInfo(
+
+  PackageInfo _packageInfo = PackageInfo(
     appName: 'Unknown',
     packageName: 'Unknown',
     version: 'Unknown',
@@ -54,6 +56,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       _packageInfo = info;
     });
   }
+
   final String _fullName = '${user.name}';
 
   File _image;
@@ -63,16 +66,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(
-      source: imageSource,  
+      source: imageSource,
     );
     final dir = await getTemporaryDirectory();
-
 
     final targetPath = dir.absolute.path + "/temp.jpg";
 
     if (pickedFile != null) {
       File compressedImage = await FlutterImageCompress.compressAndGetFile(
-        pickedFile.path, 
+        pickedFile.path,
         targetPath,
       );
       File test = File(pickedFile.path);
@@ -82,15 +84,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
         _image = compressedImage;
         // _image = File(pickedFile.path);
       });
-      if(_image != null){
+      if (_image != null) {
         uploadAvatar(_image.path).then((r) async {
-          if (r['message'] == 'Not authenticated' && r['success'].toString() == 'false') {
+          if (r['message'] == 'Not authenticated' &&
+              r['success'].toString() == 'false') {
             logOut(context);
             return r;
           } else {
             if (r["success"]) {
               print("avatar url ${r["fileName"]}");
-              
+
               await SharedPreferencesHelper.setString(
                   'avatar', '${r["fileName"]}');
               setState(() {
@@ -106,7 +109,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       }
     }
   }
-  
+
   Response response;
   ProgressBar sendingMsgProgressBar;
   BaseOptions options = new BaseOptions(
@@ -135,14 +138,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
       // _sendingMsgProgressBar.show(context, "");
 
-      response = await dio.post("/avatar/upload", 
+      response = await dio.post(
+        "/avatar/upload",
         data: formData,
         onSendProgress: (int sent, int total) {
-          String p = (sent/total*100).toStringAsFixed(2);
-          
+          String p = (sent / total * 100).toStringAsFixed(2);
+
           setState(() {
             isUploading = true;
-            uploadPercent = sent/total;
+            uploadPercent = sent / total;
             percent = "$p %";
           });
           print("$percent");
@@ -207,51 +211,50 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return InkWell(
       onTap: () {
         final act = CupertinoActionSheet(
-    title: Text('${localization.selectOption}'),
-    // message: Text('Which option?'),
-    actions: <Widget>[
-      CupertinoActionSheetAction(
-        child: Text('${localization.watch}'),
-        onPressed: () {
-          print("посмотреть ${user.avatarUrl}${user.avatar}");
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider("${user.avatarUrl}${user.avatar}"),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained*3,
-                  backgroundDecoration: BoxDecoration(
-                    color: Colors.transparent
-                  ),
-                )));
-        },
-      ),
-      CupertinoActionSheetAction(
-        child: Text('${localization.camera}'),
-        onPressed: () {
-          getImage(ImageSource.camera);
-          Navigator.pop(context);
-        },
-      ),
-      CupertinoActionSheetAction(
-        child: Text('${localization.gallery}'),
-        onPressed: () {
-          getImage(ImageSource.gallery);
-          Navigator.pop(context);
-        },
-      )
-    ],
-    cancelButton: CupertinoActionSheetAction(
-      child: Text('${localization.back}'),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    ));
-    showCupertinoModalPopup(
-    context: context,
-    builder: (BuildContext context) => act);
+            title: Text('${localization.selectOption}'),
+            // message: Text('Which option?'),
+            actions: <Widget>[
+              CupertinoActionSheetAction(
+                child: Text('${localization.watch}'),
+                onPressed: () {
+                  print("посмотреть ${user.avatarUrl}${user.avatar}");
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullScreenWrapper(
+                                imageProvider: CachedNetworkImageProvider(
+                                    "${user.avatarUrl}${user.avatar}"),
+                                minScale: PhotoViewComputedScale.contained,
+                                maxScale: PhotoViewComputedScale.contained * 3,
+                                backgroundDecoration:
+                                    BoxDecoration(color: Colors.transparent),
+                              )));
+                },
+              ),
+              CupertinoActionSheetAction(
+                child: Text('${localization.camera}'),
+                onPressed: () {
+                  getImage(ImageSource.camera);
+                  Navigator.pop(context);
+                },
+              ),
+              CupertinoActionSheetAction(
+                child: Text('${localization.gallery}'),
+                onPressed: () {
+                  getImage(ImageSource.gallery);
+                  Navigator.pop(context);
+                },
+              )
+            ],
+            cancelButton: CupertinoActionSheetAction(
+              child: Text('${localization.back}'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ));
+        showCupertinoModalPopup(
+            context: context, builder: (BuildContext context) => act);
       },
       // PlatformActionSheet().displaySheet(
       //     context: context,
@@ -285,7 +288,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           height: 100.0,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: CachedNetworkImageProvider('$avatarUrl${user.avatar.toString().replaceAll("AxB", "200x200")}'),
+              image: CachedNetworkImageProvider(
+                  '$avatarUrl${user.avatar.toString().replaceAll("AxB", "200x200")}'),
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(80.0),
@@ -312,7 +316,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       style: _nameTextStyle,
     );
   }
-
 
   TextEditingController emailController =
       new TextEditingController(text: '${user.email}');
@@ -384,11 +387,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         _buildSeparator(screenSize),
                       ],
                     ),
-                    
 
                     // SizedBox(height: screenSize.height*0.2),
                     // SizedBox(height: 20),
-                    
+
                     // LANGUAGE
                     // Container(
                     //   padding: EdgeInsets.symmetric(horizontal: 10),
@@ -428,12 +430,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           child: Material(
                             color: Colors.transparent,
                             child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  10.0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    10.0,
+                                  ),
                                 ),
-                              ),
-                              color: Color(0xFFFFFFFF),
+                                color: Color(0xFFFFFFFF),
                                 onPressed: () async {
                                   if (await canLaunch(
                                       'https://indigo24.com/contacts.html')) {
@@ -453,13 +455,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   child: Container(
                                     padding: EdgeInsets.all(5),
                                     child: Text("${localization.support}",
-                                        style: TextStyle(color: Colors.grey[700])),
+                                        style:
+                                            TextStyle(color: Colors.grey[700])),
                                   ),
                                 )),
                           ),
                         ),
-                        Text('${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',style: TextStyle(color: Colors.grey)),
-                        SizedBox(height: 20,),
+                        Text(
+                            '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                            style: TextStyle(color: Colors.grey)),
+                        SizedBox(
+                          height: 20,
+                        ),
                         Container(
                           decoration: BoxDecoration(boxShadow: [
                             BoxShadow(
@@ -476,13 +483,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 print('exit is pressed');
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) => CustomDialog(
-                                        title: null,
-                                        description:
-                                            "${localization.wantToExit}?",
-                                        buttonText: "Okay",
-                                        image: CachedNetworkImage(imageUrl: '$avatarUrl${user.avatar}'),
-                                      ),
+                                  builder: (BuildContext context) =>
+                                      CustomDialog(
+                                    title: null,
+                                    description: "${localization.wantToExit}?",
+                                    buttonText: "Okay",
+                                    image: CachedNetworkImage(
+                                        imageUrl: '$avatarUrl${user.avatar}'),
+                                  ),
                                 );
                                 // SharedPreferences preferences =
                                 //       await SharedPreferences.getInstance();
@@ -527,10 +535,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsMainPage()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SettingsMainPage()));
                           },
                           child: Ink(
-                            child: Image.asset("assets/images/settings.png", width: 35,),
+                            child: Image.asset(
+                              "assets/images/settings.png",
+                              width: 35,
+                            ),
                             // child: Text("${localization.exit}",
                             //     style: TextStyle(
                             //         color: Colors.white, fontSize: 18)),
@@ -550,39 +564,44 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               ],
             ),
-
-            isUploading?
-            Container(
-              width: screenSize.width,
-              height: screenSize.height,
-              color: Color(0xff647087).withOpacity(0.6),
-              child: Center(
-                child: CircularPercentIndicator(
-                  radius: 120.0,
-                  lineWidth: 13.0,
-                  animation: false,
-                  percent: uploadPercent,
-                  progressColor: Color(0xFF0543B8),
-                  backgroundColor: Color(0xFFffffff),
-                  center: Text(
-                    percent,
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20.0),
-                  ),
-                  footer: Text(
-                    "Загрузка",
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 17.0),
-                  ),
-                  circularStrokeCap: CircularStrokeCap.round,
-                ),
-              ),
-            ):Container()
+            isUploading
+                ? Container(
+                    width: screenSize.width,
+                    height: screenSize.height,
+                    color: Color(0xff647087).withOpacity(0.6),
+                    child: Center(
+                      child: CircularPercentIndicator(
+                        radius: 120.0,
+                        lineWidth: 13.0,
+                        animation: false,
+                        percent: uploadPercent,
+                        progressColor: Color(0xFF0543B8),
+                        backgroundColor: Color(0xFFffffff),
+                        center: Text(
+                          percent,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20.0),
+                        ),
+                        footer: Text(
+                          "Загрузка",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 17.0),
+                        ),
+                        circularStrokeCap: CircularStrokeCap.round,
+                      ),
+                    ),
+                  )
+                : Container()
           ],
         ),
       ),
     );
   }
 }
-
 
 var api = Api();
 
@@ -603,8 +622,8 @@ class CustomDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Consts.padding),
-      ),      
+        borderRadius: BorderRadius.circular(Consts.padding),
+      ),
       elevation: 0.0,
       backgroundColor: Colors.transparent,
       child: dialogContent(context),
@@ -612,8 +631,8 @@ class CustomDialog extends StatelessWidget {
   }
 
   dialogContent(BuildContext context) {
-  return Stack(
-    children: <Widget>[
+    return Stack(
+      children: <Widget>[
         //...bottom card part,
         Container(
           margin: EdgeInsets.only(top: Consts.avatarRadius),
@@ -628,7 +647,7 @@ class CustomDialog extends StatelessWidget {
               Container(
                 padding: EdgeInsets.only(
                   // top: Consts.avatarRadius + Consts.padding,
-                  top: Consts.padding+24,
+                  top: Consts.padding + 24,
                   bottom: Consts.padding,
                   left: Consts.padding,
                   right: Consts.padding,
@@ -636,57 +655,67 @@ class CustomDialog extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // To make the card compact
                   children: <Widget>[
-                    title!=null?Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ):Container(),
+                    title != null
+                        ? Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        : Container(),
                     // SizedBox(height: 16.0),
                     Text(
                       description,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color: Color(0xFF001D52)
-                      ),
+                      style:
+                          TextStyle(fontSize: 18.0, color: Color(0xFF001D52)),
                     ),
                     SizedBox(height: 24.0),
                   ],
                 ),
               ),
-
               Container(
-                decoration:  BoxDecoration(
+                decoration: BoxDecoration(
                   color: Color(0xff001D52),
                   shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(Consts.padding), bottomRight: Radius.circular(Consts.padding)),
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(Consts.padding),
+                      bottomRight: Radius.circular(Consts.padding)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Expanded(
                       child: FlatButton(
-                        onPressed: () async{
-                          var preferences =await SharedPreferences.getInstance();
+                        onPressed: () async {
+                          var preferences =
+                              await SharedPreferences.getInstance();
 
                           // await api.updateFCM('logoutToken');
                           preferences.setString('phone', 'null');
                           ChatRoom.shared.channel = null;
-                          await api.logOutHttp().then((result){
-                            if(result['success'] == true){
+                          await api.logOutHttp().then((result) {
+                            if (result['success'] == true) {
                               _firebaseMessaging.deleteInstanceID();
-                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => IntroPage()),(r) => false);
-                            } else{
-                              print('else because we cannot log out with no reason');
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => IntroPage()),
+                                  (r) => false);
+                            } else {
+                              print(
+                                  'else because we cannot log out with no reason');
                             }
                           });
                         },
                         child: Container(
-                          height: 50,
-                          child: Center(child: Text("${localization.yes}", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
-                        ),
+                            height: 50,
+                            child: Center(
+                                child: Text("${localization.yes}",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500)))),
                       ),
                     ),
                     Container(width: 1, height: 50, color: Colors.white),
@@ -696,9 +725,13 @@ class CustomDialog extends StatelessWidget {
                           Navigator.of(context).pop(); // To close the dialog
                         },
                         child: Container(
-                          height: 50,
-                          child: Center(child: Text("${localization.no}", style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)))
-                        ),
+                            height: 50,
+                            child: Center(
+                                child: Text("${localization.no}",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500)))),
                       ),
                     ),
                   ],
@@ -720,7 +753,6 @@ class CustomDialog extends StatelessWidget {
       ],
     );
   }
-
 }
 
 class Consts {

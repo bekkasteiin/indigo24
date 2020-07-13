@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:vibration/vibration.dart';
 
 import 'circle.dart';
@@ -48,15 +49,19 @@ class PasscodeScreen extends StatefulWidget {
     this.backgroundColor,
     this.cancelCallback,
     this.digits,
-  })  : circleUIConfig = circleUIConfig == null ? const CircleUIConfig() : circleUIConfig,
-        keyboardUIConfig = keyboardUIConfig == null ? const KeyboardUIConfig() : keyboardUIConfig,
+  })  : circleUIConfig =
+            circleUIConfig == null ? const CircleUIConfig() : circleUIConfig,
+        keyboardUIConfig = keyboardUIConfig == null
+            ? const KeyboardUIConfig()
+            : keyboardUIConfig,
         super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PasscodeScreenState();
 }
 
-class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProviderStateMixin {
+class _PasscodeScreenState extends State<PasscodeScreen>
+    with SingleTickerProviderStateMixin {
   StreamSubscription<bool> streamSubscription;
   String enteredPasscode = '';
   AnimationController controller;
@@ -65,28 +70,29 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
   @override
   initState() {
     super.initState();
-    streamSubscription = widget.shouldTriggerVerification.listen((isValid) => _showValidation(isValid));
-    controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    animation = Tween(begin: 0.0, end: 10.0).animate(CurvedAnimation(
-                  parent: controller, 
-                  curve: Curves.bounceInOut
-                )
-      ..addStatusListener((status) {
-        passCodeError = widget.withPin == null ? '${localization.incorrectPin}' : '';
-        widget.withPin == null ?? Vibration.vibrate();
-        if (status == AnimationStatus.completed) {
-          setState(() {
-            enteredPasscode = '';
-            passCodeError = '';
-            controller.value = 0;
-          });
-        }
-      })
-      ..addListener(() {
-        setState(() {
-          // the animation object’s value is the changed state
-        });
-      }));
+    streamSubscription = widget.shouldTriggerVerification
+        .listen((isValid) => _showValidation(isValid));
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    animation = Tween(begin: 0.0, end: 10.0)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.bounceInOut)
+          ..addStatusListener((status) {
+            passCodeError =
+                widget.withPin == null ? '${localization.incorrectPin}' : '';
+            widget.withPin == null ?? Vibration.vibrate();
+            if (status == AnimationStatus.completed) {
+              setState(() {
+                enteredPasscode = '';
+                passCodeError = '';
+                controller.value = 0;
+              });
+            }
+          })
+          ..addListener(() {
+            setState(() {
+              // the animation object’s value is the changed state
+            });
+          }));
   }
 
   @override
@@ -94,10 +100,21 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
     return Scaffold(
       backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
       body: SafeArea(
-        child: _buildPortraitPasscodeScreen(),
+        child: Stack(
+          children: [_buildBackgdound(), _buildPortraitPasscodeScreen()],
+        ),
       ),
     );
   }
+
+  _buildBackgdound() => Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Image(
+          fit: BoxFit.fill,
+          image: chatBackgroundProvider,
+        ),
+      );
 
   _buildPortraitPasscodeScreen() => Stack(
         children: [
@@ -112,8 +129,15 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
                     ),
-                    SizedBox(height: 10,),
-                    Text('$passCodeError', style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w400),),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      '$passCodeError',
+                      style: TextStyle(
+                          color: Color(0xFF001D52),
+                          fontWeight: FontWeight.w400),
+                    ),
                     Container(
                       margin: const EdgeInsets.only(top: 10),
                       height: 40,
@@ -123,7 +147,9 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
                       ),
                     ),
                     _buildKeyboard(),
-                    widget.bottomWidget != null ? widget.bottomWidget : Container()
+                    widget.bottomWidget != null
+                        ? widget.bottomWidget
+                        : Container()
                   ],
                 ),
               ),
@@ -168,7 +194,8 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
   _onDeleteCancelButtonPressed() {
     if (enteredPasscode.length > 0) {
       setState(() {
-        enteredPasscode = enteredPasscode.substring(0, enteredPasscode.length - 1);
+        enteredPasscode =
+            enteredPasscode.substring(0, enteredPasscode.length - 1);
       });
     } else {
       if (widget.cancelCallback != null) {
@@ -182,7 +209,7 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
       if (enteredPasscode.length < widget.passwordDigits) {
         enteredPasscode += text;
         if (enteredPasscode.length == widget.passwordDigits) {
-          if(widget.title == '${localization.createPin}'){
+          if (widget.title == '${localization.createPin}') {
             widget.title = '${localization.repeatPin}';
           }
           widget.passwordEnteredCallback(enteredPasscode);
@@ -197,7 +224,8 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
     // in case the stream instance changed, subscribe to the new one
     if (widget.shouldTriggerVerification != old.shouldTriggerVerification) {
       streamSubscription.cancel();
-      streamSubscription = widget.shouldTriggerVerification.listen((isValid) => _showValidation(isValid));
+      streamSubscription = widget.shouldTriggerVerification
+          .listen((isValid) => _showValidation(isValid));
     }
   }
 
@@ -220,7 +248,8 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
     if (widget.isValidCallback != null) {
       widget.isValidCallback();
     } else {
-      print("You didn't implement validation callback. Please handle a state by yourself then.");
+      print(
+          "You didn't implement validation callback. Please handle a state by yourself then.");
     }
   }
 
@@ -230,7 +259,9 @@ class _PasscodeScreenState extends State<PasscodeScreen> with SingleTickerProvid
         onPressed: _onDeleteCancelButtonPressed,
         child: Container(
           margin: widget.keyboardUIConfig.digitInnerMargin,
-          child: enteredPasscode.length == 0 ? widget.cancelButton : widget.deleteButton,
+          child: enteredPasscode.length == 0
+              ? widget.cancelButton
+              : widget.deleteButton,
         ),
       ),
     );
