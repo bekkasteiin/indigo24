@@ -103,35 +103,16 @@ Future<void> main() async {
   print('unuque: $unique');
   print('customerID: $customerID');
 
-  Api api = Api();
-  bool authenticated = false;
-
   if (!await Permission.microphone.isGranted) {
     PermissionStatus status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
       return false;
     }
   }
-  await api.checkUnique(unique, customerID).then((r) async {
-    print('Cheking unique $r');
-    if(r == false){
-      
-    } else{
-      if (r['success'] != null) {
-        authenticated = r['success'].toString() == 'true';
-        await api.getConfig();
-      } else if (r['result'] != null) {
-        print('this is else if ${r['result']}');
-        authenticated = r['result']['success'].toString() == 'true';
-        await api.getConfig();
-      }
-    }
-
-  });
 
   permissionForPush();
 
-  runApp(MyApp(phone: phone, authenticated: authenticated));
+  runApp(MyApp(phone: phone));
 }
 
 // ignore: must_be_immutable
@@ -139,13 +120,18 @@ class MyApp extends StatelessWidget {
   MyApp({
     Key key,
     @required this.phone,
-    this.authenticated,
   }) : super(key: key);
 
   bool authenticated;
   String phone;
   @override
   Widget build(BuildContext context) {
+    print(phone);
+    print(phone);
+    print(phone);
+    print(phone);
+    print(phone);
+    print(phone);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -162,8 +148,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home:
-            (phone == 'null' || authenticated == false) ? IntroPage() : Tabs(),
+        home: phone.toString() == 'null' ? IntroPage() : Tabs(),
       ),
     );
   }
