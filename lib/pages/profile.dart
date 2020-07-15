@@ -672,11 +672,15 @@ class CustomDialog extends StatelessWidget {
                           preferences.setString('phone', 'null');
                           ChatRoom.shared.channel = null;
                           await api.logOutHttp().then((result){
-                            if(result['success'] == true){
-                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => IntroPage()),(r) => false);
-                            } else{
-                              print('else because we cannot log out with no reason $result');
-                            } 
+                            if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
+                              logOut(context);
+                            } else {
+                              if(result['success'] == true){
+                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => IntroPage()),(r) => false);
+                              } else{
+                                print('else because we cannot log out with no reason $result');
+                              } 
+                            }
                           });
                         },
                         child: Container(
