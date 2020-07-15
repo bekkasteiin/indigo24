@@ -88,7 +88,6 @@ getContacts(context) async {
 permissionForPush() async {
   await Permission.notification.request();
 }
-final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -111,7 +110,7 @@ Future<void> main() async {
   }
 
   permissionForPush();
-
+  
   runApp(MyApp(phone: phone));
 }
 
@@ -126,20 +125,10 @@ class MyApp extends StatelessWidget {
   String phone;
   @override
   Widget build(BuildContext context) {
-    print(phone);
-    print(phone);
-    print(phone);
-    print(phone);
-    print(phone);
-    print(phone);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
-		fcmTokenStream.listen((token) async {
-      api.updateFCM(token);
-		});
     return OverlaySupport(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -284,6 +273,7 @@ class Tabs extends StatefulWidget {
 List<MyContact> myContacts = [];
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
+  
   bool isAuthenticated = false;
   TabController tabController;
   var api = Api();
@@ -495,6 +485,13 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     share();
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
+		fcmTokenStream.listen((token) {
+      if(user.id.toString() != null.toString() && user.unique.toString() != null.toString() && user.phone.toString() != null.toString()){
+        api.updateFCM(token);
+      }
+		});
 
     Timer.run(() {
       '${user.pin}' == 'false'

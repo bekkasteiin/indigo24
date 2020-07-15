@@ -82,24 +82,33 @@ class Api {
   }
 
   updateFCM(token) async {
+    print('updating token is called');
     try {
-      response = await dio.post("/token/fcm/update",
-          data: {"customerID": "${user.id}", "token": "$token", "unique": "${user.unique}"});
+      response = await dio.post("/token/fcm/update", data: {
+        "customerID": "${user.id}",
+        "token": "$token",
+        "unique": "${user.unique}"
+      });
       if (response.data['success'] == true) {
         print("Token updated to $token ${response.data}");
         return true;
       } else {
+        print("Else token updated to $token ${response.data}");
         return response.data;
       }
     } on DioError catch (e) {
+      print('This is error ${e.request.data}');
       if (e.response != null) {
+        print('This is error $e when response is not null');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
         return e.response.data;
       } else {
+        print('This is error $e when response is null');
         print(response.statusCode);
         print(e.response.statusCode);
+        return false;
       }
     }
   }
@@ -125,7 +134,7 @@ class Api {
       }
     }
   }
-  
+
   getHistoryBalance(page) async {
     try {
       response = await dio.post("/get/balance/history", data: {
@@ -152,7 +161,7 @@ class Api {
       response = await dio.post("/logout", data: {
         "customerID": "${user.id}",
         "unique": "${user.unique}",
-      }); 
+      });
       print(response.data);
       return response.data;
     } on DioError catch (e) {
