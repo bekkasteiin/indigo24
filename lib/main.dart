@@ -56,8 +56,9 @@ getContacts(context) async {
   try {
     contacts.clear();
     if (await Permission.contacts.request().isGranted) {
-      Iterable<Contact> phonebook = await ContactsService.getContacts(withThumbnails: false);
-      if(phonebook!=null){
+      Iterable<Contact> phonebook =
+          await ContactsService.getContacts(withThumbnails: false);
+      if (phonebook != null) {
         phonebook.forEach((el) {
           if (el.displayName != null) {
             el.phones.forEach((phone) {
@@ -102,15 +103,6 @@ Future<void> main() async {
   print('unuque: $unique');
   print('customerID: $customerID');
 
-  if (!await Permission.microphone.isGranted) {
-    PermissionStatus status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      return false;
-    }
-  }
-
-  permissionForPush();
-  
   runApp(MyApp(phone: phone));
 }
 
@@ -273,7 +265,6 @@ class Tabs extends StatefulWidget {
 List<MyContact> myContacts = [];
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
-  
   bool isAuthenticated = false;
   TabController tabController;
   var api = Api();
@@ -357,7 +348,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     user.pin = await SharedPreferencesHelper.getString('pin');
     return user.id;
   }
-
 
   Future<void> _handleNotification(
       Map<dynamic, dynamic> message, bool dialog) async {
@@ -478,20 +468,35 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     if ('${user.pin}' == 'false') {
       exit(0);
     } else {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
     }
+  }
+
+  permissions() async {
+    if (!await Permission.microphone.isGranted) {
+      PermissionStatus status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        return false;
+      }
+    }
+
+    permissionForPush();
   }
 
   @override
   void initState() {
+    permissions();
     share();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
-		fcmTokenStream.listen((token) {
-      if(user.id.toString() != null.toString() && user.unique.toString() != null.toString() && user.phone.toString() != null.toString()){
+    fcmTokenStream.listen((token) {
+      if (user.id.toString() != null.toString() &&
+          user.unique.toString() != null.toString() &&
+          user.phone.toString() != null.toString()) {
         api.updateFCM(token);
       }
-		});
+    });
 
     Timer.run(() {
       '${user.pin}' == 'false'
@@ -618,7 +623,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       if (e.json["cmd"] != 'user:check')
-      print("LISTENING EVENT ${e.json["cmd"]}");
+        print("LISTENING EVENT ${e.json["cmd"]}");
       var cmd = e.json["cmd"];
       // print('user check : ${e.json}');
       switch (cmd) {
@@ -1035,6 +1040,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     );
   }
 }
+
 var api = Api();
 
 dioError(context) async {

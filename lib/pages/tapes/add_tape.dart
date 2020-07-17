@@ -317,18 +317,18 @@ class _AddTapePageState extends State<AddTapePage> {
                   ),
                 ),
                 onPressed: () async {
-                  print(singleFile);
+                  // print(singleFile);
 
-                  if (singleFile != null) {
-                    // var json = singleFile.toJson();
-                    // print(json['path']);
-                    setState(() {
-                      // _currentFile = File(json['path']);
-                      _currentFile = File(singleFile);
-                      singleFile = null;
-                      isNotPicked = false;
-                    });
-                  }
+                  // if (singleFile != null) {
+                  //   // var json = singleFile.toJson();
+                  //   // print(json['path']);
+                  //   setState(() {
+                  //     // _currentFile = File(json['path']);
+                  //     _currentFile = File(singleFile);
+                  //     singleFile = null;
+                  //     isNotPicked = false;
+                  //   });
+                  // }
                   print("Pressed with $_currentFile");
                   if (descriptionController.text == '' ||
                       titleController.text == '') {
@@ -492,13 +492,13 @@ class _AddTapePageState extends State<AddTapePage> {
     );
   }
 
-  void settingModalBottomSheet(context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return SingleImagePickerPage();
-        });
-  }
+  // void settingModalBottomSheet(context) {
+  //   showModalBottomSheet(
+  //       context: context,
+  //       builder: (BuildContext bc) {
+  //         return SingleImagePickerPage();
+  //       });
+  // }
 
   Text _getRetrieveErrorWidget() {
     if (_retrieveDataError != null) {
