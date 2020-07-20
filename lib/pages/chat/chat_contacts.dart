@@ -425,7 +425,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                             );
                           },
                         )
-                      : Center(),
+                      : Center(child: Text('${localization.emptyContacts}'))
                 ),
               ],
             ),

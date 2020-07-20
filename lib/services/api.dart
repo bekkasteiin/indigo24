@@ -493,10 +493,6 @@ class Api {
         "account": "$account",
       });
       print(response.request.data);
-      print(response.request.data);
-      print(response.request.data);
-      print(response.request.data);
-      print(response.request.data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {

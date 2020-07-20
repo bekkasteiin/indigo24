@@ -110,7 +110,8 @@ String edit = 'Edit';
 String editedMessage = 'Edited';
 String surname = 'Surname';
 String passwordNotMatch = 'Passwords must be identical';
-String weSentToEmail = 'We have sent an SMS key to your number, which will arrive within 10 seconds';
+String weSentToEmail =
+    'We have sent an SMS key to your number, which will arrive within 10 seconds';
 String keyFromSms = 'SMS code';
 String country = 'Country';
 String status = 'Status';
@@ -125,6 +126,10 @@ String enterBelowMax = 'Enter the amount below the maximum mark';
 String enterAboveMin = 'Enter the amount above the minimum mark';
 String appVersion = 'App version';
 String httpError = 'Error while loading data';
+String historyBalance = 'Balance history';
+String emptyContacts = 'Contacts is empty';
+String empty = 'Empty';
+String noChats = 'No chats';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -245,7 +250,8 @@ setLanguage(code) {
       editedMessage = 'Edited';
       surname = 'Surname';
       passwordNotMatch = 'Passwords must be identical';
-      weSentToEmail = 'We have sent an SMS key to your number, which will arrive within 10 seconds';
+      weSentToEmail =
+          'We have sent an SMS key to your number, which will arrive within 10 seconds';
       keyFromSms = 'SMS code';
       country = 'Country';
       status = 'Status';
@@ -260,6 +266,10 @@ setLanguage(code) {
       enterAboveMin = 'Enter the amount above the minimum mark';
       appVersion = 'App version';
       httpError = 'Error while loading data';
+      historyBalance = 'Balance history';
+      emptyContacts = 'Contacts is empty';
+      empty = 'Empty';
+      noChats = 'No chats';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -305,7 +315,7 @@ setLanguage(code) {
       chatName = 'Название чата';
       newTape = 'Новая запись';
       enterPin = 'Введите PIN';
-      createPin = 'Установите PIN'; 
+      createPin = 'Установите PIN';
       incorrectPin = 'Неправильный PIN';
       chatNotifications = 'Уведомления от чатов';
       notifications = 'Уведомления';
@@ -369,7 +379,8 @@ setLanguage(code) {
       editedMessage = 'Ред';
       surname = 'Фамилия';
       passwordNotMatch = 'Пароли не совпадают';
-      weSentToEmail = 'Мы отправили на ваш номер SMS ключ, который поступит в течение 10 секунд';
+      weSentToEmail =
+          'Мы отправили на ваш номер SMS ключ, который поступит в течение 10 секунд';
       keyFromSms = 'SMS код';
       country = 'Страна';
       status = 'Статус';
@@ -383,7 +394,11 @@ setLanguage(code) {
       enterBelowMax = 'Введите сумму ниже максимальной отметки';
       enterAboveMin = 'Введите сумму выше минимальной отметки';
       appVersion = 'Версия приложения';
-      httpError = 'Error while loading data';
+      httpError = 'Ошибка при загрузке данных';
+      historyBalance = 'История баланса';
+      emptyContacts = 'Контакты пусты';
+      empty = 'Пусто';
+      noChats = 'Нет чатов';
       print('ru');
       break;
     case 'kz':
@@ -494,7 +509,8 @@ setLanguage(code) {
       editedMessage = 'Өңд.';
       surname = 'Тегі';
       passwordNotMatch = 'Парольдер сәйкес келмейді';
-      weSentToEmail = 'Біз сіздің нөміріңізге 10 секунд ішінде келетін SMS кілт жібердік';
+      weSentToEmail =
+          'Біз сіздің нөміріңізге 10 секунд ішінде келетін SMS кілт жібердік';
       keyFromSms = 'SMS кілт';
       country = 'Ел';
       status = 'Күй';
@@ -509,6 +525,10 @@ setLanguage(code) {
       enterAboveMin = 'Ең төменгі белгіден жоғары соманы енгізіңіз';
       appVersion = 'Мобильді қосымшаның нұсқасы';
       httpError = 'Деректерді жүктеу кезіндегі қате';
+      historyBalance = 'Баланс тарихы';
+      emptyContacts = 'Контактілер жоқ';
+      empty = 'Бос';
+      noChats = 'Чат жоқ';
       print('kz');
       break;
     case 'uz':
@@ -555,7 +575,7 @@ setLanguage(code) {
       chatName = 'Чат номи';
       newTape = 'Янги йозув';
       enterPin = 'PIN-кодни киритинг';
-      createPin = 'PIN-кодни ўрнатинг'; 
+      createPin = 'PIN-кодни ўрнатинг';
       incorrectPin = 'PIN-код нотўғри';
       chatNotifications = 'Чат хабарномалари';
       notifications = 'Хабарномалар';
@@ -587,7 +607,7 @@ setLanguage(code) {
       openSettings = 'Очиқ Созламалар';
       document = 'Ҳужжат. гов. ве';
       textMessage = 'Матнли хабар';
-      voiceMessage = 'Овозли хабар ъ';
+      voiceMessage = 'Овозли х���бар ъ';
       location = 'Узбекона. ве';
       reply = 'Жавоб бериш';
       money = 'Пул-Саисият';
@@ -619,7 +639,8 @@ setLanguage(code) {
       editedMessage = 'Таҳр.';
       surname = 'Фамилия';
       passwordNotMatch = 'Махфий сўз мос келмаяпти';
-      weSentToEmail = 'Електрон почтангизга 10 сония ичида қабул қилинадиган СМС-калит юбордик';
+      weSentToEmail =
+          'Електрон почтангизга 10 сония ичида қабул қилинадиган СМС-калит юбордик';
       keyFromSms = 'SMS коди';
       country = 'Мамлакат';
       status = 'Статуслари';
@@ -634,9 +655,14 @@ setLanguage(code) {
       enterAboveMin = 'Minimal белгидан юқори миқдорни киритинг';
       appVersion = 'Mobil дастур версияси';
       httpError = 'Маълумотларни юклашда хатолик';
+      historyBalance = 'Мувозанат тарихи';
+      emptyContacts = 'Алоқалар йўқ';
+      empty = 'Та бўш';
+      noChats = 'Чатлар йўқ';
+
       print('uz');
       break;
- case 'uzb':
+    case 'uzb':
       registration = 'Ro\'yxatdan o\'tish';
       login = 'Kirish';
       phoneNumber = 'Телефон рақами';
@@ -744,7 +770,8 @@ setLanguage(code) {
       editedMessage = 'Tahr.';
       surname = 'Familiya';
       passwordNotMatch = 'Maxfiy so\'z mos kelmayapti';
-      weSentToEmail = '10 soniya ichida keladigan pochta xabaringizga SMS-kalitni yubordik';
+      weSentToEmail =
+          '10 soniya ichida keladigan pochta xabaringizga SMS-kalitni yubordik';
       keyFromSms = 'SMS kodi';
       country = 'Mamlakat';
       status = 'Status';
@@ -759,6 +786,10 @@ setLanguage(code) {
       enterAboveMin = 'Eng kam belgidan yuqori miqdorni kiriting';
       appVersion = 'Mobil ilova versiyasi';
       httpError = 'Ma\'lumotlarni yuklashda xatolik';
+      historyBalance = 'Balans tarixi';
+      emptyContacts = 'Hech qanday aloqa yo\'q';
+      empty = 'Bo\'sh';
+      noChats = 'Hech qanday suhbat yo\'q';
       print('uzb');
       break;
     default:

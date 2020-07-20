@@ -246,11 +246,11 @@ final TextStyle finalStyle = TextStyle(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: <Widget>[
                     Image.asset("assets/chat_animation.gif"),
-                    // Container(
-                    //     child: Text(
-                    //   "${localization.tapToStartChat}",
-                    //   style: TextStyle(fontSize: 20),
-                    // ))
+                    Container(
+                        child: Text(
+                      "${localization.noChats}",
+                      style: TextStyle(fontSize: 20),
+                    ))
                   ],
                 ),
               ),

@@ -179,9 +179,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               return snapshot.hasData ? 
                 GestureDetector(
                 onTap: () {
-                  FocusScopeNode currentFocus = FocusScope.of(context);
-                  if (!currentFocus.hasPrimaryFocus) {
-                    currentFocus.unfocus();
+                  if (!FocusScope.of(context).hasPrimaryFocus) {
+                    FocusScope.of(context).unfocus();
                   }
                 },
                 child: SingleChildScrollView(

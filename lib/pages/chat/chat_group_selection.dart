@@ -443,7 +443,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                   ],
                 ),
               )
-            : Center(child: CircularProgressIndicator()));
+            : Center(child: Text('${localization.emptyContacts}')));
   }
 
   valu(index) {

@@ -14,6 +14,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   Api api = Api();
   List transferHistories = [];
   String avatarUrl = "";
+  bool emptyResponse = false;
 
   @override
   void initState() { 
@@ -26,8 +27,12 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         setState(() {
           avatarUrl = transactions['avatarURL'];
           print(transactions);
-          if (page == 1) 
+          if (page == 1) {
             transferHistories = transactions['transactions'].toList();
+            if(transactions['transactions'].isEmpty){
+              emptyResponse = true;
+            }
+          }
         });
         return transactions;
       }
@@ -38,7 +43,11 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: transferHistories.isNotEmpty ? _transferHistoryBody(transferHistories) : Center(child: CircularProgressIndicator()),
+      body: !emptyResponse ? transferHistories.isNotEmpty ? _transferHistoryBody(transferHistories) : Center(child: CircularProgressIndicator()) : SafeArea(
+            child: Container(
+              child: Center(child: Text('${localization.empty}')),
+            ),
+          ),
     );
   }
 

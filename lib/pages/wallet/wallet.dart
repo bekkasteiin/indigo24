@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/pages/wallet/balance_history.dart';
 import 'package:indigo24/pages/wallet/payments/payments_category.dart';
 import 'package:indigo24/pages/wallet/refill/refill.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer_list.dart';
@@ -27,18 +28,18 @@ class WalletTab extends StatefulWidget {
   @override
   _WalletTabState createState() => _WalletTabState();
 }
+  double _amount = double.parse(user.balance);
 
 class _WalletTabState extends State<WalletTab> {
   final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
   bool isAuthenticated = false;
   
   
-  double _amount;
   double _blockedAmount = 0;
   String _symbol;
   String _tengeSymbol = '₸';
-  double _realAmount = 0;
-  double _globalCoef = 0;
+  static double _realAmount = 0;
+  double _globalCoef = 1;
   double _tengeCoef = 1;
   double _euroCoef = 0;
   double _rubleCoef = 0;
@@ -182,7 +183,6 @@ class _WalletTabState extends State<WalletTab> {
     _symbol = '₸';
     _realAmount = double.parse(user.balance);
     _blockedAmount = double.parse(user.balanceInBlock);
-    _amount = _realAmount;
     api.getExchangeRate().then((v) {
       if(v['message'] == 'Not authenticated' && v['success'].toString() == 'false')
       {
@@ -202,6 +202,7 @@ class _WalletTabState extends State<WalletTab> {
 
   @override
   Widget build(BuildContext context) {
+    _amount = _realAmount / _globalCoef;
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
@@ -257,6 +258,8 @@ class _WalletTabState extends State<WalletTab> {
                               SizedBox(height: 20),
                               _transfer(size),
                               SizedBox(height: 20),
+                              historyBalance(size),
+                              SizedBox(height: 20),
                             ],
                           ),
                         ),
@@ -280,18 +283,80 @@ class _WalletTabState extends State<WalletTab> {
       color: Color(0xFF033083),
       alignment: Alignment.center,
       padding: EdgeInsets.symmetric(vertical: 5),
-      child: Text(
-        tempSymbol == '\$' 
-        ? '$tempSymbol 1 = $tempExchangeRate $_tengeSymbol'
-        : '1 $tempSymbol = $tempExchangeRate $_tengeSymbol',
-        style: TextStyle(
-          color: Colors.white, 
-          fontWeight: FontWeight.w300
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            tempSymbol == '\$' 
+            ? '$tempSymbol 1 = $tempExchangeRate '
+            : '1 $tempSymbol = $tempExchangeRate ',
+            style: TextStyle(
+              color: Colors.white, 
+              fontWeight: FontWeight.w300
+            ),
+          ),
+          Image(
+          image: AssetImage("assets/images/tenge.png"),
+          height: 12,
+          width: 12,
+        ),
+        ],
+      ),
+    );
+  }
+  Container historyBalance(Size size){
+    return Container(  
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(0.0, 0.0))
+      ]),
+      child: ButtonTheme(
+        minWidth: size.width * 0.8,
+        height: 70,
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => BalanceHistoryPage())).whenComplete(() async {
+              await api.getBalance();
+              setState(() {
+                // _amount = double.parse(user.balance);
+                _realAmount = double.parse(user.balance);
+                _blockedAmount = double.parse(user.balanceInBlock);
+              });
+            });
+          },
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Image(
+                  image: AssetImage("assets/images/history.png"),
+                  height: 40,
+                  width: 40,
+                ),
+                Text(
+                  '${localization.historyBalance}',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
+                ),
+                Container(width: 10),
+              ],
+            ),
+          ),
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
+          ),
         ),
       ),
     );
   }
-
   Container _transfer(Size size) {
     return Container(
       decoration: BoxDecoration(boxShadow: [
@@ -311,7 +376,7 @@ class _WalletTabState extends State<WalletTab> {
               MaterialPageRoute(builder: (context) => TransferListPage())).whenComplete(() async {
               await api.getBalance();
               setState(() {
-                _amount = double.parse(user.balance);
+                // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
                 _blockedAmount = double.parse(user.balanceInBlock);
                 });
@@ -361,7 +426,7 @@ class _WalletTabState extends State<WalletTab> {
             Navigator.push(context,MaterialPageRoute(builder: (context) => PaymentsCategoryPage())).whenComplete(() async {
               await api.getBalance();
               setState(() {
-                _amount = double.parse(user.balance);
+                // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
                 _blockedAmount = double.parse(user.balanceInBlock);
                 });
@@ -410,12 +475,75 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
-  Text _balanceAmount() {
-    if (_symbol == '\$')
-      return Text(
-        '$_symbol ${_amount.toStringAsFixed(2)}',
-        style: fS26(c: 'ffffff'),
-      );
+  Widget _balanceAmount() {
+
+    if (_symbol == '${String.fromCharCodes(Runes('\u0024'))}')
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Image(
+          image: AssetImage("assets/images/dollar.png"),
+          height: 25,
+          width: 25,
+        ),Text(
+          '${_amount.toStringAsFixed(2)}',
+          style: fS26(c: 'ffffff'),
+        ),
+        
+      ],
+    );
+
+    if (_symbol == '${String.fromCharCodes(Runes('\u20B8'))}')
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '${_amount.toStringAsFixed(2)}',
+          style: fS26(c: 'ffffff'),
+        ),
+        Image(
+          image: AssetImage("assets/images/tenge.png"),
+          height: 25,
+          width: 25,
+        ),
+      ],
+    );
+
+      
+             
+
+
+    if (_symbol == '${String.fromCharCodes(Runes('\u20BD'))}')
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '${_amount.toStringAsFixed(2)}',
+          style: fS26(c: 'ffffff'),
+        ),
+        Image(
+          image: AssetImage("assets/images/ruble.png"),
+          height: 25,
+          width: 25,
+        ),
+      ],
+    );
+    
+    if (_symbol ==  '${String.fromCharCodes(Runes('\u20AC'))}')
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '${_amount.toStringAsFixed(2)}',
+          style: fS26(c: 'ffffff'),
+        ),
+        Image(
+          image: AssetImage("assets/images/euro.png"),
+          height: 25,
+          width: 25,
+        ),
+      ],
+    );
     return Text(
       '${_amount.toStringAsFixed(2)} $_symbol',
       style: fS26(c: 'ffffff'),
@@ -431,8 +559,19 @@ class _WalletTabState extends State<WalletTab> {
         children: <Widget>[
           Text('${localization.balanceInBlock}', style: fS18w200(c: 'ffffff')),
           Container(height: 5),
-          Text('${_blockedAmount.toStringAsFixed(2)} ${String.fromCharCodes(Runes('\u20B8'))}',
-              style: fS26w200(c: 'ffffff')),
+          Row(
+
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('${_blockedAmount.toStringAsFixed(2)}',
+                  style: fS26w200(c: 'ffffff')),
+                  Image(
+          image: AssetImage("assets/images/tenge.png"),
+          height: 24,
+          width: 24,
+        ),
+            ],
+          ),
         ],
       ),
     );
@@ -461,7 +600,7 @@ class _WalletTabState extends State<WalletTab> {
                   MaterialPageRoute(builder: (context) => RefillPage())).whenComplete(() async {
                     await api.getBalance();
                     setState(() {
-                      _amount = double.parse(user.balance);
+                      // _amount = double.parse(user.balance);
                       _realAmount = double.parse(user.balance);
                       _blockedAmount = double.parse(user.balanceInBlock);
                       });
@@ -503,7 +642,7 @@ class _WalletTabState extends State<WalletTab> {
                   MaterialPageRoute(builder: (context) => WithdrawPage())).whenComplete(() async {
                     await api.getBalance();
                     setState(() {
-                      _amount = double.parse(user.balance);
+                      // _amount = double.parse(user.balance);
                       _realAmount = double.parse(user.balance);
                       _blockedAmount = double.parse(user.balanceInBlock);
                     });
@@ -548,10 +687,11 @@ class _WalletTabState extends State<WalletTab> {
                 ),
               ),
             ),
-            child: Text(
-              '${String.fromCharCodes(Runes('\u20B8'))}',
-              style: fS20(c: 'FFFFFF'),
-            ),
+            child: Image(
+          image: AssetImage("assets/images/tenge.png"),
+          height: 15,
+          width: 15,
+        ),
           ),
           onTap: () {
             setState(() {
@@ -576,10 +716,11 @@ class _WalletTabState extends State<WalletTab> {
                 ),
               ),
             ),
-            child: Text(
-              '${String.fromCharCodes(Runes('\u20BD'))}',
-              style: fS20(c: 'FFFFFF'),
-            ),
+            child: Image(
+          image: AssetImage("assets/images/ruble.png"),
+          height: 15,
+          width: 15,
+        ),
           ),
           onTap: () {
             setState(() {
@@ -605,10 +746,11 @@ class _WalletTabState extends State<WalletTab> {
                 ),
               ),
             ),
-            child: Text(
-              '${String.fromCharCodes(Runes('\u0024'))}',
-              style: fS20(c: 'FFFFFF'),
-            ),
+            child: Image(
+          image: AssetImage("assets/images/dollar.png"),
+          height: 15,
+          width: 15,
+        ),
           ),
           onTap: () {
             setState(() {
@@ -633,10 +775,11 @@ class _WalletTabState extends State<WalletTab> {
                 ),
               ),
             ),
-            child: Text(
-              '${String.fromCharCodes(Runes('\u20AC'))}',
-              style: fS20(c: 'FFFFFF'),
-            ),
+            child: Image(
+          image: AssetImage("assets/images/euro.png"),
+          height: 15,
+          width: 15,
+        ),
           ),
           onTap: () {
             setState(() {

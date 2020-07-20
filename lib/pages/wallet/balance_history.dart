@@ -10,74 +10,61 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class PaymentHistoryPage extends StatefulWidget {
+class BalanceHistoryPage extends StatefulWidget {
   @override
-  _PaymentHistoryPageState createState() => _PaymentHistoryPageState();
+  _BalanceHistoryPageState createState() => _BalanceHistoryPageState();
 }
 
-class _PaymentHistoryPageState extends State<PaymentHistoryPage>
+class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     with TickerProviderStateMixin {
-  bool emptyResponse = false;
   String logoUrl = "";
+  bool emptyResponse = false;
   @override
   void initState() {
-    api.getHistories(page).then((histories) {
+    api.getHistoryBalance(balanceHistoryPage).then((histories) {
       if (histories['message'] == 'Not authenticated' &&
           histories['success'].toString() == 'false') {
         logOut(context);
       } else {
         setState(() {
-          logoUrl = histories['logoURL'];
-          if(histories['payments'].toList().isEmpty){
+          if(histories['result'].isEmpty){
             emptyResponse = true;
           }
-          if (page == 1) test = histories['payments'].toList();
+          historyBalanceList.addAll(histories['result']);
         });
-        page++;
+        balanceHistoryPage++;
       }
     });
-
     super.initState();
   }
 
   Api api = Api();
 
-  void showDownloadProgress(received, total) {
-    if (total != -1) {
-      print((received / total * 100).toStringAsFixed(0) + "%");
-    }
+  Widget _historyBalanceBuilder(BuildContext context, snapshot) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        InkWell(
+          child: Row(
+            children: <Widget>[
+              SizedBox(width: 20),
+              _paymentLogo(
+                  'https://api.indigo24.com/logos/${snapshot['logo']}'),
+              _historyBalanceInfo(snapshot['description'], snapshot['date']),
+              _paymentAmount('${snapshot['amount']}', '${snapshot['status']}',
+                  type: '${snapshot['type']}'),
+              SizedBox(width: 20),
+            ],
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10, right: 20, left: 20),
+          height: 0.2,
+          color: Color(0xFF7D8E9B),
+        ),
+      ],
+    );
   }
-
-  Future download2(Dio dio, String url, String savePath) async {
-    try {
-      Response response = await dio.get(
-        url,
-        onReceiveProgress: showDownloadProgress,
-        //Received data with List<int>
-        options: Options(
-            responseType: ResponseType.bytes,
-            followRedirects: false,
-            validateStatus: (status) {
-              return status < 500;
-            }),
-      );
-      print(response.headers);
-      File file = File(savePath);
-      var raf = file.openSync(mode: FileMode.write);
-      // response.data is List<int> type
-      raf.writeFromSync(response.data);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
-      );
-      await raf.close();
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Dio dio = Dio();
 
   Widget _historyBuilder(
       BuildContext context,
@@ -102,13 +89,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
               SizedBox(width: 20),
             ],
           ),
-          // onTap: () async{
-          //   var tempDir = await getTemporaryDirectory();
-          //   String fullPath = tempDir.path + "/boo2.pdf'";
-          //   print('full path ${fullPath}');
-
-          //   download2(dio, url, fullPath);
-          // },
         ),
         Container(
           margin: EdgeInsets.only(top: 10, right: 20, left: 20),
@@ -176,6 +156,36 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
+  Expanded _historyBalanceInfo(String title, String date) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            "$title",
+            maxLines: 2,
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF636973),
+              fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            "$date",
+            style: TextStyle(
+              fontSize: 10,
+              color: Color(0xFF001D52),
+              fontWeight: FontWeight.w300,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
   Expanded _paymentInfo(String title, String account, String date) {
     return Expanded(
       child: Column(
@@ -232,7 +242,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       ),
       brightness: Brightness.light,
       title: Text(
-        "${localization.payments}",
+        "${localization.historyBalance}",
         style: TextStyle(
           color: Color(0xFF001D52),
           fontSize: 22,
@@ -249,7 +259,23 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: buildAppBar(), body: _paymentHistroyBody(test));
+    return Scaffold(
+        appBar: buildAppBar(),
+        body: _paymentHistroyBalance(historyBalanceList));
+  }
+
+  DateTime selectedDate = DateTime.now();
+
+  Future<Null> selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
   }
 
   void onRefresh() {
@@ -306,9 +332,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   RefreshController _balanceRefreshController =
       RefreshController(initialRefresh: false);
 
-  SafeArea _paymentHistroyBody(snapshot) {
+  SafeArea _paymentHistroyBalance(snapshot) {
     return !emptyResponse
-        ? test.isNotEmpty
+        ? historyBalanceList.isNotEmpty
             ? SafeArea(
                 child: SmartRefresher(
                   enablePullDown: false,
@@ -322,24 +348,18 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                       );
                     },
                   ),
-                  controller: _refreshController,
-                  onLoading: _onLoading,
+                  controller: _balanceRefreshController,
+                  onLoading: _onBalanceLoading,
                   child: ListView.builder(
                     padding: const EdgeInsets.only(bottom: 10),
                     itemCount: snapshot != null ? snapshot.length : 0,
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
                         padding: const EdgeInsets.only(top: 10),
-                        child: _historyBuilder(
-                            context,
-                            "$logoUrl${snapshot[index]['logo']}",
-                            "${snapshot[index]['account']}",
-                            "${snapshot[index]['amount']}",
-                            "${snapshot[index]['title']}",
-                            "${snapshot[index]['data']}",
-                            "${snapshot[index]['status']}",
-                            index,
-                            "${snapshot[index]['pdf']}"),
+                        child: _historyBalanceBuilder(
+                          context,
+                          snapshot[index],
+                        ),
                       );
                     },
                   ),
@@ -354,6 +374,50 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             child: Container(
               child: Center(child: Text('${localization.empty}')),
             ),
+          );
+    ;
+  }
+
+  SafeArea _paymentHistroyBody(snapshot) {
+    return test.isNotEmpty
+        ? SafeArea(
+            child: SmartRefresher(
+              enablePullDown: false,
+              enablePullUp: true,
+              footer: CustomFooter(
+                builder: (BuildContext context, LoadStatus mode) {
+                  Widget body;
+                  return Container(
+                    height: 55.0,
+                    child: Center(child: body),
+                  );
+                },
+              ),
+              controller: _refreshController,
+              onLoading: _onLoading,
+              child: ListView.builder(
+                padding: const EdgeInsets.only(bottom: 10),
+                itemCount: snapshot != null ? snapshot.length : 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: _historyBuilder(
+                        context,
+                        "$logoUrl${snapshot[index]['logo']}",
+                        "${snapshot[index]['account']}",
+                        "${snapshot[index]['amount']}",
+                        "${snapshot[index]['title']}",
+                        "${snapshot[index]['data']}",
+                        "${snapshot[index]['status']}",
+                        index,
+                        "${snapshot[index]['pdf']}"),
+                  );
+                },
+              ),
+            ),
+          )
+        : SafeArea(
+            child: Container(),
           );
   }
 }
