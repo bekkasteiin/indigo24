@@ -484,9 +484,19 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     permissionForPush();
   }
 
+  pushPermission() async {
+    if (!await Permission.notification.isGranted) {
+      PermissionStatus status = await Permission.notification.request();
+      if (status != PermissionStatus.granted) {
+        return false;
+      }
+    }
+  }
+
   @override
   void initState() {
     permissions();
+    pushPermission();
     share();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;

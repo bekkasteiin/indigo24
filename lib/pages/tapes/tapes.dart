@@ -265,48 +265,68 @@ class _TapesPageState extends State<TapesPage>
                                           padding:
                                               const EdgeInsets.only(left: 10.0),
                                           child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: <Widget>[
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(25.0),
-                                                child: Image.network(
-                                                  '$avatarUrl${result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
-                                                  width: 35,
-                                                  height: 35,
-                                                ),
-                                              ),
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
                                               Flexible(
-                                                child: Column(
+                                                child: Row(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: <Widget>[
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          left: 10.0),
-                                                      child: Text(
-                                                        '${result[index]['name']}',
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                            fontSize: 18),
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              25.0),
+                                                      child: Image.network(
+                                                        '$avatarUrl${result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                                                        width: 35,
+                                                        height: 35,
                                                       ),
                                                     ),
-                                                    Container(
-                                                      padding: EdgeInsets.only(
-                                                          left: 10.0),
-                                                      child: Text(
-                                                        '${result[index]['title']}',
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
+                                                    Flexible(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          Container(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 10.0),
+                                                            child: Text(
+                                                              '${result[index]['name']}',
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                  fontSize: 18),
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    left: 10.0),
+                                                            child: Text(
+                                                              '${result[index]['title']}',
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
+                                              IconButton(
+                                                icon: Icon(Icons.more_horiz),
+                                                onPressed: () {},
+                                              )
                                             ],
                                           ),
                                         ),
