@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
@@ -145,6 +146,52 @@ class _TapesPageState extends State<TapesPage>
 
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+
+  showAlertDialog(BuildContext context, String message) {
+    print("Alert");
+    Widget okButton = CupertinoDialogAction(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      // title: Text("Alert"),
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  moreActions() {
+    final act = CupertinoActionSheet(
+        title: Text('${localization.selectOption}'),
+        // message: Text('Which option?'),
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            child: Text('${localization.report}'),
+            onPressed: () {
+              Navigator.pop(context);
+              showAlertDialog(context, "Your complaint is being processed");
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text('${localization.back}'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ));
+    showCupertinoModalPopup(
+        context: context, builder: (BuildContext context) => act);
+  }
 
   @override
   // ignore: must_call_super
@@ -324,8 +371,10 @@ class _TapesPageState extends State<TapesPage>
                                                 ),
                                               ),
                                               IconButton(
-                                                icon: Icon(Icons.more_horiz),
-                                                onPressed: () {},
+                                                icon: Icon(Icons.more_vert),
+                                                onPressed: () {
+                                                  moreActions();
+                                                },
                                               )
                                             ],
                                           ),

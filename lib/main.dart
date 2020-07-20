@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,6 +12,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:indigo24/db/contact.dart';
 import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/pages/auth/intro.dart';
@@ -92,6 +94,7 @@ permissionForPush() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterDownloader.initialize(debug: true);
   // await ContactsService.addContact(Contact(displayName: "Name $i", givenName: 'Givenname $i', middleName: 'Middlename $i', phones: [ Item(label: 'home', value: '${87020000000+i}')])); // To Add Contacts
   SharedPreferences preferences = await SharedPreferences.getInstance();
   String languageCode = preferences.getString('languageCode');
@@ -493,11 +496,17 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
   }
 
+  initDownloader() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await FlutterDownloader.initialize(debug: true);
+  }
+
   @override
   void initState() {
     permissions();
     pushPermission();
     share();
+    initDownloader();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
     fcmTokenStream.listen((token) {

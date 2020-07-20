@@ -199,7 +199,8 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
-  sendMessage(String chatID, String message, {int type, attachments}) {
+  sendMessage(String chatID, String message,
+      {int type, var fileId, attachments}) {
     outSound();
 
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
@@ -214,6 +215,7 @@ class ChatRoom {
           "chat_id": "$chatID",
           "text": '$message',
           "message_type": type == null ? 0 : type,
+          "file_id": fileId == null ? 0 : fileId,
           "attachments": attachments == null ? null : attachments
         }
       });
@@ -503,7 +505,7 @@ class ChatRoom {
                 contactController.add(new MyContactEvent(json));
               }
               if (cabinetInfoController != null) {
-                if(!cabinetInfoController.isClosed){
+                if (!cabinetInfoController.isClosed) {
                   print('added to cabinet info');
                   cabinetInfoController.add(new MyCabinetInfoEvent(json));
                 }

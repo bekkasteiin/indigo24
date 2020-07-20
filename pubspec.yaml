@@ -47,7 +47,6 @@ dependencies:
   url_launcher: ^5.4.10
   file_picker: ^1.11.0+3
   firebase_messaging: ^6.0.16
-  image_picker_flutter: ^1.4.4
   flutter_webview_plugin: ^0.3.11
   mask_text_input_formatter: ^1.0.7
   datetime_picker_formfield: ^1.0.0
@@ -64,6 +63,7 @@ dependencies:
   flutter_widgets: ^0.1.12
   package_info: ^0.4.1
   flutter_cache_manager: any
+  flutter_downloader: ^1.4.4
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +87,7 @@ flutter:
     - assets/sound/msg_out.mp3
     - assets/sound/message_in.mp3
     - assets/images/send.png
+    - assets/images/pdf.png
     - assets/images/download.png
     - assets/images/upload.png
     - assets/images/camera.png
@@ -126,6 +127,10 @@ flutter:
     - assets/images/refresh.png
     - assets/images/newPost.png
     - assets/images/forward.png
+    - assets/images/dollar.png
+    - assets/images/tenge.png
+    - assets/images/ruble.png
+    - assets/images/euro.png
 
   fonts:
      - family: Spectral

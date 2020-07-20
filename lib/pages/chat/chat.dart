@@ -221,7 +221,7 @@ class _ChatPageState extends State<ChatPage> {
           e.json['data'].forEach((memberElement) {
             myContacts.toList().forEach((element) {
               if ('${element.phone}' == '${memberElement['phone']}') {
-                if(!temp.contains(memberElement)){
+                if (!temp.contains(memberElement)) {
                   print('match ${element.phone}');
                   temp.add(memberElement);
                 }
@@ -521,10 +521,14 @@ class _ChatPageState extends State<ChatPage> {
       print("RRR ${r["message"]}");
       if (r["status"]) {
         var a = [
-          {"filename": "${r["file_name"]}"}
+          {
+            "filename": "${r["file_name"]}",
+          }
         ];
         ChatRoom.shared.sendMessage('${widget.chatID}', "file",
-            type: 2, attachments: jsonDecode(jsonEncode(a)));
+            type: 2,
+            fileId: r["file_id"],
+            attachments: jsonDecode(jsonEncode(a)));
       } else {
         showAlertDialog(context, r["message"]);
         print("error");
@@ -1003,9 +1007,10 @@ class _ChatPageState extends State<ChatPage> {
                 borderRadius: BorderRadius.circular(25.0),
                 child: ClipOval(
                     child: Image.network(
-                        '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                        width: 35,
-                        height: 35,)
+                  '${widget.avatarUrl.toString()}${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                  width: 35,
+                  height: 35,
+                )
                     // child: CachedNetworkImage(
                     //   height: 50,
                     //   width: 50,
@@ -1322,37 +1327,37 @@ class _ChatPageState extends State<ChatPage> {
                                 },
                               ),
                               !isRecording
-                                  ?
-                              Flexible(
-                                child: TextField(
-                                  maxLines: 6,
-                                  minLines: 1,
-                                  controller: _text,
-                                  onChanged: (value) {
-                                    print("Typing: $value");
-                                    if (value == '') {
-                                      setState(() {
-                                        isTyping = false;
-                                      });
-                                    } else {
-                                      ChatRoom.shared.typing(widget.chatID);
-                                      setState(() {
-                                        isTyping = true;
-                                      });
-                                    }
-                                  },
-                                ),
-                              )
-                              : Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Image.asset("assets/record.gif",
-                                        width: 10, height: 10),
-                                    Container(width: 5),
-                                    TimerText(dependencies: dependencies),
-                                  ],
-                                ),
+                                  ? Flexible(
+                                      child: TextField(
+                                        maxLines: 6,
+                                        minLines: 1,
+                                        controller: _text,
+                                        onChanged: (value) {
+                                          print("Typing: $value");
+                                          if (value == '') {
+                                            setState(() {
+                                              isTyping = false;
+                                            });
+                                          } else {
+                                            ChatRoom.shared
+                                                .typing(widget.chatID);
+                                            setState(() {
+                                              isTyping = true;
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Image.asset("assets/record.gif",
+                                            width: 10, height: 10),
+                                        Container(width: 5),
+                                        TimerText(dependencies: dependencies),
+                                      ],
+                                    ),
                               !isTyping
                                   ? ClipOval(
                                       child: GestureDetector(
@@ -1376,13 +1381,13 @@ class _ChatPageState extends State<ChatPage> {
                                         child: Center(
                                             child: !isRecording
                                                 ? Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(
                                                       Icons.mic,
                                                       size: 50,
                                                     ),
-                                                )
+                                                  )
                                                 : Container()),
                                       ),
                                     )
@@ -1393,54 +1398,60 @@ class _ChatPageState extends State<ChatPage> {
                                   //     print("audio pressed");
                                   //   },
                                   // )
-                                  :
-                              Container(
-                                height: 50,
-                                width: 50,
-                                child: IconButton(
-                                  icon: Icon(Icons.send),
-                                  onPressed: () {
-                                    print(
-                                        "new message or editing? editing: $isEditing");
-                                    if (isEditing) {
-                                      print("Edit message is called");
-                                      var mId = editMessage['id'] == null
-                                          ? editMessage['message_id']
-                                          : editMessage['id'];
-                                      var type = editMessage['type'];
-                                      var time = editMessage['time'];
-                                      ChatRoom.shared.editMessage(_text.text,
-                                          widget.chatID, type, time, mId);
-                                      setState(() {
-                                        isTyping = false;
-                                        _text.text = '';
-                                        isEditing = false;
-                                        editMessage = null;
-                                      });
-                                    } else if (isReplying) {
-                                      print("Reply message is called");
-                                      var mId = replyMessage['id'] == null
-                                          ? replyMessage['message_id']
-                                          : replyMessage['id'];
-                                      ChatRoom.shared.replyMessage(
-                                          _text.text, widget.chatID, 10, mId);
-                                      setState(() {
-                                        isTyping = false;
-                                        _text.text = '';
-                                        isReplying = false;
-                                        replyMessage = null;
-                                      });
-                                    } else {
-                                      ChatRoom.shared.sendMessage(
-                                          '${widget.chatID}', _text.text);
-                                      setState(() {
-                                        isTyping = false;
-                                        _text.text = '';
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
+                                  : Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: IconButton(
+                                        icon: Icon(Icons.send),
+                                        onPressed: () {
+                                          print(
+                                              "new message or editing? editing: $isEditing");
+                                          if (isEditing) {
+                                            print("Edit message is called");
+                                            var mId = editMessage['id'] == null
+                                                ? editMessage['message_id']
+                                                : editMessage['id'];
+                                            var type = editMessage['type'];
+                                            var time = editMessage['time'];
+                                            ChatRoom.shared.editMessage(
+                                                _text.text,
+                                                widget.chatID,
+                                                type,
+                                                time,
+                                                mId);
+                                            setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                              isEditing = false;
+                                              editMessage = null;
+                                            });
+                                          } else if (isReplying) {
+                                            print("Reply message is called");
+                                            var mId = replyMessage['id'] == null
+                                                ? replyMessage['message_id']
+                                                : replyMessage['id'];
+                                            ChatRoom.shared.replyMessage(
+                                                _text.text,
+                                                widget.chatID,
+                                                10,
+                                                mId);
+                                            setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                              isReplying = false;
+                                              replyMessage = null;
+                                            });
+                                          } else {
+                                            ChatRoom.shared.sendMessage(
+                                                '${widget.chatID}', _text.text);
+                                            setState(() {
+                                              isTyping = false;
+                                              _text.text = '';
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ),
                             ],
                           ),
                         ],

@@ -211,7 +211,10 @@ class SendedMessageWidget extends StatelessWidget {
                                           imageCount: imageCount.indexOf(test));
                                     }())
                                   : (type == "2")
-                                      ? FileMessage(url: "$mediaUrl$media")
+                                      ? new FileMessage(
+                                          url: "$mediaUrl/$media",
+                                          key: Key("$mediaUrl/$media"),
+                                        )
                                       : (type == "3")
                                           ? new AudioMessage("$mediaUrl$media")
                                           : (type == "4")

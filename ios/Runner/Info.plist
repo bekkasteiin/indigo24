@@ -32,6 +32,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FDAllFilesDownloadedMessage</key>
+	<string>All files have been downloaded</string>
+	<key>FDMaximumConcurrentTasks</key>
+	<integer>5</integer>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
