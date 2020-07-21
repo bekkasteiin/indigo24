@@ -326,6 +326,7 @@ class _TransferPageState extends State<TransferPage> {
                        
                         keyboardType: TextInputType.number,
                         inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(25),
                         ],
                         decoration: InputDecoration.collapsed(
@@ -476,6 +477,9 @@ class _TransferPageState extends State<TransferPage> {
                 child: Container(
                   child: TextFormField(
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter.digitsOnly,
+                    ],
                     controller: sumController,
                     decoration: InputDecoration.collapsed(
                         hintText: '${localization.amount}'),

@@ -14,6 +14,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:video_player/video_player.dart';
+import 'package:indigo24/db/tapes_helper.dart';
+
 import 'tape.dart';
 
 class TapesPage extends StatefulWidget {
@@ -33,9 +35,14 @@ class _TapesPageState extends State<TapesPage>
   VideoPlayerController _videoPlayerController;
   ChewieController _chewieController;
 
+  getTapeFromDb() async {
+    tapesDatabaseData = await tapeDb.getAll();
+  }
+
   @override
   void initState() {
     print("tapes init state");
+    getTapeFromDb();
     getTapes();
     super.initState();
   }
@@ -56,16 +63,19 @@ class _TapesPageState extends State<TapesPage>
     });
   }
 
+  var tapesDatabaseData = [];
   getTapes() {
     setState(() {
       flickMultiManager = FlickMultiManager();
     });
-    api.getTapes('$tapePage').then((tapes) {
+    api.getTapes('$tapePage').then((tapes) async {
       if (tapes['message'] == 'Not authenticated' &&
           tapes['success'].toString() == 'false') {
         logOut(context);
         return true;
       } else {
+        // print(tapeDb.getAll());
+        // print(tapeDb.getAll());
         return setTapes(tapes);
       }
     });
@@ -80,7 +90,7 @@ class _TapesPageState extends State<TapesPage>
   }
 
   Future rebuild(tapes) async {
-    setState(() {
+    setState(() async {
       result = tapes["result"].toList();
       _listFuture = Future(foo);
       result.forEach((el) async {
@@ -120,6 +130,7 @@ class _TapesPageState extends State<TapesPage>
     _refreshController.loadComplete();
   }
 
+  TapeDB tapeDb = TapeDB();
   int foo() {
     return 1;
   }
@@ -150,6 +161,7 @@ class _TapesPageState extends State<TapesPage>
   showAlertDialog(BuildContext context, String message) {
     print("Alert");
     Widget okButton = CupertinoDialogAction(
+      isDestructiveAction: true,
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
@@ -170,7 +182,7 @@ class _TapesPageState extends State<TapesPage>
     );
   }
 
-  moreActions() {
+  moreActions({dynamic data}) {
     final act = CupertinoActionSheet(
         title: Text('${localization.selectOption}'),
         // message: Text('Which option?'),
@@ -180,6 +192,25 @@ class _TapesPageState extends State<TapesPage>
             onPressed: () {
               Navigator.pop(context);
               showAlertDialog(context, "Your complaint is being processed");
+            },
+          ),
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            child: Text('${localization.hide}'),
+            onPressed: () async {
+              Navigator.pop(context);
+              MyTape tape = MyTape(
+                id: data['id'],
+              );
+
+              await tapeDb.updateOrInsert(tape);
+
+              tapesDatabaseData = await tapeDb.getAll();
+              setState(() {
+                tapesDatabaseData = tapesDatabaseData;
+              });
+              print('$data' '$tapesDatabaseData');
+              showAlertDialog(context, "${data['title']} ${localization.hide}");
             },
           ),
         ],
@@ -275,6 +306,13 @@ class _TapesPageState extends State<TapesPage>
                       reverse: false,
                       itemCount: result.length,
                       itemBuilder: (BuildContext context, int index) {
+                        bool needToHide = false;
+                        tapesDatabaseData.forEach((element) {
+                          if ('${element.toJson()['id']}' ==
+                              '${result[index]['id']}') {
+                            needToHide = true;
+                          }
+                        });
                         // if (result[index]['media'].endsWith('mp4')) {
                         //   print(result[index]['media']);
                         //   _controller =
@@ -327,7 +365,9 @@ class _TapesPageState extends State<TapesPage>
                                                           BorderRadius.circular(
                                                               25.0),
                                                       child: Image.network(
-                                                        '$avatarUrl${result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                                                        needToHide
+                                                            ? '${avatarUrl}noAvatar.png'
+                                                            : '$avatarUrl${result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
                                                         width: 35,
                                                         height: 35,
                                                       ),
@@ -343,7 +383,9 @@ class _TapesPageState extends State<TapesPage>
                                                                 EdgeInsets.only(
                                                                     left: 10.0),
                                                             child: Text(
-                                                              '${result[index]['name']}',
+                                                              needToHide
+                                                                  ? 'Blocked content by ${result[index]['name']}'
+                                                                  : '${result[index]['name']}',
                                                               maxLines: 1,
                                                               overflow:
                                                                   TextOverflow
@@ -352,260 +394,303 @@ class _TapesPageState extends State<TapesPage>
                                                                   fontSize: 18),
                                                             ),
                                                           ),
-                                                          Container(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    left: 10.0),
-                                                            child: Text(
-                                                              '${result[index]['title']}',
-                                                              maxLines: 1,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
-                                                          ),
+                                                          needToHide
+                                                              ? Center()
+                                                              : Container(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          left:
+                                                                              10.0),
+                                                                  child: Text(
+                                                                    '${result[index]['title']}',
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
                                                         ],
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                              IconButton(
-                                                icon: Icon(Icons.more_vert),
-                                                onPressed: () {
-                                                  moreActions();
-                                                },
-                                              )
+                                              needToHide
+                                                  ? Center()
+                                                  : IconButton(
+                                                      icon:
+                                                          Icon(Icons.more_vert),
+                                                      onPressed: () {
+                                                        moreActions(
+                                                            data:
+                                                                result[index]);
+                                                      },
+                                                    )
                                             ],
                                           ),
                                         ),
                                         SizedBox(
                                           height: 10,
                                         ),
-                                        GestureDetector(
-                                          onDoubleTap: () async {
-                                            await api
-                                                .likeTape(
-                                                    '${result[index]['id']}')
-                                                .then((value) {
-                                              likeResult = value;
-                                            });
-                                            setState(() {
-                                              if (likeResult['result']
-                                                  ['myLike']) {
-                                                _saved.add(result[index]['id']);
-                                                result[index]['likesCount'] +=
-                                                    1;
-                                                final snackBar = SnackBar(
-                                                  elevation: 200,
-                                                  duration:
-                                                      Duration(seconds: 2),
-                                                  content: Text(
-                                                    'Вы лайнули пост ${result[index]['title']} от ${result[index]['name']}',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.w600),
+                                        needToHide
+                                            ? Center()
+                                            : GestureDetector(
+                                                onDoubleTap: () async {
+                                                  await api
+                                                      .likeTape(
+                                                          '${result[index]['id']}')
+                                                      .then((value) {
+                                                    likeResult = value;
+                                                  });
+                                                  setState(() {
+                                                    if (likeResult['result']
+                                                        ['myLike']) {
+                                                      _saved.add(
+                                                          result[index]['id']);
+                                                      result[index]
+                                                          ['likesCount'] += 1;
+                                                      final snackBar = SnackBar(
+                                                        elevation: 200,
+                                                        duration: Duration(
+                                                            seconds: 2),
+                                                        content: Text(
+                                                          'Вы лайнули пост ${result[index]['title']} от ${result[index]['name']}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600),
+                                                        ),
+                                                        backgroundColor:
+                                                            Colors.blue,
+                                                      );
+                                                      Scaffold.of(context)
+                                                          .showSnackBar(
+                                                              snackBar);
+                                                    } else {
+                                                      _saved.remove(
+                                                          result[index]['id']);
+                                                      result[index]
+                                                          ['likesCount'] -= 1;
+                                                    }
+                                                  });
+                                                },
+                                                child: Container(
+                                                  height: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  child: Center(
+                                                    child:
+                                                        (result[index]['media']
+                                                                    .toString()
+                                                                    .endsWith(
+                                                                        "MOV") ||
+                                                                result[index][
+                                                                        'media']
+                                                                    .toString()
+                                                                    .endsWith(
+                                                                        "mov") ||
+                                                                result[index][
+                                                                        'media']
+                                                                    .toString()
+                                                                    .endsWith(
+                                                                        "mp4") ||
+                                                                result[index][
+                                                                        'media']
+                                                                    .toString()
+                                                                    .endsWith(
+                                                                        "mpeg") ||
+                                                                result[index][
+                                                                        'media']
+                                                                    .toString()
+                                                                    .endsWith(
+                                                                        "avi"))
+                                                            ? new FlickMultiPlayer(
+                                                                url:
+                                                                    "$uploadTapes${result[index]['media']}",
+                                                                flickMultiManager:
+                                                                    flickMultiManager,
+                                                                image: result[index]
+                                                                            [
+                                                                            'frame'] !=
+                                                                        null
+                                                                    ? result[
+                                                                            index]
+                                                                        [
+                                                                        'frame']
+                                                                    : 'assets/preloader.gif',
+                                                              )
+                                                            // new ChewieVideo(
+                                                            //     controller:
+                                                            //         VideoPlayerController
+                                                            //             .network(
+                                                            //                 "$uploadTapes${result[index]['media']}"),
+                                                            //   )
+                                                            : AspectRatio(
+                                                                aspectRatio:
+                                                                    1 / 1,
+                                                                // Puts a "mask" on the child, so that it will keep its original, unzoomed size
+                                                                // even while it's being zoomed in
+                                                                child: ClipRect(
+                                                                  child:
+                                                                      PhotoView(
+                                                                    imageProvider:
+                                                                        CachedNetworkImageProvider(
+                                                                      '$uploadTapes${result[index]['media']}',
+                                                                    ),
+                                                                    backgroundDecoration:
+                                                                        BoxDecoration(
+                                                                            color:
+                                                                                Colors.transparent),
+                                                                    // Contained = the smallest possible size to fit one dimension of the screen
+                                                                    minScale:
+                                                                        PhotoViewComputedScale
+                                                                            .contained,
+                                                                    // Covered = the smallest possible size to fit the whole screen
+                                                                    maxScale:
+                                                                        PhotoViewComputedScale
+                                                                            .contained,
+                                                                    enableRotation:
+                                                                        false,
+                                                                  ),
+                                                                ),
+                                                              ),
+
+                                                    // Image(
+                                                    //   image: NetworkImage(
+                                                    //     "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
+                                                    //   ),
+                                                    // ),
                                                   ),
-                                                  backgroundColor: Colors.blue,
-                                                );
-                                                Scaffold.of(context)
-                                                    .showSnackBar(snackBar);
-                                              } else {
-                                                _saved.remove(
-                                                    result[index]['id']);
-                                                result[index]['likesCount'] -=
-                                                    1;
-                                              }
-                                            });
-                                          },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            child: Center(
-                                              child: (result[index]['media']
-                                                          .toString()
-                                                          .endsWith("MOV") ||
-                                                      result[index]['media']
-                                                          .toString()
-                                                          .endsWith("mov") ||
-                                                      result[index]['media']
-                                                          .toString()
-                                                          .endsWith("mp4") ||
-                                                      result[index]['media']
-                                                          .toString()
-                                                          .endsWith("mpeg") ||
-                                                      result[index]['media']
-                                                          .toString()
-                                                          .endsWith("avi"))
-                                                  ? new FlickMultiPlayer(
-                                                      url:
-                                                          "$uploadTapes${result[index]['media']}",
-                                                      flickMultiManager:
-                                                          flickMultiManager,
-                                                      image: result[index]
-                                                                  ['frame'] !=
-                                                              null
-                                                          ? result[index]
-                                                              ['frame']
-                                                          : 'assets/preloader.gif',
-                                                    )
-                                                  // new ChewieVideo(
-                                                  //     controller:
-                                                  //         VideoPlayerController
-                                                  //             .network(
-                                                  //                 "$uploadTapes${result[index]['media']}"),
-                                                  //   )
-                                                  : AspectRatio(
-                                                      aspectRatio: 1 / 1,
-                                                      // Puts a "mask" on the child, so that it will keep its original, unzoomed size
-                                                      // even while it's being zoomed in
-                                                      child: ClipRect(
-                                                        child: PhotoView(
-                                                          imageProvider:
-                                                              CachedNetworkImageProvider(
-                                                            '$uploadTapes${result[index]['media']}',
-                                                          ),
-                                                          backgroundDecoration:
-                                                              BoxDecoration(
-                                                                  color: Colors
-                                                                      .transparent),
-                                                          // Contained = the smallest possible size to fit one dimension of the screen
-                                                          minScale:
-                                                              PhotoViewComputedScale
-                                                                  .contained,
-                                                          // Covered = the smallest possible size to fit the whole screen
-                                                          maxScale:
-                                                              PhotoViewComputedScale
-                                                                  .contained,
-                                                          enableRotation: false,
+                                                ),
+                                              ),
+                                        needToHide
+                                            ? Center()
+                                            : Row(
+                                                children: <Widget>[
+                                                  IconButton(
+                                                    icon: Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      child: Image(
+                                                        image: AssetImage(
+                                                          _saved.contains(
+                                                                  result[index]
+                                                                      ['id'])
+                                                              ? 'assets/images/tapeLiked.png'
+                                                              : 'assets/images/tapeUnliked.png',
                                                         ),
                                                       ),
                                                     ),
+                                                    onPressed: () async {
+                                                      await api
+                                                          .likeTape(
+                                                              '${result[index]['id']}')
+                                                          .then((value) {
+                                                        print(value);
+                                                        setState(() {
+                                                          likeResult = value;
+                                                        });
+                                                      });
 
-                                              // Image(
-                                              //   image: NetworkImage(
-                                              //     "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
-                                              //   ),
-                                              // ),
-                                            ),
-                                          ),
-                                        ),
-                                        Row(
-                                          children: <Widget>[
-                                            IconButton(
-                                              icon: Container(
-                                                width: 35,
-                                                height: 35,
-                                                child: Image(
-                                                  image: AssetImage(
-                                                    _saved.contains(
-                                                            result[index]['id'])
-                                                        ? 'assets/images/tapeLiked.png'
-                                                        : 'assets/images/tapeUnliked.png',
+                                                      setState(() {
+                                                        if (likeResult['result']
+                                                            ['myLike']) {
+                                                          _saved.add(
+                                                              result[index]
+                                                                  ['id']);
+                                                          result[index][
+                                                              'likesCount'] += 1;
+                                                        } else {
+                                                          _saved.remove(
+                                                              result[index]
+                                                                  ['id']);
+                                                          result[index][
+                                                              'likesCount'] -= 1;
+                                                        }
+                                                      });
+                                                    },
                                                   ),
+                                                  Container(
+                                                    width: 30,
+                                                    child: Text(
+                                                      '${result[index]['likesCount']}',
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      child: Image(
+                                                        image: AssetImage(
+                                                          'assets/images/tapeComment.png',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              TapePage(result[
+                                                                  index]),
+                                                        ),
+                                                      ).whenComplete(() {});
+                                                    },
+                                                  ),
+                                                  // IconButton(
+                                                  //   icon: Container(
+                                                  //     width: 35,
+                                                  //     height: 35,
+                                                  //     child: Image(
+                                                  //       image: AssetImage(
+                                                  //         'assets/images/send.png',
+                                                  //       ),
+                                                  //     ),
+                                                  //   ),
+                                                  //   onPressed: () {
+                                                  //     print("${result[index]['id']}");
+                                                  //   },
+                                                  // ),
+                                                  // Container(
+                                                  //   width: 30,
+                                                  //   child: Text(
+                                                  //     '${result[index]['commentsCount']}',
+                                                  //   ),
+                                                  // ),
+                                                  Expanded(
+                                                    child: Text(''),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 10.0),
+                                                    child: Text(
+                                                      '${result[index]['created'].toString().replaceAll(".2020", "")}',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                        needToHide
+                                            ? Center()
+                                            : Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0),
+                                                child: Text(
+                                                  '${result[index]['description']}',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                  maxLines: 3,
                                                 ),
                                               ),
-                                              onPressed: () async {
-                                                await api
-                                                    .likeTape(
-                                                        '${result[index]['id']}')
-                                                    .then((value) {
-                                                  print(value);
-                                                  setState(() {
-                                                    likeResult = value;
-                                                  });
-                                                });
-
-                                                setState(() {
-                                                  if (likeResult['result']
-                                                      ['myLike']) {
-                                                    _saved.add(
-                                                        result[index]['id']);
-                                                    result[index]
-                                                        ['likesCount'] += 1;
-                                                  } else {
-                                                    _saved.remove(
-                                                        result[index]['id']);
-                                                    result[index]
-                                                        ['likesCount'] -= 1;
-                                                  }
-                                                });
-                                              },
-                                            ),
-                                            Container(
-                                              width: 30,
-                                              child: Text(
-                                                '${result[index]['likesCount']}',
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: Container(
-                                                width: 35,
-                                                height: 35,
-                                                child: Image(
-                                                  image: AssetImage(
-                                                    'assets/images/tapeComment.png',
-                                                  ),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        TapePage(result[index]),
-                                                  ),
-                                                ).whenComplete(() {});
-                                              },
-                                            ),
-                                            // IconButton(
-                                            //   icon: Container(
-                                            //     width: 35,
-                                            //     height: 35,
-                                            //     child: Image(
-                                            //       image: AssetImage(
-                                            //         'assets/images/send.png',
-                                            //       ),
-                                            //     ),
-                                            //   ),
-                                            //   onPressed: () {
-                                            //     print("${result[index]['id']}");
-                                            //   },
-                                            // ),
-                                            // Container(
-                                            //   width: 30,
-                                            //   child: Text(
-                                            //     '${result[index]['commentsCount']}',
-                                            //   ),
-                                            // ),
-                                            Expanded(
-                                              child: Text(''),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 10.0),
-                                              child: Text(
-                                                '${result[index]['created'].toString().replaceAll(".2020", "")}',
-                                                style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10.0),
-                                          child: Text(
-                                            '${result[index]['description']}',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(fontSize: 16),
-                                            maxLines: 3,
-                                          ),
-                                        ),
                                         Padding(
                                           padding: const EdgeInsets.only(
                                               bottom: 10.0),

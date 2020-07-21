@@ -346,9 +346,11 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         keyboardType: TextInputType.number,
                         inputFormatters: temp == 'false' ? [
                           LengthLimitingTextInputFormatter(25),
+                          WhitelistingTextInputFormatter.digitsOnly,
                         ] : [
                           loginFormatter,  
                           LengthLimitingTextInputFormatter(25),
+                          WhitelistingTextInputFormatter.digitsOnly,
                         ] ,
                         decoration: InputDecoration.collapsed(
                           // hintText: '${localization.phoneNumber}',

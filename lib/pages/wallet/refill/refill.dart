@@ -128,6 +128,7 @@ class _RefillPageState extends State<RefillPage> {
                 margin: const EdgeInsets.symmetric(vertical: 20),
                 child: TextFormField(
                   textAlign: TextAlign.center,
+                  inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration.collapsed(
                     hintText: '${localization.amount}',

@@ -23,7 +23,14 @@ class _WithdrawPageState extends State<WithdrawPage> {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
+
   WillPopScope buildWebviewScaffold(url) {
+    print(' this is url $url');
+    print(' this is url $url');
+    print(' this is url $url');
+    print(' this is url $url');
+    print(' this is url $url');
+    print(' this is url $url');
     return WillPopScope(
       onWillPop: () async {
         return false;
@@ -58,43 +65,48 @@ class _WithdrawPageState extends State<WithdrawPage> {
         ),
         body: SafeArea(
           child: WebviewScaffold(
-            url: '$url',
-            withZoom: true,
-            withLocalStorage: true,
-            hidden: false,
-            initialChild: Center(child: CircularProgressIndicator())
-          ),
+              url: '$url',
+              withZoom: true,
+              withLocalStorage: true,
+              hidden: false,
+              initialChild: Center(child: CircularProgressIndicator())),
         ),
       ),
     );
   }
-  
+
+  @override
+  void initState() {
+    print('${configs.withdrawCommission}');
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-        },
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
       child: Scaffold(
         backgroundColor: Color(0xFFF7F7F7),
         appBar: AppBar(
           centerTitle: true,
           leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
+                ),
               ),
             ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
           brightness: Brightness.light,
           title: Text(
             "${localization.withdraw}",
@@ -113,42 +125,56 @@ class _WithdrawPageState extends State<WithdrawPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
               ),
-              Center(child: Text('${localization.commission} ${configs.withdrawCommission}%')),
-              Center(child: Text('${localization.minAmount} ${configs.withdrawMin} KZT')),
-              Center(child: Text('${localization.minCommission} ${configs.withdrawMinCommission} KZT')),
-              Center(child: Text('${localization.maxAmount} ${configs.withdrawMax} KZT')),
+              Center(
+                  child: Text(
+                      '${localization.commission} ${configs.withdrawCommission}%')),
+              Center(
+                  child: Text(
+                      '${localization.minAmount} ${configs.withdrawMin} KZT')),
+              Center(
+                  child: Text(
+                      '${localization.minCommission} ${configs.withdrawMinCommission} KZT')),
+              Center(
+                  child: Text(
+                      '${localization.maxAmount} ${configs.withdrawMax} KZT')),
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 margin: const EdgeInsets.symmetric(vertical: 20),
                 child: TextFormField(
                   textAlign: TextAlign.center,
+                  inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration.collapsed(
                     hintText: '${localization.amount}',
                   ),
-                  style: TextStyle(fontSize: 20), 
+                  style: TextStyle(fontSize: 20),
                   controller: amountController,
                   onChanged: (String text) async {
-                    if(amountController.text[0] == '0'){
+                    if (amountController.text[0] == '0') {
                       amountController.clear();
                     }
-                    if(amountController.text.isNotEmpty){
+                    if (amountController.text.isNotEmpty) {
                       // if(amountController.text[0] == '0'){
                       //   amountController.text = '';
                       // }
-                      if(int.parse(amountController.text) < int.parse(configs.refillMax))
+                      if (int.parse(amountController.text) <
+                          int.parse(configs.refillMax))
                         setState(() {
                           print(configs.withdrawCommission);
                           print(configs.withdrawCommission);
                           print(configs.withdrawCommission);
                           print(configs.withdrawCommission);
                           print(configs.withdrawCommission);
-                          commission = (int.parse(text) * double.parse('${configs.withdrawCommission}') / 100).toStringAsFixed(2);
-                          if(double.parse(commission) < 350.00 )
+                          commission = (int.parse(text) *
+                                  double.parse(
+                                      '${configs.withdrawCommission}') /
+                                  100)
+                              .toStringAsFixed(2);
+                          if (double.parse(commission) < 350.00)
                             commission = '350';
                         });
-                    } else{
+                    } else {
                       setState(() {
                         commission = '0';
                       });
@@ -177,12 +203,19 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   height: 100.0,
                   child: FlatButton(
                     onPressed: () async {
-                      if(amountController.text.isNotEmpty){
-                        api.withdraw(amountController.text).then((withdrawResult){
+                      if (amountController.text.isNotEmpty) {
+                        api
+                            .withdraw(amountController.text)
+                            .then((withdrawResult) {
                           print('Withdraw result $withdrawResult');
-                          if(withdrawResult['success'].toString() == 'true'){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => buildWebviewScaffold(withdrawResult['redirectURL'])));
-                          } else{
+                          if (withdrawResult['success'].toString() == 'true') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => buildWebviewScaffold(
+                                        withdrawResult['result']
+                                            ['redirectURL'])));
+                          } else {
                             Widget okButton = CupertinoDialogAction(
                               child: Text("OK"),
                               onPressed: () {
@@ -210,12 +243,15 @@ class _WithdrawPageState extends State<WithdrawPage> {
                     child: Text(
                       '${localization.withdraw}',
                       style: TextStyle(
-                          color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
+                          color: Color(0xFF0543B8),
+                          fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
             ],
           ),
         ),
