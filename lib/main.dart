@@ -375,8 +375,10 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     if (user.pin == 'waiting' && temp == enteredPasscode) {
       print('creating');
       api.createPin(enteredPasscode);
-      Navigator.maybePop(context);
-      Navigator.maybePop(context);
+      Future.delayed(const Duration(milliseconds: 250), () {
+        Navigator.maybePop(context);
+        Navigator.maybePop(context);
+      });
     }
     if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
       return showDialog<void>(
@@ -503,6 +505,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    api.getConfig();
     permissions();
     pushPermission();
     share();

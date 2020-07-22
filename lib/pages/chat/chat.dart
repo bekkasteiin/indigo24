@@ -547,6 +547,44 @@ class _ChatPageState extends State<ChatPage> {
     audioPlayers = [];
   }
 
+  moreActions() {
+    final act = CupertinoActionSheet(
+        title: Text('${localization.selectOption}'),
+        // message: Text('Which option?'),
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            child: Text('${localization.photo}'),
+            onPressed: () async {
+              Navigator.pop(context);
+
+              SystemChannels.textInput.invokeMethod('TextInput.hide');
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus) {
+                currentFocus.unfocus();
+              }
+              Navigator.pop(context);
+              getImage(ImageSource.camera);
+              print('Камера');
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Text('${localization.video}'),
+            onPressed: () async {
+              getVideo(ImageSource.camera);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text('${localization.back}'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ));
+    showCupertinoModalPopup(
+        context: context, builder: (BuildContext context) => act);
+  }
+
   showAttachmentBottomSheet(context) {
     showModalBottomSheet(
         barrierColor: Colors.white.withOpacity(0),
@@ -610,16 +648,7 @@ class _ChatPageState extends State<ChatPage> {
                                   ],
                                 ),
                                 onPressed: () {
-                                  SystemChannels.textInput
-                                      .invokeMethod('TextInput.hide');
-                                  FocusScopeNode currentFocus =
-                                      FocusScope.of(context);
-                                  if (!currentFocus.hasPrimaryFocus) {
-                                    currentFocus.unfocus();
-                                  }
-                                  Navigator.pop(context);
-                                  getImage(ImageSource.camera);
-                                  print('Камера');
+                                  moreActions();
                                 },
                               ),
                             ),
@@ -709,44 +738,6 @@ class _ChatPageState extends State<ChatPage> {
                                   print('Галерея');
                                   Navigator.pop(context);
                                   getImage(ImageSource.gallery);
-                                },
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: 50,
-                            child: Theme(
-                              data: ThemeData(),
-                              child: FlatButton(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      width: 40,
-                                      height: 40,
-                                      child: Image(
-                                        image: AssetImage(
-                                          'assets/images/files.png',
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    FittedBox(
-                                      fit: BoxFit.fitWidth,
-                                      child: Text('${localization.video}',
-                                          style: TextStyle(
-                                              color: Color(0xFF001D52),
-                                              fontWeight: FontWeight.w500)),
-                                    ),
-                                  ],
-                                ),
-                                onPressed: () {
-                                  print('видео');
-                                  Navigator.pop(context);
-                                  getVideo(ImageSource.gallery);
                                 },
                               ),
                             ),

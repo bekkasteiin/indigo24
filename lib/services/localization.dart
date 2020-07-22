@@ -133,6 +133,7 @@ String noChats = 'No chats';
 String report = "To complain";
 String terms = "Terms of use";
 String hide = 'Hide';
+String block = 'Block';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -275,6 +276,7 @@ setLanguage(code) {
       noChats = 'No chats';
       terms = "Terms of use";
       hide = 'Hide';
+      block = 'Block';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -406,6 +408,7 @@ setLanguage(code) {
       noChats = 'Нет чатов';
       terms = "Пользовательское соглашение";
       hide = 'Скрыть';
+      block = 'Заблокировать';
       print('ru');
       break;
     case 'kz':
@@ -538,6 +541,7 @@ setLanguage(code) {
       noChats = 'Чат жоқ';
       terms = "Қолдану ережелері";
       hide = 'Жасыру';
+      block = 'Бұғаттау';
       print('kz');
       break;
     case 'uz':
@@ -669,6 +673,7 @@ setLanguage(code) {
       empty = 'Та бўш';
       noChats = 'Чатлар йўқ';
       hide = 'Яшириш';
+      block = 'Блоклаш';
       print('uz');
       break;
     case 'uzb':
@@ -801,6 +806,7 @@ setLanguage(code) {
       noChats = 'Hech qanday suhbat yo\'q';
       terms = "Foydalanish shartlari";
       hide = 'Yashirish';
+      block = 'Bloklash';
       print('uzb');
       break;
     default:

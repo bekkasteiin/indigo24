@@ -816,4 +816,26 @@ class Api {
       }
     }
   }
+
+  blockUser(String userId) async {
+    try {
+      response = await dio.post("/block/user", data: {
+        "customerID": "${user.id}",
+        "unique": "${user.unique}",
+        "blockedID": "$userId",
+      });
+      print(response.data);
+      return response.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print(e.response.data);
+        print(e.response.headers);
+        print(e.response.request);
+        return e.response.data;
+      } else {
+        print(response.statusCode);
+        print(e.response.statusCode);
+      }
+    }
+  }
 }

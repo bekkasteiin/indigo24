@@ -132,6 +132,9 @@ flutter:
     - assets/images/tenge.png
     - assets/images/ruble.png
     - assets/images/euro.png
+    - assets/images/balanceHistory.png
+    - assets/images/payIn.png
+    - assets/images/payOut.png
 
   fonts:
      - family: Spectral

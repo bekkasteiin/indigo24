@@ -334,7 +334,7 @@ class _WalletTabState extends State<WalletTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Image(
-                  image: AssetImage("assets/images/history.png"),
+                  image: AssetImage("assets/images/balanceHistory.png"),
                   height: 40,
                   width: 40,
                 ),
