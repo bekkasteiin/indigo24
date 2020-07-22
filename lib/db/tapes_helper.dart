@@ -48,6 +48,7 @@ class MyTape {
   // var commentsCount;
   // var created;
   // var description;
+  bool isBlocked = false;
   var id;
   // var likes = [];
   // var likesCount;
@@ -59,6 +60,7 @@ class MyTape {
 
   MyTape({
     this.id,
+    this.isBlocked,
     // this.commentsCount,
     // this.avatar,
     // this.created,
@@ -74,6 +76,7 @@ class MyTape {
 
   factory MyTape.fromJson(Map<String, dynamic> json) => MyTape(
         id: json["id"],
+        isBlocked: json['isBlocked'],
         //   commentsCount: json["commentsCount"],
         //   avatar: json["avatar"],
         //   created: json["created"],
@@ -89,6 +92,7 @@ class MyTape {
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        "isBlocked": isBlocked,
         // commentsCount: commentsCount,
         // avatar: avatar,
         // created: created,

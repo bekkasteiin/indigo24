@@ -27,7 +27,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
         logOut(context);
       } else {
         setState(() {
-          if(histories['result'].isEmpty){
+          if (histories['result'].isEmpty) {
             emptyResponse = true;
           }
           historyBalanceList.addAll(histories['result']);
@@ -48,8 +48,8 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
           child: Row(
             children: <Widget>[
               SizedBox(width: 20),
-              _paymentLogo(
-                  'https://api.indigo24.com/logos/${snapshot['logo']}'),
+              _paymentLogo('https://api.indigo24.com/logos/${snapshot['logo']}',
+                  type: '${snapshot['type']}'),
               _historyBalanceInfo(snapshot['description'], snapshot['date']),
               _paymentAmount('${snapshot['amount']}', '${snapshot['status']}',
                   type: '${snapshot['type']}'),
@@ -99,17 +99,24 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  Container _paymentLogo(String logo) {
+  Container _paymentLogo(String logo, {type}) {
     return Container(
       margin: EdgeInsets.only(right: 10),
       alignment: Alignment.topCenter,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(25),
-        child: Image.network(
-          '${logo.replaceAll("AxB", "200x200")}',
-          width: 50.0,
-          height: 50,
-        ),
+        child: type != null
+            ? Image.asset(
+                '$type' == 'out'
+                    ? 'assets/images/payOut.png'
+                    : 'assets/images/payIn.png',
+                width: 40,
+                height: 40,
+              )
+            : Image.network(
+                '${logo.replaceAll("AxB", "200x200")}',
+                width: 50.0,
+                height: 50,
+              ),
       ),
     );
   }
@@ -160,17 +167,15 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Text(
             "$title",
-            maxLines: 2,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: Color(0xFF636973),
               fontWeight: FontWeight.w500,
             ),
-            overflow: TextOverflow.ellipsis,
           ),
           Text(
             "$date",
