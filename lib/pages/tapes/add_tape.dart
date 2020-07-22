@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/widgets/picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 

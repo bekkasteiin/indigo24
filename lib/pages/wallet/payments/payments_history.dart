@@ -28,7 +28,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       } else {
         setState(() {
           logoUrl = histories['logoURL'];
-          if(histories['payments'].toList().isEmpty){
+          if (histories['payments'].toList().isEmpty) {
             emptyResponse = true;
           }
           if (page == 1) test = histories['payments'].toList();
@@ -257,7 +257,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     _refreshController.refreshCompleted();
   }
 
-  void _onBalanceLoading() async {
+  void onBalanceLoading() async {
     print("_onBalanceLoading ");
     _loadBalanceData();
     _balanceRefreshController.loadComplete();

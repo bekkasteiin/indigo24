@@ -134,6 +134,8 @@ String report = "To complain";
 String terms = "Terms of use";
 String hide = 'Hide';
 String block = 'Block';
+String acceptTerms = 'Please read user agreement';
+String iAgree = 'I accept the terms of the agreement';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -277,6 +279,8 @@ setLanguage(code) {
       terms = "Terms of use";
       hide = 'Hide';
       block = 'Block';
+      acceptTerms = 'Please read user agreement';
+      iAgree = 'I accept the terms of the agreement';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -409,6 +413,8 @@ setLanguage(code) {
       terms = "Пользовательское соглашение";
       hide = 'Скрыть';
       block = 'Заблокировать';
+      acceptTerms = 'Пожалуйста, прочтите пользовательское соглашение';
+      iAgree = 'Я принимаю условия соглашения';
       print('ru');
       break;
     case 'kz':
@@ -542,6 +548,8 @@ setLanguage(code) {
       terms = "Қолдану ережелері";
       hide = 'Жасыру';
       block = 'Бұғаттау';
+      acceptTerms = 'Пайдаланушы келісімімен танысыңыз';
+      iAgree = 'Мен келісім шарттарын қабылдаймын';
       print('kz');
       break;
     case 'uz':
@@ -674,6 +682,9 @@ setLanguage(code) {
       noChats = 'Чатлар йўқ';
       hide = 'Яшириш';
       block = 'Блоклаш';
+      terms = 'Фойдаланиш шартлари';
+      acceptTerms = 'Фойдаланувчи шартномасини ўқиб чиқинг';
+      iAgree = 'Шартнома шартларини қабул қиламан';
       print('uz');
       break;
     case 'uzb':
@@ -807,6 +818,8 @@ setLanguage(code) {
       terms = "Foydalanish shartlari";
       hide = 'Yashirish';
       block = 'Bloklash';
+      acceptTerms = 'Iltimos, foydalanuvchi shartnomasini o\'qing';
+      iAgree = 'Shartnoma shartlarini qabul qilaman';
       print('uzb');
       break;
     default:

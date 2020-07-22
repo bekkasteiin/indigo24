@@ -1,10 +1,8 @@
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsTermsPage extends StatefulWidget {
   @override

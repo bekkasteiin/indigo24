@@ -99,10 +99,8 @@ class _PasscodeScreenState extends State<PasscodeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
-      body: SafeArea(
-        child: Stack(
-          children: [_buildBackgdound(), _buildPortraitPasscodeScreen()],
-        ),
+      body: Stack(
+        children: [_buildBackgdound(), _buildPortraitPasscodeScreen()],
       ),
     );
   }

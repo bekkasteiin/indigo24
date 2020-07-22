@@ -1,11 +1,7 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -66,7 +62,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  Widget _historyBuilder(
+  Widget historyBuilder(
       BuildContext context,
       String logo,
       String account,
@@ -294,7 +290,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     _balanceRefreshController.loadComplete();
   }
 
-  void _onLoading() async {
+  void onLoading() async {
     print("_onLoading ");
     _loadData();
     _refreshController.loadComplete();
@@ -379,50 +375,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
             child: Container(
               child: Center(child: Text('${localization.empty}')),
             ),
-          );
-    ;
-  }
-
-  SafeArea _paymentHistroyBody(snapshot) {
-    return test.isNotEmpty
-        ? SafeArea(
-            child: SmartRefresher(
-              enablePullDown: false,
-              enablePullUp: true,
-              footer: CustomFooter(
-                builder: (BuildContext context, LoadStatus mode) {
-                  Widget body;
-                  return Container(
-                    height: 55.0,
-                    child: Center(child: body),
-                  );
-                },
-              ),
-              controller: _refreshController,
-              onLoading: _onLoading,
-              child: ListView.builder(
-                padding: const EdgeInsets.only(bottom: 10),
-                itemCount: snapshot != null ? snapshot.length : 0,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: _historyBuilder(
-                        context,
-                        "$logoUrl${snapshot[index]['logo']}",
-                        "${snapshot[index]['account']}",
-                        "${snapshot[index]['amount']}",
-                        "${snapshot[index]['title']}",
-                        "${snapshot[index]['data']}",
-                        "${snapshot[index]['status']}",
-                        index,
-                        "${snapshot[index]['pdf']}"),
-                  );
-                },
-              ),
-            ),
-          )
-        : SafeArea(
-            child: Container(),
           );
   }
 }

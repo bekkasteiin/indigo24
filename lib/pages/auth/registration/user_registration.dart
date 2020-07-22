@@ -406,7 +406,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: [
                           Flexible(
                             child: Text(
-                              "Я принимаю соглашение",
+                              "${localization.iAgree}",
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),

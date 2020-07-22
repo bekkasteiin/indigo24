@@ -250,11 +250,11 @@ class FileMessage extends StatefulWidget {
 class _FileMessageState extends State<FileMessage> {
   var percent = '';
 
-  List<_TaskInfo> _tasks;
+  List<_TaskInfo> tasks;
   _TaskInfo globalTask;
-  List<_ItemHolder> _items;
-  bool _isLoading;
-  bool _permissionReady;
+  List<_ItemHolder> items;
+  bool isLoading;
+  bool permissionReady;
   String _localPath;
   ReceivePort _port = ReceivePort();
 
@@ -265,8 +265,8 @@ class _FileMessageState extends State<FileMessage> {
 
     FlutterDownloader.registerCallback(downloadCallback);
 
-    _isLoading = true;
-    _permissionReady = false;
+    isLoading = true;
+    permissionReady = false;
 
     _prepare();
   }
@@ -330,7 +330,7 @@ class _FileMessageState extends State<FileMessage> {
       openFileFromNotification:
           false, // click on notification to open downloaded file (for Android)
     );
-    final tasks = await FlutterDownloader.loadTasks();
+    // final tasks = await FlutterDownloader.loadTasks();
     setState(() {
       downloadTaskId = taskId;
     });
@@ -497,9 +497,9 @@ class _FileMessageState extends State<FileMessage> {
         openFileFromNotification: false);
   }
 
-  void _cancelDownload(_TaskInfo task) async {
-    await FlutterDownloader.cancel(taskId: task.taskId);
-  }
+  // void _cancelDownload(_TaskInfo task) async {
+  //   await FlutterDownloader.cancel(taskId: task.taskId);
+  // }
 
   void _pauseDownload(_TaskInfo task) async {
     await FlutterDownloader.pause(taskId: task.taskId);
@@ -576,7 +576,7 @@ class _FileMessageState extends State<FileMessage> {
       }
     });
 
-    _permissionReady = await _checkPermission();
+    permissionReady = await _checkPermission();
 
     _localPath = (await _findLocalPath()) + Platform.pathSeparator + 'Download';
 
@@ -587,7 +587,7 @@ class _FileMessageState extends State<FileMessage> {
     }
 
     setState(() {
-      _isLoading = false;
+      isLoading = false;
     });
   }
 
