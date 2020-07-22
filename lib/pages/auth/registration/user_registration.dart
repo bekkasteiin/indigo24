@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
+import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -24,6 +25,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
 
   bool _obscureText = true;
   bool _obscureText2 = true;
+  bool confirm = false;
   var password;
   @override
   void initState() {
@@ -270,7 +272,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Пароль",
+                              Text("${localization.password}",
                                   style: TextStyle(
                                       color: Color(0xff0543B8), fontSize: 16)),
                               SizedBox(
@@ -330,7 +332,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Пароль",
+                              Text("${localization.password}",
                                   style: TextStyle(
                                       color: Color(0xff0543B8), fontSize: 16)),
                               SizedBox(
@@ -383,6 +385,43 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                       ),
                     ),
                     _space(15),
+                    FlatButton(
+                      child: Text(
+                        "${localization.terms}",
+                        style: TextStyle(color: Color(0xff0543B8)),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    PDFViewer('assets/terms.pdf')));
+                      },
+                    ),
+                    _space(15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              "Я принимаю соглашение",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          Checkbox(
+                            onChanged: (value) {
+                              setState(() {
+                                confirm = value;
+                              });
+                            },
+                            value: confirm,
+                          )
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 25),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
@@ -402,75 +441,82 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: Color(0xff0543B8),
-                        onPressed: () async {
-                          if (passwordController.text.isNotEmpty &&
-                              passwordController2.text.isNotEmpty &&
-                              nameController.text.isNotEmpty &&
-                              lastNameController.text.isNotEmpty &&
-                              emailController.text.isNotEmpty) {
-                            setState(() {
-                              globalError = '';
-                            });
-                            print('is not empty ');
-                            if (passwordController.text ==
-                                passwordController2.text) {
-                              password = passwordController.text;
-                              setState(() {
-                                secondPasswordError = '';
-                                emailError = '';
-                                nameError = '';
-                                lastnameError = '';
-                                firstPasswordError = '';
-                                emailError = '';
-                              });
-                              await api
-                                  .register(
-                                      "${widget.phone}",
-                                      "${nameController.text + ' ' + lastNameController.text}",
-                                      "$password",
-                                      "${emailController.text}")
-                                  .then((registerResponse) {
-                                print(
-                                    'this is register result $registerResponse');
-                                if (registerResponse['success'] == true) {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginPage()),
-                                      (r) => false);
+                        onPressed: !confirm
+                            ? null
+                            : () async {
+                                if (passwordController.text.isNotEmpty &&
+                                    passwordController2.text.isNotEmpty &&
+                                    nameController.text.isNotEmpty &&
+                                    lastNameController.text.isNotEmpty &&
+                                    emailController.text.isNotEmpty) {
                                   setState(() {
-                                    firstPasswordError = '';
-                                    emailError = '';
+                                    globalError = '';
                                   });
-                                } else if (registerResponse['message'] !=
-                                    null) {
-                                  _showError(
-                                      context, registerResponse['message']);
+                                  print('is not empty ');
+                                  if (passwordController.text ==
+                                      passwordController2.text) {
+                                    password = passwordController.text;
+                                    setState(() {
+                                      secondPasswordError = '';
+                                      emailError = '';
+                                      nameError = '';
+                                      lastnameError = '';
+                                      firstPasswordError = '';
+                                      emailError = '';
+                                    });
+                                    await api
+                                        .register(
+                                            "${widget.phone}",
+                                            "${nameController.text + ' ' + lastNameController.text}",
+                                            "$password",
+                                            "${emailController.text}")
+                                        .then((registerResponse) {
+                                      print(
+                                          'this is register result $registerResponse');
+                                      if (registerResponse['success'] == true) {
+                                        Navigator.of(context)
+                                            .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        LoginPage()),
+                                                (r) => false);
+                                        setState(() {
+                                          firstPasswordError = '';
+                                          emailError = '';
+                                        });
+                                      } else if (registerResponse['message'] !=
+                                          null) {
+                                        _showError(context,
+                                            registerResponse['message']);
+                                      } else {
+                                        setState(() {
+                                          firstPasswordError =
+                                              '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                          secondPasswordError =
+                                              '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                          emailError =
+                                              '${registerResponse['message']['email'] == null ? '' : registerResponse['message']['email']}';
+                                        });
+                                      }
+                                    });
+                                  } else {
+                                    print('different passwords');
+                                    setState(() {
+                                      firstPasswordError =
+                                          '${localization.passwordNotMatch}';
+                                      secondPasswordError =
+                                          '${localization.passwordNotMatch}';
+                                    });
+                                  }
                                 } else {
+                                  print('empty');
                                   setState(() {
-                                    firstPasswordError =
-                                        '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
-                                    secondPasswordError =
-                                        '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
-                                    emailError =
-                                        '${registerResponse['message']['email'] == null ? '' : registerResponse['message']['email']}';
+                                    globalError =
+                                        '${localization.fillAllFields}';
+                                    // Заполните все нужные поля';
                                   });
                                 }
-                              });
-                            } else {
-                              print('different passwords');
-                              setState(() {
-                                firstPasswordError = '${localization.passwordNotMatch}';
-                                secondPasswordError = '${localization.passwordNotMatch}';
-                              });
-                            }
-                          } else {
-                            print('empty');
-                            setState(() {
-                              globalError = '${localization.fillAllFields}';
-                              // Заполните все нужные поля';
-                            });
-                          }
-                        },
+                              },
                       ),
                     ),
                     SizedBox(height: 40),

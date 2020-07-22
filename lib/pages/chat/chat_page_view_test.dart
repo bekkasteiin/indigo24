@@ -613,7 +613,8 @@ class _PDFViewerState extends State<PDFViewer> {
 
   @override
   void initState() {
-    _pdfController = PdfController(document: PdfDocument.openFile(widget.file));
+    _pdfController =
+        PdfController(document: PdfDocument.openAsset(widget.file));
     super.initState();
   }
 
@@ -626,9 +627,23 @@ class _PDFViewerState extends State<PDFViewer> {
   @override
   Widget build(BuildContext context) => MaterialApp(
         theme: ThemeData(primaryColor: Colors.white),
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
             centerTitle: true,
+            leading: IconButton(
+              icon: Container(
+                padding: EdgeInsets.all(10),
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/back.png',
+                  ),
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
             title: Text('${localization.file}'),
             actions: <Widget>[
               IconButton(

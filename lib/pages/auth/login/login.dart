@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   var length;
   _getCountries() async {
     await api.getCountries().then((response) {
-      if(response == false){
+      if (response == false) {
         dioError(context);
       } else {
         setState(() {
@@ -333,11 +333,18 @@ class _LoginPageState extends State<LoginPage> {
                               passwordError = '';
                             });
 
-                            await api.signIn("$phonePrefix${loginController.text}",passwordController.text).then((response) async {
+                            await api
+                                .signIn("$phonePrefix${loginController.text}",
+                                    passwordController.text)
+                                .then((response) async {
                               singInResult = response;
+                              print("LOGIN RESULT $response");
                               if ('${response['success']}' == 'true') {
                                 await api.getBalance();
-                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => Tabs()),(r) => false);
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) => Tabs()),
+                                    (r) => false);
                               } else {
                                 setState(() {
                                   passwordError = singInResult["message"];

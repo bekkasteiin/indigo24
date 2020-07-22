@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/pages/auth/registration/registration.dart';
+import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/custom_dropdown.dart';
-
 
 class IntroPage extends StatefulWidget {
   @override
@@ -17,7 +17,7 @@ class _IntroPageState extends State<IntroPage> {
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +36,7 @@ class _IntroPageState extends State<IntroPage> {
             Container(
                 decoration: BoxDecoration(
               image: DecorationImage(
-                  image: introBackgroundProvider,
-                  fit: BoxFit.cover),
+                  image: introBackgroundProvider, fit: BoxFit.cover),
             )),
             SingleChildScrollView(
               child: SafeArea(
@@ -53,34 +52,49 @@ class _IntroPageState extends State<IntroPage> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                          color: Colors.white,
                           borderRadius: BorderRadius.all(
                             Radius.circular(16.0),
-                          )
-                      ),
-                        child: DropdownButtonHideUnderline(
-                          child: Container(
-                            child: CustomDropdownButton(
+                          )),
+                      child: DropdownButtonHideUnderline(
+                        child: Container(
+                          child: CustomDropdownButton(
                             isExpanded: false,
-                            hint: Text("${localization.currentLanguage}", style: TextStyle(color: Color(0xFF001D52))),
+                            hint: Text("${localization.currentLanguage}",
+                                style: TextStyle(color: Color(0xFF001D52))),
                             // value: _valFriends,
                             items: localization.languages.map((value) {
                               return DropdownMenuItem(
-                                child: Text('${value['title']}',style: TextStyle(color: Color(0xFF001D52))),
+                                child: Text('${value['title']}',
+                                    style: TextStyle(color: Color(0xFF001D52))),
                                 value: value,
                               );
                             }).toList(),
                             onChanged: (value) {
                               print('${value['title']}');
                               setState(() {
-                                 localization.currentLanguage = '${value['title']}';
+                                localization.currentLanguage =
+                                    '${value['title']}';
                               });
                               localization.setLanguage(value['code']);
                             },
-                      ),
                           ),
                         ),
+                      ),
                     ),
+                    FlatButton(
+                      child: Text(
+                        "${localization.terms}",
+                        style: TextStyle(color: Color(0xffD1E0E5)),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    PDFViewer('assets/terms.pdf')));
+                      },
+                    )
                   ],
                 ),
               ),
@@ -149,6 +163,3 @@ class _IntroPageState extends State<IntroPage> {
     );
   }
 }
-
-
-

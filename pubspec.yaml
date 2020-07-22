@@ -75,6 +75,7 @@ flutter:
 
   assets:
     - assets/dev.gif
+    - assets/terms.pdf
     - assets/preloader.gif
     - assets/typing.gif
     - assets/developing.gif 

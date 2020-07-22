@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -99,18 +102,23 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                   ),
                   FlatButton(
                     onPressed: () async {
-                      if (await canLaunch('https://indigo24.com/rules.html')) {
-                        await launch(
-                          'https://indigo24.com/rules.html',
-                          forceSafariVC: false,
-                          forceWebView: false,
-                          headers: <String, String>{
-                            'my_header_key': 'my_header_value'
-                          },
-                        );
-                      } else {
-                        throw 'Could not launch https://indigo24.com/rules.html';
-                      }
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PDFViewer('assets/terms.pdf')));
+                      // if (await canLaunch('https://indigo24.com/rules.html')) {
+                      //   await launch(
+                      //     'https://indigo24.com/rules.html',
+                      //     forceSafariVC: false,
+                      //     forceWebView: false,
+                      //     headers: <String, String>{
+                      //       'my_header_key': 'my_header_value'
+                      //     },
+                      //   );
+                      // } else {
+                      //   throw 'Could not launch https://indigo24.com/rules.html';
+                      // }
                     },
                     child: Text('Открыть'),
                   )
