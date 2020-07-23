@@ -502,6 +502,7 @@ class ChatRoom {
               break;
             case "user:check":
               if (contactController != null) {
+                print('added to contacts');
                 contactController.add(new MyContactEvent(json));
               }
               if (cabinetInfoController != null) {

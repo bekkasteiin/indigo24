@@ -336,8 +336,10 @@ final TextStyle finalStyle = TextStyle(
                         children: <Widget>[
                           Text(
                             myList[i]['last_message']["time"] == null
-                                ? "null"
-                                : time("${myList[i]['last_message']["time"]}"),
+                                ? "II:II" :
+                                 myList[i]['last_message']["time"].toString() != ''
+                                ? time("${myList[i]['last_message']["time"]}")
+                                : "II:II",
                             style: TextStyle(color: Color(0xFF001D52)),
                           ),
                           myList[i]['unread_messages'] == 0
