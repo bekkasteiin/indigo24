@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/full_photo.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
@@ -36,7 +37,7 @@ class DeviderMessageWidget extends StatelessWidget {
         child: Center(
             child: Text(
           '$date',
-          style: TextStyle(fontSize: 16, color: Color(0xFF5E5E5E)),
+          style: TextStyle(fontSize: 16, color: darkGreyColor2),
         )),
       ),
     );
@@ -250,11 +251,11 @@ class FileMessage extends StatefulWidget {
 class _FileMessageState extends State<FileMessage> {
   var percent = '';
 
-  List<_TaskInfo> _tasks;
+  List<_TaskInfo> tasks;
   _TaskInfo globalTask;
-  List<_ItemHolder> _items;
-  bool _isLoading;
-  bool _permissionReady;
+  List<_ItemHolder> items;
+  bool isLoading;
+  bool permissionReady;
   String _localPath;
   ReceivePort _port = ReceivePort();
 
@@ -265,8 +266,8 @@ class _FileMessageState extends State<FileMessage> {
 
     FlutterDownloader.registerCallback(downloadCallback);
 
-    _isLoading = true;
-    _permissionReady = false;
+    isLoading = true;
+    permissionReady = false;
 
     _prepare();
   }
@@ -576,7 +577,7 @@ class _FileMessageState extends State<FileMessage> {
       }
     });
 
-    _permissionReady = await _checkPermission();
+    permissionReady = await _checkPermission();
 
     _localPath = (await _findLocalPath()) + Platform.pathSeparator + 'Download';
 
@@ -587,7 +588,7 @@ class _FileMessageState extends State<FileMessage> {
     }
 
     setState(() {
-      _isLoading = false;
+      isLoading = false;
     });
   }
 

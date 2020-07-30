@@ -7,6 +7,7 @@ import 'package:indigo24/pages/auth/login/login.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'phone_confirm.dart';
@@ -39,9 +40,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var length;
   _getCountries() async {
     await api.getCountries().then((response) {
-      if(response == false){
+      if (response == false) {
         dioError(context);
-      } else{
+      } else {
         setState(() {
           Iterable list = response['countries'];
           List<dynamic> responseJson = response['countries'].toList();
@@ -55,7 +56,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
           dropDownMenuItems = getDropDownMenuItems(_titles);
           _currentCountry = _titles[0];
           loginFormatter = MaskTextInputFormatter(
-              mask: '${_countries[0]['mask']}', filter: {"*": RegExp(r'[0-9]')});
+              mask: '${_countries[0]['mask']}',
+              filter: {"*": RegExp(r'[0-9]')});
           prefix = _countries[0]['prefix'];
           _hintText = _countries[0]['mask'];
           length = _countries[0]['length'];
@@ -195,7 +197,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 children: <Widget>[
                                   Text('$_currentCountry ',
                                       style: TextStyle(
-                                          color: Color(0xFF001D52),
+                                          color: blackPurpleColor,
                                           fontSize: 18)),
                                   SizedBox(
                                     width: 10,
@@ -226,7 +228,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             children: <Widget>[
                               Text("${localization.phoneNumber}",
                                   style: TextStyle(
-                                      color: Color(0xFF001D52), fontSize: 16))
+                                      color: blackPurpleColor, fontSize: 16))
                             ],
                           ),
                           Stack(
@@ -272,14 +274,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 fontWeight: FontWeight.w300)),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
-                        color: Color(0xFF0543B8),
+                        color: primaryColor,
                         onPressed: () async {
                           if (loginController.text.isNotEmpty) {
-                            var temp = loginController.text.replaceAll(' ', '').replaceAll('+', '');
+                            var temp = loginController.text
+                                .replaceAll(' ', '')
+                                .replaceAll('+', '');
                             if (temp.length == length) {
-                              await api.checkRegistration(temp).then((checkPhoneResult) async {
-                                print('empty check Registration $checkPhoneResult');
-                                if (checkPhoneResult['success'] == false)  {
+                              await api
+                                  .checkRegistration(temp)
+                                  .then((checkPhoneResult) async {
+                                print(
+                                    'empty check Registration $checkPhoneResult');
+                                if (checkPhoneResult['success'] == false) {
                                   await api.sendSms(temp).then((sendSmsResult) {
                                     print('smsSendResult $sendSmsResult');
                                     if (sendSmsResult['success'] == true) {
@@ -305,7 +312,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   });
                                 } else {
                                   setState(() {
-                                    loginError = checkPhoneResult['message'];
+                                    loginError = 'Пользователь занят';
+                                    // loginError = checkPhoneResult['message'];
                                   });
                                 }
                               });

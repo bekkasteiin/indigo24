@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/style/colors.dart';
 
 import 'chat.dart';
 import 'chat_contacts.dart';
@@ -104,7 +105,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
               context,
               MaterialPageRoute(
                   builder: (context) => ChatPage(name, chatID,
-                      avatarUrl: 'https://indigo24.com/uploads/avatars/' ,
+                      avatarUrl: 'https://indigo24.com/uploads/avatars/',
                       chatType: e.json['data']['type'],
                       memberCount: e.json["data"]['members_count'])),
             ).whenComplete(() {
@@ -215,7 +216,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
           title: Text(
             "${localization.createGroup}",
             style: TextStyle(
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontWeight: FontWeight.w400,
               fontSize: 22,
             ),
@@ -225,7 +226,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             IconButton(
                 icon: Icon(Icons.group_add),
                 iconSize: 30,
-                color: Color(0xFF001D52),
+                color: blackPurpleColor,
                 onPressed: () {
                   if (_saved2.length > 2) {
                     if (_titleController.text.isNotEmpty) {
@@ -245,8 +246,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                     }
                   } else {
                     print('member count less than 3');
-                    _showError(
-                        context, '${localization.minMembersCount}');
+                    _showError(context, '${localization.minMembersCount}');
                   }
                 })
           ],
@@ -281,7 +281,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(20.0),
                                       child: Container(
-                                        color: Color(0xFF0543B8),
+                                        color: primaryColor,
                                         width: 35,
                                         height: 35,
                                         child: Center(
@@ -319,7 +319,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                           decoration: BoxDecoration(
                                             color: Colors.white,
                                             border: Border.all(
-                                              color: Color(0xFF0543B8),
+                                              color: primaryColor,
                                             ),
                                             borderRadius:
                                                 BorderRadius.circular(20.0),
@@ -332,7 +332,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                                 child: Icon(
                                                   Icons.close,
                                                   size: 14,
-                                                  color: Color(0xFF0543B8),
+                                                  color: primaryColor,
                                                 ),
                                                 onTap: () {
                                                   setState(() {
@@ -374,10 +374,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                           decoration: new InputDecoration(
                             prefixIcon: Icon(
                               Icons.search,
-                              color: Color(0xFF001D52),
+                              color: blackPurpleColor,
                             ),
                             hintText: "${localization.search}",
-                            fillColor: Color(0xFF001D52),
+                            fillColor: blackPurpleColor,
                           ),
                           onChanged: (value) {
                             search(value);

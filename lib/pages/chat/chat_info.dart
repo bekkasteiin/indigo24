@@ -12,6 +12,7 @@ import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
@@ -218,7 +219,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(80.0),
             border: Border.all(
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               width: 5.0,
             ),
           ),
@@ -685,7 +686,16 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                               child: Stack(
                                                 children: <Widget>[
                                                   CircleAvatar(
-                                                    backgroundImage: (membersList[i]["avatar"] == null || membersList[i]["avatar"] == '' || membersList[i][ "avatar"] == false)
+                                                    backgroundImage: (membersList[
+                                                                        i][
+                                                                    "avatar"] ==
+                                                                null ||
+                                                            membersList[i][
+                                                                    "avatar"] ==
+                                                                '' ||
+                                                            membersList[i][
+                                                                    "avatar"] ==
+                                                                false)
                                                         ? CachedNetworkImageProvider(
                                                             "${avatarUrl}noAvatar.png")
                                                         : CachedNetworkImageProvider(
@@ -717,8 +727,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                                                             i][
                                                                         'online'] ==
                                                                     'online'
-                                                                ? Color(
-                                                                    0xFF00cc00)
+                                                                ? greenColor
                                                                 : Colors
                                                                     .transparent),
                                                         height: 15,

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+
+import 'transfer.dart';
 
 class TransferHistoryPage extends StatefulWidget {
   @override
@@ -17,10 +20,11 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   bool emptyResponse = false;
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     api.getTransactions(page).then((transactions) {
-      if (transactions['message'] == 'Not authenticated' && transactions['success'].toString() == 'false') {
+      if (transactions['message'] == 'Not authenticated' &&
+          transactions['success'].toString() == 'false') {
         logOut(context);
         return transactions;
       } else {
@@ -29,7 +33,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
           print(transactions);
           if (page == 1) {
             transferHistories = transactions['transactions'].toList();
-            if(transactions['transactions'].isEmpty){
+            if (transactions['transactions'].isEmpty) {
               emptyResponse = true;
             }
           }
@@ -38,16 +42,20 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       }
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: !emptyResponse ? transferHistories.isNotEmpty ? _transferHistoryBody(transferHistories) : Center(child: CircularProgressIndicator()) : SafeArea(
-            child: Container(
-              child: Center(child: Text('${localization.empty}')),
+      body: !emptyResponse
+          ? transferHistories.isNotEmpty
+              ? _transferHistoryBody(transferHistories)
+              : Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: Container(
+                child: Center(child: Text('${localization.empty}')),
+              ),
             ),
-          ),
     );
   }
 
@@ -57,34 +65,60 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       alignment: Alignment.topCenter,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
-        child: Image.network('${logo.replaceAll("AxB", "200x200")}', width: 50.0, height: 50,),
+        child: Image.network(
+          '${logo.replaceAll("AxB", "200x200")}',
+          width: 50.0,
+          height: 50,
+        ),
       ),
     );
   }
 
-  Widget _transferAmount(String type, String amount) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(),
-        Text(
-          type == 'in' ? '+$amount KZT' : "-$amount KZT",
-          style: TextStyle(
-            fontSize: 18,
-            color: Color(0xFF001D52),
-          ),
+  Widget _transferAmount(String type, String amount, phone) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(),
+            Text(
+              type == 'in' ? '+$amount KZT' : "-$amount KZT",
+              style: TextStyle(
+                fontSize: 14,
+                color: blackPurpleColor,
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Container(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Container(
+                  height: 15,
+                  width: 15,
+                  color: type == 'in' ? Colors.green : Colors.red,
+                ),
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: 5,),
-        Container(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: Container(
-                height: 15,
-                width: 15,
-                color: type == 'in' ? Colors.green : Colors.red),
-          ),
-        ),
+        FlatButton(
+          child: Text('Повторить'), // TODO ADD LOCALIZATION
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TransferPage(
+                  phone: phone,
+                  amount: amount,
+                ),
+              ),
+            );
+          },
+        )
       ],
     );
   }
@@ -100,7 +134,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             "$name",
             style: TextStyle(
               fontSize: 16,
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
@@ -109,7 +143,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             "$phone",
             style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontWeight: FontWeight.w400,
             ),
             overflow: TextOverflow.ellipsis,
@@ -140,7 +174,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                 SizedBox(width: 20),
                 _transferLogo(logo),
                 _transferInfo(title, date, phone),
-                _transferAmount(type, amount),
+                _transferAmount(type, amount, phone),
                 SizedBox(width: 20),
               ],
             ),
@@ -148,26 +182,29 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
           Container(
             margin: EdgeInsets.only(top: 10, right: 20, left: 20),
             height: 0.2,
-            color: Color(0xFF7D8E9B),
+            color: greyColor,
           ),
         ],
       ),
     );
   }
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   void _onLoading() async {
     print("_onLoading ");
     _loadData();
     _refreshController.loadComplete();
   }
+
   bool isLoaded = false;
   int page = 1;
 
   Future _loadData() async {
-    api.getTransactions(page).then((histories){
+    api.getTransactions(page).then((histories) {
       List temp = histories['transactions'].toList();
-      setState((){
+      setState(() {
         transferHistories.addAll(temp);
       });
       page++;
@@ -180,7 +217,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         enablePullDown: false,
         enablePullUp: true,
         footer: CustomFooter(
-          builder:(BuildContext context, LoadStatus mode) {
+          builder: (BuildContext context, LoadStatus mode) {
             Widget body;
             return Container(
               height: 55.0,
@@ -239,7 +276,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       title: Text(
         "${localization.transfers}",
         style: TextStyle(
-          color: Color(0xFF001D52),
+          color: blackPurpleColor,
           fontSize: 22,
           fontWeight: FontWeight.w400,
         ),

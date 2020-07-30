@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -268,7 +269,7 @@ class FullScreenWrapper extends StatelessWidget {
           title: Text(
             "${localization.photo}",
             style: TextStyle(
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontSize: 22,
               fontWeight: FontWeight.w400,
             ),
@@ -328,7 +329,6 @@ class OneTapWrapper extends StatelessWidget {
     );
   }
 }
-
 
 class ExampleAppBar extends StatelessWidget {
   const ExampleAppBar({this.title, this.showGoBack = false}) : super();

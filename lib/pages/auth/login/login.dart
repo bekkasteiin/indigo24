@@ -7,6 +7,7 @@ import 'package:indigo24/pages/restore_password.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 
 class LoginPage extends StatefulWidget {
@@ -32,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   var length;
   _getCountries() async {
     await api.getCountries().then((response) {
+      print('some response $response');
       if (response == false) {
         dioError(context);
       } else {
@@ -158,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                                 children: <Widget>[
                                   Text('$_currentCountry ',
                                       style: TextStyle(
-                                          color: Color(0xFF001D52),
+                                          color: blackPurpleColor,
                                           fontSize: 18)),
                                   SizedBox(
                                     width: 10,
@@ -189,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                             children: <Widget>[
                               Text("${localization.phoneNumber}",
                                   style: TextStyle(
-                                      color: Color(0xFF001D52), fontSize: 16))
+                                      color: blackPurpleColor, fontSize: 16))
                             ],
                           ),
                           Stack(
@@ -238,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                             children: <Widget>[
                               Text("${localization.password}",
                                   style: TextStyle(
-                                      color: Color(0xFF001D52), fontSize: 16))
+                                      color: blackPurpleColor, fontSize: 16))
                             ],
                           ),
                           TextField(
@@ -283,7 +285,7 @@ class _LoginPageState extends State<LoginPage> {
                     FlatButton(
                       child: Text(
                         '${localization.forgotPassword}',
-                        style: TextStyle(color: Color(0xFF444444)),
+                        style: TextStyle(color: darkGreyColor),
                       ),
                       onPressed: () {
                         Navigator.push(
@@ -303,7 +305,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.w300)),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
-                        color: Color(0xFF0543B8),
+                        color: primaryColor,
                         onPressed: () async {
                           if (passwordController.text.isEmpty) {
                             setState(() {
@@ -417,7 +419,7 @@ class Countries extends StatelessWidget {
         title: Text(
           "${localization.country}",
           style: TextStyle(
-            color: Color(0xFF001D52),
+            color: blackPurpleColor,
             fontSize: 22,
             fontWeight: FontWeight.w400,
           ),
@@ -439,7 +441,7 @@ class Countries extends StatelessWidget {
                   child: Text(
                     '${countries[index]['title']}',
                     style: TextStyle(
-                      color: Color(0xFF001D52),
+                      color: blackPurpleColor,
                       fontWeight: FontWeight.w400,
                       fontSize: 18,
                     ),

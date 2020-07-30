@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/style/colors.dart';
 import 'transfer.dart';
 import 'transfer_history.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -48,7 +49,7 @@ class _TransferListPageState extends State<TransferListPage> {
       title: Text(
         "${localization.transfers}",
         style: TextStyle(
-          color: Color(0xFF001D52),
+          color: blackPurpleColor,
           fontSize: 22,
           fontWeight: FontWeight.w400,
         ),
@@ -57,13 +58,13 @@ class _TransferListPageState extends State<TransferListPage> {
       actions: <Widget>[
         IconButton(
           icon: Container(
-          padding: EdgeInsets.all(5),
-          child: Image(
-            image: AssetImage(
-              'assets/images/history.png',
+            padding: EdgeInsets.all(5),
+            child: Image(
+              image: AssetImage(
+                'assets/images/history.png',
+              ),
             ),
           ),
-        ),
           onPressed: () {
             // StudentDao().deleteAll();
             Navigator.push(
@@ -123,13 +124,13 @@ class _TransferListPageState extends State<TransferListPage> {
                 Container(width: 10),
                 Text(
                   '${localization.toIndigo24Client}',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                  style: TextStyle(fontSize: 14, color: blackPurpleColor),
                 ),
               ],
             ),
           ),
-          color: Color(0xFFFFFFFF),
-          textColor: Color(0xFF001D52),
+          color: whiteColor,
+          textColor: blackPurpleColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               10.0,

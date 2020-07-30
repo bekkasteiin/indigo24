@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/style/colors.dart';
 
 import 'payments_history.dart';
 import 'payments_services.dart';
@@ -120,7 +121,8 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
     return FutureBuilder(
       future: api.getCategories().then((categories) {
         print(categories);
-        if (categories['message'] == 'Not authenticated' && categories['success'].toString() == 'false') {
+        if (categories['message'] == 'Not authenticated' &&
+            categories['success'].toString() == 'false') {
           logOut(context);
           return categories;
         } else {
@@ -132,11 +134,13 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
           appBar: buildAppBar(),
           body: snapshot.hasData == true
               ? SafeArea(
-                child: Scrollbar(
-                  child: ListView.builder(
-                    padding: EdgeInsets.only(bottom: 20),
-                    shrinkWrap: true,
-                      itemCount: snapshot.data["categories"] != null ? snapshot.data["categories"].length : 0,
+                  child: Scrollbar(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: 20),
+                      shrinkWrap: true,
+                      itemCount: snapshot.data["categories"] != null
+                          ? snapshot.data["categories"].length
+                          : 0,
                       itemBuilder: (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 10),
@@ -150,8 +154,8 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                         );
                       },
                     ),
-                ),
-              )
+                  ),
+                )
               : Center(child: CircularProgressIndicator()),
         );
       },
@@ -178,7 +182,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       title: Text(
         "${localization.payments}",
         style: TextStyle(
-          color: Color(0xFF001D52),
+          color: blackPurpleColor,
           fontSize: 22,
           fontWeight: FontWeight.w400,
         ),
@@ -195,7 +199,6 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
             ),
           ),
           onPressed: () {
-            // StudentDao().deleteAll();
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => PaymentHistoryPage()),
@@ -223,14 +226,14 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         child: RaisedButton(
           onPressed: () {
             Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PaymentsGroupPage(
-                index,
-                name,
+              context,
+              MaterialPageRoute(
+                builder: (context) => PaymentsGroupPage(
+                  index,
+                  name,
+                ),
               ),
-            ),
-          );
+            );
           },
           child: Container(
             child: Row(
@@ -249,15 +252,15 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                 Expanded(
                   child: Text(
                     '$name',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                    style: TextStyle(fontSize: 14, color: blackPurpleColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
           ),
-          color: Color(0xFFFFFFFF),
-          textColor: Color(0xFF001D52),
+          color: whiteColor,
+          textColor: blackPurpleColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               10.0,

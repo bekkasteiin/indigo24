@@ -1,13 +1,10 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class BalanceHistoryPage extends StatefulWidget {
@@ -60,40 +57,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
         Container(
           margin: EdgeInsets.only(top: 10, right: 20, left: 20),
           height: 0.2,
-          color: Color(0xFF7D8E9B),
-        ),
-      ],
-    );
-  }
-
-  Widget _historyBuilder(
-      BuildContext context,
-      String logo,
-      String account,
-      String amount,
-      String title,
-      String date,
-      String status,
-      int index,
-      String url) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        InkWell(
-          child: Row(
-            children: <Widget>[
-              SizedBox(width: 20),
-              _paymentLogo(logo),
-              _paymentInfo(title, account, date),
-              _paymentAmount(amount, status),
-              SizedBox(width: 20),
-            ],
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 10, right: 20, left: 20),
-          height: 0.2,
-          color: Color(0xFF7D8E9B),
+          color: greyColor,
         ),
       ],
     );
@@ -128,11 +92,11 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
         children: <Widget>[
           Text(
             type != null
-                ? '$type' == 'out' ? "-$amount KZT" : "+$amount KZT"
+                ? type == 'out' ? "-$amount KZT" : "+$amount KZT"
                 : "$amount KZT",
             style: TextStyle(
               fontSize: 18,
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -140,17 +104,18 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
           ClipRRect(
             borderRadius: BorderRadius.circular(25),
             child: Container(
-                height: 15,
-                width: 15,
-                color: status == '4'
-                    ? Colors.green
-                    : status == '3'
-                        ? Colors.orange
-                        : status == '2'
-                            ? Colors.red
-                            : (status == '1') || (status == '0')
-                                ? Colors.yellow
-                                : Colors.grey),
+              height: 15,
+              width: 15,
+              color: status == '4'
+                  ? Colors.green
+                  : status == '3'
+                      ? Colors.orange
+                      : status == '2'
+                          ? Colors.red
+                          : (status == '1') || (status == '0')
+                              ? Colors.yellow
+                              : Colors.grey,
+            ),
           ),
         ],
       ),
@@ -173,7 +138,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
             "$title",
             style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF636973),
+              color: brightGreyColor2,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -181,45 +146,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
             "$date",
             style: TextStyle(
               fontSize: 10,
-              color: Color(0xFF001D52),
-              fontWeight: FontWeight.w300,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Expanded _paymentInfo(String title, String account, String date) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            "$title",
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF636973),
-              fontWeight: FontWeight.w500,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            "$account",
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF001D52),
-              fontWeight: FontWeight.w500,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            "$date",
-            style: TextStyle(
-              fontSize: 10,
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontWeight: FontWeight.w300,
             ),
             overflow: TextOverflow.ellipsis,
@@ -249,7 +176,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
       title: Text(
         "${localization.historyBalance}",
         style: TextStyle(
-          color: Color(0xFF001D52),
+          color: blackPurpleColor,
           fontSize: 22,
           fontWeight: FontWeight.w400,
         ),
@@ -294,12 +221,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     _balanceRefreshController.loadComplete();
   }
 
-  void _onLoading() async {
-    print("_onLoading ");
-    _loadData();
-    _refreshController.loadComplete();
-  }
-
   bool isLoaded = false;
   int page = 1;
   int balanceHistoryPage = 1;
@@ -314,20 +235,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
           historyBalanceList.addAll(temp);
         });
         print(balanceHistoryPage);
-      }
-    });
-  }
-
-  Future _loadData() async {
-    api.getHistories(page).then((histories) {
-      print(histories);
-      if (histories['payments'].isNotEmpty) {
-        List temp = histories['payments'].toList();
-        setState(() {
-          test.addAll(temp);
-        });
-        page++;
-        print(page);
       }
     });
   }
@@ -379,50 +286,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
             child: Container(
               child: Center(child: Text('${localization.empty}')),
             ),
-          );
-    ;
-  }
-
-  SafeArea _paymentHistroyBody(snapshot) {
-    return test.isNotEmpty
-        ? SafeArea(
-            child: SmartRefresher(
-              enablePullDown: false,
-              enablePullUp: true,
-              footer: CustomFooter(
-                builder: (BuildContext context, LoadStatus mode) {
-                  Widget body;
-                  return Container(
-                    height: 55.0,
-                    child: Center(child: body),
-                  );
-                },
-              ),
-              controller: _refreshController,
-              onLoading: _onLoading,
-              child: ListView.builder(
-                padding: const EdgeInsets.only(bottom: 10),
-                itemCount: snapshot != null ? snapshot.length : 0,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: _historyBuilder(
-                        context,
-                        "$logoUrl${snapshot[index]['logo']}",
-                        "${snapshot[index]['account']}",
-                        "${snapshot[index]['amount']}",
-                        "${snapshot[index]['title']}",
-                        "${snapshot[index]['data']}",
-                        "${snapshot[index]['status']}",
-                        index,
-                        "${snapshot[index]['pdf']}"),
-                  );
-                },
-              ),
-            ),
-          )
-        : SafeArea(
-            child: Container(),
           );
   }
 }

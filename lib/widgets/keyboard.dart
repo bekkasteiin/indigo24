@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 
 typedef KeyboardTapCallback = void Function(String text);
 
@@ -19,10 +20,12 @@ class KeyboardUIConfig {
     this.digitBorderWidth = 1,
     this.keyboardRowMargin = const EdgeInsets.only(top: 15, left: 4, right: 4),
     this.digitInnerMargin = const EdgeInsets.all(24),
-    this.primaryColor = const Color(0xFF001D52),
+    this.primaryColor = blackPurpleColor,
     this.digitFillColor = Colors.transparent,
-    this.digitTextStyle = const TextStyle(fontSize: 30, color: Color(0xFF001D52)),
-    this.deleteButtonTextStyle = const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+    this.digitTextStyle =
+        const TextStyle(fontSize: 30, color: blackPurpleColor),
+    this.deleteButtonTextStyle =
+        const TextStyle(fontSize: 16, color: blackPurpleColor),
     this.keyboardSize,
   });
 }
@@ -52,7 +55,9 @@ class Keyboard extends StatelessWidget {
       keyboardItems = digits;
     }
     final screenSize = MediaQuery.of(context).size;
-    final keyboardHeight = screenSize.height > screenSize.width ? screenSize.height / 2 : screenSize.height - 80;
+    final keyboardHeight = screenSize.height > screenSize.width
+        ? screenSize.height / 2
+        : screenSize.height - 80;
     final keyboardWidth = keyboardHeight * 3 / 4;
     final keyboardSize = this.keyboardUIConfig.keyboardSize != null
         ? this.keyboardUIConfig.keyboardSize
@@ -91,7 +96,9 @@ class Keyboard extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: keyboardUIConfig.primaryColor, width: keyboardUIConfig.digitBorderWidth),
+                border: Border.all(
+                    color: keyboardUIConfig.primaryColor,
+                    width: keyboardUIConfig.digitBorderWidth),
               ),
             ),
           ),
@@ -109,13 +116,16 @@ class AlignedGrid extends StatelessWidget {
   final List<Widget> children;
   final Size keyboardSize;
 
-  const AlignedGrid({Key key, @required this.children, @required this.keyboardSize})
+  const AlignedGrid(
+      {Key key, @required this.children, @required this.keyboardSize})
       : listSize = children.length,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final primarySize = keyboardSize.width > keyboardSize.height ? keyboardSize.height : keyboardSize.width;
+    final primarySize = keyboardSize.width > keyboardSize.height
+        ? keyboardSize.height
+        : keyboardSize.width;
     final itemSize = (primarySize - runSpacing * (columns - 1)) / columns;
     return Wrap(
       runSpacing: runSpacing,

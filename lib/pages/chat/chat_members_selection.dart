@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/style/colors.dart';
 
 import 'chat_contacts.dart';
 
@@ -196,7 +197,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
           title: Text(
             "${localization.addToGroup}",
             style: TextStyle(
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontWeight: FontWeight.w400,
               fontSize: 22,
             ),
@@ -206,7 +207,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
             IconButton(
                 icon: Icon(Icons.group_add),
                 iconSize: 30,
-                color: Color(0xFF001D52),
+                color: blackPurpleColor,
                 onPressed: () {
                   print(_saved2);
                   String userIds = '';
@@ -249,7 +250,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(20.0),
                                       child: Container(
-                                        color: Color(0xFF0543B8),
+                                        color: primaryColor,
                                         width: 35,
                                         height: 35,
                                         child: Center(
@@ -287,7 +288,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                           decoration: BoxDecoration(
                                             color: Colors.white,
                                             border: Border.all(
-                                              color: Color(0xFF0543B8),
+                                              color: primaryColor,
                                             ),
                                             borderRadius:
                                                 BorderRadius.circular(20.0),
@@ -300,7 +301,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                                 child: Icon(
                                                   Icons.close,
                                                   size: 14,
-                                                  color: Color(0xFF0543B8),
+                                                  color: primaryColor,
                                                 ),
                                                 onTap: () {
                                                   setState(() {
@@ -328,10 +329,10 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                           decoration: new InputDecoration(
                             prefixIcon: Icon(
                               Icons.search,
-                              color: Color(0xFF001D52),
+                              color: blackPurpleColor,
                             ),
                             hintText: "${localization.search}",
-                            fillColor: Color(0xFF001D52),
+                            fillColor: blackPurpleColor,
                           ),
                           onChanged: (value) {
                             search(value);

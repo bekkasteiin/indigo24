@@ -1,18 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class PaymentsServicePage extends StatefulWidget {
   final String _logo;
@@ -27,35 +27,39 @@ class PaymentsServicePage extends StatefulWidget {
 
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
   Api api = Api();
-  
-  showAlertDialog(BuildContext context, String type, String message, {bool withPop})  {
+
+  showAlertDialog(BuildContext context, String type, String message,
+      {bool withPop}) {
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
-        // type == '1' 
-        // ? Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => PaymentHistoryPage()),(r) => false) 
-        // : 
+        // type == '1'
+        // ? Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => PaymentHistoryPage()),(r) => false)
+        // :
         SystemChannels.textInput.invokeMethod('TextInput.hide');
-        if(withPop != null){
+        if (withPop != null) {
           Navigator.pop(context);
           Navigator.pop(context);
           Navigator.pop(context);
           Navigator.pop(context);
-        } else{
+        } else {
           Navigator.pop(context);
         }
-
       },
     );
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        print('showed dialog');
-        return ConstrainedBox( 
+        print('showed dialog $message');
+        return ConstrainedBox(
           constraints: BoxConstraints(maxHeight: 1.0),
           child: CupertinoAlertDialog(
-            title: Text(type == '0' ? "${localization.attention}" : type == '1' ? '${localization.success}' : '${localization.error}' ),
+            title: Text(type == '0'
+                ? "${localization.attention}"
+                : type == '1'
+                    ? '${localization.success}'
+                    : '${localization.error}'),
             content: Text(message),
             actions: [
               okButton,
@@ -65,16 +69,20 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       },
     );
   }
-  final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
-  bool isAuthenticated = false;
 
+  final StreamController<bool> _verificationNotifier =
+      StreamController<bool>.broadcast();
+  bool isAuthenticated = false;
+  double amount;
+  double exchangeRate;
+  double expectedAmount;
+  String expectedCurrency;
   final receiverController = TextEditingController();
   final sumController = TextEditingController();
   var loginFormatter;
 
-    _showLockScreen(BuildContext context, String title,
-      {
-      bool withPin,
+  _showLockScreen(BuildContext context, String title,
+      {bool withPin,
       bool opaque,
       CircleUIConfig circleUIConfig,
       KeyboardUIConfig keyboardUIConfig,
@@ -84,27 +92,28 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         context,
         PageRouteBuilder(
           opaque: opaque,
-          pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              PasscodeScreen(
             withPin: withPin,
             title: '$title',
             passwordEnteredCallback: _onPasscodeEntered,
             cancelButton: cancelButton,
             deleteButton: Text(
               'Delete',
-              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+              style: const TextStyle(fontSize: 16, color: blackPurpleColor),
               semanticsLabel: 'Delete',
             ),
             shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: Color(0xFFF7F7F7),
+            backgroundColor: milkWhiteColor,
             cancelCallback: _onPasscodeCancelled,
             digits: digits,
           ),
         ));
   }
-  
-    _onPasscodeEntered(String enteredPasscode) {
+
+  _onPasscodeEntered(String enteredPasscode) {
     print('user pin is ${user.pin}');
-    if('${user.pin}'.toString() == 'false'){
+    if ('${user.pin}'.toString() == 'false') {
       Navigator.maybePop(context);
       Navigator.maybePop(context);
       print('set pin');
@@ -115,34 +124,53 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     _verificationNotifier.add(isValid);
     if (isValid) {
       print(' is really valid ');
-      api.payService(widget.serviceID,'${receiverController.text.replaceAll(' ','').replaceAll('+','')}',sumController.text).then((services) {
-        if (services['message'] == 'Not authenticated' && services['success'].toString() == 'false') {
-          logOut(context);
-          return services;
-        } else {
-            if(services['success'].toString() == 'false') 
-              showAlertDialog(context, '0', services['message']); 
-            else {
-                showAlertDialog(context, '1', services['message']);
-                api.getBalance().then((result){
-                  setState(() {
-                  });
-                });
-              }
-          return services;
-        }
+
+      api
+          .paymentProceed(
+              widget.serviceID,
+              '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
+              sumController.text)
+          .then((result) {
+        showAlertDialog(context, '1', result['message']);
+        api.getBalance().then((result) {
+          setState(() {});
+        });
       });
+
+      // api
+      //     .payService(
+      //         widget.serviceID,
+      //         '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
+      //         sumController.text)
+      //     .then((services) {
+      //   if (services['message'] == 'Not authenticated' &&
+      //       services['success'].toString() == 'false') {
+      //     logOut(context);
+      //     return services;
+      //   } else {
+      //     if (services['success'].toString() == 'false')
+      //       showAlertDialog(context, '0', services['message']);
+      //     else {
+      //       showAlertDialog(context, '1', services['message']);
+      //       api.getBalance().then((result) {
+      //         setState(() {});
+      //       });
+      //     }
+      //     return services;
+      //   }
+      // });
       setState(() {
         this.isAuthenticated = isValid;
       });
     }
- 
   }
 
   _onPasscodeCancelled() {
     Navigator.pop(context);
   }
+
   var temp;
+  int accountLength;
   var accountRegex;
   String amountPlaceholder = '';
   String accountPlaceholder = '';
@@ -154,124 +182,172 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         child: Scaffold(
           body: FutureBuilder(
             future: api.getService(widget.serviceID).then((getServiceResult) {
-              getServiceResult['result'].forEach((element){
+              getServiceResult['result'].forEach((element) {
                 print('forEach element $element');
-                if('${element['name']}' == 'amount'){
+                if ('${element['name']}' == 'amount') {
                   amountPlaceholder = element['placeholder'];
                 }
-                if('${element['name']}' == 'account'){
-                  accountPlaceholder  = element['placeholder'];
+                if ('${element['name']}' == 'account') {
+                  accountPlaceholder = element['placeholder'];
                   accountMask = element['mask'];
                   accountRegex = new RegExp(r'' + element['regex']);
-                  if(element['mask'] == ' '){
+                  if (element['mask'] == ' ') {
                     print('if');
                     // temp = 'false';
                     // loginFormatter = MaskTextInputFormatter(filter: { "*" : RegExp(r'[0-9]') });
-                  } else{
-                    print('else else');
-                    loginFormatter = MaskTextInputFormatter(mask: '${element['mask']}', filter: { "*" : RegExp(r'[0-9]') });
+                  } else {
+                    print('else else ');
+                    accountLength = element['mask'].replaceAll(' ', '').length;
+                    // loginFormatter = MaskTextInputFormatter(
+                    //     mask: '${element['mask']}',
+                    //     filter: {"*": RegExp(r'[0-9]')});
                   }
                 }
-              });              
+              });
               return getServiceResult;
             }),
             builder: (context, snapshot) {
-              return snapshot.hasData ? 
-                GestureDetector(
-                onTap: () {
-                  if (!FocusScope.of(context).hasPrimaryFocus) {
-                    FocusScope.of(context).unfocus();
-                  }
-                },
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Stack(
-                        children: <Widget>[
-                          Image.asset(
-                            'assets/images/background_little.png',
-                            fit: BoxFit.fill,
-                          ),
-                          Column(
-                            children: <Widget>[
-                              AppBar(
-                                centerTitle: true,
-                                title: Text("${localization.payments}"),
-                                leading: IconButton(
-                                  icon: Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/backWhite.png',
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
+              return snapshot.hasData
+                  ? GestureDetector(
+                      onTap: () {
+                        if (!FocusScope.of(context).hasPrimaryFocus) {
+                          FocusScope.of(context).unfocus();
+                        }
+                      },
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            Stack(
+                              children: <Widget>[
+                                Image.asset(
+                                  'assets/images/background_little.png',
+                                  fit: BoxFit.fill,
                                 ),
-                                backgroundColor: Colors.transparent,
-                                elevation: 0,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(left: 0, right: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                Column(
                                   children: <Widget>[
-                                    Container(
-                                      height: 0.6,
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      color: Color(0xFFD1E1FF),
+                                    AppBar(
+                                      centerTitle: true,
+                                      title: Text("${localization.payments}"),
+                                      leading: IconButton(
+                                        icon: Container(
+                                          padding: EdgeInsets.all(10),
+                                          child: Image(
+                                            image: AssetImage(
+                                              'assets/images/backWhite.png',
+                                            ),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
                                     ),
                                     Container(
-                                      margin: EdgeInsets.only(left: 30, right: 10),
+                                      margin:
+                                          EdgeInsets.only(left: 0, right: 20),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          SizedBox(height: 15),
-                                          Text(
-                                            '${localization.walletBalance}',
-                                            style: fS14(c: 'FFFFFF'),
+                                          Container(
+                                            height: 0.6,
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                            color: brightGreyColor,
                                           ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            '${user.balance} ₸',
-                                            style: fS18(c: 'FFFFFF'),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 30, right: 10),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                SizedBox(height: 15),
+                                                Text(
+                                                  '${localization.walletBalance}',
+                                                  style: fS14(c: 'FFFFFF'),
+                                                ),
+                                                SizedBox(height: 5),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      '${user.balance}',
+                                                      style: fS18(c: 'FFFFFF'),
+                                                    ),
+                                                    Image(
+                                                      image: AssetImage(
+                                                          "assets/images/tenge.png"),
+                                                      height: 16,
+                                                      width: 16,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                            amount != null
+                                ? Column(
+                                    children: [
+                                      Text(
+                                          'Amount ${amount.toStringAsFixed(3)} KZT'),
+                                      Text(
+                                          '1 $expectedCurrency = ${exchangeRate.toStringAsFixed(3)} KZT'),
+                                      Text('Expected Amount $expectedAmount'),
+                                    ],
+                                  )
+                                : Center(),
+                            Container(
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.white,
+                                padding: EdgeInsets.only(left: 20, top: 20),
+                                child: Text('${widget.title}',
+                                    maxLines: 3,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: blackPurpleColor))),
+                            mainPaymentsDetailMobile(snapshot.data),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Center(
+                                child: Text(
+                                    '${localization.minAmount} ${snapshot.data['service']['min']} KZT',
+                                    style: TextStyle(color: blackPurpleColor))),
+                            Center(
+                                child: Text(
+                                    '${localization.maxAmount} ${snapshot.data['service']['max']} KZT',
+                                    style: TextStyle(color: blackPurpleColor))),
+                            Center(
+                                child: Text(
+                                    '${localization.commission} ${snapshot.data['service']['commission']}%',
+                                    style: TextStyle(color: blackPurpleColor))),
+                            transferButton(snapshot),
+                            SizedBox(
+                              height: 10,
+                            )
                           ],
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          color: Colors.white,
-                          padding: EdgeInsets.only(left: 20, top: 20),
-                          child: Text('${widget.title}', maxLines: 3, style: TextStyle(fontSize: 16, color: Color(0xFF001D52)))
-                        ),
-                        mainPaymentsDetailMobile(snapshot.data),
-                        SizedBox(height: 10,),
-                        Center(child: Text('${localization.minAmount} ${snapshot.data['service']['min']} KZT', style: TextStyle(color: Color(0xFF001D52)))),
-                        Center(child: Text('${localization.maxAmount} ${snapshot.data['service']['max']} KZT', style: TextStyle(color: Color(0xFF001D52)))),
-                        Center(child: Text('${localization.commission} ${snapshot.data['service']['commission']}%', style: TextStyle(color: Color(0xFF001D52)))),
-                        transferButton(snapshot),
-                        SizedBox(height: 10,)
-                    ],
-                  ),
-                ),
-              ) : Center(child: CircularProgressIndicator());
+                      ),
+                    )
+                  : Center(child: CircularProgressIndicator());
             },
           ),
         ),
       ),
     );
   }
+
+  bool first = true;
+
   Container transferButton(snapshot) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -286,23 +362,53 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
-            if(receiverController.text.isNotEmpty & sumController.text.isNotEmpty){
-              String str = "${receiverController.text.replaceAll(' ','').replaceAll('+','')}";
-              bool matches = accountRegex.hasMatch(str);
-              if(int.parse(sumController.text) >= snapshot.data['service']['min']){
-                if(int.parse(sumController.text) <= snapshot.data['service']['max']){
-                  if(matches){
-                    await _showLockScreen(context,'${localization.enterPin}',opaque: false, cancelButton: Text('Cancel', style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)), semanticsLabel: 'Cancel'));
-                  } else{
-                    showAlertDialog(context, '0', '${localization.enterValidAccount}');
+            if (receiverController.text.isNotEmpty &
+                sumController.text.isNotEmpty) {}
+            String str =
+                "${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
+            bool matches = accountRegex.hasMatch(str);
+            if (int.parse(sumController.text) >=
+                snapshot.data['service']['min']) {
+              if (int.parse(sumController.text) <=
+                  snapshot.data['service']['max']) {
+                if (matches) {
+                  if (first) {
+                    first = false;
+                    api
+                        .calculateSum(
+                            widget.serviceID,
+                            '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
+                            sumController.text)
+                        .then((result) {
+                      result = json.decode(result);
+                      setState(() {
+                        amount = result['Amount'];
+                        exchangeRate = result['ExchangeRate'];
+                        expectedAmount = result['ExpectedAmount'];
+                        expectedCurrency = result['ExpectedCurrency'];
+                      });
+                    });
+                  } else {
+                    await _showLockScreen(
+                      context,
+                      '${localization.enterPin}',
+                      opaque: false,
+                      cancelButton: Text('Cancel',
+                          style: const TextStyle(
+                              fontSize: 16, color: blackPurpleColor),
+                          semanticsLabel: 'Cancel'),
+                    );
                   }
-                } else{
-                  showAlertDialog(context, '0', '${localization.enterBelowMax}');
+                } else {
+                  print(accountRegex);
+                  showAlertDialog(
+                      context, '0', '${localization.enterValidAccount}');
                 }
+              } else {
+                showAlertDialog(context, '0', '${localization.enterBelowMax}');
               }
-              else{
-                showAlertDialog(context, '0', '${localization.enterAboveMin}');
-              }
+            } else {
+              showAlertDialog(context, '0', '${localization.enterAboveMin}');
             }
           },
           child: Container(
@@ -311,12 +417,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             child: Center(
               child: Text(
                 '${localization.pay}',
-                style: TextStyle(color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
+                style:
+                    TextStyle(color: primaryColor, fontWeight: FontWeight.w800),
               ),
             ),
           ),
-          color: Color(0xFFFFFFFF),
-          textColor: Color(0xFF001D52),
+          color: whiteColor,
+          textColor: blackPurpleColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               10.0,
@@ -326,6 +433,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       ),
     );
   }
+
   String accountMask = '';
   Container mainPaymentsDetailMobile(snapshot) {
     return Container(
@@ -344,17 +452,19 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     Container(
                       child: TextFormField(
                         keyboardType: TextInputType.number,
-                        inputFormatters: temp == 'false' ? [
-                          LengthLimitingTextInputFormatter(25),
-                          WhitelistingTextInputFormatter.digitsOnly,
-                        ] : [
-                          loginFormatter,  
-                          LengthLimitingTextInputFormatter(25),
-                          WhitelistingTextInputFormatter.digitsOnly,
-                        ] ,
+                        inputFormatters: temp == 'false'
+                            ? [
+                                LengthLimitingTextInputFormatter(accountLength),
+                                WhitelistingTextInputFormatter.digitsOnly,
+                              ]
+                            : [
+                                // loginFormatter,
+                                LengthLimitingTextInputFormatter(accountLength),
+                                WhitelistingTextInputFormatter.digitsOnly,
+                              ],
                         decoration: InputDecoration.collapsed(
                           // hintText: '${localization.phoneNumber}',
-                          hintText:  accountPlaceholder,
+                          hintText: accountPlaceholder,
                         ),
                         controller: receiverController,
                         style: TextStyle(fontSize: 20),
@@ -381,15 +491,14 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     keyboardType: TextInputType.number,
                     controller: sumController,
                     decoration: InputDecoration.collapsed(
-                      // hintText: '${localization.amount}',
-                      hintText: amountPlaceholder
-                    ),
+                        // hintText: '${localization.amount}',
+                        hintText: amountPlaceholder),
                     style: TextStyle(fontSize: 20),
                     inputFormatters: [
-                          BlacklistingTextInputFormatter(new RegExp(r"^(?!(0))$")),
+                      BlacklistingTextInputFormatter(new RegExp(r"^(?!(0))$")),
                     ],
-                    onChanged: (value){
-                      if(sumController.text[0] == '0'){
+                    onChanged: (value) {
+                      if (sumController.text[0] == '0') {
                         sumController.clear();
                       }
                     },

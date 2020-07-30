@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/pages/settings/settings_language.dart';
 import 'package:indigo24/pages/settings/settings_terms.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 
 class SettingsMainPage extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF001D52)),
+                      color: blackPurpleColor),
                 ),
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(
@@ -47,7 +48,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF001D52)),
+                        color: blackPurpleColor),
                   ),
                   Container(
                     margin: EdgeInsets.only(right: 15),
@@ -85,7 +86,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF001D52)),
+                      color: blackPurpleColor),
                 ),
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Container(
@@ -128,8 +129,8 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
           ),
           title: Text(
             "${localization.settings}",
-            style: TextStyle(
-                color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+            style:
+                TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -150,7 +151,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       // Container(
                       //   margin: EdgeInsets.only(left: 20),
                       //   height: 0.5,
-                      //   color: Color(0xFF7D8E9B)
+                      //   color: greyColor
                       // ),
                       // Material(
                       //   child: InkWell(
@@ -163,11 +164,11 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       //       child: Row(
                       //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       //         children: <Widget>[
-                      //           Text('${localization.notifications}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
+                      //           Text('${localization.notifications}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color:blackPurpleColor),),
                       //           Row(
                       //             mainAxisSize: MainAxisSize.min,
                       //             children: [
-                      //               // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
+                      //               // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
                       //               Container(
                       //                 margin: EdgeInsets.only(right: 15),
                       //                 child: Image(
@@ -188,17 +189,17 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       Container(
                           margin: EdgeInsets.only(left: 20),
                           height: 0.5,
-                          color: Color(0xFF7D8E9B)),
+                          color: greyColor),
                       // Container(
                       //   padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
                       //   child: Row(
                       //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       //     children: <Widget>[
-                      //       Text('${localization.currentLanguage}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
+                      //       Text('${localization.currentLanguage}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color:blackPurpleColor),),
                       //       Row(
                       //         mainAxisSize: MainAxisSize.min,
                       //         children: [
-                      //           // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF001D52)),),
+                      //           // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
                       //           IconButton(
                       //             icon: Container(
                       //               padding: EdgeInsets.symmetric(vertical: 10),
@@ -220,7 +221,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       // Container(
                       //   margin: EdgeInsets.only(left: 20),
                       //   height: 0.5,
-                      //   color: Color(0xFF7D8E9B)
+                      //   color: greyColor
                       // ),
                     ],
                   ),

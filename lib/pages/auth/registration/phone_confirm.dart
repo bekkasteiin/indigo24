@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'user_registration.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -67,19 +68,18 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
           ),
         ),
         body: GestureDetector(
-                onTap: () {
-                  FocusScopeNode currentFocus = FocusScope.of(context);
-                  if (!currentFocus.hasPrimaryFocus) {
-                    currentFocus.unfocus();
-                  }
-                },
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
           child: Stack(
             children: <Widget>[
               Container(
                   decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: introBackgroundProvider,
-                    fit: BoxFit.cover),
+                    image: introBackgroundProvider, fit: BoxFit.cover),
               )),
               Center(child: _buildForeground())
             ],
@@ -117,7 +117,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         children: <Widget>[
                           Text("${localization.keyFromSms}",
                               style: TextStyle(
-                                  color: Color(0xFF001D52), fontSize: 16))
+                                  color: blackPurpleColor, fontSize: 16))
                         ],
                       ),
                       TextField(
@@ -125,7 +125,14 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(hintText: ""),
                       ),
-                      Text('$smsError', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 10), overflow: TextOverflow.ellipsis,),
+                      Text(
+                        '$smsError',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 10),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),
@@ -135,7 +142,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                   child: Text(
                     '${localization.weSentToEmail}',
                     style: TextStyle(
-                      color: Color(0xff898DA5),
+                      color: darkGreyColor3,
                       fontSize: 12,
                     ),
                     textAlign: TextAlign.center,
@@ -149,13 +156,15 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         style: TextStyle(color: Colors.white, fontSize: 22)),
                     progressWidget: CircularProgressIndicator(),
                     borderRadius: 10.0,
-                    color: Color(0xff0543B8),
+                    color: primaryColor,
                     onPressed: () async {
                       //@TODO REMOVE CONDITION
-                      if(smsController.text.isNotEmpty){
-                        await api.checkSms(widget.phone, smsController.text).then((checkSmsResponse) async {
+                      if (smsController.text.isNotEmpty) {
+                        await api
+                            .checkSms(widget.phone, smsController.text)
+                            .then((checkSmsResponse) async {
                           print('this is checkSmsResponse $checkSmsResponse');
-                          if(checkSmsResponse['success'] == true){
+                          if (checkSmsResponse['success'] == true) {
                             setState(() {
                               smsError = "";
                             });
@@ -166,7 +175,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                                     UserRegistrationPage(widget.phone),
                               ),
                             );
-                          } else{
+                          } else {
                             setState(() {
                               smsError = checkSmsResponse['message'];
                             });
@@ -183,11 +192,10 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                           //   _showError(context, '$r');
                           // }
                         });
-                      }
-                      else{
+                      } else {
                         setState(() {
-                            smsError = '${localization.enterSmsCode}';
-                          });
+                          smsError = '${localization.enterSmsCode}';
+                        });
                       }
                     },
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/style/colors.dart';
 
 class ReplyMessage extends StatefulWidget {
   final text;
@@ -40,7 +41,7 @@ class _ReplyMessageState extends State<ReplyMessage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(width: 2.5, height: 45, color: Color(0xff0543B8)),
+                  Container(width: 2.5, height: 45, color: primaryColor),
                   Container(width: 5),
                   widget.replyData == null
                       ? Container()
@@ -60,7 +61,7 @@ class _ReplyMessageState extends State<ReplyMessage> {
                       children: [
                         Text(
                             "${widget.replyData == null ? "" : widget.replyData["user_name"]}",
-                            style: TextStyle(color: Color(0xff0543B8)),
+                            style: TextStyle(color: primaryColor),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             softWrap: false),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 
 @immutable
 class CircleUIConfig {
@@ -8,7 +9,10 @@ class CircleUIConfig {
   final double circleSize;
 
   const CircleUIConfig(
-      {this.borderColor = const Color(0xFF001D52), this.borderWidth = 1, this.fillColor = const Color(0xFF001D52), this.circleSize = 20});
+      {this.borderColor = blackPurpleColor,
+      this.borderWidth = 1,
+      this.fillColor = blackPurpleColor,
+      this.circleSize = 20});
 }
 
 // ignore: must_be_immutable
@@ -17,7 +21,12 @@ class Circle extends StatelessWidget {
   final CircleUIConfig circleUIConfig;
   double extraSize = 0;
 
-  Circle({Key key, this.filled = false, @required this.circleUIConfig, this.extraSize = 0}) : super(key: key);
+  Circle(
+      {Key key,
+      this.filled = false,
+      @required this.circleUIConfig,
+      this.extraSize = 0})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +37,9 @@ class Circle extends StatelessWidget {
       decoration: BoxDecoration(
           color: filled ? circleUIConfig.fillColor : Colors.transparent,
           shape: BoxShape.circle,
-          border: Border.all(color: circleUIConfig.borderColor, width: circleUIConfig.borderWidth)),
+          border: Border.all(
+              color: circleUIConfig.borderColor,
+              width: circleUIConfig.borderWidth)),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:vibration/vibration.dart';
 
@@ -127,7 +128,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                     Text(
                       '${widget.title}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFF001D52), fontSize: 28),
+                      style: TextStyle(color: blackPurpleColor, fontSize: 28),
                     ),
                     SizedBox(
                       height: 10,
@@ -135,8 +136,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                     Text(
                       '$passCodeError',
                       style: TextStyle(
-                          color: Color(0xFF001D52),
-                          fontWeight: FontWeight.w400),
+                          color: blackPurpleColor, fontWeight: FontWeight.w400),
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 10),

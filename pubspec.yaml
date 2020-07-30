@@ -64,7 +64,9 @@ dependencies:
   package_info: ^0.4.1
   flutter_cache_manager: any
   flutter_downloader: ^1.4.4
+  http: ^0.12.2
 
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
