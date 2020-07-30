@@ -1,6 +1,5 @@
 // home: TimerPage()
 
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +8,7 @@ import 'package:indigo24/pages/auth/login/login.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 
 class RestorePasswordPage extends StatefulWidget {
@@ -75,14 +75,19 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: type == 0 ? Text('${localization.error}') : Text('${localization.success}'),
+          title: type == 0
+              ? Text('${localization.error}')
+              : Text('${localization.success}'),
           content: Text(m),
           actions: <Widget>[
             CupertinoDialogAction(
               child: Text('Ok'),
               onPressed: () {
-              Navigator.of(context).pop();
-               if(type == 1) Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => LoginPage()),(r) => false);
+                Navigator.of(context).pop();
+                if (type == 1)
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      (r) => false);
               },
             ),
           ],
@@ -98,7 +103,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
             centerTitle: true,
-            backgroundColor: Colors.white, 
+            backgroundColor: Colors.white,
             brightness: Brightness.light,
           ),
         ),
@@ -107,15 +112,15 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
             Container(
                 decoration: BoxDecoration(
               image: DecorationImage(
-                  image: introBackgroundProvider,
-                  fit: BoxFit.cover),
+                  image: introBackgroundProvider, fit: BoxFit.cover),
             )),
             _buildForeground()
           ],
         ));
   }
+
   var _selectedCountry;
-  
+
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(
       context,
@@ -128,7 +133,8 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
         phonePrefix = _selectedCountry['prefix'];
       });
   }
-    Widget _buildForeground() {
+
+  Widget _buildForeground() {
     return Center(
       child: SingleChildScrollView(
         child: Column(
@@ -160,8 +166,13 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                  Text('$_currentCountry ',style: TextStyle(color: Color(0xFF001D52), fontSize: 18)),
-                                  SizedBox(width: 10,),
+                                  Text('$_currentCountry ',
+                                      style: TextStyle(
+                                          color: blackPurpleColor,
+                                          fontSize: 18)),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
                                   Container(
                                     child: Image(
                                       width: 15,
@@ -187,7 +198,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                             children: <Widget>[
                               Text("${localization.phoneNumber}",
                                   style: TextStyle(
-                                      color: Color(0xFF001D52), fontSize: 16))
+                                      color: blackPurpleColor, fontSize: 16))
                             ],
                           ),
                           Stack(
@@ -202,8 +213,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                                 controller: loginController,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
-                                  color: Colors.black, fontSize: 15
-                                ),
+                                    color: Colors.black, fontSize: 15),
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
@@ -229,18 +239,21 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                                 fontWeight: FontWeight.w300)),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
-                        color: Color(0xFF0543B8),
+                        color: primaryColor,
                         onPressed: () async {
-                        await api.restorePassword(phonePrefix + loginController.text).then((restorePasswordResponse) async {
-                          // print('phone check result $checkPhoneResult');
-                          print('empty check Registration $restorePasswordResponse');
-                           if(restorePasswordResponse['success'] == true){
-                             _showError(context, restorePasswordResponse['message'], 1);
-                          } else{
-                            _showError(context, restorePasswordResponse['message'], 0);
-                          }
-                        });
-                      },
+                          await api
+                              .restorePassword(
+                                  phonePrefix + loginController.text)
+                              .then((restorePasswordResponse) async {
+                            if (restorePasswordResponse['success'] == true) {
+                              _showError(context,
+                                  restorePasswordResponse['message'], 1);
+                            } else {
+                              _showError(context,
+                                  restorePasswordResponse['message'], 0);
+                            }
+                          });
+                        },
                       ),
                     ),
                     _space(50),
@@ -253,6 +266,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
       ),
     );
   }
+
   void changedDropDownItem(String selectedCountry) {
     print("Selected county $selectedCountry, we are going to refresh the UI");
     print("TEST $_countries");

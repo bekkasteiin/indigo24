@@ -10,17 +10,18 @@ import 'package:indigo24/services/socket.dart';
 
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 
-
 class TransferPage extends StatefulWidget {
   final phone;
+  final amount;
   final transferChat;
-  const TransferPage({this.phone, this.transferChat});
+  const TransferPage({this.phone, this.transferChat, this.amount});
   @override
   _TransferPageState createState() => _TransferPageState();
 }
@@ -39,7 +40,9 @@ class _TransferPageState extends State<TransferPage> {
     );
 
     CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text(type == '0' ? "${localization.attention}" : type == '1' ? '${localization.success}' : '${localization.error}' ),
+      title: Text(type == '0'
+          ? "${localization.attention}"
+          : type == '1' ? '${localization.success}' : '${localization.error}'),
       content: Text(message),
       actions: [
         okButton,
@@ -55,18 +58,40 @@ class _TransferPageState extends State<TransferPage> {
       },
     );
   }
-  
 
   final receiverController = TextEditingController();
   final sumController = TextEditingController();
 
   @override
   void initState() {
-    if(widget.phone != null){
+    if (widget.phone != null && widget.amount != null) {
       receiverController.text = widget.phone;
+      sumController.text = widget.amount;
+      setState(() {
+        toName = '';
+        toAvatar = '';
+      });
+      if (receiverController.text.length > 10) {
+        api.checkPhoneForSendMoney('${widget.phone}').then((r) {
+          print(r);
+          if (r['success'].toString() == 'true') {
+            setState(() {
+              toName = r['name'];
+              toAvatar = r['avatar'];
+            });
+          } else {
+            setState(() {
+              toName = '${localization.userNotFound}';
+              toAvatar = '';
+            });
+          }
+        });
+      }
     }
+
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -119,7 +144,7 @@ class _TransferPageState extends State<TransferPage> {
                               height: 0.6,
                               margin: EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 20),
-                              color: Color(0xFFD1E1FF),
+                              color: brightGreyColor,
                             ),
                             Container(
                               margin: EdgeInsets.only(left: 30, right: 10),
@@ -146,7 +171,9 @@ class _TransferPageState extends State<TransferPage> {
                   ),
                   mainPaymentsDetailMobile(),
                   transferButton(),
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                 ],
               ),
             ),
@@ -176,7 +203,7 @@ class _TransferPageState extends State<TransferPage> {
       title: Text(
         "${localization.toIndigo24Client}",
         style: TextStyle(
-          color: Color(0xFF001D52),
+          color: blackPurpleColor,
           fontSize: 22,
           fontWeight: FontWeight.w400,
         ),
@@ -184,41 +211,47 @@ class _TransferPageState extends State<TransferPage> {
       ),
     );
   }
-  final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
+
+  final StreamController<bool> _verificationNotifier =
+      StreamController<bool>.broadcast();
   bool checked = false;
   _onPasscodeEntered(String enteredPasscode) {
     bool isValid = '${user.pin}' == enteredPasscode;
     _verificationNotifier.add(isValid);
-    if(enteredPasscode == user.pin){
+    if (enteredPasscode == user.pin) {
       Navigator.maybePop(context);
       Navigator.maybePop(context);
-      if(receiverController.text.isNotEmpty && sumController.text.isNotEmpty){
-          api.checkPhoneForSendMoney(receiverController.text).then((result) {
-            print('transfer result $result');
-            if (result['message'] == 'Not authenticated' && result['success'].toString() == 'false') {
-              logOut(context);
-              return result;
+      if (receiverController.text.isNotEmpty && sumController.text.isNotEmpty) {
+        api.checkPhoneForSendMoney(receiverController.text).then((result) {
+          print('transfer result $result');
+          if (result['message'] == 'Not authenticated' &&
+              result['success'].toString() == 'false') {
+            logOut(context);
+            return result;
+          } else {
+            if (result["success"].toString() == 'true') {
+              api
+                  .doTransfer(result["toID"], sumController.text,
+                      transferChat: widget.transferChat)
+                  .then((res) {
+                if (res['success'].toString() == 'false')
+                  showAlertDialog(context, '0', res['message']);
+                else {
+                  showAlertDialog(context, '1', res['message']);
+                  ChatRoom.shared.sendMoney(
+                      res['transfer_money_chat_token'], widget.transferChat);
+                  api.getBalance().then((result) {
+                    setState(() {});
+                  });
+                }
+              });
             } else {
-              if (result["success"].toString() == 'true') {
-                api.doTransfer(result["toID"], sumController.text, transferChat: widget.transferChat).then((res) {
-                  if(res['success'].toString() == 'false') 
-                    showAlertDialog(context, '0', res['message']); 
-                  else{
-                    showAlertDialog(context, '1', res['message']);
-                    ChatRoom.shared.sendMoney(res['transfer_money_chat_token'], widget.transferChat);
-                    api.getBalance().then((result){
-                      setState(() {
-                      });
-                    });
-                  }
-                });
-              } else{
-                showAlertDialog(context, '0', result['message']);
-              }
-              return result;
+              showAlertDialog(context, '0', result['message']);
             }
-          });
-      } else{
+            return result;
+          }
+        });
+      } else {
         showAlertDialog(context, '0', '${localization.fillAllFields}');
       }
     }
@@ -226,16 +259,15 @@ class _TransferPageState extends State<TransferPage> {
 
   _onPasscodeCancelled() {
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => Tabs(),
-        ),
-        (r) => false, 
+      MaterialPageRoute(
+        builder: (context) => Tabs(),
+      ),
+      (r) => false,
     );
   }
 
   _showLockScreen(BuildContext context, String title,
-      {
-      bool withPin,
+      {bool withPin,
       bool opaque,
       CircleUIConfig circleUIConfig,
       KeyboardUIConfig keyboardUIConfig,
@@ -245,24 +277,25 @@ class _TransferPageState extends State<TransferPage> {
         context,
         PageRouteBuilder(
           opaque: opaque,
-          pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              PasscodeScreen(
             title: '$title',
             withPin: withPin,
             passwordEnteredCallback: _onPasscodeEntered,
             cancelButton: cancelButton,
             deleteButton: Text(
               'Delete',
-              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+              style: const TextStyle(fontSize: 16, color: blackPurpleColor),
               semanticsLabel: 'Delete',
             ),
             shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: Color(0xFFF7F7F7),
+            backgroundColor: milkWhiteColor,
             cancelCallback: _onPasscodeCancelled,
             digits: digits,
           ),
         ));
-  } 
-  
+  }
+
   Container transferButton() {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -277,12 +310,14 @@ class _TransferPageState extends State<TransferPage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
-            if(receiverController.text.isNotEmpty && sumController.text.isNotEmpty){
-              _showLockScreen(
-                context,
-                '${localization.enterPin}',
-                opaque: false,
-                cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+            if (receiverController.text.isNotEmpty &&
+                sumController.text.isNotEmpty) {
+              _showLockScreen(context, '${localization.enterPin}',
+                  opaque: false,
+                  cancelButton: Text('Cancel',
+                      style: const TextStyle(
+                          fontSize: 16, color: blackPurpleColor),
+                      semanticsLabel: 'Cancel'));
             }
           },
           child: Container(
@@ -291,12 +326,13 @@ class _TransferPageState extends State<TransferPage> {
             child: Center(
               child: Text(
                 '${localization.transfer}',
-                style: TextStyle(color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
+                style:
+                    TextStyle(color: primaryColor, fontWeight: FontWeight.w800),
               ),
             ),
           ),
-          color: Color(0xFFFFFFFF),
-          textColor: Color(0xFF001D52),
+          color: whiteColor,
+          textColor: blackPurpleColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               10.0,
@@ -306,6 +342,7 @@ class _TransferPageState extends State<TransferPage> {
       ),
     );
   }
+
   String toName = '';
   String toAvatar = '';
   Container mainPaymentsDetailMobile() {
@@ -323,7 +360,6 @@ class _TransferPageState extends State<TransferPage> {
                   children: <Widget>[
                     Container(
                       child: TextField(
-                       
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           WhitelistingTextInputFormatter.digitsOnly,
@@ -339,15 +375,15 @@ class _TransferPageState extends State<TransferPage> {
                             toName = '';
                             toAvatar = '';
                           });
-                          if(receiverController.text.length > 10){
+                          if (receiverController.text.length > 10) {
                             api.checkPhoneForSendMoney('$value').then((r) {
                               print(r);
-                              if(r['success'].toString() == 'true'){
+                              if (r['success'].toString() == 'true') {
                                 setState(() {
                                   toName = r['name'];
                                   toAvatar = r['avatar'];
                                 });
-                              } else{
+                              } else {
                                 setState(() {
                                   toName = '${localization.userNotFound}';
                                   toAvatar = '';
@@ -369,97 +405,127 @@ class _TransferPageState extends State<TransferPage> {
                       radius: 20,
                       child: ClipOval(
                         child: CachedNetworkImage(
-                          imageUrl: 
-                          toAvatar == '' 
-                          ? "${avatarUrl}noAvatar.png"
-                          : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}'
-                        ),
+                            imageUrl: toAvatar == ''
+                                ? "${avatarUrl}noAvatar.png"
+                                : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}'),
                       ),
                     ),
                     onTap: () {
                       showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return SafeArea(
-                            child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: 40.0,
-                                    maxHeight: MediaQuery.of(context).size.height,
-                                  ),
-                                  child: Container(
-                                    // height: 120,
-                                    // width: 100,
-                                    child: ListView.builder(
-                                      itemCount: myContacts.length,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, i) {
-                                        // print(myContacts[i]);
-                                        // print(temp.length);
-                                        return Center(
-                                          child: InkWell(
-                                            onTap: () {
-                                              Navigator.pop(context);
-                                              setState(() {
-                                                receiverController.text = myContacts[i].phone;
-                                              });
-                                              // Navigator.push(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //     builder: (context) => TransferPage(
-                                              //       phone: myContacts[i].phone,
-                                              //     ),
-                                              //   ),
-                                              // );
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-                                              child: Row(
-                                                children: <Widget>[
-                                                  ClipRRect(
-                                                    borderRadius: BorderRadius.circular(25.0),
-                                                    child: Image.network(
-                                                      '${myContacts[i].avatar}' == '' 
-                                                      ? '${avatarUrl}noAvatar.png'
-                                                      : '$avatarUrl${myContacts[i].avatar.replaceAll('AxB', '200x200')}',
-                                                      width: 35,
-                                                      height: 35,
-                                                    ),
+                          context: context,
+                          builder: (context) {
+                            return SafeArea(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: 40.0,
+                                  maxHeight: MediaQuery.of(context).size.height,
+                                ),
+                                child: Container(
+                                  // height: 120,
+                                  // width: 100,
+                                  child: ListView.builder(
+                                    itemCount: myContacts.length,
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, i) {
+                                      // print(myContacts[i]);
+                                      // print(temp.length);
+                                      return Center(
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            setState(() {
+                                              receiverController.text =
+                                                  myContacts[i].phone;
+                                            });
+
+                                            api
+                                                .checkPhoneForSendMoney(
+                                                    '${myContacts[i].phone}')
+                                                .then((r) {
+                                              print(r);
+                                              if (r['success'].toString() ==
+                                                  'true') {
+                                                setState(() {
+                                                  toName = r['name'];
+                                                  toAvatar = r['avatar'];
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  toName =
+                                                      '${localization.userNotFound}';
+                                                  toAvatar = '';
+                                                });
+                                              }
+                                            });
+                                            // Navigator.push(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //     builder: (context) => TransferPage(
+                                            //       phone: myContacts[i].phone,
+                                            //     ),
+                                            //   ),
+                                            // );
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 20, horizontal: 40),
+                                            child: Row(
+                                              children: <Widget>[
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          25.0),
+                                                  child: Image.network(
+                                                    '${myContacts[i].avatar}' ==
+                                                            ''
+                                                        ? '${avatarUrl}noAvatar.png'
+                                                        : '$avatarUrl${myContacts[i].avatar.replaceAll('AxB', '200x200')}',
+                                                    width: 35,
+                                                    height: 35,
                                                   ),
-                                                  SizedBox(width: 20,),
-                                                  Flexible(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: <Widget>[
-                                                        Container(
-                                                          child: Text(
-                                                            '${myContacts[i].name}',
-                                                            overflow: TextOverflow.ellipsis,
-                                                            maxLines: 1,
-                                                          ),
+                                                ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Flexible(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: <Widget>[
+                                                      Container(
+                                                        child: Text(
+                                                          '${myContacts[i].name}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
                                                         ),
-                                                        Container(
-                                                          child: Text(
-                                                            '${myContacts[i].phone}',
-                                                            overflow: TextOverflow.ellipsis,
-                                                            maxLines: 1,
-                                                          ),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                          '${myContacts[i].phone}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
                                                         ),
-                                                      ],
-                                                    ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        );
-                                      },
-                                    ),
+                                        ),
+                                      );
+                                    },
                                   ),
-                            ),
-                          );
-                        });
-                      print('transfer avatar is pressed');
+                                ),
+                              ),
+                            );
+                          });
+                      print('transfer avatar is pressed $myContacts');
                     },
                   ),
                   Text('$toName')
@@ -484,8 +550,8 @@ class _TransferPageState extends State<TransferPage> {
                     decoration: InputDecoration.collapsed(
                         hintText: '${localization.amount}'),
                     style: TextStyle(fontSize: 20),
-                    onChanged: (value){
-                      if(sumController.text[0] == '0'){
+                    onChanged: (value) {
+                      if (sumController.text[0] == '0') {
                         sumController.clear();
                       }
                     },

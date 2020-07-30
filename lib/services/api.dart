@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/configs.dart' as configs;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 
@@ -59,15 +58,15 @@ class Api {
       var commission = response.data['commissions'];
       var withdrawConfig = commission['withdraw'];
       var refillConfig = commission['refill'];
-      configs.withdrawCommission = '${withdrawConfig['commission']}';
-      configs.withdrawMinCommission = '${withdrawConfig['minCommission']}';
-      configs.withdrawMin = '${withdrawConfig['min']}';
-      configs.withdrawMax = '${withdrawConfig['max']}';
+      withdrawCommission = '${withdrawConfig['commission']}';
+      withdrawMinCommission = '${withdrawConfig['minCommission']}';
+      withdrawMin = '${withdrawConfig['min']}';
+      withdrawMax = '${withdrawConfig['max']}';
 
-      configs.refillCommission = '${refillConfig['commission']}';
-      configs.refillMinCommission = '${refillConfig['minCommission']}';
-      configs.refillMin = '${refillConfig['min']}';
-      configs.refillMax = '${refillConfig['max']}';
+      refillCommission = '${refillConfig['commission']}';
+      refillMinCommission = '${refillConfig['minCommission']}';
+      refillMin = '${refillConfig['min']}';
+      refillMax = '${refillConfig['max']}';
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -160,7 +159,7 @@ class Api {
     try {
       response = await dio.post("/logout", data: {
         "customerID": "${user.id}",
-        "unique": "${user.unique}",
+        "_token": "0#!_kA8B@ncV2",
       });
       print(response.data);
       return response.data;
@@ -483,6 +482,67 @@ class Api {
     }
   }
 
+  calculateSum(serviceID, account, amount) async {
+    try {
+      Response response = await Dio().get(
+        "https://api.indigo24.xyz/hermes/sum/calculate",
+        queryParameters: {
+          "customerID": "${user.id}",
+          "unique": "${user.unique}",
+          "serviceID": "$serviceID",
+          "amount": "$amount",
+          "currency": "KZT",
+          "account": "$account",
+        },
+      );
+      print(response);
+      return response.data;
+    } catch (e) {
+      print('${e.response} this is e $e');
+      return e;
+    }
+  }
+
+  paymentProceed(serviceID, account, amount) async {
+    try {
+      Response response = await Dio().post(
+        "https://api.indigo24.xyz/hermes/payment/proceed",
+        queryParameters: {
+          "customerID": "${user.id}",
+          "unique": "${user.unique}",
+          "serviceID": "$serviceID",
+          "amount": "$amount",
+          "currency": "KZT",
+          "account": "$account",
+        },
+      );
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      print('${e.response} this is e $e');
+    }
+  }
+
+  transactionStatus(serviceID, account, amount) async {
+    try {
+      Response response = await Dio().get(
+        "https://api.indigo24.xyz/transaction/status",
+        queryParameters: {
+          "transactionID": '1',
+          // "customerID": "${user.id}",
+          // "unique": "${user.unique}",
+          // "serviceID": "$serviceID",
+          // "amount": "$amount",
+          // "currency": "KZT",
+          // "account": "$account",
+        },
+      );
+      print(response);
+    } catch (e) {
+      print('${e.response} this is e $e');
+    }
+  }
+
   payService(serviceID, account, amount) async {
     try {
       response = await dio.post("/service/pay", data: {
@@ -538,6 +598,7 @@ class Api {
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
+        print(e.request.path);
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);

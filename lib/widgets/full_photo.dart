@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share/share.dart';
@@ -47,8 +48,8 @@ class FullPhoto extends StatelessWidget {
             child: Column(children: <Widget>[
               Text(
                 'Медиафайлы',
-                style: TextStyle(
-                    color: Color(0xFFffffff), fontWeight: FontWeight.w400),
+                style:
+                    TextStyle(color: whiteColor, fontWeight: FontWeight.w400),
                 overflow: TextOverflow.ellipsis,
               ),
             ]),
@@ -196,7 +197,8 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                 if (tempList[i]['type'].toString() == '1') {
                   var a = jsonDecode(tempList[i]['attachments']);
 
-                  var url1 ='${tempList[i]['attachment_url']}${a[0]['filename']}';
+                  var url1 =
+                      '${tempList[i]['attachment_url']}${a[0]['filename']}';
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -216,7 +218,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                         // ),
                         ),
                   );
-                } else{
+                } else {
                   return Center();
                 }
               },
@@ -229,11 +231,13 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
     GallerySaver.saveImage(url).then((bool success) {
       if (success)
         setState(() {
-          showAlertDialog(context, "${localization.success}", "${localization.uploaded}");
+          showAlertDialog(
+              context, "${localization.success}", "${localization.uploaded}");
           print('Image is saved');
         });
       else
-        showAlertDialog(context, "${localization.error}", "${localization.somethingWentWrong}");
+        showAlertDialog(context, "${localization.error}",
+            "${localization.somethingWentWrong}");
     });
   }
 

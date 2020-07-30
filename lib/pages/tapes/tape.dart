@@ -5,6 +5,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/style/colors.dart';
 
 class TapePage extends StatefulWidget {
   final tape;
@@ -20,7 +21,8 @@ class _TapePageState extends State<TapePage>
   @override
   void initState() {
     api.getTape(widget.tape["id"]).then((result) {
-      if (result['message'] == 'Not authenticated' &&result['success'].toString() == 'false') {
+      if (result['message'] == 'Not authenticated' &&
+          result['success'].toString() == 'false') {
         logOut(context);
         return true;
       } else {
@@ -44,6 +46,7 @@ class _TapePageState extends State<TapePage>
   int foo() {
     return 1;
   }
+
   var _saved = List<dynamic>();
 
   TextEditingController _commentController = TextEditingController();
@@ -59,9 +62,8 @@ class _TapePageState extends State<TapePage>
   // ignore: must_call_super
   Widget build(BuildContext context) {
     bool keyboardIsOpened = MediaQuery.of(context).viewInsets.bottom != 0.0;
-    if(_commentController.text.isEmpty)
-      letterCount = 100;
-    if(_commentController.text.isNotEmpty)
+    if (_commentController.text.isEmpty) letterCount = 100;
+    if (_commentController.text.isNotEmpty)
       letterCount = 100 - _commentController.text.length;
     return Scaffold(
       appBar: AppBar(
@@ -83,7 +85,7 @@ class _TapePageState extends State<TapePage>
         title: Text(
           "${localization.comments}",
           style: TextStyle(
-            color: Color(0xFF001D52),
+            color: blackPurpleColor,
             fontSize: 22,
             fontWeight: FontWeight.w400,
           ),
@@ -106,19 +108,22 @@ class _TapePageState extends State<TapePage>
                         top: 10,
                       ),
                       child: Container(
-                        color: Color(0xfff7f8fa),
+                        color: milkWhiteColor,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${localization.comments} : $commentCount',
-                            style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
+                            Text(
+                              '${localization.comments} : $commentCount',
+                              style: TextStyle(
+                                  color: blackPurpleColor,
+                                  fontWeight: FontWeight.w300),
                             ),
                             ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: com.length,
                               itemBuilder: (context, index) {
-                                _saved.add({'index': index, 'maxLines' : 5});
+                                _saved.add({'index': index, 'maxLines': 5});
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -128,56 +133,75 @@ class _TapePageState extends State<TapePage>
                                     Container(
                                       margin: EdgeInsets.only(bottom: 10),
                                       child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.start,
-
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: <Widget>[
                                           Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
                                             children: <Widget>[
                                               CircleAvatar(
                                                 radius: 15.0,
-                                                backgroundImage: NetworkImage('$avatarUrl${user.avatar}'),
+                                                backgroundImage: NetworkImage(
+                                                    '$avatarUrl${user.avatar}'),
                                                 backgroundColor: Colors.red,
                                               ),
-                                              
                                             ],
                                           ),
-                                          
+
                                           SizedBox(
                                             width: 10,
                                           ),
                                           Flexible(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 RichText(
                                                   text: TextSpan(
-                                                    text: '${com[index]['name']} ',
-                                                    style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w600),
+                                                    text:
+                                                        '${com[index]['name']} ',
+                                                    style: TextStyle(
+                                                        color: blackPurpleColor,
+                                                        fontWeight:
+                                                            FontWeight.w600),
                                                     children: <TextSpan>[
                                                       TextSpan(
-                                                        text: '${com[index]['comment']}',
-                                                        style: TextStyle(color: Color(0xFF001D52), fontWeight: FontWeight.w300),
+                                                        text:
+                                                            '${com[index]['comment']}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                blackPurpleColor,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
-                                                 Container(
-                                                   padding: EdgeInsets.only(top: 5),
-                                                   alignment: Alignment.centerLeft,
-                                                   child: Text(
-                                                   '${com[index]['date']}',
-                                                   overflow: TextOverflow.ellipsis,
-                                                   style: TextStyle(color: Color(0xFF5E5E5E), fontWeight: FontWeight.w300),
-                                              ),
-                                                 ),
+                                                Container(
+                                                  padding:
+                                                      EdgeInsets.only(top: 5),
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    '${com[index]['date']}',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                        color: darkGreyColor2,
+                                                        fontWeight:
+                                                            FontWeight.w300),
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           ),
-                                        
+
                                           // SizedBox(
-                                            // width: 10,
+                                          // width: 10,
                                           // ),
                                           // InkWell(
                                           //   child: Text('еще'),
@@ -199,7 +223,6 @@ class _TapePageState extends State<TapePage>
                             SizedBox(
                               height: 60,
                             ),
-                            
                           ],
                         ),
                       ),
@@ -239,13 +262,18 @@ class _TapePageState extends State<TapePage>
                       child: TextField(
                         maxLines: 6,
                         onSubmitted: (value) async {
-                          if(_commentController.text.isNotEmpty){
+                          if (_commentController.text.isNotEmpty) {
                             setState(() {
                               tapeResult.cast<String, dynamic>();
                               commentCount++;
                             });
                             letterCount = 100;
-                            await api.addCommentToTape('${_commentController.text}','${widget.tape['id']}',).then((v) {
+                            await api
+                                .addCommentToTape(
+                              '${_commentController.text}',
+                              '${widget.tape['id']}',
+                            )
+                                .then((v) {
                               var result = {
                                 "avatar": "${user.avatar}",
                                 "comment": "${_commentController.text}",
@@ -283,13 +311,18 @@ class _TapePageState extends State<TapePage>
                           suffixIcon: IconButton(
                             icon: Icon(Icons.send),
                             onPressed: () async {
-                              if(_commentController.text.isNotEmpty){
+                              if (_commentController.text.isNotEmpty) {
                                 setState(() {
                                   tapeResult.cast<String, dynamic>();
                                   commentCount++;
                                 });
                                 letterCount = 100;
-                                await api.addCommentToTape('${_commentController.text}','${widget.tape['id']}',).then((v) {
+                                await api
+                                    .addCommentToTape(
+                                  '${_commentController.text}',
+                                  '${widget.tape['id']}',
+                                )
+                                    .then((v) {
                                   print('addCommentResult $v');
                                   var result = {
                                     "avatar": "${user.avatar}",
@@ -302,7 +335,7 @@ class _TapePageState extends State<TapePage>
                                   });
                                 });
                                 _commentController.text = "";
-                                }
+                              }
                             },
                           ),
                           border: InputBorder.none,

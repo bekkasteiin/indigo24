@@ -10,6 +10,7 @@ import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/chat/ui/replyMessage.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -224,7 +225,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                       topLeft: Radius.circular(15),
                       topRight: Radius.circular(15)),
                   child: Container(
-                    color: type == '11' ? Color(0xFF0543B8) : Colors.white,
+                    color: type == '11' ? primaryColor : Colors.white,
                     child: Stack(children: <Widget>[
                       Column(
                         mainAxisSize: MainAxisSize.min,

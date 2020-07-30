@@ -5,6 +5,7 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -148,7 +149,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             children: <Widget>[
                               Text("Имя",
                                   style: TextStyle(
-                                      color: Color(0xff0543B8), fontSize: 16)),
+                                      color: primaryColor, fontSize: 16)),
                               SizedBox(
                                 width: 20,
                               ),
@@ -190,7 +191,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             children: <Widget>[
                               Text("${localization.surname}",
                                   style: TextStyle(
-                                      color: Color(0xff0543B8), fontSize: 16)),
+                                      color: primaryColor, fontSize: 16)),
                               SizedBox(
                                 width: 20,
                               ),
@@ -232,7 +233,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             children: <Widget>[
                               Text("Email",
                                   style: TextStyle(
-                                      color: Color(0xff0543B8), fontSize: 16)),
+                                      color: primaryColor, fontSize: 16)),
                               SizedBox(
                                 width: 20,
                               ),
@@ -274,7 +275,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             children: <Widget>[
                               Text("${localization.password}",
                                   style: TextStyle(
-                                      color: Color(0xff0543B8), fontSize: 16)),
+                                      color: primaryColor, fontSize: 16)),
                               SizedBox(
                                 width: 20,
                               ),
@@ -334,7 +335,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             children: <Widget>[
                               Text("${localization.password}",
                                   style: TextStyle(
-                                      color: Color(0xff0543B8), fontSize: 16)),
+                                      color: primaryColor, fontSize: 16)),
                               SizedBox(
                                 width: 20,
                               ),
@@ -388,7 +389,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     FlatButton(
                       child: Text(
                         "${localization.terms}",
-                        style: TextStyle(color: Color(0xff0543B8)),
+                        style: TextStyle(color: primaryColor),
                       ),
                       onPressed: () {
                         Navigator.push(
@@ -406,7 +407,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: [
                           Flexible(
                             child: Text(
-                              "${localization.iAgree}",
+                              "Я принимаю соглашение",
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
@@ -426,7 +427,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       // decoration: BoxDecoration(
-                      //   color: Color(0xff0543B8),
+                      //   color: primaryColor,
                       //   borderRadius: BorderRadius.only(
                       //     topRight: Radius.circular(10.0),
                       //     topLeft: Radius.circular(10.0),
@@ -440,7 +441,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                 TextStyle(color: Colors.white, fontSize: 22)),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
-                        color: Color(0xff0543B8),
+                        color: primaryColor,
                         onPressed: !confirm
                             ? null
                             : () async {

@@ -1,8 +1,8 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 
 class SettingsTermsPage extends StatefulWidget {
   @override
@@ -33,8 +33,8 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
           ),
           title: Text(
             "${localization.terms}",
-            style: TextStyle(
-                color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+            style:
+                TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -54,7 +54,7 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFF001D52)),
+                    color: blackPurpleColor),
               ),
             ),
             Container(
@@ -77,12 +77,12 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                       Text("Terms.pdf",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Color(0xff001D52))),
+                          style: TextStyle(color: blackPurpleColor)),
                       Flexible(
                           child: Text("381.0 KB",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Color(0xff7D8E9B)))),
+                              style: TextStyle(color: greyColor))),
                     ],
                   )
                 ],

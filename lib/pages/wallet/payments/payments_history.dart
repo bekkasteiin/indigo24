@@ -8,7 +8,10 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import 'payments_service.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
   @override
@@ -88,7 +91,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       String date,
       String status,
       int index,
-      String url) {
+      String url,
+      int serviceID) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -99,6 +103,23 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
               _paymentLogo(logo),
               _paymentInfo(title, account, date),
               _paymentAmount(amount, status),
+              FlatButton(
+                child: Text('Повторить'), // TODO ADD LOCALIZATION
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentsServicePage(
+                        serviceID,
+                        logo,
+                        title,
+                        account: account,
+                        amount: amount,
+                      ),
+                    ),
+                  );
+                },
+              ),
               SizedBox(width: 20),
             ],
           ),
@@ -113,7 +134,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         Container(
           margin: EdgeInsets.only(top: 10, right: 20, left: 20),
           height: 0.2,
-          color: Color(0xFF7D8E9B),
+          color: greyColor,
         ),
       ],
     );
@@ -145,7 +166,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                 : "$amount KZT",
             style: TextStyle(
               fontSize: 18,
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -186,7 +207,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             "$title",
             style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF636973),
+              color: brightGreyColor2,
               fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
@@ -195,7 +216,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             "$account",
             style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
@@ -204,7 +225,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             "$date",
             style: TextStyle(
               fontSize: 10,
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               fontWeight: FontWeight.w300,
             ),
             overflow: TextOverflow.ellipsis,
@@ -234,7 +255,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       title: Text(
         "${localization.payments}",
         style: TextStyle(
-          color: Color(0xFF001D52),
+          color: blackPurpleColor,
           fontSize: 22,
           fontWeight: FontWeight.w400,
         ),
@@ -257,12 +278,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     _refreshController.refreshCompleted();
   }
 
-  void onBalanceLoading() async {
-    print("_onBalanceLoading ");
-    _loadBalanceData();
-    _balanceRefreshController.loadComplete();
-  }
-
   void _onLoading() async {
     print("_onLoading ");
     _loadData();
@@ -272,20 +287,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   bool isLoaded = false;
   int page = 1;
   int balanceHistoryPage = 1;
-
-  Future _loadBalanceData() async {
-    api.getHistoryBalance(balanceHistoryPage + 1).then((balanceHistory) {
-      print(balanceHistory);
-      if (balanceHistory['result'].isNotEmpty) {
-        balanceHistoryPage++;
-        List temp = balanceHistory['result'].toList();
-        setState(() {
-          historyBalanceList.addAll(temp);
-        });
-        print(balanceHistoryPage);
-      }
-    });
-  }
 
   Future _loadData() async {
     api.getHistories(page).then((histories) {
@@ -302,8 +303,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   }
 
   RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  RefreshController _balanceRefreshController =
       RefreshController(initialRefresh: false);
 
   SafeArea _paymentHistroyBody(snapshot) {
@@ -331,15 +330,17 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                       return Container(
                         padding: const EdgeInsets.only(top: 10),
                         child: _historyBuilder(
-                            context,
-                            "$logoUrl${snapshot[index]['logo']}",
-                            "${snapshot[index]['account']}",
-                            "${snapshot[index]['amount']}",
-                            "${snapshot[index]['title']}",
-                            "${snapshot[index]['data']}",
-                            "${snapshot[index]['status']}",
-                            index,
-                            "${snapshot[index]['pdf']}"),
+                          context,
+                          "$logoUrl${snapshot[index]['logo']}",
+                          "${snapshot[index]['account']}",
+                          "${snapshot[index]['amount']}",
+                          "${snapshot[index]['title']}",
+                          "${snapshot[index]['data']}",
+                          "${snapshot[index]['status']}",
+                          index,
+                          "${snapshot[index]['pdf']}",
+                          snapshot[index]['serviceID'],
+                        ),
                       );
                     },
                   ),

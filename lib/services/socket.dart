@@ -425,6 +425,20 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  searchChatMembers(search, chatId) {
+    var data = json.encode({
+      "cmd": "chat:member:search",
+      "data": {
+        "user_id": "${user.id}",
+        "chat_id": '$chatId',
+        "userToken": "${user.unique}",
+        "search": '$search',
+      }
+    });
+    print('searching $search chat members in chat N$chatId $data');
+    channel.sink.add(data);
+  }
+
   replyMessage(message, chatID, type, mId) {
     outSound();
 
@@ -502,7 +516,6 @@ class ChatRoom {
               break;
             case "user:check":
               if (contactController != null) {
-                print('added to contacts');
                 contactController.add(new MyContactEvent(json));
               }
               if (cabinetInfoController != null) {
@@ -535,6 +548,10 @@ class ChatRoom {
               if (cabinetController != null && !cabinetController.isClosed) {
                 cabinetController.add(new MyCabinetEvent(json));
               }
+              break;
+            case "chat:member:search":
+              print('added to chatInfoController');
+              chatInfoController.add(new MyChatInfoEvent(json));
               break;
             case "chat:members:privileges":
               print('added to chatInfoController');

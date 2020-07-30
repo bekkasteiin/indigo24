@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/full_photo.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
@@ -36,7 +37,7 @@ class DeviderMessageWidget extends StatelessWidget {
         child: Center(
             child: Text(
           '$date',
-          style: TextStyle(fontSize: 16, color: Color(0xFF5E5E5E)),
+          style: TextStyle(fontSize: 16, color: darkGreyColor2),
         )),
       ),
     );
@@ -330,7 +331,7 @@ class _FileMessageState extends State<FileMessage> {
       openFileFromNotification:
           false, // click on notification to open downloaded file (for Android)
     );
-    // final tasks = await FlutterDownloader.loadTasks();
+    final tasks = await FlutterDownloader.loadTasks();
     setState(() {
       downloadTaskId = taskId;
     });
@@ -497,9 +498,9 @@ class _FileMessageState extends State<FileMessage> {
         openFileFromNotification: false);
   }
 
-  // void _cancelDownload(_TaskInfo task) async {
-  //   await FlutterDownloader.cancel(taskId: task.taskId);
-  // }
+  void _cancelDownload(_TaskInfo task) async {
+    await FlutterDownloader.cancel(taskId: task.taskId);
+  }
 
   void _pauseDownload(_TaskInfo task) async {
     await FlutterDownloader.pause(taskId: task.taskId);

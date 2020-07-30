@@ -40,6 +40,8 @@ import 'services/my_connectivity.dart';
 import 'services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'style/colors.dart';
+
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 String formatPhone(String phone) {
@@ -289,7 +291,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   var contactsDB = ContactsDB();
 
   share() async {
-    await contactsDB.getAll().then((value) => myContacts = value);
+    await contactsDB.getAll().then((value) {
+      myContacts = value;
+    });
 
     // For sharing images coming from outside the app while the app is in the memory
     _intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream()
@@ -458,11 +462,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             cancelButton: (cancelButton),
             deleteButton: Text(
               'Delete',
-              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+              style: const TextStyle(fontSize: 16, color: blackPurpleColor),
               semanticsLabel: 'Delete',
             ),
             shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: Color(0xFFF7F7F7),
+            backgroundColor: milkWhiteColor,
             cancelCallback: _onPasscodeCancelled,
             digits: digits,
           ),
@@ -526,14 +530,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               withPin: false,
               opaque: false,
               cancelButton: Text('${localization.cancel}',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+                  style: TextStyle(fontSize: 16, color: blackPurpleColor),
                   semanticsLabel: '${localization.cancel}'))
           : Text('');
       // _showLockScreen(
       //     context,
       //     '${localization.enterPin}',
       //     opaque: false,
-      //     cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),semanticsLabel: 'Cancel'));
+      //     cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color:blackPurpleColor),semanticsLabel: 'Cancel'));
     });
 
     getContacts(context).then((getContactsResult) {
@@ -772,8 +776,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   labelPadding: EdgeInsets.all(0),
                   indicatorWeight: 0.0000000000001,
                   controller: tabController,
-                  unselectedLabelColor: Color(0xff001D52),
-                  labelColor: Color(0xff0543B8),
+                  unselectedLabelColor: blackPurpleColor,
+                  labelColor: primaryColor,
                   tabs: [
                     new Tab(
                       icon: new Image(
@@ -871,8 +875,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                                     lineWidth: 13.0,
                                     animation: false,
                                     percent: uploadPercent,
-                                    progressColor: Color(0xFF0543B8),
-                                    backgroundColor: Color(0xFF000000),
+                                    progressColor: primaryColor,
+                                    backgroundColor: blackColor,
                                     center: Text(
                                       percent,
                                       style: TextStyle(
@@ -1133,7 +1137,7 @@ class Developing extends StatelessWidget {
         elevation: 0.5,
         title: Text(
           string,
-          style: TextStyle(color: Color(0xFF001D52)),
+          style: TextStyle(color: blackPurpleColor),
         ),
         brightness: Brightness.light,
       ),

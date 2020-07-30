@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:indigo24/style/colors.dart';
+
 const Duration _kDropdownMenuDuration = Duration(milliseconds: 300);
 const double _kMenuItemHeight = 48.0;
 const double _kDenseButtonHeight = 24.0;
@@ -156,9 +158,9 @@ class _DropdownMenuState<T> extends State<_DropdownMenu<T>> {
             child: route.items[itemIndex],
           ),
           onTap: () => Navigator.pop(
-                context,
-                new _DropdownRouteResult<T>(route.items[itemIndex].value),
-              ),
+            context,
+            new _DropdownRouteResult<T>(route.items[itemIndex].value),
+          ),
         ),
       ));
     }
@@ -391,18 +393,18 @@ class CustomDropdownButton<T> extends StatefulWidget {
   ///
   /// The [elevation] and [iconSize] arguments must not be null (they both have
   /// defaults, so do not need to be specified).
-  CustomDropdownButton({
-    Key key,
-    @required this.items,
-    this.value,
-    this.hint,
-    @required this.onChanged,
-    this.elevation = 8,
-    this.style,
-    this.iconSize = 24.0,
-    this.isDense = false,
-    this.isExpanded = false
-  })  : assert(items != null),
+  CustomDropdownButton(
+      {Key key,
+      @required this.items,
+      this.value,
+      this.hint,
+      @required this.onChanged,
+      this.elevation = 8,
+      this.style,
+      this.iconSize = 24.0,
+      this.isDense = false,
+      this.isExpanded = false})
+      : assert(items != null),
         assert(value == null ||
             items
                     .where((DropdownMenuItem<T> item) => item.value == value)
@@ -451,7 +453,7 @@ class CustomDropdownButton<T> extends StatefulWidget {
   final bool isDense;
 
   final bool isExpanded;
-  
+
   @override
   _DropdownButtonState<T> createState() => new _DropdownButtonState<T>();
 }
@@ -583,20 +585,19 @@ class _DropdownButtonState<T> extends State<CustomDropdownButton<T>>
           children: <Widget>[
             // If value is null (then _selectedIndex is null) then we display
             // the hint or nothing at all.
-            widget.isExpanded?
-            Expanded(
-              child: new IndexedStack(
-                index: _selectedIndex ?? hintIndex,
-                alignment: AlignmentDirectional.centerStart,
-                children: items,
-              ),
-            )
-            :
-            new IndexedStack(
-              index: _selectedIndex ?? hintIndex,
-              alignment: AlignmentDirectional.centerStart,
-              children: items,
-            ),
+            widget.isExpanded
+                ? Expanded(
+                    child: new IndexedStack(
+                      index: _selectedIndex ?? hintIndex,
+                      alignment: AlignmentDirectional.centerStart,
+                      children: items,
+                    ),
+                  )
+                : new IndexedStack(
+                    index: _selectedIndex ?? hintIndex,
+                    alignment: AlignmentDirectional.centerStart,
+                    children: items,
+                  ),
             new Icon(Icons.arrow_drop_down,
                 size: widget.iconSize,
                 // These colors are not defined in the Material Design spec.
@@ -620,9 +621,10 @@ class _DropdownButtonState<T> extends State<CustomDropdownButton<T>>
             child: new Container(
               height: 1.0,
               decoration: const BoxDecoration(
-                  border: Border(
-                      bottom:
-                          BorderSide(color: Color(0xFFBDBDBD), width: 0.0))),
+                border: Border(
+                  bottom: BorderSide(color: milkWhiteColor, width: 0.0),
+                ),
+              ),
             ),
           ),
         ],
@@ -632,7 +634,10 @@ class _DropdownButtonState<T> extends State<CustomDropdownButton<T>>
     return new Semantics(
       button: true,
       child: new GestureDetector(
-          onTap: _handleTap, behavior: HitTestBehavior.opaque, child: result),
+        onTap: _handleTap,
+        behavior: HitTestBehavior.opaque,
+        child: result,
+      ),
     );
   }
 }

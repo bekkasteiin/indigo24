@@ -11,6 +11,7 @@ import 'package:indigo24/pages/chat/ui/received.dart';
 import 'package:indigo24/pages/chat/ui/sended.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/test_timer.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/keyboard_dismisser.dart';
@@ -642,7 +643,7 @@ class _ChatPageState extends State<ChatPage> {
                                       fit: BoxFit.fitWidth,
                                       child: Text('${localization.camera}',
                                           style: TextStyle(
-                                              color: Color(0xFF001D52),
+                                              color: blackPurpleColor,
                                               fontWeight: FontWeight.w500)),
                                     ),
                                   ],
@@ -678,7 +679,7 @@ class _ChatPageState extends State<ChatPage> {
                                       fit: BoxFit.fitWidth,
                                       child: Text('${localization.money}',
                                           style: TextStyle(
-                                              color: Color(0xFF001D52),
+                                              color: blackPurpleColor,
                                               fontWeight: FontWeight.w500)),
                                     ),
                                   ],
@@ -729,7 +730,7 @@ class _ChatPageState extends State<ChatPage> {
                                       fit: BoxFit.fitWidth,
                                       child: Text('${localization.gallery}',
                                           style: TextStyle(
-                                              color: Color(0xFF001D52),
+                                              color: blackPurpleColor,
                                               fontWeight: FontWeight.w500)),
                                     ),
                                   ],
@@ -767,7 +768,7 @@ class _ChatPageState extends State<ChatPage> {
                                       fit: BoxFit.fitWidth,
                                       child: Text('${localization.files}',
                                           style: TextStyle(
-                                              color: Color(0xFF001D52),
+                                              color: blackPurpleColor,
                                               fontWeight: FontWeight.w500)),
                                     ),
                                   ],
@@ -925,7 +926,7 @@ class _ChatPageState extends State<ChatPage> {
                       ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}"
                       : "",
                   style: TextStyle(
-                      color: Color(0xFF001D52), fontWeight: FontWeight.w400),
+                      color: blackPurpleColor, fontWeight: FontWeight.w400),
                   overflow: TextOverflow.ellipsis,
                 ),
                 isSomeoneTyping
@@ -935,7 +936,7 @@ class _ChatPageState extends State<ChatPage> {
                           (widget.memberCount > 2)
                               ? Text("${typingName.join(' ')} ",
                                   style: TextStyle(
-                                      color: Color(0xFF001D52),
+                                      color: blackPurpleColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400))
                               : Container(),
@@ -949,7 +950,7 @@ class _ChatPageState extends State<ChatPage> {
                         ? Text(
                             '${localization.members} ${widget.memberCount}',
                             style: TextStyle(
-                                color: Color(0xFF001D52),
+                                color: blackPurpleColor,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400),
                           )
@@ -961,7 +962,7 @@ class _ChatPageState extends State<ChatPage> {
                                     ? '$online'
                                     : '${localization.lastSeen} $online',
                                 style: TextStyle(
-                                    color: Color(0xFF001D52),
+                                    color: blackPurpleColor,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400),
                               ),
@@ -1116,8 +1117,7 @@ class _ChatPageState extends State<ChatPage> {
                                                     Container(
                                                         width: 2.5,
                                                         height: 45,
-                                                        color:
-                                                            Color(0xff0543B8)),
+                                                        color: primaryColor),
                                                     Container(width: 5),
                                                     Expanded(
                                                       child: Column(
@@ -1133,8 +1133,8 @@ class _ChatPageState extends State<ChatPage> {
                                                                   child: Text(
                                                                       "${localization.edit}",
                                                                       style: TextStyle(
-                                                                          color: Color(
-                                                                              0xff0543B8)),
+                                                                          color:
+                                                                              primaryColor),
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis,
@@ -1198,8 +1198,7 @@ class _ChatPageState extends State<ChatPage> {
                                                     Container(
                                                         width: 2.5,
                                                         height: 45,
-                                                        color:
-                                                            Color(0xff0543B8)),
+                                                        color: primaryColor),
                                                     Container(width: 5),
                                                     replyMessage[
                                                                 "attachment_url"] !=
@@ -1229,8 +1228,8 @@ class _ChatPageState extends State<ChatPage> {
                                                                   child: Text(
                                                                       "${replyMessage["user_name"]}",
                                                                       style: TextStyle(
-                                                                          color: Color(
-                                                                              0xff0543B8)),
+                                                                          color:
+                                                                              primaryColor),
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis,

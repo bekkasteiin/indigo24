@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'payments_service.dart';
 import 'package:indigo24/services/constants.dart';
 
@@ -22,7 +23,8 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: api.getServices(widget.categoryID).then((services) {
-          if (services['message'] == 'Not authenticated' && services['success'].toString() == 'false') {
+          if (services['message'] == 'Not authenticated' &&
+              services['success'].toString() == 'false') {
             logOut(context);
             return services;
           } else {
@@ -34,11 +36,13 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
             appBar: buildAppBar(),
             body: snapshot.hasData == true
                 ? SafeArea(
-                  child: Scrollbar(
-                    child: ListView.builder(
+                    child: Scrollbar(
+                      child: ListView.builder(
                         padding: EdgeInsets.only(bottom: 20),
                         shrinkWrap: true,
-                        itemCount: snapshot.data["services"] != null ? snapshot.data["services"].length : 0,
+                        itemCount: snapshot.data["services"] != null
+                            ? snapshot.data["services"].length
+                            : 0,
                         itemBuilder: (BuildContext context, int index) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 10),
@@ -51,8 +55,8 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                           );
                         },
                       ),
-                  ),
-                )
+                    ),
+                  )
                 : Center(child: CircularProgressIndicator()),
           );
         });
@@ -78,7 +82,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
       title: Text(
         "${localization.payments}",
         style: TextStyle(
-          color: Color(0xFF001D52),
+          color: blackPurpleColor,
           fontSize: 22,
           fontWeight: FontWeight.w400,
         ),
@@ -104,12 +108,12 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
         child: RaisedButton(
           onPressed: () {
             Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  PaymentsServicePage(index, _serviceLogo, _serviceTitle),
-            ),
-          );
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    PaymentsServicePage(index, _serviceLogo, _serviceTitle),
+              ),
+            );
           },
           child: Container(
             child: Row(
@@ -128,15 +132,15 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                 Expanded(
                   child: Text(
                     '$_serviceTitle',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF001D52)),
+                    style: TextStyle(fontSize: 14, color: blackPurpleColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
           ),
-          color: Color(0xFFFFFFFF),
-          textColor: Color(0xFF001D52),
+          color: whiteColor,
+          textColor: blackPurpleColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               10.0,

@@ -6,6 +6,7 @@ import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_contacts.dart';
 import 'package:indigo24/pages/chat/chat_list.dart';
 import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -183,7 +184,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
             ),
             borderRadius: BorderRadius.circular(80.0),
             border: Border.all(
-              color: Color(0xFF001D52),
+              color: blackPurpleColor,
               width: 5.0,
             ),
           ),

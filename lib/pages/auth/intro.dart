@@ -1,17 +1,12 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/pages/auth/registration/registration.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/custom_dropdown.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 class IntroPage extends StatefulWidget {
   @override
@@ -23,59 +18,6 @@ class _IntroPageState extends State<IntroPage> {
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Timer.run(() {
-      getFromShared().then((result) {
-        print('result is $result');
-        !result
-            ? showDialog<void>(
-                barrierDismissible: false,
-                context: context,
-                builder: (BuildContext context) {
-                  return CupertinoAlertDialog(
-                    title: Text('${localization.acceptTerms}'),
-                    actions: <Widget>[
-                      CupertinoDialogAction(
-                        child: Text('OK'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          setAgree();
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      PDFViewer('assets/terms.pdf')));
-                        },
-                      ),
-                      CupertinoDialogAction(
-                        isDestructiveAction: true,
-                        child: Text('${localization.exit}'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          exit(0);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              )
-            : print("1");
-      });
-    });
-  }
-
-  getFromShared() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    return preferences.getBool('isAgree');
-  }
-
-  setAgree() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setBool('isAgree', true);
   }
 
   @override
@@ -120,22 +62,21 @@ class _IntroPageState extends State<IntroPage> {
                           child: CustomDropdownButton(
                             isExpanded: false,
                             hint: Text("${localization.currentLanguage}",
-                                style: TextStyle(color: Color(0xFF001D52))),
+                                style: TextStyle(color: blackPurpleColor)),
                             // value: _valFriends,
                             items: localization.languages.map((value) {
                               return DropdownMenuItem(
                                 child: Text('${value['title']}',
-                                    style: TextStyle(color: Color(0xFF001D52))),
+                                    style: TextStyle(color: blackPurpleColor)),
                                 value: value,
                               );
                             }).toList(),
                             onChanged: (value) {
-                              print('${value['title']}');
+                              localization.setLanguage(value['code']);
                               setState(() {
                                 localization.currentLanguage =
                                     '${value['title']}';
                               });
-                              localization.setLanguage(value['code']);
                             },
                           ),
                         ),
@@ -144,7 +85,7 @@ class _IntroPageState extends State<IntroPage> {
                     FlatButton(
                       child: Text(
                         "${localization.terms}",
-                        style: TextStyle(color: Color(0xffD1E0E5)),
+                        style: TextStyle(color: brightGreyColor),
                       ),
                       onPressed: () {
                         Navigator.push(
@@ -184,8 +125,8 @@ class _IntroPageState extends State<IntroPage> {
           '${localization.login}',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
         ),
-        color: Color(0xFFFFFFFF),
-        textColor: Color(0xFF001D52),
+        color: whiteColor,
+        textColor: blackPurpleColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
             10.0,
@@ -211,8 +152,8 @@ class _IntroPageState extends State<IntroPage> {
           '${localization.registration}',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
         ),
-        color: Color(0xFFffffff).withOpacity(0.35),
-        textColor: Color(0xFFffffff),
+        color: whiteColor.withOpacity(0.35),
+        textColor: whiteColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
             10.0,

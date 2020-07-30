@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/services/configs.dart' as configs;
+import 'package:indigo24/style/colors.dart';
 
 class WithdrawPage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class WithdrawPage extends StatefulWidget {
 }
 
 class _WithdrawPageState extends State<WithdrawPage> {
+  bool preLoaderForRefill = false;
   var commission = '0';
   final amountController = TextEditingController();
 
@@ -77,7 +79,6 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   @override
   void initState() {
-    print('${configs.withdrawCommission}');
     super.initState();
   }
 
@@ -91,7 +92,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFF7F7F7),
+        backgroundColor: milkWhiteColor,
         appBar: AppBar(
           centerTitle: true,
           leading: IconButton(
@@ -127,23 +128,24 @@ class _WithdrawPageState extends State<WithdrawPage> {
               ),
               Center(
                   child: Text(
-                      '${localization.commission} ${configs.withdrawCommission}%')),
+                      '${localization.commission} ${withdrawCommission}%')),
+              Center(
+                  child: Text('${localization.minAmount} ${withdrawMin} KZT')),
               Center(
                   child: Text(
-                      '${localization.minAmount} ${configs.withdrawMin} KZT')),
+                      '${localization.minCommission} ${withdrawMinCommission} KZT')),
               Center(
-                  child: Text(
-                      '${localization.minCommission} ${configs.withdrawMinCommission} KZT')),
-              Center(
-                  child: Text(
-                      '${localization.maxAmount} ${configs.withdrawMax} KZT')),
+                  child: Text('${localization.maxAmount} ${withdrawMax} KZT')),
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 margin: const EdgeInsets.symmetric(vertical: 20),
                 child: TextFormField(
                   textAlign: TextAlign.center,
-                  inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                  inputFormatters: [
+                    WhitelistingTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(withdrawMax.length)
+                  ],
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration.collapsed(
                     hintText: '${localization.amount}',
@@ -151,29 +153,34 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   style: TextStyle(fontSize: 20),
                   controller: amountController,
                   onChanged: (String text) async {
-                    if (amountController.text[0] == '0') {
-                      amountController.clear();
-                    }
                     if (amountController.text.isNotEmpty) {
-                      // if(amountController.text[0] == '0'){
-                      //   amountController.text = '';
-                      // }
-                      if (int.parse(amountController.text) <
-                          int.parse(configs.refillMax))
+                      if (int.parse(amountController.text) > 0) {
+                        print('if > 0 $text');
+                        if (int.parse(amountController.text) < 1000) {
+                          print('if < 1000 $text');
+                          setState(() {
+                            commission = '0';
+                          });
+                        } else {
+                          print('else $text');
+                          if (double.parse(text) <= double.parse(withdrawMax)) {
+                            setState(() {
+                              commission = (int.parse(text) *
+                                      double.parse(withdrawCommission) /
+                                      100)
+                                  .toStringAsFixed(2);
+                            });
+                          }
+                        }
+                      }
+                      if (double.parse(commission) <=
+                          double.parse(withdrawMinCommission)) {
+                        print('if < 350 $text');
+
                         setState(() {
-                          print(configs.withdrawCommission);
-                          print(configs.withdrawCommission);
-                          print(configs.withdrawCommission);
-                          print(configs.withdrawCommission);
-                          print(configs.withdrawCommission);
-                          commission = (int.parse(text) *
-                                  double.parse(
-                                      '${configs.withdrawCommission}') /
-                                  100)
-                              .toStringAsFixed(2);
-                          if (double.parse(commission) < 350.00)
-                            commission = '350';
+                          commission = '$withdrawMinCommission';
                         });
+                      }
                     } else {
                       setState(() {
                         commission = '0';
@@ -204,10 +211,16 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   child: FlatButton(
                     onPressed: () async {
                       if (amountController.text.isNotEmpty) {
+                        setState(() {
+                          preLoaderForRefill = true;
+                        });
                         api
                             .withdraw(amountController.text)
                             .then((withdrawResult) {
                           print('Withdraw result $withdrawResult');
+                          setState(() {
+                            preLoaderForRefill = false;
+                          });
                           if (withdrawResult['success'].toString() == 'true') {
                             Navigator.push(
                                 context,
@@ -243,8 +256,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                     child: Text(
                       '${localization.withdraw}',
                       style: TextStyle(
-                          color: Color(0xFF0543B8),
-                          fontWeight: FontWeight.w800),
+                          color: primaryColor, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
