@@ -358,7 +358,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                           Text(
                             myList[i]['last_message']["time"] == null
                                 ? "null"
-                                : time("${myList[i]['last_message']["time"]}"),
+                                : time(myList[i]['last_message']["time"]),
                             style: TextStyle(color: blackPurpleColor),
                           ),
                           myList[i]['unread_messages'] == 0
@@ -389,20 +389,26 @@ class _ChatsListPageState extends State<ChatsListPage>
   }
 
   String time(timestamp) {
-    var date = DateTime.fromMillisecondsSinceEpoch(
-      int.parse("$timestamp") * 1000,
-    );
-    TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
-    var hours;
-    var minutes;
-    // messageMinutes = '${roomBooked.minute}';
-    hours = '${roomBooked.hour}';
-    minutes = '${roomBooked.minute}';
+    if (timestamp != null) {
+      if (timestamp != '') {
+        var date = DateTime.fromMillisecondsSinceEpoch(
+          int.parse("$timestamp") * 1000,
+        );
+        TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
+        var hours;
+        var minutes;
+        // messageMinutes = '${roomBooked.minute}';
+        hours = '${roomBooked.hour}';
+        minutes = '${roomBooked.minute}';
 
-    if (roomBooked.hour.toString().length == 1) hours = '0${roomBooked.hour}';
-    if (roomBooked.minute.toString().length == 1)
-      minutes = '0${roomBooked.minute}';
-    return '$hours:$minutes';
+        if (roomBooked.hour.toString().length == 1)
+          hours = '0${roomBooked.hour}';
+        if (roomBooked.minute.toString().length == 1)
+          minutes = '0${roomBooked.minute}';
+        return '$hours:$minutes';
+      }
+    }
+    return '??:??';
   }
 
   @override

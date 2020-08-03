@@ -191,15 +191,16 @@ class _RefillPageState extends State<RefillPage> {
                     height: 50,
                     width: 200,
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10.0,
-                              spreadRadius: -2,
-                              offset: Offset(0.0, 0.0))
-                        ]),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 10.0,
+                            spreadRadius: -2,
+                            offset: Offset(0.0, 0.0))
+                      ],
+                    ),
                     alignment: Alignment.center,
                     margin: EdgeInsets.only(top: 20, bottom: 10),
                     child: ButtonTheme(
@@ -208,6 +209,11 @@ class _RefillPageState extends State<RefillPage> {
                       child: FlatButton(
                         onPressed: () async {
                           if (amountController.text.isNotEmpty) {
+                            FocusScopeNode currentFocus =
+                                FocusScope.of(context);
+                            if (!currentFocus.hasPrimaryFocus) {
+                              currentFocus.unfocus();
+                            }
                             setState(() {
                               preLoaderForRefill = true;
                             });

@@ -105,9 +105,34 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             ),
           ],
         ),
-        FlatButton(
-          child: Text('Повторить'), // TODO ADD LOCALIZATION
-          onPressed: () {
+        SizedBox(width: 5),
+        InkWell(
+          child: Container(
+            width: 40,
+            padding: EdgeInsets.all(5),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  child: Image.asset(
+                    type == 'in'
+                        ? 'assets/images/repeat.png'
+                        : 'assets/images/replyTransfer.png',
+                    width: 20,
+                    height: 20,
+                  ),
+                ),
+                FittedBox(
+                  child: Text(
+                    '${type == 'in' ? localization.repeat : localization.reply}',
+                    style: TextStyle(
+                      color: Color(0xFF0543B8),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -118,7 +143,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               ),
             );
           },
-        )
+        ),
       ],
     );
   }

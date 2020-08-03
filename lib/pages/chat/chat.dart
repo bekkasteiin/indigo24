@@ -833,7 +833,6 @@ class _ChatPageState extends State<ChatPage> {
                           onTap: () {
                             print(json.decode(json.encode(temp[i])));
                             print(temp[i]['phone']);
-
                             // myContacts
                             Navigator.pop(context);
                             Navigator.push(

@@ -709,6 +709,7 @@ class CustomDialog extends StatelessWidget {
                           preferences.setString('phone', 'null');
                           ChatRoom.shared.channel = null;
                           await api.logOutHttp().then((result) {
+                            print(result);
                             if (result['message'] == 'Not authenticated' &&
                                 result['success'].toString() == 'false') {
                               logOut(context);

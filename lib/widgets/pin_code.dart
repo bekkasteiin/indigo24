@@ -98,11 +98,17 @@ class _PasscodeScreenState extends State<PasscodeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: widget.backgroundColor ?? Colors.black.withOpacity(0.8),
-      body: SafeArea(
-        child: Stack(
-          children: [_buildBackgdound(), _buildPortraitPasscodeScreen()],
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor:
+            widget.backgroundColor ?? Colors.black.withOpacity(0.8),
+        body: SafeArea(
+          child: Stack(
+            children: [_buildBackgdound(), _buildPortraitPasscodeScreen()],
+          ),
         ),
       ),
     );

@@ -134,6 +134,11 @@ String report = "To complain";
 String terms = "Terms of use";
 String hide = 'Hide';
 String block = 'Block';
+String repeat = 'Repeat';
+String calculate = 'Calculate';
+String service = 'Service';
+String toPay = 'To pay';
+String conversion = 'Conversion';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -277,6 +282,11 @@ setLanguage(code) {
       terms = "Terms of use";
       hide = 'Hide';
       block = 'Block';
+      repeat = 'Repeat';
+      calculate = 'Calculate';
+      service = 'Service';
+      toPay = 'To pay';
+      conversion = 'Conversion';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -409,6 +419,11 @@ setLanguage(code) {
       terms = "Пользовательское соглашение";
       hide = 'Скрыть';
       block = 'Заблокировать';
+      repeat = 'Повторить';
+      calculate = 'Посчитать';
+      service = 'Сервис';
+      toPay = 'К оплате';
+      conversion = 'Конвертация';
       print('ru');
       break;
     case 'kz':
@@ -542,6 +557,11 @@ setLanguage(code) {
       terms = "Қолдану ережелері";
       hide = 'Жасыру';
       block = 'Бұғаттау';
+      repeat = 'Қайталау';
+      calculate = 'Санау';
+      service = 'Қызмет';
+      toPay = 'Төлемге';
+      conversion = 'Айырбастау';
       print('kz');
       break;
     case 'uz':
@@ -674,6 +694,11 @@ setLanguage(code) {
       noChats = 'Чатлар йўқ';
       hide = 'Яшириш';
       block = 'Блоклаш';
+      repeat = 'Такрорлаш';
+      calculate = 'Деб биламан';
+      service = 'Хизмат';
+      toPay = 'Тўлов учун';
+      conversion = 'Конверсия';
       print('uz');
       break;
     case 'uzb':
@@ -807,6 +832,11 @@ setLanguage(code) {
       terms = "Foydalanish shartlari";
       hide = 'Yashirish';
       block = 'Bloklash';
+      repeat = 'Takrorlang';
+      calculate = 'Hisoblash';
+      service = 'Xizmat';
+      toPay = 'To\'lov uchun';
+      conversion = 'Konvertatsiya qilish';
       print('uzb');
       break;
     default:

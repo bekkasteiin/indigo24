@@ -157,7 +157,7 @@ class Api {
 
   logOutHttp() async {
     try {
-      response = await dio.post("/logout", data: {
+      response = await dio.post("/logout/fix", data: {
         "customerID": "${user.id}",
         "_token": "0#!_kA8B@ncV2",
       });
@@ -485,32 +485,35 @@ class Api {
   calculateSum(serviceID, account, amount) async {
     try {
       Response response = await Dio().get(
-        "https://api.indigo24.xyz/hermes/sum/calculate",
+        "https://api.indigo24.com/hermes/sum/calculate", // TODO FIX BASE URL
         queryParameters: {
           "customerID": "${user.id}",
           "unique": "${user.unique}",
-          "serviceID": "$serviceID",
+          // "serviceID": "$serviceID", // TODO TURN ON THIS AFTER TESTS
+          "serviceID": "100014",
           "amount": "$amount",
-          "currency": "KZT",
+          "currency":
+              "KZT", // TODO REMOVE FIELD 'CURRENCY' AFTER BACK END DEPLOY
           "account": "$account",
         },
       );
-      print(response);
+      print('resp ${response.data}');
       return response.data;
     } catch (e) {
       print('${e.response} this is e $e');
-      return e;
+      return e.response.data;
     }
   }
 
   paymentProceed(serviceID, account, amount) async {
     try {
       Response response = await Dio().post(
-        "https://api.indigo24.xyz/hermes/payment/proceed",
+        "https://api.indigo24.com/hermes/payment/proceed",
         queryParameters: {
           "customerID": "${user.id}",
           "unique": "${user.unique}",
-          "serviceID": "$serviceID",
+          // "serviceID": "$serviceID", // TODO TURN ON THIS AFTER TESTS
+          "serviceID": "100014",
           "amount": "$amount",
           "currency": "KZT",
           "account": "$account",

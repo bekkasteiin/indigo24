@@ -211,6 +211,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   child: FlatButton(
                     onPressed: () async {
                       if (amountController.text.isNotEmpty) {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+                        if (!currentFocus.hasPrimaryFocus) {
+                          currentFocus.unfocus();
+                        }
                         setState(() {
                           preLoaderForRefill = true;
                         });

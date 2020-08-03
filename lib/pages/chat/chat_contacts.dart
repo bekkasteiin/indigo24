@@ -203,31 +203,36 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
   var actualList = List<dynamic>();
 
-  void search(String query) {
+  search(String query) {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
-
       myContacts.forEach((item) {
-        if (item.name.toLowerCase().contains(query.toLowerCase()) ||
-            item.phone.toLowerCase().contains(query.toLowerCase())) {
-          matches.add(item);
+        print('${item.name} ${item.phone}');
+        if (item.name != null && item.phone != null) {
+          if (item.name.toString().toLowerCase().contains(query.toLowerCase()) ||
+              item.phone.toString().toLowerCase().contains(query.toLowerCase())) {
+            print('a');
+            matches.add(item);
+          }
         }
       });
-
       setState(() {
         actualList = [];
         actualList.addAll(matches);
       });
-  
+      setState(() {
+        a = query;
+      });
       return;
     } else {
       setState(() {
-        actualList.clear();
+        actualList = [];
         actualList.addAll(myContacts);
       });
     }
   }
 
+  String a = 'asd';
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -347,6 +352,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                               if ('${user.phone}' ==
                                   '+${actualList[index].phone}')
                                 return Center();
+                              if (actualList[index].phone == null &&
+                                  actualList[index].name == null)
+                                return Container();
                               return Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Container(
@@ -369,7 +377,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                     height: 35,
                                                     child: Center(
                                                       child: Text(
-                                                        '${actualList[index].name[0]}',
+                                                        '${actualList[index].name.toString()[0]}',
                                                         overflow: TextOverflow
                                                             .ellipsis,
                                                         style: TextStyle(
@@ -397,7 +405,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                                       actualList[index -
                                                                               1]
                                                                           .name
-                                                                  ? '${actualList[index].name} ${actualList[index].label}'
+                                                                  ? '${actualList[index].name}'
                                                                   : '${actualList[index].name}'
                                                               : '${actualList[index].name}',
                                                           overflow: TextOverflow

@@ -135,6 +135,8 @@ flutter:
     - assets/images/balanceHistory.png
     - assets/images/payIn.png
     - assets/images/payOut.png
+    - assets/images/repeat.png
+    - assets/images/replyTransfer.png
 
   fonts:
      - family: Spectral

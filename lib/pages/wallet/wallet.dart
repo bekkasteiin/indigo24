@@ -85,8 +85,7 @@ class _WalletTabState extends State<WalletTab> {
     if (user.pin == 'waiting' && temp == enteredPasscode) {
       print('creating');
       api.createPin(enteredPasscode);
-      Navigator.maybePop(context);
-      Navigator.maybePop(context);
+      Navigator.pop(context);
     }
     if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
       return showDialog<void>(
@@ -121,6 +120,7 @@ class _WalletTabState extends State<WalletTab> {
         setState(() {
           this.isAuthenticated = isValid;
         });
+        Navigator.pop(context);
       });
     } else {
       _verificationNotifier.add(isValid);
