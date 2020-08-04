@@ -11,6 +11,8 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'payments_service.dart';
+
 class PaymentHistoryPage extends StatefulWidget {
   @override
   _PaymentHistoryPageState createState() => _PaymentHistoryPageState();
@@ -32,7 +34,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
           if (histories['payments'].toList().isEmpty) {
             emptyResponse = true;
           }
-          if (page == 1) test = histories['payments'].toList();
+          if (page == 1) resultList = histories['payments'].toList();
         });
         page++;
       }
@@ -54,7 +56,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       Response response = await dio.get(
         url,
         onReceiveProgress: showDownloadProgress,
-        //Received data with List<int>
         options: Options(
             responseType: ResponseType.bytes,
             followRedirects: false,
@@ -65,7 +66,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       print(response.headers);
       File file = File(savePath);
       var raf = file.openSync(mode: FileMode.write);
-      // response.data is List<int> type
       raf.writeFromSync(response.data);
 
       Navigator.push(
@@ -89,7 +89,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       String date,
       String status,
       int index,
-      String url) {
+      String url,
+      int serviceID) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -100,6 +101,48 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
               _paymentLogo(logo),
               _paymentInfo(title, account, date),
               _paymentAmount(amount, status),
+              SizedBox(width: 5),
+              Container(
+                width: 40,
+                child: InkWell(
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Image.asset(
+                            'assets/images/repeat.png',
+                            width: 20,
+                            height: 20,
+                          ),
+                        ),
+                        FittedBox(
+                          child: Text(
+                            '${localization.repeat}',
+                            style: TextStyle(
+                              color: Color(0xFF0543B8),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PaymentsServicePage(
+                          serviceID,
+                          logo,
+                          title,
+                          account: account,
+                          amount: amount,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
               SizedBox(width: 20),
             ],
           ),
@@ -142,7 +185,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         children: <Widget>[
           Text(
             type != null
-                ? '$type' == 'out' ? "-$amount KZT" : "+$amount KZT"
+                ? type == 'out' ? "-$amount KZT" : "+$amount KZT"
                 : "$amount KZT",
             style: TextStyle(
               fontSize: 18,
@@ -154,17 +197,18 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
           ClipRRect(
             borderRadius: BorderRadius.circular(25),
             child: Container(
-                height: 15,
-                width: 15,
-                color: status == '4'
-                    ? Colors.green
-                    : status == '3'
-                        ? Colors.orange
-                        : status == '2'
-                            ? Colors.red
-                            : (status == '1') || (status == '0')
-                                ? Colors.yellow
-                                : Colors.grey),
+              height: 15,
+              width: 15,
+              color: status == '4'
+                  ? Colors.green
+                  : status == '3'
+                      ? Colors.orange
+                      : status == '2'
+                          ? Colors.red
+                          : (status == '1' || status == '0')
+                              ? Colors.yellow
+                              : Colors.grey,
+            ),
           ),
         ],
       ),
@@ -184,7 +228,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            "$title",
+            title,
             style: TextStyle(
               fontSize: 14,
               color: brightGreyColor2,
@@ -193,7 +237,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            "$account",
+            account,
             style: TextStyle(
               fontSize: 14,
               color: blackPurpleColor,
@@ -202,7 +246,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            "$date",
+            date,
             style: TextStyle(
               fontSize: 10,
               color: blackPurpleColor,
@@ -233,7 +277,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       ),
       brightness: Brightness.light,
       title: Text(
-        "${localization.payments}",
+        localization.payments,
         style: TextStyle(
           color: blackPurpleColor,
           fontSize: 22,
@@ -245,12 +289,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     );
   }
 
-  List test = [];
-  List historyBalanceList = [];
+  List resultList = [];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: buildAppBar(), body: _paymentHistroyBody(test));
+    return Scaffold(
+        appBar: buildAppBar(), body: _paymentHistroyBody(resultList));
   }
 
   void onRefresh() {
@@ -266,7 +310,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   bool isLoaded = false;
   int page = 1;
-  int balanceHistoryPage = 1;
 
   Future _loadData() async {
     api.getHistories(page).then((histories) {
@@ -274,7 +317,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       if (histories['payments'].isNotEmpty) {
         List temp = histories['payments'].toList();
         setState(() {
-          test.addAll(temp);
+          resultList.addAll(temp);
         });
         page++;
         print(page);
@@ -287,7 +330,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   SafeArea _paymentHistroyBody(snapshot) {
     return !emptyResponse
-        ? test.isNotEmpty
+        ? resultList.isNotEmpty
             ? SafeArea(
                 child: SmartRefresher(
                   enablePullDown: false,
@@ -310,15 +353,17 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                       return Container(
                         padding: const EdgeInsets.only(top: 10),
                         child: _historyBuilder(
-                            context,
-                            "$logoUrl${snapshot[index]['logo']}",
-                            "${snapshot[index]['account']}",
-                            "${snapshot[index]['amount']}",
-                            "${snapshot[index]['title']}",
-                            "${snapshot[index]['data']}",
-                            "${snapshot[index]['status']}",
-                            index,
-                            "${snapshot[index]['pdf']}"),
+                          context,
+                          "$logoUrl${snapshot[index]['logo']}",
+                          "${snapshot[index]['account']}",
+                          "${snapshot[index]['amount']}",
+                          "${snapshot[index]['title']}",
+                          "${snapshot[index]['data']}",
+                          "${snapshot[index]['status']}",
+                          index,
+                          "${snapshot[index]['pdf']}",
+                          snapshot[index]['serviceID'],
+                        ),
                       );
                     },
                   ),

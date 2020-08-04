@@ -16,7 +16,7 @@ class ContactsDB {
   }
 
   Future updateOrInsert(MyContact contact) async {
-    await _contactsFolder.record(contact.id).put(await _db, contact.toJson());
+    await _contactsFolder.record(int.parse('${contact.id}')).put(await _db, contact.toJson());
   }
 
   Future insertList(List<MyContact> contacts) async {

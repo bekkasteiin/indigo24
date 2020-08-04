@@ -12,10 +12,20 @@ class RefillPage extends StatefulWidget {
   _RefillPageState createState() => _RefillPageState();
 }
 
-bool preLoaderForRefill = false;
-
 class _RefillPageState extends State<RefillPage> {
   final flutterWebViewPlugin = FlutterWebviewPlugin();
+  bool preLoaderForRefill = false;
+  TextEditingController amountController;
+  String commission = '0';
+  Api api;
+
+  @override
+  void initState() {
+    api = Api();
+    amountController = TextEditingController();
+    super.initState();
+  }
+
   @override
   void dispose() {
     api.getBalance();
@@ -23,9 +33,6 @@ class _RefillPageState extends State<RefillPage> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  var commission = '0';
-  final amountController = TextEditingController();
-  Api api = Api();
   WillPopScope buildWebviewScaffold(url) {
     return WillPopScope(
       onWillPop: () async {
@@ -61,11 +68,14 @@ class _RefillPageState extends State<RefillPage> {
         ),
         body: SafeArea(
           child: WebviewScaffold(
-              url: '$url',
-              withZoom: true,
-              withLocalStorage: true,
-              hidden: false,
-              initialChild: Center(child: CircularProgressIndicator())),
+            url: '$url',
+            withZoom: true,
+            withLocalStorage: true,
+            hidden: false,
+            initialChild: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
         ),
       ),
     );
@@ -114,7 +124,7 @@ class _RefillPageState extends State<RefillPage> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    padding: EdgeInsets.symmetric(vertical: 10),
                   ),
                   Center(
                     child:
@@ -125,15 +135,16 @@ class _RefillPageState extends State<RefillPage> {
                   ),
                   Center(
                     child: Text(
-                        '${localization.minCommission} $refillMinCommission KZT'),
+                      '${localization.minCommission} $refillMinCommission KZT',
+                    ),
                   ),
                   Center(
                     child: Text('${localization.maxAmount} $refillMax KZT'),
                   ),
                   Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    margin: EdgeInsets.symmetric(vertical: 20),
                     child: TextFormField(
                       textAlign: TextAlign.center,
                       inputFormatters: [
@@ -149,52 +160,54 @@ class _RefillPageState extends State<RefillPage> {
                       onChanged: (String text) async {
                         if (amountController.text.isNotEmpty) {
                           if (int.parse(amountController.text) > 0) {
-                            print('if > 0 $text');
                             if (int.parse(amountController.text) < 1000) {
-                              print('if < 1000 $text');
                               setState(() {
                                 commission = '0';
                               });
                             } else {
-                              print('else $text');
                               if (double.parse(text) <=
-                                  double.parse(withdrawMax)) {
+                                  double.parse(refillMax)) {
                                 setState(() {
                                   commission = (int.parse(text) *
-                                          double.parse(withdrawCommission) /
+                                          double.parse(refillCommission) /
                                           100)
                                       .toStringAsFixed(2);
                                 });
                               }
                             }
                           }
-                          if (double.parse(commission) <= 350) {
-                            print('if < 350 $text');
-
+                          if (double.parse(commission) <=
+                              double.parse(refillMinCommission)) {
                             setState(() {
-                              commission = '350';
+                              commission = '$refillMinCommission';
                             });
                           }
+                        } else {
+                          setState(() {
+                            commission = '0';
+                          });
                         }
                       },
                     ),
                   ),
                   Center(
-                      child:
-                          Text('${localization.commission} $commission KZT')),
+                    child: Text('${localization.commission} $commission KZT'),
+                  ),
                   Container(
                     height: 50,
                     width: 200,
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10.0,
-                              spreadRadius: -2,
-                              offset: Offset(0.0, 0.0))
-                        ]),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10.0,
+                          spreadRadius: -2,
+                          offset: Offset(0.0, 0.0),
+                        )
+                      ],
+                    ),
                     alignment: Alignment.center,
                     margin: EdgeInsets.only(top: 20, bottom: 10),
                     child: ButtonTheme(
@@ -203,6 +216,11 @@ class _RefillPageState extends State<RefillPage> {
                       child: FlatButton(
                         onPressed: () async {
                           if (amountController.text.isNotEmpty) {
+                            FocusScopeNode currentFocus =
+                                FocusScope.of(context);
+                            if (!currentFocus.hasPrimaryFocus) {
+                              currentFocus.unfocus();
+                            }
                             setState(() {
                               preLoaderForRefill = true;
                             });
@@ -215,11 +233,13 @@ class _RefillPageState extends State<RefillPage> {
                               if (refillResult['success'].toString() ==
                                   'true') {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            buildWebviewScaffold(
-                                                refillResult['redirectURL'])));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => buildWebviewScaffold(
+                                      refillResult['redirectURL'],
+                                    ),
+                                  ),
+                                );
                               } else {
                                 Widget okButton = CupertinoDialogAction(
                                   child: Text("OK"),
@@ -242,14 +262,15 @@ class _RefillPageState extends State<RefillPage> {
                                   },
                                 );
                               }
-                              print(refillResult);
                             });
                           }
                         },
                         child: Text(
                           '${localization.refill}',
                           style: TextStyle(
-                              color: primaryColor, fontWeight: FontWeight.w800),
+                            color: primaryColor,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),

@@ -12,20 +12,33 @@ class TransferListPage extends StatefulWidget {
 }
 
 class _TransferListPageState extends State<TransferListPage> {
-  Api api = new Api();
+  Api api;
+
+  @override
+  void initState() {
+    api = Api();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
       body: GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
-          child: mainScreen(context)),
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: mainScreen(context),
+      ),
     );
   }
 
@@ -66,10 +79,11 @@ class _TransferListPageState extends State<TransferListPage> {
             ),
           ),
           onPressed: () {
-            // StudentDao().deleteAll();
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => TransferHistoryPage()),
+              MaterialPageRoute(
+                builder: (context) => TransferHistoryPage(),
+              ),
             );
           },
         )
@@ -95,13 +109,15 @@ class _TransferListPageState extends State<TransferListPage> {
   Container transferlist(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10.0,
+              spreadRadius: -2,
+              offset: Offset(0.0, 0.0))
+        ],
+      ),
       child: ButtonTheme(
         height: 40,
         child: RaisedButton(
@@ -139,11 +155,5 @@ class _TransferListPageState extends State<TransferListPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 }

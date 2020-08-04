@@ -17,3 +17,4 @@ const Color brightGreyColor3 = Color(0xFF2B7C0CE);
 const Color darkGreyColor = Color(0xFF444444);
 const Color darkGreyColor2 = Color(0xFF5E5E5E);
 const Color greenColor = Color(0xFF00CC00);
+const Color redColor = Colors.red;

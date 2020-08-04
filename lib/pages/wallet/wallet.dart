@@ -85,8 +85,7 @@ class _WalletTabState extends State<WalletTab> {
     if (user.pin == 'waiting' && temp == enteredPasscode) {
       print('creating');
       api.createPin(enteredPasscode);
-      Navigator.maybePop(context);
-      Navigator.maybePop(context);
+      Navigator.pop(context);
     }
     if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
       return showDialog<void>(
@@ -121,6 +120,7 @@ class _WalletTabState extends State<WalletTab> {
         setState(() {
           this.isAuthenticated = isValid;
         });
+        Navigator.pop(context);
       });
     } else {
       _verificationNotifier.add(isValid);
@@ -232,8 +232,48 @@ class _WalletTabState extends State<WalletTab> {
                     child: Column(
                       children: <Widget>[
                         SizedBox(height: 10),
-                        Text('${localization.wallet}',
-                            style: fS26(c: 'ffffff')),
+                        Stack(
+                          children: [
+                            Container(
+                              alignment: Alignment.topCenter,
+                              child: Text(
+                                '${localization.wallet}',
+                                style: fS26(c: 'ffffff'),
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.topRight,
+                              child: InkWell(
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 30, top: 2),
+                                  color: whiteColor,
+                                  width: 40,
+                                  padding: EdgeInsets.all(5),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        child: Image.asset(
+                                          'assets/images/refresh.png',
+                                          width: 20,
+                                          height: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                onTap: () async {
+                                  await api.getBalance();
+                                  setState(() {
+                                    // _amount = double.parse(user.balance);
+                                    _realAmount = double.parse(user.balance);
+                                    _blockedAmount =
+                                        double.parse(user.balanceInBlock);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                         _devider(),
                         _balance(),
                         SizedBox(height: 10),

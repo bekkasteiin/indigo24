@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +18,9 @@ class RegistrationPage extends StatefulWidget {
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
+
+int start = 0;
+Timer _timer;
 
 class _RegistrationPageState extends State<RegistrationPage> {
   var api = Api();
@@ -66,6 +71,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
+  bool isPageOpened = true;
+
   List<DropdownMenuItem<String>> getDropDownMenuItems(List titles) {
     List<DropdownMenuItem<String>> items = new List();
     for (var i = 0; i < titles.length; i++) {
@@ -75,9 +82,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return items;
   }
 
+  Color timerColor = primaryColor;
   @override
   void initState() {
     super.initState();
+    if (start != 59) {
+      startTimer();
+    }
     loginController = new TextEditingController();
     passwordController = new TextEditingController();
     _getCountries();
@@ -86,6 +97,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   void dispose() {
     super.dispose();
+    isPageOpened = false;
+    _timer = null;
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
@@ -161,6 +174,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
         length = _selectedCountry['length'];
         loginController.text = '';
       });
+  }
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    if (_timer == null) {
+      print('staring time');
+      _timer = Timer.periodic(oneSec, (Timer timer) {
+        if (isPageOpened) {
+          print('if sec');
+          setState(() {
+            if (start < 1) {
+              timer.cancel();
+              _timer = null;
+            } else {
+              start = start - 1;
+            }
+          });
+        } else {
+          print('else sec');
+          if (start < 1) {
+            timer.cancel();
+          } else {
+            start = start - 1;
+          }
+        }
+      });
+    }
   }
 
   Widget _buildForeground() {
@@ -264,6 +304,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                     ),
                     _space(30),
+                    Text(
+                      '${start != 0 ? start : ''}',
+                      style: TextStyle(
+                        color: timerColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    _space(30),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
@@ -276,47 +325,62 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         borderRadius: 10.0,
                         color: primaryColor,
                         onPressed: () async {
-                          if (loginController.text.isNotEmpty) {
-                            var temp = loginController.text
-                                .replaceAll(' ', '')
-                                .replaceAll('+', '');
-                            if (temp.length == length) {
-                              await api
-                                  .checkRegistration(temp)
-                                  .then((checkPhoneResult) async {
-                                print(
-                                    'empty check Registration $checkPhoneResult');
-                                if (checkPhoneResult['success'] == false) {
-                                  await api.sendSms(temp).then((sendSmsResult) {
-                                    print('smsSendResult $sendSmsResult');
-                                    if (sendSmsResult['success'] == true) {
+                          if (start == 0) {
+                            print('pressed within start');
+                            if (loginController.text.isNotEmpty) {
+                              var temp = loginController.text
+                                  .replaceAll(' ', '')
+                                  .replaceAll('+', '');
+
+                              if (temp.length == length) {
+                                await api
+                                    .checkRegistration(temp)
+                                    .then((checkPhoneResult) async {
+                                  print(
+                                      'empty check Registration $checkPhoneResult');
+                                  if (checkPhoneResult['success'] == false) {
+                                    await api
+                                        .sendSms(temp)
+                                        .then((sendSmsResult) {
                                       setState(() {
-                                        // loginError = sendSmsResult['message'];
+                                        start = 59;
                                       });
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              PhoneConfirmPage(
-                                            sendSmsResult['pin'],
-                                            temp,
+                                      startTimer();
+                                      print('smsSendResult $sendSmsResult');
+                                      if (sendSmsResult['success'] == true) {
+                                        setState(() {
+                                          loginError = '';
+                                        });
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PhoneConfirmPage(
+                                              sendSmsResult['pin'],
+                                              temp,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    } else {
-                                      setState(() {
-                                        loginError = sendSmsResult['message'];
-                                      });
-                                      // _showError(context, sendSmsResult['message']);
-                                    }
-                                  });
-                                } else {
-                                  setState(() {
-                                    loginError = 'Пользователь занят';
-                                    // loginError = checkPhoneResult['message'];
-                                  });
-                                }
-                              });
+                                        );
+                                      } else {
+                                        setState(() {
+                                          loginError = sendSmsResult['message'];
+                                        });
+                                        // _showError(context, sendSmsResult['message']);
+                                      }
+                                    });
+                                  } else {
+                                    setState(() {
+                                      // loginError = 'Пользователь ';
+                                      loginError =
+                                          '${checkPhoneResult['message']}';
+                                    });
+                                  }
+                                });
+                              } else {
+                                setState(() {
+                                  loginError = '${localization.enterPhone}';
+                                });
+                              }
                             } else {
                               setState(() {
                                 loginError = '${localization.enterPhone}';
@@ -324,7 +388,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             }
                           } else {
                             setState(() {
-                              loginError = '${localization.enterPhone}';
+                              if (timerColor == primaryColor) {
+                                timerColor = redColor;
+                                Future.delayed(const Duration(seconds: 2), () {
+                                  timerColor = primaryColor;
+                                });
+                              }
                             });
                           }
                         },

@@ -14,10 +14,16 @@ class WithdrawPage extends StatefulWidget {
 
 class _WithdrawPageState extends State<WithdrawPage> {
   bool preLoaderForRefill = false;
-  var commission = '0';
-  final amountController = TextEditingController();
+  String commission = '0';
+  TextEditingController amountController;
+  Api api;
 
-  Api api = Api();
+  @override
+  void initState() {
+    super.initState();
+    api = Api();
+    amountController = TextEditingController();
+  }
 
   @override
   void dispose() {
@@ -27,12 +33,6 @@ class _WithdrawPageState extends State<WithdrawPage> {
   }
 
   WillPopScope buildWebviewScaffold(url) {
-    print(' this is url $url');
-    print(' this is url $url');
-    print(' this is url $url');
-    print(' this is url $url');
-    print(' this is url $url');
-    print(' this is url $url');
     return WillPopScope(
       onWillPop: () async {
         return false;
@@ -67,19 +67,17 @@ class _WithdrawPageState extends State<WithdrawPage> {
         ),
         body: SafeArea(
           child: WebviewScaffold(
-              url: '$url',
-              withZoom: true,
-              withLocalStorage: true,
-              hidden: false,
-              initialChild: Center(child: CircularProgressIndicator())),
+            url: '$url',
+            withZoom: true,
+            withLocalStorage: true,
+            hidden: false,
+            initialChild: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -127,19 +125,22 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 padding: const EdgeInsets.symmetric(vertical: 10),
               ),
               Center(
-                  child: Text(
-                      '${localization.commission} ${withdrawCommission}%')),
+                child: Text('${localization.commission} $withdrawCommission%'),
+              ),
               Center(
-                  child: Text('${localization.minAmount} ${withdrawMin} KZT')),
+                child: Text('${localization.minAmount} $withdrawMin KZT'),
+              ),
               Center(
-                  child: Text(
-                      '${localization.minCommission} ${withdrawMinCommission} KZT')),
+                child: Text(
+                    '${localization.minCommission} $withdrawMinCommission KZT'),
+              ),
               Center(
-                  child: Text('${localization.maxAmount} ${withdrawMax} KZT')),
+                child: Text('${localization.maxAmount} $withdrawMax KZT'),
+              ),
               Container(
                 color: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                margin: const EdgeInsets.symmetric(vertical: 20),
+                padding: EdgeInsets.symmetric(vertical: 20),
+                margin: EdgeInsets.symmetric(vertical: 20),
                 child: TextFormField(
                   textAlign: TextAlign.center,
                   inputFormatters: [
@@ -153,21 +154,33 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   style: TextStyle(fontSize: 20),
                   controller: amountController,
                   onChanged: (String text) async {
-                    if (int.parse(amountController.text) > 0) {
-                      if (int.parse(amountController.text) < 1000) {
-                        setState(() {
-                          commission = '0';
-                        });
-                      } else {
-                        if (double.parse(text) <= double.parse(withdrawMax)) {
+                    if (amountController.text.isNotEmpty) {
+                      if (int.parse(amountController.text) > 0) {
+                        if (int.parse(amountController.text) < 1000) {
                           setState(() {
-                            commission = (int.parse(text) *
-                                    double.parse(withdrawCommission) /
-                                    100)
-                                .toStringAsFixed(2);
+                            commission = '0';
                           });
+                        } else {
+                          if (double.parse(text) <= double.parse(withdrawMax)) {
+                            setState(() {
+                              commission = (int.parse(text) *
+                                      double.parse(withdrawCommission) /
+                                      100)
+                                  .toStringAsFixed(2);
+                            });
+                          }
                         }
                       }
+                      if (double.parse(commission) <=
+                          double.parse(withdrawMinCommission)) {
+                        setState(() {
+                          commission = '$withdrawMinCommission';
+                        });
+                      }
+                    } else {
+                      setState(() {
+                        commission = '0';
+                      });
                     }
                   },
                 ),
@@ -177,15 +190,17 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 height: 50,
                 width: 200,
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10.0,
-                          spreadRadius: -2,
-                          offset: Offset(0.0, 0.0))
-                    ]),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10.0,
+                      spreadRadius: -2,
+                      offset: Offset(0.0, 0.0),
+                    )
+                  ],
+                ),
                 alignment: Alignment.center,
                 margin: EdgeInsets.only(top: 20, bottom: 10),
                 child: ButtonTheme(
@@ -194,6 +209,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   child: FlatButton(
                     onPressed: () async {
                       if (amountController.text.isNotEmpty) {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+                        if (!currentFocus.hasPrimaryFocus) {
+                          currentFocus.unfocus();
+                        }
                         setState(() {
                           preLoaderForRefill = true;
                         });
@@ -206,11 +225,13 @@ class _WithdrawPageState extends State<WithdrawPage> {
                           });
                           if (withdrawResult['success'].toString() == 'true') {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => buildWebviewScaffold(
-                                        withdrawResult['result']
-                                            ['redirectURL'])));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => buildWebviewScaffold(
+                                  withdrawResult['result']['redirectURL'],
+                                ),
+                              ),
+                            );
                           } else {
                             Widget okButton = CupertinoDialogAction(
                               child: Text("OK"),
@@ -232,14 +253,15 @@ class _WithdrawPageState extends State<WithdrawPage> {
                               },
                             );
                           }
-                          print(withdrawResult);
                         });
                       }
                     },
                     child: Text(
                       '${localization.withdraw}',
                       style: TextStyle(
-                          color: primaryColor, fontWeight: FontWeight.w800),
+                        color: primaryColor,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),

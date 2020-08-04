@@ -21,7 +21,11 @@ class FullPhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          image: DecorationImage(image: previewBackgoundProvider)),
+        image: DecorationImage(
+          image: previewBackgoundProvider,
+          fit: BoxFit.fitWidth,
+        ),
+      ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(

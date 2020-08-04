@@ -35,7 +35,6 @@ class _TransferPageState extends State<TransferPage> {
       child: Text("OK"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.pop(context);
       },
     );
 
@@ -61,12 +60,17 @@ class _TransferPageState extends State<TransferPage> {
 
   final receiverController = TextEditingController();
   final sumController = TextEditingController();
+  bool boolForPreloader = false;
 
   @override
   void initState() {
-    if (widget.phone != null && widget.amount != null) {
+    print('${widget.amount}');
+
+    if (widget.phone != null) {
       receiverController.text = widget.phone;
-      sumController.text = widget.amount;
+      if (widget.amount != null) {
+        sumController.text = widget.amount;
+      }
       setState(() {
         toName = '';
         toAvatar = '';
@@ -105,77 +109,86 @@ class _TransferPageState extends State<TransferPage> {
             }
           },
           child: Scaffold(
-            body: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Stack(
+            body: Stack(
+              children: <Widget>[
+                SingleChildScrollView(
+                  child: Column(
                     children: <Widget>[
-                      Image.asset(
-                        'assets/images/background_little.png',
-                        fit: BoxFit.fill,
-                      ),
-                      Positioned(
-                        child: AppBar(
-                          centerTitle: true,
-                          title: Text("${localization.toIndigo24Client}"),
-                          leading: IconButton(
-                            icon: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Image(
-                                image: AssetImage(
-                                  'assets/images/backWhite.png',
-                                ),
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
+                      Stack(
+                        children: <Widget>[
+                          Image.asset(
+                            'assets/images/background_little.png',
+                            fit: BoxFit.fill,
                           ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 45, left: 0, right: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              height: 0.6,
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              color: brightGreyColor,
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(left: 30, right: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  SizedBox(height: 15),
-                                  Text(
-                                    '${localization.walletBalance}',
-                                    style: fS14(c: 'FFFFFF'),
+                          Positioned(
+                            child: AppBar(
+                              centerTitle: true,
+                              title: Text("${localization.toIndigo24Client}"),
+                              leading: IconButton(
+                                icon: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Image(
+                                    image: AssetImage(
+                                      'assets/images/backWhite.png',
+                                    ),
                                   ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '${user.balance} ₸',
-                                    style: fS18(c: 'FFFFFF'),
-                                  ),
-                                ],
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
                               ),
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
                             ),
-                          ],
-                        ),
+                          ),
+                          Container(
+                            margin:
+                                EdgeInsets.only(top: 45, left: 0, right: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  height: 0.6,
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  color: brightGreyColor,
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 30, right: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(height: 15),
+                                      Text(
+                                        '${localization.walletBalance}',
+                                        style: fS14(c: 'FFFFFF'),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        '${user.balance} ₸',
+                                        style: fS18(c: 'FFFFFF'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      mainPaymentsDetailMobile(),
+                      transferButton(),
+                      SizedBox(
+                        height: 20,
                       ),
                     ],
                   ),
-                  mainPaymentsDetailMobile(),
-                  transferButton(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
-              ),
+                ),
+                boolForPreloader
+                    ? Center(child: CircularProgressIndicator())
+                    : Center()
+              ],
             ),
           ),
         ),
@@ -219,51 +232,57 @@ class _TransferPageState extends State<TransferPage> {
     bool isValid = '${user.pin}' == enteredPasscode;
     _verificationNotifier.add(isValid);
     if (enteredPasscode == user.pin) {
-      Navigator.maybePop(context);
-      Navigator.maybePop(context);
-      if (receiverController.text.isNotEmpty && sumController.text.isNotEmpty) {
-        api.checkPhoneForSendMoney(receiverController.text).then((result) {
-          print('transfer result $result');
-          if (result['message'] == 'Not authenticated' &&
-              result['success'].toString() == 'false') {
-            logOut(context);
-            return result;
-          } else {
-            if (result["success"].toString() == 'true') {
-              api
-                  .doTransfer(result["toID"], sumController.text,
-                      transferChat: widget.transferChat)
-                  .then((res) {
-                if (res['success'].toString() == 'false')
-                  showAlertDialog(context, '0', res['message']);
-                else {
-                  showAlertDialog(context, '1', res['message']);
-                  ChatRoom.shared.sendMoney(
-                      res['transfer_money_chat_token'], widget.transferChat);
-                  api.getBalance().then((result) {
-                    setState(() {});
-                  });
-                }
-              });
+      Future.delayed(const Duration(milliseconds: 250), () {
+        Navigator.pop(context);
+        if (receiverController.text.isNotEmpty &&
+            sumController.text.isNotEmpty) {
+          print('global bool resetted to true');
+          setState(() {
+            boolForPreloader = true;
+          });
+          api.checkPhoneForSendMoney(receiverController.text).then((result) {
+            print('transfer result $result');
+
+            if (result['message'] == 'Not authenticated' &&
+                result['success'].toString() == 'false') {
+              logOut(context);
+              return result;
             } else {
-              showAlertDialog(context, '0', result['message']);
+              if (result["success"].toString() == 'true') {
+                api
+                    .doTransfer(result["toID"], sumController.text,
+                        transferChat: widget.transferChat)
+                    .then((res) {
+                  setState(() {
+                    boolForPreloader = false;
+                  });
+                  if (res['success'].toString() == 'false')
+                    showAlertDialog(context, '0', res['message']);
+                  else {
+                    showAlertDialog(context, '1', res['message']);
+                    ChatRoom.shared.sendMoney(
+                        res['transfer_money_chat_token'], widget.transferChat);
+                    api.getBalance().then((result) {
+                      setState(() {});
+                    });
+                  }
+                });
+              } else {
+                showAlertDialog(context, '0', result['message']);
+              }
+
+              return result;
             }
-            return result;
-          }
-        });
-      } else {
-        showAlertDialog(context, '0', '${localization.fillAllFields}');
-      }
+          });
+        } else {
+          showAlertDialog(context, '0', '${localization.fillAllFields}');
+        }
+      });
     }
   }
 
   _onPasscodeCancelled() {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => Tabs(),
-      ),
-      (r) => false,
-    );
+    Navigator.pop(context);
   }
 
   _showLockScreen(BuildContext context, String title,
@@ -310,6 +329,10 @@ class _TransferPageState extends State<TransferPage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
             if (receiverController.text.isNotEmpty &&
                 sumController.text.isNotEmpty) {
               _showLockScreen(context, '${localization.enterPin}',
@@ -411,6 +434,10 @@ class _TransferPageState extends State<TransferPage> {
                       ),
                     ),
                     onTap: () {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      if (!currentFocus.hasPrimaryFocus) {
+                        currentFocus.unfocus();
+                      }
                       showModalBottomSheet(
                           context: context,
                           builder: (context) {
@@ -429,6 +456,8 @@ class _TransferPageState extends State<TransferPage> {
                                     itemBuilder: (context, i) {
                                       // print(myContacts[i]);
                                       // print(temp.length);
+                                      if (myContacts[i].phone == null)
+                                        return Center();
                                       return Center(
                                         child: InkWell(
                                           onTap: () {
@@ -436,6 +465,26 @@ class _TransferPageState extends State<TransferPage> {
                                             setState(() {
                                               receiverController.text =
                                                   myContacts[i].phone;
+                                            });
+
+                                            api
+                                                .checkPhoneForSendMoney(
+                                                    '${myContacts[i].phone}')
+                                                .then((r) {
+                                              print(r);
+                                              if (r['success'].toString() ==
+                                                  'true') {
+                                                setState(() {
+                                                  toName = r['name'];
+                                                  toAvatar = r['avatar'];
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  toName =
+                                                      '${localization.userNotFound}';
+                                                  toAvatar = '';
+                                                });
+                                              }
                                             });
                                             // Navigator.push(
                                             //   context,
@@ -505,7 +554,7 @@ class _TransferPageState extends State<TransferPage> {
                               ),
                             );
                           });
-                      print('transfer avatar is pressed $myContacts');
+                      // print('transfer avatar is pressed $myContacts');
                     },
                   ),
                   Text('$toName')

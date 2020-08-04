@@ -28,17 +28,18 @@ class _IntroPageState extends State<IntroPage> {
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
             centerTitle: true,
-            backgroundColor: Colors.white, // status bar color
-            brightness: Brightness.light, // status bar brightness
+            backgroundColor: Colors.white,
+            brightness: Brightness.light,
           ),
         ),
         body: Stack(
           children: <Widget>[
             Container(
-                decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: introBackgroundProvider, fit: BoxFit.cover),
-            )),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: introBackgroundProvider, fit: BoxFit.cover),
+              ),
+            ),
             SingleChildScrollView(
               child: SafeArea(
                 child: Column(
@@ -53,17 +54,17 @@ class _IntroPageState extends State<IntroPage> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(16.0),
-                          )),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(16.0),
+                        ),
+                      ),
                       child: DropdownButtonHideUnderline(
                         child: Container(
                           child: CustomDropdownButton(
                             isExpanded: false,
                             hint: Text("${localization.currentLanguage}",
                                 style: TextStyle(color: blackPurpleColor)),
-                            // value: _valFriends,
                             items: localization.languages.map((value) {
                               return DropdownMenuItem(
                                 child: Text('${value['title']}',
@@ -89,10 +90,11 @@ class _IntroPageState extends State<IntroPage> {
                       ),
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    PDFViewer('assets/terms.pdf')));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PDFViewer('assets/terms.pdf'),
+                          ),
+                        );
                       },
                     )
                   ],
@@ -115,7 +117,6 @@ class _IntroPageState extends State<IntroPage> {
       height: 60,
       child: RaisedButton(
         onPressed: () {
-          print('Login is pressed');
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => LoginPage()),
@@ -145,7 +146,9 @@ class _IntroPageState extends State<IntroPage> {
           print('Register is pressed');
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => RegistrationPage()),
+            MaterialPageRoute(
+              builder: (context) => RegistrationPage(),
+            ),
           );
         },
         child: Text(

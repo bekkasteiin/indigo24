@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +13,19 @@ import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 
+import '../../../main.dart';
+
+int accountLength;
+
 class PaymentsServicePage extends StatefulWidget {
   final String _logo;
   final int serviceID;
   final String title;
+  final String account;
+  final String amount;
 
-  PaymentsServicePage(this.serviceID, this._logo, this.title);
+  PaymentsServicePage(this.serviceID, this._logo, this.title,
+      {this.account, this.amount});
 
   @override
   _PaymentsServicePageState createState() => _PaymentsServicePageState();
@@ -51,7 +57,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        print('showed dialog $message');
+        print('showed dialog');
         return ConstrainedBox(
           constraints: BoxConstraints(maxHeight: 1.0),
           child: CupertinoAlertDialog(
@@ -73,14 +79,25 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
   bool isAuthenticated = false;
+
+  final receiverController = TextEditingController();
+  final sumController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    if (widget.account != null) {
+      setState(() {
+        receiverController.text = widget.account;
+        sumController.text = widget.amount;
+      });
+    }
+  }
+
+  bool isCalculated = false;
   double amount;
   double exchangeRate;
   double expectedAmount;
   String expectedCurrency;
-  final receiverController = TextEditingController();
-  final sumController = TextEditingController();
-  var loginFormatter;
-
   _showLockScreen(BuildContext context, String title,
       {bool withPin,
       bool opaque,
@@ -100,11 +117,11 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             cancelButton: cancelButton,
             deleteButton: Text(
               'Delete',
-              style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
               semanticsLabel: 'Delete',
             ),
             shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: milkWhiteColor,
+            backgroundColor: Color(0xFFF7F7F7),
             cancelCallback: _onPasscodeCancelled,
             digits: digits,
           ),
@@ -114,55 +131,53 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   _onPasscodeEntered(String enteredPasscode) {
     print('user pin is ${user.pin}');
     if ('${user.pin}'.toString() == 'false') {
-      Navigator.maybePop(context);
-      Navigator.maybePop(context);
       print('set pin');
       api.createPin(enteredPasscode);
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
     _verificationNotifier.add(isValid);
-    if (isValid) {
-      print(' is really valid ');
-
-      api
-          .paymentProceed(
-              widget.serviceID,
-              '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-              sumController.text)
-          .then((result) {
-        showAlertDialog(context, '1', result['message']);
-        api.getBalance().then((result) {
-          setState(() {});
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (isValid) {
+        _onPasscodeCancelled();
+        // api
+        //     .paymentProceed(
+        //         widget.serviceID,
+        //         '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
+        //         expectedAmount)
+        //     .then((result) {
+        //   showAlertDialog(context, '1', '${result['message']}');
+        //   api.getBalance().then((result) {
+        //     setState(() {});
+        //   });
+        // });
+        api
+            .payService(
+                widget.serviceID,
+                '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
+                sumController.text)
+            .then((services) {
+          if (services['message'] == 'Not authenticated' &&
+              services['success'].toString() == 'false') {
+            logOut(context);
+            return services;
+          } else {
+            if (services['success'].toString() == 'false')
+              showAlertDialog(context, '0', services['message']);
+            else {
+              showAlertDialog(context, '1', services['message']);
+              api.getBalance().then((result) {
+                setState(() {});
+              });
+            }
+            return services;
+          }
         });
-      });
-
-      // api
-      //     .payService(
-      //         widget.serviceID,
-      //         '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-      //         sumController.text)
-      //     .then((services) {
-      //   if (services['message'] == 'Not authenticated' &&
-      //       services['success'].toString() == 'false') {
-      //     logOut(context);
-      //     return services;
-      //   } else {
-      //     if (services['success'].toString() == 'false')
-      //       showAlertDialog(context, '0', services['message']);
-      //     else {
-      //       showAlertDialog(context, '1', services['message']);
-      //       api.getBalance().then((result) {
-      //         setState(() {});
-      //       });
-      //     }
-      //     return services;
-      //   }
-      // });
-      setState(() {
-        this.isAuthenticated = isValid;
-      });
-    }
+        setState(() {
+          this.isAuthenticated = isValid;
+        });
+      }
+    });
   }
 
   _onPasscodeCancelled() {
@@ -170,7 +185,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   }
 
   var temp;
-  int accountLength;
   var accountRegex;
   String amountPlaceholder = '';
   String accountPlaceholder = '';
@@ -183,7 +197,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           body: FutureBuilder(
             future: api.getService(widget.serviceID).then((getServiceResult) {
               getServiceResult['result'].forEach((element) {
-                print('forEach element $element');
+                // print('forEach element $element');
                 if ('${element['name']}' == 'amount') {
                   amountPlaceholder = element['placeholder'];
                 }
@@ -192,15 +206,14 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   accountMask = element['mask'];
                   accountRegex = new RegExp(r'' + element['regex']);
                   if (element['mask'] == ' ') {
-                    print('if');
+                    // print('if');
                     // temp = 'false';
                     // loginFormatter = MaskTextInputFormatter(filter: { "*" : RegExp(r'[0-9]') });
                   } else {
-                    print('else else ');
+                    // print('else else');
                     accountLength = element['mask'].replaceAll(' ', '').length;
-                    // loginFormatter = MaskTextInputFormatter(
-                    //     mask: '${element['mask']}',
-                    //     filter: {"*": RegExp(r'[0-9]')});
+
+                    // loginFormatter = MaskTextInputFormatter(mask: '${element['mask']}', filter: { "*" : RegExp(r'[0-9]') });
                   }
                 }
               });
@@ -255,7 +268,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             height: 0.6,
                                             margin: EdgeInsets.symmetric(
                                                 vertical: 10, horizontal: 20),
-                                            color: brightGreyColor,
+                                            color: Color(0xFFD1E1FF),
                                           ),
                                           Container(
                                             margin: EdgeInsets.only(
@@ -270,19 +283,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                                   style: fS14(c: 'FFFFFF'),
                                                 ),
                                                 SizedBox(height: 5),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      '${user.balance}',
-                                                      style: fS18(c: 'FFFFFF'),
-                                                    ),
-                                                    Image(
-                                                      image: AssetImage(
-                                                          "assets/images/tenge.png"),
-                                                      height: 16,
-                                                      width: 16,
-                                                    ),
-                                                  ],
+                                                Text(
+                                                  '${user.balance} ₸',
+                                                  style: fS18(c: 'FFFFFF'),
                                                 ),
                                               ],
                                             ),
@@ -294,42 +297,141 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                 ),
                               ],
                             ),
-                            amount != null
-                                ? Column(
-                                    children: [
-                                      Text(
-                                          'Amount ${amount.toStringAsFixed(3)} KZT'),
-                                      Text(
-                                          '1 $expectedCurrency = ${exchangeRate.toStringAsFixed(3)} KZT'),
-                                      Text('Expected Amount $expectedAmount'),
-                                    ],
+                            isCalculated
+                                ? Container(
+                                    color: whiteColor,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.05,
+                                      vertical: 10,
+                                    ),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${localization.account}',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: darkGreyColor2,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${receiverController.text}',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                color: blackPurpleColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${localization.service}',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: darkGreyColor2,
+                                              ),
+                                            ),
+                                            Row(
+                                              children: <Widget>[
+                                                Text(
+                                                  '${widget.title}',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: blackPurpleColor,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 5),
+                                                Image.network(
+                                                  '${widget._logo}',
+                                                  width: 30,
+                                                  height: 30,
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        Container(
+                                          height: 10,
+                                          width: 10,
+                                          color: Colors.red,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${localization.toPay}',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: blackPurpleColor,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${amount.toStringAsFixed(3)}',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: blackPurpleColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${localization.conversion}',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: blackPurpleColor,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${expectedAmount.toStringAsFixed(3)}',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: blackPurpleColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   )
-                                : Center(),
-                            Container(
-                                width: MediaQuery.of(context).size.width,
-                                color: Colors.white,
-                                padding: EdgeInsets.only(left: 20, top: 20),
-                                child: Text('${widget.title}',
-                                    maxLines: 3,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: blackPurpleColor))),
-                            mainPaymentsDetailMobile(snapshot.data),
+                                : mainPaymentsDetailMobile(snapshot.data),
                             SizedBox(
                               height: 10,
                             ),
+                            isCalculated
+                                ? Center(
+                                    child: Text(
+                                        '1 $expectedCurrency = $exchangeRate KZT',
+                                        style: TextStyle(
+                                            color: Color(0xFF001D52))))
+                                : Center(),
                             Center(
                                 child: Text(
                                     '${localization.minAmount} ${snapshot.data['service']['min']} KZT',
-                                    style: TextStyle(color: blackPurpleColor))),
+                                    style:
+                                        TextStyle(color: Color(0xFF001D52)))),
                             Center(
                                 child: Text(
                                     '${localization.maxAmount} ${snapshot.data['service']['max']} KZT',
-                                    style: TextStyle(color: blackPurpleColor))),
+                                    style:
+                                        TextStyle(color: Color(0xFF001D52)))),
                             Center(
                                 child: Text(
                                     '${localization.commission} ${snapshot.data['service']['commission']}%',
-                                    style: TextStyle(color: blackPurpleColor))),
+                                    style:
+                                        TextStyle(color: Color(0xFF001D52)))),
                             transferButton(snapshot),
                             SizedBox(
                               height: 10,
@@ -346,8 +448,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     );
   }
 
-  bool first = true;
-
   Container transferButton(snapshot) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -363,52 +463,90 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         child: RaisedButton(
           onPressed: () async {
             if (receiverController.text.isNotEmpty &
-                sumController.text.isNotEmpty) {}
-            String str =
-                "${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
-            bool matches = accountRegex.hasMatch(str);
-            if (int.parse(sumController.text) >=
-                snapshot.data['service']['min']) {
-              if (int.parse(sumController.text) <=
-                  snapshot.data['service']['max']) {
-                if (matches) {
-                  if (first) {
-                    first = false;
-                    api
-                        .calculateSum(
-                            widget.serviceID,
-                            '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-                            sumController.text)
-                        .then((result) {
-                      result = json.decode(result);
-                      setState(() {
-                        amount = result['Amount'];
-                        exchangeRate = result['ExchangeRate'];
-                        expectedAmount = result['ExpectedAmount'];
-                        expectedCurrency = result['ExpectedCurrency'];
-                      });
-                    });
+                sumController.text.isNotEmpty) {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus) {
+                currentFocus.unfocus();
+              }
+              if (receiverController.text.isNotEmpty &
+                  sumController.text.isNotEmpty) {
+                String str =
+                    "${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
+                bool matches = accountRegex.hasMatch(str);
+                if (int.parse(sumController.text) >=
+                    snapshot.data['service']['min']) {
+                  if (int.parse(sumController.text) <=
+                      snapshot.data['service']['max']) {
+                    if (matches) {
+                      await _showLockScreen(context, '${localization.enterPin}',
+                          opaque: false,
+                          cancelButton: Text('Cancel',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Color(0xFF001D52)),
+                              semanticsLabel: 'Cancel'));
+                    } else {
+                      showAlertDialog(
+                          context, '0', '${localization.enterValidAccount}');
+                    }
                   } else {
-                    await _showLockScreen(
-                      context,
-                      '${localization.enterPin}',
-                      opaque: false,
-                      cancelButton: Text('Cancel',
-                          style: const TextStyle(
-                              fontSize: 16, color: blackPurpleColor),
-                          semanticsLabel: 'Cancel'),
-                    );
+                    showAlertDialog(
+                        context, '0', '${localization.enterBelowMax}');
                   }
                 } else {
-                  print(accountRegex);
                   showAlertDialog(
-                      context, '0', '${localization.enterValidAccount}');
+                      context, '0', '${localization.enterAboveMin}');
                 }
-              } else {
-                showAlertDialog(context, '0', '${localization.enterBelowMax}');
+                // if (isCalculated) {
+                //   String str =
+                //       "${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
+                //   bool matches = accountRegex.hasMatch(str);
+                //   if (int.parse(sumController.text) >=
+                //       snapshot.data['service']['min']) {
+                //     if (int.parse(sumController.text) <=
+                //         snapshot.data['service']['max']) {
+                //       if (matches) {
+                //         await _showLockScreen(context, '${localization.enterPin}',
+                //             opaque: false,
+                //             cancelButton: Text('Cancel',
+                //                 style: const TextStyle(
+                //                     fontSize: 16, color: Color(0xFF001D52)),
+                //                 semanticsLabel: 'Cancel'));
+                //       } else {
+                //         showAlertDialog(
+                //             context, '0', '${localization.enterValidAccount}');
+                //       }
+                //     } else {
+                //       showAlertDialog(
+                //           context, '0', '${localization.enterBelowMax}');
+                //     }
+                //   } else {
+                //     showAlertDialog(
+                //         context, '0', '${localization.enterAboveMin}');
+                //   }
+                // } else {
+                //   api
+                //       .calculateSum(
+                //           widget.serviceID,
+                //           '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
+                //           sumController.text)
+                //       .then((result) {
+                //     result = json.decode(result);
+                //     if (result['message'] == 'Not authenticated' &&
+                //         result['success'].toString() == 'false') {
+                //       logOut(context);
+                //     } else {
+                //       print('this is $result');
+                //       setState(() {
+                //         isCalculated = true;
+                //         amount = result['Amount'];
+                //         exchangeRate = result['ExchangeRate'];
+                //         expectedAmount = result['ExpectedAmount'];
+                //         expectedCurrency = result['ExpectedCurrency'];
+                //       });
+                //     }
+                //   });
+                // }
               }
-            } else {
-              showAlertDialog(context, '0', '${localization.enterAboveMin}');
             }
           },
           child: Container(
@@ -416,14 +554,14 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             width: 200,
             child: Center(
               child: Text(
-                '${localization.pay}',
-                style:
-                    TextStyle(color: primaryColor, fontWeight: FontWeight.w800),
+                '${isCalculated ? localization.pay : localization.calculate}',
+                style: TextStyle(
+                    color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
               ),
             ),
           ),
-          color: whiteColor,
-          textColor: blackPurpleColor,
+          color: Color(0xFFFFFFFF),
+          textColor: Color(0xFF001D52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               10.0,
@@ -442,6 +580,19 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Container(
+            width: MediaQuery.of(context).size.width,
+            color: Colors.white,
+            padding: EdgeInsets.only(top: 20),
+            child: Text(
+              '${widget.title}',
+              maxLines: 3,
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF001D52),
+              ),
+            ),
+          ),
           Row(
             children: <Widget>[
               Expanded(
@@ -458,7 +609,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                 WhitelistingTextInputFormatter.digitsOnly,
                               ]
                             : [
-                                // loginFormatter,
                                 LengthLimitingTextInputFormatter(accountLength),
                                 WhitelistingTextInputFormatter.digitsOnly,
                               ],

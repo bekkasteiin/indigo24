@@ -50,12 +50,12 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                   Material(
                     child: InkWell(
                       onTap: () {
+                        localization
+                            .setLanguage(localization.languages[index]['code']);
                         setState(() {
                           localization.currentLanguage =
                               '${localization.languages[index]['title']}';
                         });
-                        localization
-                            .setLanguage(localization.languages[index]['code']);
                       },
                       child: Container(
                         padding: EdgeInsets.only(

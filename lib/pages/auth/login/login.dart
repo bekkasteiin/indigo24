@@ -60,10 +60,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   List<DropdownMenuItem<String>> getDropDownMenuItems(List titles) {
-    List<DropdownMenuItem<String>> items = new List();
+    List<DropdownMenuItem<String>> items = List();
     for (var i = 0; i < titles.length; i++) {
-      items.add(
-          new DropdownMenuItem(value: titles[i], child: new Text(titles[i])));
+      items.add(DropdownMenuItem(value: titles[i], child: Text(titles[i])));
     }
     return items;
   }
@@ -71,8 +70,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    loginController = new TextEditingController();
-    passwordController = new TextEditingController();
+    loginController = TextEditingController();
+    passwordController = TextEditingController();
     _getCountries();
   }
 
@@ -99,32 +98,36 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0.0),
-          child: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.white, // status bar color
-            brightness: Brightness.light, // status bar brightness
-          ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          brightness: Brightness.light,
         ),
-        body: GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
-          child: Stack(
-            children: <Widget>[
-              Container(
-                  decoration: BoxDecoration(
+      ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Stack(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: introBackgroundProvider, fit: BoxFit.cover),
-              )),
-              _buildForeground()
-            ],
-          ),
-        ));
+                  image: introBackgroundProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            _buildForeground()
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildForeground() {
@@ -137,7 +140,6 @@ class _LoginPageState extends State<LoginPage> {
             Center(
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
-                // height: MediaQuery.of(context).size.height*0.4,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -158,10 +160,13 @@ class _LoginPageState extends State<LoginPage> {
                             child: Ink(
                               child: Row(
                                 children: <Widget>[
-                                  Text('$_currentCountry ',
-                                      style: TextStyle(
-                                          color: blackPurpleColor,
-                                          fontSize: 18)),
+                                  Text(
+                                    '$_currentCountry ',
+                                    style: TextStyle(
+                                      color: blackPurpleColor,
+                                      fontSize: 18,
+                                    ),
+                                  ),
                                   SizedBox(
                                     width: 10,
                                   ),
@@ -189,9 +194,13 @@ class _LoginPageState extends State<LoginPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("${localization.phoneNumber}",
-                                  style: TextStyle(
-                                      color: blackPurpleColor, fontSize: 16))
+                              Text(
+                                "${localization.phoneNumber}",
+                                style: TextStyle(
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
+                                ),
+                              )
                             ],
                           ),
                           Stack(
@@ -215,7 +224,9 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                ),
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
@@ -230,17 +241,22 @@ class _LoginPageState extends State<LoginPage> {
                           Text(
                             '$loginError',
                             style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12),
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           _space(30),
                           Row(
                             children: <Widget>[
-                              Text("${localization.password}",
-                                  style: TextStyle(
-                                      color: blackPurpleColor, fontSize: 16))
+                              Text(
+                                "${localization.password}",
+                                style: TextStyle(
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
+                                ),
+                              )
                             ],
                           ),
                           TextField(
@@ -289,20 +305,25 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RestorePasswordPage()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RestorePasswordPage(),
+                          ),
+                        );
                       },
                     ),
                     _space(20),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
-                        defaultWidget: Text("${localization.next}",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w300)),
+                        defaultWidget: Text(
+                          "${localization.next}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: primaryColor,
@@ -334,7 +355,6 @@ class _LoginPageState extends State<LoginPage> {
                               loginError = '';
                               passwordError = '';
                             });
-
                             await api
                                 .signIn("$phonePrefix${loginController.text}",
                                     passwordController.text)
@@ -344,9 +364,11 @@ class _LoginPageState extends State<LoginPage> {
                               if ('${response['success']}' == 'true') {
                                 await api.getBalance();
                                 Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => Tabs()),
-                                    (r) => false);
+                                  MaterialPageRoute(
+                                    builder: (context) => Tabs(),
+                                  ),
+                                  (r) => false,
+                                );
                               } else {
                                 setState(() {
                                   passwordError = singInResult["message"];
@@ -396,7 +418,6 @@ class _LoginPageState extends State<LoginPage> {
 class Countries extends StatelessWidget {
   final countries;
   Countries(this.countries);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -448,7 +469,6 @@ class Countries extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  print('${countries[index]['title']}');
                   Navigator.of(context).pop(countries[index]);
                 },
               );

@@ -3,6 +3,7 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/db/contact.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_list.dart';
@@ -46,7 +47,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   @override
   void initState() {
     super.initState();
-    actualList.addAll(contacts);
+    actualList.addAll(myContacts);
     ChatRoom.shared.setContactsStream();
     listen();
     getContacts(context).then((getContactsResult) {
@@ -74,6 +75,26 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         );
       }
     });
+  }
+
+  Future<void> _showError(BuildContext context, m) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('${localization.error}'),
+          content: Text(m),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   listen() {
@@ -178,45 +199,46 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     return r;
   }
 
-  Future getCashedContacts() async {
-    setState(() {
-      actualList.addAll(contacts);
-    });
-    return contacts;
-  }
-
   TextEditingController _searchController = TextEditingController();
 
   var actualList = List<dynamic>();
 
-  void search(String query) {
+  search(String query) {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
-      contacts.forEach((item) {
-        if (item['name'].toLowerCase().contains(query.toLowerCase()) ||
-            item['phone'].toLowerCase().contains(query.toLowerCase())) {
-          matches.add(item);
+      myContacts.forEach((item) {
+        print('${item.name} ${item.phone}');
+        if (item.name != null && item.phone != null) {
+          if (item.name
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              item.phone
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase())) {
+            print('a');
+            matches.add(item);
+          }
         }
       });
       setState(() {
-        actualList.clear();
+        actualList = [];
         actualList.addAll(matches);
       });
-      if (actualList.isEmpty) {
-        setState(() {
-          actualList.clear();
-          // actualList.addAll(contacts);
-        });
-      }
+      setState(() {
+        a = query;
+      });
       return;
     } else {
       setState(() {
-        actualList.clear();
-        actualList.addAll(contacts);
+        actualList = [];
+        actualList.addAll(myContacts);
       });
     }
   }
 
+  String a = 'asd';
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -268,36 +290,38 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                 onPressed: () {
                   print('update contacts');
                   setState(() {
-                    getContacts(context).then((getContactsResult) {
-                      var result = getContactsResult is List
-                          ? false
-                          : !getContactsResult;
-                      if (result) {
-                        Widget okButton = CupertinoDialogAction(
-                          child: Text("${localization.openSettings}"),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            AppSettings.openAppSettings();
-                          },
-                        );
-                        CupertinoAlertDialog alert = CupertinoAlertDialog(
-                          title: Text("${localization.error}"),
-                          content: Text('${localization.allowContacts}'),
-                          actions: [
-                            okButton,
-                          ],
-                        );
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return alert;
-                          },
-                        );
-                      } else {
-                        actualList.clear();
-                        actualList.addAll(getContactsResult);
-                      }
-                    });
+                    actualList.clear();
+                    actualList.addAll(myContacts); // TODO CHECK
+                    // getContacts(context).then((getContactsResult) {
+                    //   var result = getContactsResult is List
+                    //       ? false
+                    //       : !getContactsResult;
+                    //   if (result) {
+                    //     Widget okButton = CupertinoDialogAction(
+                    //       child: Text("${localization.openSettings}"),
+                    //       onPressed: () {
+                    //         Navigator.pop(context);
+                    //         AppSettings.openAppSettings();
+                    //       },
+                    //     );
+                    //     CupertinoAlertDialog alert = CupertinoAlertDialog(
+                    //       title: Text("${localization.error}"),
+                    //       content: Text('${localization.allowContacts}'),
+                    //       actions: [
+                    //         okButton,
+                    //       ],
+                    //     );
+                    //     showDialog(
+                    //       context: context,
+                    //       builder: (BuildContext context) {
+                    //         return alert;
+                    //       },
+                    //     );
+                    //   } else {
+                    //     // actualList.clear();
+                    //     // actualList.addAll(getContactsResult);
+                    //   }
+                    // });
                   });
                 },
               )
@@ -326,14 +350,17 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   ),
                 ),
                 Expanded(
-                    child: actualList.isNotEmpty
+                    child: true
                         ? ListView.builder(
                             itemCount:
                                 actualList != null ? actualList.length : 0,
                             itemBuilder: (BuildContext context, int index) {
                               if ('${user.phone}' ==
-                                  '+${actualList[index]['phone']}')
+                                  '+${actualList[index].phone}')
                                 return Center();
+                              if (actualList[index].phone == null &&
+                                  actualList[index].name == null)
+                                return Container();
                               return Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Container(
@@ -356,7 +383,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                     height: 35,
                                                     child: Center(
                                                       child: Text(
-                                                        '${actualList[index]['name'][0]}',
+                                                        '${actualList[index].name.toString()[0]}',
                                                         overflow: TextOverflow
                                                             .ellipsis,
                                                         style: TextStyle(
@@ -380,15 +407,13 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                         Text(
                                                           index != 0
                                                               ? actualList[index]
-                                                                          [
-                                                                          'name'] ==
+                                                                          .name ==
                                                                       actualList[index -
                                                                               1]
-                                                                          [
-                                                                          'name']
-                                                                  ? '${actualList[index]['name']} ${actualList[index]['label']}'
-                                                                  : '${actualList[index]['name']}'
-                                                              : '${actualList[index]['name']}',
+                                                                          .name
+                                                                  ? '${actualList[index].name}'
+                                                                  : '${actualList[index].name}'
+                                                              : '${actualList[index].name}',
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style: TextStyle(
@@ -397,7 +422,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                               TextAlign.left,
                                                         ),
                                                         Text(
-                                                          '${actualList[index]['phone']}',
+                                                          '${actualList[index].phone}',
                                                           style: TextStyle(
                                                               fontSize: 10),
                                                           textAlign:
@@ -418,9 +443,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                     ),
                                     onPressed: () {
                                       print(
-                                          "${actualList[index]['name']} ${actualList[index]['phone']} pressed");
-                                      ChatRoom.shared.userCheck(
-                                          actualList[index]['phone']);
+                                          "${actualList[index].name} ${actualList[index].phone} pressed");
+                                      ChatRoom.shared
+                                          .userCheck(actualList[index].phone);
                                     },
                                   ),
                                   decoration: BoxDecoration(

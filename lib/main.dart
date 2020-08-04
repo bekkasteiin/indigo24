@@ -130,6 +130,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Indigo24',
+        builder: (context, child) {
+          return MediaQuery(
+            child: child,
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          );
+        },
         navigatorObservers: [routeObserver],
         theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -162,14 +168,16 @@ inAppPush(m) {
                 userIds: "${m['user_id']}");
           },
           leading: SizedBox.fromSize(
-              size: const Size(40, 40),
-              child: ClipOval(
-                  child: CachedNetworkImage(
+            size: const Size(40, 40),
+            child: ClipOval(
+              child: CachedNetworkImage(
                 imageUrl: "${avatarUrl}noAvatar.png",
-              ))),
+              ),
+            ),
+          ),
           title: Text("${m['user_name']}"),
           subtitle: Text(
-            m['attachments'] == null ? "${m["text"]}" : switchType(m['type']),
+            m['attachments'] == null ? "${m["text"]}" : identifyType(m['type']),
           ),
           trailing: IconButton(
               icon: Icon(Icons.close),
@@ -206,7 +214,7 @@ goToChat(name, chatID, context,
   });
 }
 
-switchType(type) {
+identifyType(type) {
   // const TEXT_MESSAGE_TYPE = 0;
   // const IMAGE_MESSAGE_TYPE = 1;
   // const DOCUMENT_MESSAGE_TYPE = 2;
@@ -380,8 +388,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       print('creating');
       api.createPin(enteredPasscode);
       Future.delayed(const Duration(milliseconds: 250), () {
-        Navigator.maybePop(context);
-        Navigator.maybePop(context);
+        Navigator.pop(context);
       });
     }
     if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
@@ -417,6 +424,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         setState(() {
           this.isAuthenticated = isValid;
         });
+        Navigator.pop(context);
       });
     } else {
       _verificationNotifier.add(isValid);

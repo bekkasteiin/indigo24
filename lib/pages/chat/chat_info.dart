@@ -38,6 +38,7 @@ class ChatProfileInfo extends StatefulWidget {
 
 class _ChatProfileInfoState extends State<ChatProfileInfo> {
   List membersList = [];
+  List actualMembersList = [];
   String _chatTitle;
 
   File _image;
@@ -49,7 +50,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     chatTitleController.text =
         '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}';
     super.initState();
-    memberCount = 0;
+    onlineCount = 0;
   }
 
   final picker = ImagePicker();
@@ -65,11 +66,13 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       switch (cmd) {
         case "chat:members":
           setState(() {
-            memberCount = 0;
+            onlineCount = 0;
             if (chatMembersPage.toString() == '1') {
               membersList = message;
+              actualMembersList = message;
             } else {
               membersList.addAll(message);
+              actualMembersList.addAll(message);
             }
             if (membersList.isNotEmpty) {
               membersList.forEach((member) {
@@ -77,7 +80,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                   myPrivilege = member['role'].toString();
                 }
                 if (member['online'] == 'online') {
-                  memberCount++;
+                  onlineCount++;
                 }
               });
             }
@@ -85,6 +88,19 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           break;
         case "chat:members:privileges":
           ChatRoom.shared.chatMembers(widget.chatId);
+          break;
+        case "chat:member:search":
+          // ADD TO SEARCH VALUE
+          // print('a');
+          setState(() {
+            actualMembersList = [];
+            if (message.isNotEmpty) {
+              actualMembersList.addAll(message);
+            }
+            if (_searchController.text.isEmpty) {
+              actualMembersList.addAll(membersList);
+            }
+          });
           break;
         case "chat:members:delete":
           ChatRoom.shared.chatMembers(widget.chatId);
@@ -113,7 +129,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
 
   void _onLoading() async {
     await Future.delayed(Duration(milliseconds: 1000));
-    if (membersList.length % 20 == 0) {
+    if (actualMembersList.length % 20 == 0) {
       chatMembersPage++;
       if (mounted)
         setState(() {
@@ -175,8 +191,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           //   // action(widget.chatId, membersList[i]);
           // }
         } else {
-          if (membersList.length == 2) {
-            membersList.forEach((member) {
+          if (actualMembersList.length == 2) {
+            actualMembersList.forEach((member) {
               if (member['user_id'].toString() != '${user.id}') {
                 memberAction(member);
               }
@@ -482,9 +498,39 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   }
 
   TextEditingController chatTitleController = TextEditingController();
-  int memberCount = 0;
+  TextEditingController _searchController = TextEditingController();
+
+  int onlineCount = 0;
   String myPrivilege = '';
   bool isEditing = false;
+
+  // var actualList = List<dynamic>();
+
+  // void search(String query) {
+  //   if (query.isNotEmpty) {
+  //     List<dynamic> matches = List<dynamic>();
+
+  //     membersList.forEach((item) {
+  //       if (item.name.toLowerCase().contains(query.toLowerCase()) ||
+  //           item.phone.toLowerCase().contains(query.toLowerCase())) {
+  //         matches.add(item);
+  //       }
+  //     });
+
+  //     setState(() {
+  //       actualList = [];
+  //       actualList.addAll(matches);
+  //     });
+
+  //     return;
+  //   } else {
+  //     setState(() {
+  //       actualList.clear();
+  //       actualList.addAll(membersList);
+  //     });
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -593,6 +639,29 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       ],
                     ),
                     SizedBox(height: 10),
+                    // searchChatMembers
+                    widget.chatType == 1
+                        ? Padding(
+                            padding: const EdgeInsets.only(
+                                top: 10.0, left: 10.0, right: 10, bottom: 0),
+                            child: TextField(
+                              decoration: new InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: blackPurpleColor,
+                                ),
+                                hintText: "${localization.search}",
+                                fillColor: blackPurpleColor,
+                              ),
+                              onChanged: (value) {
+                                // search(value);
+                                ChatRoom.shared.searchChatMembers(
+                                    value, '${widget.chatId}');
+                              },
+                              controller: _searchController,
+                            ),
+                          )
+                        : Container(),
                     widget.chatType == 1
                         ? Container(
                             alignment: Alignment.centerLeft,
@@ -611,7 +680,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.only(left: 20),
                             child: Text(
-                              '$memberCount ${localization.online}',
+                              '$onlineCount ${localization.online}',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -620,8 +689,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                           )
                         : Center(),
                     SizedBox(height: 10),
-                    membersList.isEmpty
-                        ? Center(child: CircularProgressIndicator())
+                    actualMembersList.isEmpty
+                        ? Center(child: Text('${localization.emptyContacts}'))
                         : widget.chatType == 1
                             ? Flexible(
                                 child: ScrollConfiguration(
@@ -644,41 +713,43 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                     onRefresh: _onRefresh,
                                     onLoading: _onLoading,
                                     child: ListView.builder(
-                                      itemCount: membersList.length,
+                                      itemCount: actualMembersList.length,
                                       itemBuilder: (context, i) {
                                         return ListTile(
                                             onTap: () {
-                                              if (membersList[i]['user_id']
+                                              if (actualMembersList[i]
+                                                          ['user_id']
                                                       .toString() ==
                                                   '${user.id}') {
-                                                print(membersList[i]['user_id']
+                                                print(actualMembersList[i]
+                                                            ['user_id']
                                                         .toString() ==
                                                     '${user.id}');
-                                                // memberAction(membersList[i]);
+                                                // memberAction(actualMembersList[i]);
                                               } else {
                                                 switch (
                                                     myPrivilege.toString()) {
                                                   case '$ownerRole':
                                                     print('ownerAction');
                                                     action(widget.chatId,
-                                                        membersList[i]);
+                                                        actualMembersList[i]);
                                                     break;
                                                   case '$adminRole':
                                                     print('adminAction');
                                                     adminAction(widget.chatId,
-                                                        membersList[i]);
+                                                        actualMembersList[i]);
                                                     break;
                                                   case '$memberRole':
                                                     print('memberAction');
                                                     memberAction(
-                                                        membersList[i]);
+                                                        actualMembersList[i]);
                                                     break;
                                                   default:
                                                 }
                                               }
                                               // ChatRoom.shared.checkUserOnline(ids);
                                               // ChatRoom.shared
-                                              //     .getMessages(membersList[i]['id']);
+                                              //     .getMessages(actualMembersList[i]['id']);
                                             },
                                             leading: Container(
                                               height: 42,
@@ -686,20 +757,22 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                               child: Stack(
                                                 children: <Widget>[
                                                   CircleAvatar(
-                                                    backgroundImage: (membersList[
+                                                    backgroundImage: (actualMembersList[
                                                                         i][
                                                                     "avatar"] ==
                                                                 null ||
-                                                            membersList[i][
+                                                            actualMembersList[i]
+                                                                    [
                                                                     "avatar"] ==
                                                                 '' ||
-                                                            membersList[i][
+                                                            actualMembersList[i]
+                                                                    [
                                                                     "avatar"] ==
                                                                 false)
                                                         ? CachedNetworkImageProvider(
                                                             "${avatarUrl}noAvatar.png")
                                                         : CachedNetworkImageProvider(
-                                                            '$avatarUrl${membersList[i]["avatar"]}'),
+                                                            '$avatarUrl${actualMembersList[i]["avatar"]}'),
                                                   ),
                                                   Align(
                                                     alignment:
@@ -711,7 +784,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(10),
-                                                          color: membersList[i][
+                                                          color: actualMembersList[
+                                                                          i][
                                                                       'online'] ==
                                                                   'online'
                                                               ? Colors.white
@@ -723,7 +797,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                                                 BorderRadius
                                                                     .circular(
                                                                         10),
-                                                            color: membersList[
+                                                            color: actualMembersList[
                                                                             i][
                                                                         'online'] ==
                                                                     'online'
@@ -739,9 +813,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                               ),
                                             ),
                                             title: Text(
-                                                "${membersList[i]["user_name"]}"),
-                                            subtitle:
-                                                memberName(membersList[i]));
+                                                "${actualMembersList[i]["user_name"]}"),
+                                            subtitle: memberName(
+                                                actualMembersList[i]));
                                       },
                                     ),
                                   ),
