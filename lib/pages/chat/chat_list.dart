@@ -235,20 +235,19 @@ class _ChatsListPageState extends State<ChatsListPage>
         // ? dbChats.isNotEmpty
         //     ? localChatBuilder(dbChats)
         ? InkWell(
-            // onTap: () {
-            //   print("чат");
-            //   Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //               builder: (context) => ChatContactsPage()))
-            //       .whenComplete(() {
-            //     ChatRoom.shared.contactController.close();
-            //     // this is bool for check load more is needed or not
-            //     globalBoolForForGetChat = false;
-            //     ChatRoom.shared.forceGetChat();
-            //     ChatRoom.shared.closeContactsStream();
-            //   });
-            // },
+            onTap: () {
+              print("чат");
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChatContactsPage()))
+                  .whenComplete(() {
+                ChatRoom.shared.contactController.close();
+                // this is bool for check load more is needed or not
+                ChatRoom.shared.forceGetChat();
+                ChatRoom.shared.closeContactsStream();
+              });
+            },
             child: Container(
               color: Colors.white,
               child: Center(
@@ -258,10 +257,12 @@ class _ChatsListPageState extends State<ChatsListPage>
                   children: <Widget>[
                     Image.asset("assets/chat_animation.gif"),
                     Container(
-                        child: Text(
-                      "${localization.noChats}",
-                      style: TextStyle(fontSize: 20),
-                    ))
+                      child: Text(
+                        "${localization.noChats} \n${localization.clickToStart}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -287,6 +288,7 @@ class _ChatsListPageState extends State<ChatsListPage>
             child: ListView.builder(
               itemCount: myList.length,
               itemBuilder: (context, i) {
+                print(myList[i]);
                 return Column(
                   children: <Widget>[
                     ListTile(

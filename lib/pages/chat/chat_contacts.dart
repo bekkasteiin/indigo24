@@ -226,9 +226,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         actualList = [];
         actualList.addAll(matches);
       });
-      setState(() {
-        a = query;
-      });
       return;
     } else {
       setState(() {
@@ -238,7 +235,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     }
   }
 
-  String a = 'asd';
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

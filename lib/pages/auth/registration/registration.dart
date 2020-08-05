@@ -22,6 +22,8 @@ class RegistrationPage extends StatefulWidget {
 int start = 0;
 Timer _timer;
 
+get tamer => _timer;
+ 
 class _RegistrationPageState extends State<RegistrationPage> {
   var api = Api();
   TextEditingController loginController;

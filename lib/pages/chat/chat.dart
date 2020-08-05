@@ -191,7 +191,7 @@ class _ChatPageState extends State<ChatPage> {
   int pageCounter = 1;
   bool isUploading = false;
   bool isUploaded = false;
-
+  int onlineCount = 0;
   listen() {
     ChatRoom.shared.onCabinetChange.listen((e) {
       print("CABINET EVENT ${e.json['cmd']}");
@@ -220,6 +220,9 @@ class _ChatPageState extends State<ChatPage> {
           print(e.json);
           temp = [];
           e.json['data'].forEach((memberElement) {
+            if (memberElement['online'] == 'online') {
+              onlineCount++;
+            }
             myContacts.toList().forEach((element) {
               if ('${element.phone}' == '${memberElement['phone']}') {
                 if (!temp.contains(memberElement)) {
@@ -548,6 +551,42 @@ class _ChatPageState extends State<ChatPage> {
     audioPlayers = [];
   }
 
+  galleryActions() {
+    final act = CupertinoActionSheet(
+        title: Text('${localization.selectOption}'),
+        // message: Text('Which option?'),
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            child: Text('${localization.photo}'),
+            onPressed: () async {
+              SystemChannels.textInput.invokeMethod('TextInput.hide');
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus) {
+                currentFocus.unfocus();
+              }
+              Navigator.pop(context);
+              getImage(ImageSource.gallery);
+              print('Камера');
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Text('${localization.video}'),
+            onPressed: () async {
+              getVideo(ImageSource.gallery);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text('${localization.back}'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ));
+    showCupertinoModalPopup(
+        context: context, builder: (BuildContext context) => act);
+  }
+
   moreActions() {
     final act = CupertinoActionSheet(
         title: Text('${localization.selectOption}'),
@@ -738,7 +777,7 @@ class _ChatPageState extends State<ChatPage> {
                                 onPressed: () {
                                   print('Галерея');
                                   Navigator.pop(context);
-                                  getImage(ImageSource.gallery);
+                                  galleryActions();
                                 },
                               ),
                             ),
@@ -946,12 +985,23 @@ class _ChatPageState extends State<ChatPage> {
                         ],
                       )
                     : (widget.chatType == 1)
-                        ? Text(
-                            '${localization.members} ${widget.memberCount}',
-                            style: TextStyle(
-                                color: blackPurpleColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400),
+                        ? Column(
+                            children: <Widget>[
+                              Text(
+                                '${localization.members} ${widget.memberCount}',
+                                style: TextStyle(
+                                    color: blackPurpleColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              Text(
+                                '${localization.online} ${onlineCount}',
+                                style: TextStyle(
+                                    color: blackPurpleColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
                           )
                         : online == null
                             ? Container()

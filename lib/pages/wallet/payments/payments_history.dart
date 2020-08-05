@@ -178,15 +178,16 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     );
   }
 
-  Container _paymentAmount(String amount, String status, {type}) {
+  Container _paymentAmount(amount, String status, {type}) {
+    amount = double.parse(amount);
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Text(
             type != null
-                ? type == 'out' ? "-$amount KZT" : "+$amount KZT"
-                : "$amount KZT",
+                ? type == 'out' ? "-${amount.toStringAsFixed(2)} KZT" : "+${amount.toStringAsFixed(2)} KZT"
+                : "${amount.toStringAsFixed(2)} KZT",
             style: TextStyle(
               fontSize: 18,
               color: blackPurpleColor,

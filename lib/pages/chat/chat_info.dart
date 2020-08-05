@@ -242,29 +242,42 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           child: ClipOval(
             child: Center(
               child: widget.chatType.toString() == '1'
-                  ? GridView.count(
-                      crossAxisCount: 2,
-                      physics: NeverScrollableScrollPhysics(),
-                      children: List.generate(4, (index) {
-                        var tempAvatar;
-                        membersList.length > index
-                            ? tempAvatar =
-                                '$avatarUrl${membersList[index]["avatar"].toString().replaceAll("AxB", "200x200")}'
-                            : tempAvatar = '';
-                        return Center(
-                          child: AspectRatio(
-                            aspectRatio: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                fit: BoxFit.fitHeight,
-                                alignment: FractionalOffset.topCenter,
-                                image: NetworkImage('$tempAvatar'),
-                              )),
-                            ),
+                  ? Stack(
+                      children: <Widget>[
+                        Flexible(
+                          child: Container(
+                            color: Colors.white,
                           ),
-                        );
-                      }),
+                        ),
+                        GridView.count(
+                          crossAxisCount: 2,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: List.generate(membersList.length, (index) {
+                            var tempAvatar;
+                            membersList.length > index
+                                ? tempAvatar =
+                                    '$avatarUrl${membersList[index]["avatar"].toString().replaceAll("AxB", "200x200")}'
+                                : tempAvatar = '';
+                            return Center(
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: Container(
+                                  decoration: BoxDecoration(),
+                                  child: CachedNetworkImage(
+                                    imageUrl: widget.chatAvatar != null
+                                        ? '$tempAvatar'
+                                        : '',
+                                    errorWidget: (context, url, error) =>
+                                        CachedNetworkImage(
+                                      imageUrl: "${avatarUrl}noAvatar.png",
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
                     )
                   : CachedNetworkImage(
                       imageUrl: widget.chatAvatar != null
@@ -365,7 +378,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     final act = CupertinoActionSheet(
         title: Text('${localization.selectOption}'),
         actions: <Widget>[
-          myPrivilege == '$ownerRole'
+          myPrivilege == '$ownerRole' || myPrivilege == '$adminRole'
               ? CupertinoActionSheetAction(
                   child: Text('${localization.addToGroup}'),
                   onPressed: () {

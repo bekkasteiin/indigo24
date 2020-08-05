@@ -369,7 +369,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                                 //             .white),
                                                                 //   )
                                                                 // MoneyMessage(content)
-                                                                : Text(
+                                                                : SelectableText(
                                                                     content,
                                                                   ),
                           ),

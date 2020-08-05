@@ -199,6 +199,29 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  readMessage(chatId, messageId) {
+    var data = json.encode({
+      "cmd": "message:write",
+      "data": {
+        "userToken": "${user.unique}",
+        "chat_id": chatId,
+        "user_id": '${user.id}',
+        "message_id": '$messageId',
+      }
+    });
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId'); // TODO REMOVE
+    channel.sink.add(data);
+  }
+
   sendMessage(String chatID, String message,
       {int type, var fileId, attachments}) {
     outSound();

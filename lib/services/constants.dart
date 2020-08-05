@@ -1,5 +1,5 @@
-const String domen = 'com';
-// const String domen = 'xyz';
+// const String domen = 'com';
+const String domen = 'xyz';
 
 const String avatarUrl = domen == 'com'
     ? 'https://media.indigo24.com/avatars/'
