@@ -165,9 +165,19 @@ class _TransferPageState extends State<TransferPage> {
                                         style: fS14(c: 'FFFFFF'),
                                       ),
                                       SizedBox(height: 5),
-                                      Text(
-                                        '${user.balance} ₸',
-                                        style: fS18(c: 'FFFFFF'),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '${user.balance}',
+                                            style: fS18(c: 'FFFFFF'),
+                                          ),
+                                          Image(
+                                            image: AssetImage(
+                                                "assets/images/tenge.png"),
+                                            height: 12,
+                                            width: 12,
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),

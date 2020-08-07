@@ -82,6 +82,14 @@ class Api {
 
   updateFCM(token) async {
     print('updating token is called');
+    print('updating token is called');
+    print('updating token is called');
+    print('updating token is called');
+    print('updating token is called');
+    print('updating token is called');
+    print('updating token is called');
+    print('updating token is called');
+    print('updating token is called');
     try {
       response = await dio.post("/token/fcm/update", data: {
         "customerID": "${user.id}",
@@ -202,7 +210,7 @@ class Api {
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
-        print('e response is ${e.response}');
+        print('e response is  restore ${e.response}');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
@@ -350,7 +358,7 @@ class Api {
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        print('e response is login ${e.response}');
+        print('e response $phone is login ${e.response}');
         print(e.response.data);
         print(e.response.headers);
         print(e.response.request);
@@ -440,13 +448,24 @@ class Api {
     }
   }
 
-  getTransactions(page) async {
+  getTransactions(page, {String fromDate, String toDate}) async {
     try {
-      response = await dio.post("/get/transactions", data: {
+      dynamic data = {
         "customerID": "${user.id}",
         "unique": "${user.unique}",
         "page": "$page",
-      });
+      };
+      if (fromDate != null && toDate != null) {
+        data = {
+          "customerID": "${user.id}",
+          "unique": "${user.unique}",
+          'fromDate': fromDate,
+          'toDate': toDate,
+          "page": "$page",
+        };
+      }
+      response = await dio.post("/get/transactions", data: data);
+      print(data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -591,13 +610,24 @@ class Api {
     }
   }
 
-  getHistories(page) async {
+  getHistories(page, {String fromDate, String toDate}) async {
     try {
-      response = await dio.post("/get/histories", data: {
+      dynamic data = {
         "customerID": "${user.id}",
         "unique": "${user.unique}",
         "page": "$page"
-      });
+      };
+
+      if (fromDate != null && toDate != null) {
+        data = {
+          "customerID": "${user.id}",
+          "unique": "${user.unique}",
+          "page": "$page",
+          'fromDate': fromDate,
+          'toDate': toDate,
+        };
+      }
+      response = await dio.post("/get/histories", data: data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {

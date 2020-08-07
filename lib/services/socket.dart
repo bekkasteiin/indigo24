@@ -448,6 +448,20 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  muteChat(chatId, mute) {
+    var data = json.encode({
+      "cmd": "chat:mute",
+      "data": {
+        "userToken": "${user.unique}",
+        "chat_id": '$chatId',
+        "user_id": '${user.id}',
+        'mute': '$mute',
+      }
+    });
+    print('muting chat $chatId');
+    channel.sink.add(data);
+  }
+
   searchChatMembers(search, chatId) {
     var data = json.encode({
       "cmd": "chat:member:search",

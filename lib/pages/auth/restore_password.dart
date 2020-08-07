@@ -4,12 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
+import 'package:indigo24/db/country_dao.dart';
+import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
+
+import '../../main.dart';
 
 class RestorePasswordPage extends StatefulWidget {
   @override
@@ -30,23 +34,6 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   List<DropdownMenuItem<String>> dropDownMenuItems;
   String _currentCountry = "Казахстан";
 
-  _getCountries() async {
-    await api.getCountries().then((response) {
-      setState(() {
-        Iterable list = response['countries'];
-        List<dynamic> responseJson = response['countries'].toList();
-        countries = list.map((model) => Country.fromJson(model)).toList();
-        _countries = jsonDecode(jsonEncode(responseJson));
-        for (var i = 0; i < _countries.length; i++) {
-          _titles.add(_countries[i]['title']);
-        }
-        country = _countries[countryId];
-        dropDownMenuItems = getDropDownMenuItems(_titles);
-        _currentCountry = _titles[0];
-      });
-    });
-  }
-
   List<DropdownMenuItem<String>> getDropDownMenuItems(List titles) {
     List<DropdownMenuItem<String>> items = new List();
     for (var i = 0; i < titles.length; i++) {
@@ -54,6 +41,23 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
           new DropdownMenuItem(value: titles[i], child: new Text(titles[i])));
     }
     return items;
+  }
+
+  CountryDao countryDao = CountryDao();
+  var length;
+  _getCountries() async {
+    var list = await countryDao.getAll();
+    // response['countries'].forEach((element) {
+    // countryDao.insertOne(Country.fromJson(element));
+    // });
+    setState(() {
+      countries = list;
+      countries.forEach((element) {
+        _titles.add(element.title);
+      });
+      country = countries[countryId];
+      length = country.length;
+    });
   }
 
   @override
@@ -124,13 +128,13 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Countries(_countries)),
+      MaterialPageRoute(builder: (context) => Countries(countries)),
     );
 
     if (_selectedCountry != null)
       setState(() {
-        _currentCountry = _selectedCountry['title'];
-        phonePrefix = _selectedCountry['prefix'];
+        _currentCountry = _selectedCountry.title;
+        phonePrefix = _selectedCountry.phonePrefix;
       });
   }
 
@@ -286,29 +290,5 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
     return Container(
       height: h,
     );
-  }
-}
-
-class Country {
-  int id;
-  String title;
-  String phonePrefix;
-  String code;
-
-  Country(int id, String name, String phonePrefix, String code) {
-    this.id = id;
-    this.title = name;
-    this.phonePrefix = phonePrefix;
-    this.code = code;
-  }
-
-  Country.fromJson(Map json)
-      : id = json['id'],
-        title = json['name'],
-        phonePrefix = json['phonePrefix'],
-        code = json['code'];
-
-  Map toJson() {
-    return {'id': id, 'title': title, 'phonePrefix': phonePrefix, 'code': code};
   }
 }

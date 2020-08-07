@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:indigo24/db/chats_model.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_contacts.dart';
@@ -288,95 +289,120 @@ class _ChatsListPageState extends State<ChatsListPage>
             child: ListView.builder(
               itemCount: myList.length,
               itemBuilder: (context, i) {
-                print(myList[i]);
                 return Column(
                   children: <Widget>[
-                    ListTile(
-                      onTap: () {
-                        // ChatRoom.shared.checkUserOnline(ids);
-                        print('get message');
-                        ChatRoom.shared.getMessages(myList[i]['id']);
-                        goToChat(myList[i]['name'], myList[i]['id'],
-                            phone: myList[i]
-                                ['another_user_phone'], //@TODO CHECK DIS
-                            members: myList[i]['members'],
-                            memberCount: myList[i]['members_count'],
-                            chatType: myList[i]['type'],
-                            userIds: myList[i]['another_user_id'],
-                            avatar: myList[i]['avatar']
-                                .toString()
-                                .replaceAll("AxB", "200x200"),
-                            avatarUrl: myList[i]['avatar_url']);
-                      },
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: Container(
-                          height: 50,
-                          width: 50,
-                          child: ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: (myList[i]["avatar"] == null ||
-                                      myList[i]["avatar"] == '' ||
-                                      myList[i]["avatar"] == false)
-                                  ? "${avatarUrl}noAvatar.png"
-                                  : '$avatarUrl${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  CachedNetworkImage(
-                                      imageUrl: "${avatarUrl}noAvatar.png"),
+                    Slidable(
+                      actionPane: SlidableDrawerActionPane(),
+                      actionExtentRatio: 0.25,
+                      secondaryActions: <Widget>[
+                        myList[i]['mute'].toString() == '0'
+                            ? IconSlideAction(
+                                caption: '${localization.mute}',
+                                color: Colors.red,
+                                icon: Icons.volume_mute,
+                                onTap: () {
+                                  ChatRoom.shared.muteChat(myList[i]['id'], 1);
+                                  ChatRoom.shared.forceGetChat();
+                                },
+                              )
+                            : IconSlideAction(
+                                caption: '${localization.unmute}',
+                                color: Colors.grey,
+                                icon: Icons.settings_backup_restore,
+                                onTap: () {
+                                  ChatRoom.shared.muteChat(myList[i]['id'], 0);
+                                  ChatRoom.shared.forceGetChat();
+                                },
+                              ),
+                      ],
+                      child: ListTile(
+                        onTap: () {
+                          // ChatRoom.shared.checkUserOnline(ids);
+                          print('get message');
+                          ChatRoom.shared.getMessages(myList[i]['id']);
+                          goToChat(myList[i]['name'], myList[i]['id'],
+                              phone: myList[i]
+                                  ['another_user_phone'], //@TODO CHECK DIS
+                              members: myList[i]['members'],
+                              memberCount: myList[i]['members_count'],
+                              chatType: myList[i]['type'],
+                              userIds: myList[i]['another_user_id'],
+                              avatar: myList[i]['avatar']
+                                  .toString()
+                                  .replaceAll("AxB", "200x200"),
+                              avatarUrl: myList[i]['avatar_url']);
+                        },
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: Container(
+                            height: 50,
+                            width: 50,
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: (myList[i]["avatar"] == null ||
+                                        myList[i]["avatar"] == '' ||
+                                        myList[i]["avatar"] == false)
+                                    ? "${avatarUrl}noAvatar.png"
+                                    : '$avatarUrl${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    CachedNetworkImage(
+                                        imageUrl: "${avatarUrl}noAvatar.png"),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      title: Text(
-                        myList[i]["name"].length != 0
-                            ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
-                            : "",
-                        maxLines: 1,
-                        style: TextStyle(
-                            color: blackPurpleColor,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      subtitle: Text(
-                        myList[i]["last_message"].length != 0
-                            ? myList[i]["last_message"]['text'].length != 0
-                                ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"
-                                : myList[i]["last_message"]
-                                            ['message_for_type'] !=
-                                        null
-                                    ? "${myList[i]["last_message"]['message_for_type'][0].toUpperCase() + myList[i]["last_message"]['message_for_type'].substring(1)}"
-                                    : ""
-                            : "",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(color: darkGreyColor2),
-                      ),
-                      trailing: Wrap(
-                        direction: Axis.vertical,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        alignment: WrapAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            myList[i]['last_message']["time"] == null
-                                ? "null"
-                                : time(myList[i]['last_message']["time"]),
-                            style: TextStyle(color: blackPurpleColor),
-                          ),
-                          myList[i]['unread_messages'] == 0
-                              ? Container()
-                              // :
-                              // myList[i]['unread_messages'].toString().startsWith('-')?
-                              // Container()
-                              : Container(
-                                  decoration: BoxDecoration(
-                                      color: brightGreyColor4,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Text(
-                                      " ${myList[i]['unread_messages']} ",
-                                      style: TextStyle(color: Colors.white)),
-                                )
-                        ],
+                        title: Text(
+                          myList[i]["name"].length != 0
+                              ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
+                              : "",
+                          maxLines: 1,
+                          style: TextStyle(
+                              color: blackPurpleColor,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        subtitle: Text(
+                          myList[i]["last_message"].length != 0
+                              ? myList[i]["last_message"]['text'].length != 0
+                                  ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"
+                                  : myList[i]["last_message"]
+                                              ['message_for_type'] !=
+                                          null
+                                      ? "${myList[i]["last_message"]['message_for_type'][0].toUpperCase() + myList[i]["last_message"]['message_for_type'].substring(1)}"
+                                      : ""
+                              : "",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(color: darkGreyColor2),
+                        ),
+                        trailing: Wrap(
+                          direction: Axis.vertical,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          alignment: WrapAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              myList[i]['last_message']["time"] == null
+                                  ? "null"
+                                  : time(myList[i]['last_message']["time"]),
+                              style: TextStyle(color: blackPurpleColor),
+                            ),
+                            myList[i]['unread_messages'] == 0
+                                ? Container()
+                                // :
+                                // myList[i]['unread_messages'].toString().startsWith('-')?
+                                // Container()
+                                : Container(
+                                    decoration: BoxDecoration(
+                                        color: brightGreyColor4,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Text(
+                                        " ${myList[i]['unread_messages']} ",
+                                        style: TextStyle(color: Colors.white)),
+                                  )
+                          ],
+                        ),
                       ),
                     ),
                     Container(

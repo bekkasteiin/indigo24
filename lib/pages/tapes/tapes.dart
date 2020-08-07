@@ -147,6 +147,7 @@ class _TapesPageState extends State<TapesPage>
     _videoPlayerController.dispose();
     _chewieController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
+    flickMultiManager.dispose();
   }
 
   final Set _saved = Set();

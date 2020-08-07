@@ -9,6 +9,7 @@ import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'payments_service.dart';
@@ -186,7 +187,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         children: <Widget>[
           Text(
             type != null
-                ? type == 'out' ? "-${amount.toStringAsFixed(2)} KZT" : "+${amount.toStringAsFixed(2)} KZT"
+                ? type == 'out'
+                    ? "-${amount.toStringAsFixed(2)} KZT"
+                    : "+${amount.toStringAsFixed(2)} KZT"
                 : "${amount.toStringAsFixed(2)} KZT",
             style: TextStyle(
               fontSize: 18,
@@ -329,56 +332,130 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
-  SafeArea _paymentHistroyBody(snapshot) {
-    return !emptyResponse
-        ? resultList.isNotEmpty
-            ? SafeArea(
-                child: SmartRefresher(
-                  enablePullDown: false,
-                  enablePullUp: true,
-                  footer: CustomFooter(
-                    builder: (BuildContext context, LoadStatus mode) {
-                      Widget body;
-                      return Container(
-                        height: 55.0,
-                        child: Center(child: body),
-                      );
-                    },
-                  ),
-                  controller: _refreshController,
-                  onLoading: _onLoading,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    itemCount: snapshot != null ? snapshot.length : 0,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: _historyBuilder(
-                          context,
-                          "$logoUrl${snapshot[index]['logo']}",
-                          "${snapshot[index]['account']}",
-                          "${snapshot[index]['amount']}",
-                          "${snapshot[index]['title']}",
-                          "${snapshot[index]['data']}",
-                          "${snapshot[index]['status']}",
-                          index,
-                          "${snapshot[index]['pdf']}",
-                          snapshot[index]['serviceID'],
+  MaskTextInputFormatter filterFormatter = MaskTextInputFormatter(
+    mask: '****-**-** / ****-**-**',
+    filter: {
+      "*": RegExp(r'[0-9]'),
+    },
+  );
+
+  Widget _paymentHistroyBody(snapshot) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Container(
+        //   width: MediaQuery.of(context).size.width / 1.5,
+        //   margin: EdgeInsets.symmetric(horizontal: 20),
+        //   child: Row(
+        //     crossAxisAlignment: CrossAxisAlignment.center,
+        //     children: [
+        //       Flexible(
+        //         child: TextFormField(
+        //           inputFormatters: [filterFormatter],
+        //         ),
+        //       ),
+        //       InkWell(
+        //         child: Container(
+        //           width: 40,
+        //           padding: EdgeInsets.all(5),
+        //           child: Column(
+        //             children: <Widget>[
+        //               Container(
+        //                 child: Image.asset(
+        //                   'assets/images/filter.png',
+        //                   width: 20,
+        //                   height: 20,
+        //                 ),
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //         onTap: () {
+        //           String maskedText =
+        //               filterFormatter.getMaskedText().replaceAll(' ', '');
+
+        //           var splittedDates = maskedText.split("/");
+        //           page = 1;
+
+        //           api
+        //               .getHistories(page,
+        //                   fromDate: splittedDates[0], toDate: splittedDates[1])
+        //               .then((histories) {
+        //             print(histories);
+        //             if (histories['message'] == 'Not authenticated' &&
+        //                 histories['success'].toString() == 'false') {
+        //               logOut(context);
+        //             } else {
+        //               setState(() {
+        //                 logoUrl = histories['logoURL'];
+        //                 if (histories['payments'].toList().isEmpty) {
+        //                   emptyResponse = true;
+        //                 }
+        //                 if (page == 1)
+        //                   resultList = histories['payments'].toList();
+        //               });
+        //               page++;
+        //             }
+        //           });
+        //         },
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // SizedBox(height: 10),
+        !emptyResponse
+            ? resultList.isNotEmpty
+                ? Flexible(
+                    child: SafeArea(
+                      child: SmartRefresher(
+                        enablePullDown: false,
+                        enablePullUp: true,
+                        footer: CustomFooter(
+                          builder: (BuildContext context, LoadStatus mode) {
+                            Widget body;
+                            return Container(
+                              height: 55.0,
+                              child: Center(child: body),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
-              )
+                        controller: _refreshController,
+                        onLoading: _onLoading,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          itemCount: snapshot != null ? snapshot.length : 0,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: _historyBuilder(
+                                context,
+                                "$logoUrl${snapshot[index]['logo']}",
+                                "${snapshot[index]['account']}",
+                                "${snapshot[index]['amount']}",
+                                "${snapshot[index]['title']}",
+                                "${snapshot[index]['data']}",
+                                "${snapshot[index]['status']}",
+                                index,
+                                "${snapshot[index]['pdf']}",
+                                snapshot[index]['serviceID'],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  )
+                : SafeArea(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
             : SafeArea(
-                child: Center(
-                  child: CircularProgressIndicator(),
+                child: Container(
+                  child: Center(child: Text('${localization.empty}')),
                 ),
-              )
-        : SafeArea(
-            child: Container(
-              child: Center(child: Text('${localization.empty}')),
-            ),
-          );
+              ),
+      ],
+    );
   }
 }

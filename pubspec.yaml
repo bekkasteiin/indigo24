@@ -139,6 +139,7 @@ flutter:
     - assets/images/payOut.png
     - assets/images/repeat.png
     - assets/images/replyTransfer.png
+    - assets/images/filter.png
 
   fonts:
      - family: Spectral

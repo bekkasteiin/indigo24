@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -35,8 +36,10 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             if (transactions['transactions'].isEmpty) {
               emptyResponse = true;
             }
+            page++;
           }
         });
+
         return transactions;
       }
     });
@@ -46,15 +49,87 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      body: !emptyResponse
-          ? transferHistories.isNotEmpty
-              ? _transferHistoryBody(transferHistories)
-              : Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: Container(
-                child: Center(child: Text('${localization.empty}')),
-              ),
-            ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Container(
+          //   width: MediaQuery.of(context).size.width / 1.5,
+          //   margin: EdgeInsets.symmetric(horizontal: 20),
+          //   child: Row(
+          //     children: [
+          //       Flexible(
+          //         child: TextFormField(
+          //           inputFormatters: [filterFormatter],
+          //         ),
+          //       ),
+          //       InkWell(
+          //         child: Container(
+          //           width: 40,
+          //           padding: EdgeInsets.all(5),
+          //           child: Column(
+          //             children: <Widget>[
+          //               Container(
+          //                 child: Image.asset(
+          //                   'assets/images/filter.png',
+          //                   width: 20,
+          //                   height: 20,
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //         onTap: () {
+          //           String maskedText =
+          //               filterFormatter.getMaskedText().replaceAll(' ', '');
+
+          //           var splittedDates = maskedText.split("/");
+          //           page = 1;
+          //           api
+          //               .getTransactions(page,
+          //                   fromDate: splittedDates[0],
+          //                   toDate: splittedDates[1])
+          //               .then((transactions) {
+          //             print(transactions);
+          //             if (transactions['message'] == 'Not authenticated' &&
+          //                 transactions['success'].toString() == 'false') {
+          //               logOut(context);
+          //               return transactions;
+          //             } else {
+          //               setState(() {
+          //                 avatarUrl = transactions['avatarURL'];
+          //                 if (page == 1) {
+          //                   print('setStates');
+
+          //                   transferHistories =
+          //                       transactions['transactions'].toList();
+          //                   if (transactions['transactions'].isEmpty) {
+          //                     emptyResponse = true;
+          //                   }
+          //                   page++;
+          //                 }
+          //               });
+
+          //               return transactions;
+          //             }
+          //           });
+          //         },
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(height: 10),
+          !emptyResponse
+              ? transferHistories.isNotEmpty
+                  ? Flexible(
+                      child: _transferHistoryBody(transferHistories, context))
+                  : Center(child: CircularProgressIndicator())
+              : SafeArea(
+                  child: Container(
+                    child: Center(child: Text('${localization.empty}')),
+                  ),
+                ),
+        ],
+      ),
     );
   }
 
@@ -235,41 +310,56 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     });
   }
 
-  SafeArea _transferHistoryBody(snapshot) {
+  MaskTextInputFormatter filterFormatter = MaskTextInputFormatter(
+    mask: '****-**-** / ****-**-**',
+    filter: {
+      "*": RegExp(r'[0-9]'),
+    },
+  );
+
+  SafeArea _transferHistoryBody(snapshot, context) {
     return SafeArea(
-      child: SmartRefresher(
-        enablePullDown: false,
-        enablePullUp: true,
-        footer: CustomFooter(
-          builder: (BuildContext context, LoadStatus mode) {
-            Widget body;
-            return Container(
-              height: 55.0,
-              child: Center(child: body),
-            );
-          },
-        ),
-        controller: _refreshController,
-        onLoading: _onLoading,
-        child: ListView.builder(
-          itemCount: snapshot != null ? snapshot.length : 0,
-          padding: const EdgeInsets.only(bottom: 10),
-          itemBuilder: (BuildContext context, int index) {
-            return Container(
-              padding: const EdgeInsets.only(top: 10),
-              child: _historyBuilder(
-                context,
-                "${avatarUrl + snapshot[index]['avatar']}",
-                "${snapshot[index]['amount']}",
-                "${snapshot[index]['name']}",
-                "${snapshot[index]['phone']}",
-                '${snapshot[index]['type']}',
-                "${snapshot[index]['data']}",
-                index,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flexible(
+            child: SmartRefresher(
+              enablePullDown: false,
+              enablePullUp: true,
+              footer: CustomFooter(
+                builder: (BuildContext context, LoadStatus mode) {
+                  Widget body;
+                  return Container(
+                    height: 55.0,
+                    child: Center(child: body),
+                  );
+                },
               ),
-            );
-          },
-        ),
+              controller: _refreshController,
+              onLoading: _onLoading,
+              child: ListView.builder(
+                itemCount: snapshot != null ? snapshot.length : 0,
+                padding: const EdgeInsets.only(bottom: 10),
+                shrinkWrap: false,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: _historyBuilder(
+                      context,
+                      "${avatarUrl + snapshot[index]['avatar']}",
+                      "${snapshot[index]['amount']}",
+                      "${snapshot[index]['name']}",
+                      "${snapshot[index]['phone']}",
+                      '${snapshot[index]['type']}',
+                      "${snapshot[index]['data']}",
+                      index,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

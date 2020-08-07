@@ -12,6 +12,7 @@ import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../main.dart';
 
@@ -33,7 +34,10 @@ class PaymentsServicePage extends StatefulWidget {
 
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
   Api api = Api();
-
+// I/flutter (10428): forEach element {placeholder: Введите Ваш аккаунт,    name: account,  mask: ,                 qr_code: 0, regex: ^\d{1,18}$,    type: string, default: , data: ,      example: }
+// I/flutter (10428): forEach element {placeholder: Введите сумму,          name: amount,   mask: ,                 qr_code: 0, regex: ^\d{1,5}$,     type: number, default: , data: ,      example: }
+// I/flutter (10428): forEach element {placeholder: Введите номер телефона, name: account,  mask: +7 *** *** ** **, qr_code: 0, regex: ^7[0-9]{10}$,  type: phone,  default: , data: null,  example: }
+// I/flutter (10428): forEach element {placeholder: Введите сумму,          name: amount,   mask: ,                 qr_code: 0, regex: ^\d{1,5}$,     type: number, default: , data: null,  example: }
   showAlertDialog(BuildContext context, String type, String message,
       {bool withPop}) {
     Widget okButton = CupertinoDialogAction(
@@ -57,7 +61,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        print('showed dialog');
         return ConstrainedBox(
           constraints: BoxConstraints(maxHeight: 1.0),
           child: CupertinoAlertDialog(
@@ -188,6 +191,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   var accountRegex;
   String amountPlaceholder = '';
   String accountPlaceholder = '';
+  String tempString = '';
+  MaskTextInputFormatter loginFormatter;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -197,7 +202,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           body: FutureBuilder(
             future: api.getService(widget.serviceID).then((getServiceResult) {
               getServiceResult['result'].forEach((element) {
-                // print('forEach element $element');
+                print(element);
                 if ('${element['name']}' == 'amount') {
                   amountPlaceholder = element['placeholder'];
                 }
@@ -208,12 +213,15 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   if (element['mask'] == ' ') {
                     // print('if');
                     // temp = 'false';
-                    // loginFormatter = MaskTextInputFormatter(filter: { "*" : RegExp(r'[0-9]') });
+                    loginFormatter =
+                        MaskTextInputFormatter(filter: {"*": accountRegex});
                   } else {
-                    // print('else else');
+                    print('else else');
                     accountLength = element['mask'].replaceAll(' ', '').length;
 
-                    // loginFormatter = MaskTextInputFormatter(mask: '${element['mask']}', filter: { "*" : RegExp(r'[0-9]') });
+                    loginFormatter = MaskTextInputFormatter(
+                        mask: '${element['mask']}',
+                        filter: {"*": accountRegex});
                   }
                 }
               });
@@ -283,9 +291,19 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                                   style: fS14(c: 'FFFFFF'),
                                                 ),
                                                 SizedBox(height: 5),
-                                                Text(
-                                                  '${user.balance} ₸',
-                                                  style: fS18(c: 'FFFFFF'),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      '${user.balance}',
+                                                      style: fS18(c: 'FFFFFF'),
+                                                    ),
+                                                    Image(
+                                                      image: AssetImage(
+                                                          "assets/images/tenge.png"),
+                                                      height: 12,
+                                                      width: 12,
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
@@ -602,15 +620,14 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   children: <Widget>[
                     Container(
                       child: TextFormField(
-                        keyboardType: TextInputType.number,
                         inputFormatters: temp == 'false'
                             ? [
+                                // loginFormatter,
                                 LengthLimitingTextInputFormatter(accountLength),
-                                WhitelistingTextInputFormatter.digitsOnly,
                               ]
                             : [
+                                // loginFormatter,
                                 LengthLimitingTextInputFormatter(accountLength),
-                                WhitelistingTextInputFormatter.digitsOnly,
                               ],
                         decoration: InputDecoration.collapsed(
                           // hintText: '${localization.phoneNumber}',
@@ -638,7 +655,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               Expanded(
                 child: Container(
                   child: TextFormField(
-                    keyboardType: TextInputType.number,
                     controller: sumController,
                     decoration: InputDecoration.collapsed(
                         // hintText: '${localization.amount}',
@@ -647,11 +663,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     inputFormatters: [
                       BlacklistingTextInputFormatter(new RegExp(r"^(?!(0))$")),
                     ],
-                    onChanged: (value) {
-                      if (sumController.text[0] == '0') {
-                        sumController.clear();
-                      }
-                    },
+                    onChanged: (value) {},
                   ),
                 ),
               ),

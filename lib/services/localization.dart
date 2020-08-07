@@ -72,7 +72,7 @@ String somethingWentWrong = 'Somethin went wrong';
 String save = 'Save';
 String share = 'Share';
 String photo = 'Photo';
-String sessionIsOver = 'Session is over';
+String sessionIsOver = 'Your account was signed in with a different device';
 String cancel = 'Cancel';
 String allowContacts = 'Allow contacts';
 String openSettings = 'Open settings';
@@ -139,6 +139,8 @@ String calculate = 'Calculate';
 String service = 'Service';
 String toPay = 'To pay';
 String conversion = 'Conversion';
+String mute = 'Mute'; // TODO ADD LOCALIZATION
+String unmute = 'Unmute'; // TODO ADD LOCALIZATION
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -221,7 +223,7 @@ setLanguage(code) {
       save = 'Save';
       share = 'Share';
       photo = 'Photo';
-      sessionIsOver = 'Session done';
+      sessionIsOver = 'Your account was signed in with a different device';
       cancel = 'Cancel';
       allowContacts = 'Allow contacts';
       openSettings = 'Open settings';
@@ -358,7 +360,7 @@ setLanguage(code) {
       save = 'Сохранить';
       share = 'Поделиться';
       photo = 'Фото';
-      sessionIsOver = 'Сессия окончена';
+      sessionIsOver = 'На ваш аккаунт вошли через другое устройство';
       cancel = 'Cancel';
       allowContacts = 'Разрешить контакты';
       openSettings = 'Открыть настройки';
@@ -496,7 +498,7 @@ setLanguage(code) {
       save = 'Сақтау';
       share = 'Бөлісу';
       photo = 'Фото';
-      sessionIsOver = 'Сессия аяқталды';
+      sessionIsOver = 'Тіркелгіңізге басқа құрылғы арқылы кірді';
       cancel = 'Болдырмау';
       allowContacts = 'Контактілерге рұқсат беріңіз';
       openSettings = 'Параметрлерді ашу';
@@ -634,7 +636,7 @@ setLanguage(code) {
       save = 'Ҳозирги тил';
       share = 'Насиб қилса';
       photo = 'Сурат';
-      sessionIsOver = 'Сессия тугади';
+      sessionIsOver = 'Сизнинг ҳисоб бошқа қурилма орқали кирган';
       cancel = 'Бекор қилиш';
       allowContacts = 'Контактларга рухсат бериш';
       openSettings = 'Очиқ Созламалар';
@@ -771,7 +773,7 @@ setLanguage(code) {
       save = 'Saqlash';
       share = 'Share';
       photo = 'Surat';
-      sessionIsOver = 'Sessiya tugadi';
+      sessionIsOver = 'Hisobingizga boshqa qurilma orqali kirish mumkin';
       cancel = 'Cancel';
       allowContacts = 'Kontaktlar ruxsat berish';
       openSettings = 'Ochiq Sozlamalar';

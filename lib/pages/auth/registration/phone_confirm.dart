@@ -109,17 +109,13 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
           _timer = null;
         }
         if (isPageOpened) {
-          setState(() {
-            
-          });
+          setState(() {});
           if (tamer == null) {
             setState(() {
               start = start - 1;
             });
           } else {
-            setState(() {
-              
-            });
+            setState(() {});
           }
         }
       });
@@ -306,29 +302,5 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
     return Container(
       height: h,
     );
-  }
-}
-
-class Country {
-  int id;
-  String title;
-  String phonePrefix;
-  String code;
-
-  Country(int id, String name, String phonePrefix, String code) {
-    this.id = id;
-    this.title = name;
-    this.phonePrefix = phonePrefix;
-    this.code = code;
-  }
-
-  Country.fromJson(Map json)
-      : id = json['id'],
-        title = json['name'],
-        phonePrefix = json['phonePrefix'],
-        code = json['code'];
-
-  Map toJson() {
-    return {'id': id, 'title': title, 'phonePrefix': phonePrefix, 'code': code};
   }
 }

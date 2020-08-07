@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/db/country_dao.dart';
+import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/pages/auth/registration/registration.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
+import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/custom_dropdown.dart';
+
+import '../../main.dart';
 
 class IntroPage extends StatefulWidget {
   @override
@@ -18,6 +23,37 @@ class _IntroPageState extends State<IntroPage> {
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  Api api = Api();
+  CountryDao countryDao = CountryDao();
+
+  _getCountries() async {
+    await api.getCountries().then((response) async {
+      print("getCountries $response");
+      if (response == false) {
+        dioError(context);
+      } else {
+        response['countries'].forEach((element) async {
+          Country country2 = Country(
+            element['ID'],
+            element['length'],
+            element['title'],
+            element['prefix'],
+            element['code'],
+            element['mask'],
+            element['icon'],
+          );
+          await countryDao.updateOrInsert(country2);
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    _getCountries();
+    super.initState();
   }
 
   @override

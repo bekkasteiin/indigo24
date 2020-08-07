@@ -120,6 +120,8 @@ class MyApp extends StatelessWidget {
 
   bool authenticated;
   String phone;
+  String tempString = '';
+  TextEditingController sumController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -371,11 +373,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     _init();
 
     ChatRoom.shared.getMessages(m['chat_id']);
-    goToChat("${m['user_name']}", "${m['chat_id']}",
-        memberCount: "${m['type']}" == "0" ? 2 : 3,
-        chatType: "${m['type']}",
-        avatar: "${m['avatar']}",
-        userIds: "${m['user_id']}");
+    goToChat(
+      "${m['chat_name']}",
+      "${m['chat_id']}",
+      memberCount: "${m['type']}" == "0" ? 2 : 3,
+      chatType: "${m['chat_type']}",
+      avatar: "${m['avatar']}",
+      userIds: "${m['user_id']}",
+    );
   }
 
   bool withPin;
@@ -518,19 +523,48 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     api.getConfig();
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
+    print('___________ TABS INIT STATE____________');
     permissions();
     pushPermission();
     share();
     initDownloader();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
-    fcmTokenStream.listen((token) {
-      if (user.id.toString() != null.toString() &&
-          user.unique.toString() != null.toString() &&
-          user.phone.toString() != null.toString()) {
-        api.updateFCM(token);
-      }
-    });
+    // var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
+    // fcmTokenStream.listen((token) {
+    //   if (user.id.toString() != null.toString() &&
+    //       user.unique.toString() != null.toString() &&
+    //       user.phone.toString() != null.toString()) {
+    //     api.updateFCM(token);
+    //   }
+    // });
 
     Timer.run(() {
       '${user.pin}' == 'false'
@@ -581,12 +615,13 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         );
       }
     });
-    _firebaseMessaging.getToken().then((value) async {
-      print("MY FCM TOKEN $value");
-      await api.updateFCM(value).then((val) {
-        print("VALUE VALUE $val");
-      });
-    });
+
+    // _firebaseMessaging.getToken().then((value) async {
+    //   print("MY FCM TOKEN $value");
+    //   await api.updateFCM(value).then((val) {
+    //     print("VALUE VALUE $val");
+    //   });
+    // });
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {

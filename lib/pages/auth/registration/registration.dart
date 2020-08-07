@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
+import 'package:indigo24/db/country_dao.dart';
+import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'dart:convert';
@@ -23,7 +25,7 @@ int start = 0;
 Timer _timer;
 
 get tamer => _timer;
- 
+
 class _RegistrationPageState extends State<RegistrationPage> {
   var api = Api();
   TextEditingController loginController;
@@ -41,35 +43,27 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   var mask;
   var loginFormatter;
-  String prefix = '';
+  String prefix = '77';
   List _response = [];
-  String _hintText = '';
+  String _hintText = '+77';
   var length;
+  CountryDao countryDao = CountryDao();
+  var _selectedCountry;
   _getCountries() async {
-    await api.getCountries().then((response) {
-      if (response == false) {
-        dioError(context);
-      } else {
-        setState(() {
-          Iterable list = response['countries'];
-          List<dynamic> responseJson = response['countries'].toList();
-          countries = list.map((model) => Country.fromJson(model)).toList();
-          _countries = jsonDecode(jsonEncode(responseJson));
-          for (var i = 0; i < _countries.length; i++) {
-            _titles.add(_countries[i]['title']);
-            _response.add(_countries[i]);
-          }
-          country = _countries[countryId];
-          dropDownMenuItems = getDropDownMenuItems(_titles);
-          _currentCountry = _titles[0];
-          loginFormatter = MaskTextInputFormatter(
-              mask: '${_countries[0]['mask']}',
-              filter: {"*": RegExp(r'[0-9]')});
-          prefix = _countries[0]['prefix'];
-          _hintText = _countries[0]['mask'];
-          length = _countries[0]['length'];
-        });
-      }
+    var list = await countryDao.getAll();
+    // response['countries'].forEach((element) {
+    // countryDao.insertOne(Country.fromJson(element));
+    // });
+    setState(() {
+      countries = list;
+      _selectedCountry = countries[1];
+      loginFormatter = MaskTextInputFormatter(
+          mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});
+      countries.forEach((element) {
+        _titles.add(element.title);
+      });
+      country = countries[countryId];
+      length = country.length;
     });
   }
 
@@ -155,25 +149,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ));
   }
 
-  var _selectedCountry;
-
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Countries(_countries)),
+      MaterialPageRoute(builder: (context) => Countries(countries)),
     );
 
     if (_selectedCountry != null)
       setState(() {
-        _currentCountry = _selectedCountry['title'];
-        phonePrefix = _selectedCountry['prefix'];
-        _hintText = _selectedCountry['mask'];
-        prefix = _selectedCountry['prefix'];
-        _hintText = _selectedCountry['mask'];
+        _currentCountry = _selectedCountry.title;
+        phonePrefix = _selectedCountry.phonePrefix;
+        _hintText = _selectedCountry.mask;
+        prefix = _selectedCountry.phonePrefix;
+        _hintText = _selectedCountry.mask;
         loginFormatter = MaskTextInputFormatter(
-            mask: '${_selectedCountry['mask']}',
-            filter: {"*": RegExp(r'[0-9]')});
-        length = _selectedCountry['length'];
+            mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});
+        length = _selectedCountry.length;
         loginController.text = '';
       });
   }
@@ -285,7 +276,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   loginFormatter,
                                 ],
                                 decoration: InputDecoration(
-                                  hintText: '$_hintText',
+                                  hintText: '${_hintText}',
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
                                   hoverColor: Colors.black,
@@ -431,29 +422,5 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Container(
       height: h,
     );
-  }
-}
-
-class Country {
-  int id;
-  String title;
-  String phonePrefix;
-  String code;
-
-  Country(int id, String name, String phonePrefix, String code) {
-    this.id = id;
-    this.title = name;
-    this.phonePrefix = phonePrefix;
-    this.code = code;
-  }
-
-  Country.fromJson(Map json)
-      : id = json['id'],
-        title = json['name'],
-        phonePrefix = json['phonePrefix'],
-        code = json['code'];
-
-  Map toJson() {
-    return {'id': id, 'title': title, 'phonePrefix': phonePrefix, 'code': code};
   }
 }

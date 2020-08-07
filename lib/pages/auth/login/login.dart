@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
+import 'package:indigo24/db/country_dao.dart';
+import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/restore_password.dart';
+import 'package:indigo24/pages/auth/restore_password.dart';
 import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -24,31 +26,26 @@ class _LoginPageState extends State<LoginPage> {
   var countryId = 0;
   var country;
   var countries = new List<Country>();
-  var _countries;
   var phonePrefix = '77';
   List _titles = [];
   String _currentCountry = "Казахстан";
   String loginError = "";
   String passwordError = "";
+  CountryDao countryDao = CountryDao();
+
   var length;
   _getCountries() async {
-    await api.getCountries().then((response) {
-      print("getCountries $response");
-      if (response == false) {
-        dioError(context);
-      } else {
-        setState(() {
-          Iterable list = response['countries'];
-          List<dynamic> responseJson = response['countries'].toList();
-          countries = list.map((model) => Country.fromJson(model)).toList();
-          _countries = jsonDecode(jsonEncode(responseJson));
-          for (var i = 0; i < _countries.length; i++) {
-            _titles.add(_countries[i]['title']);
-          }
-          country = _countries[countryId];
-          length = country['length'];
-        });
-      }
+    var list = await countryDao.getAll();
+    // response['countries'].forEach((element) {
+    // countryDao.insertOne(Country.fromJson(element));
+    // });
+    setState(() {
+      countries = list;
+      countries.forEach((element) {
+        _titles.add(element.title);
+      });
+      country = countries[countryId];
+      length = country.length;
     });
   }
 
@@ -359,7 +356,8 @@ class _LoginPageState extends State<LoginPage> {
                                     passwordController.text)
                                 .then((response) async {
                               singInResult = response;
-                              print("LOGIN RESULT $response");
+                              print(
+                                  "LOGIN RESULT $phonePrefix${loginController.text} $response");
                               if ('${response['success']}' == 'true') {
                                 await api.getBalance();
                                 Navigator.of(context).pushAndRemoveUntil(
@@ -394,14 +392,14 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Countries(_countries)),
+      MaterialPageRoute(builder: (context) => Countries(countries)),
     );
 
     if (_selectedCountry != null)
       setState(() {
-        _currentCountry = _selectedCountry['title'];
-        phonePrefix = _selectedCountry['prefix'];
-        length = _selectedCountry['length'];
+        _currentCountry = _selectedCountry.title;
+        phonePrefix = _selectedCountry.phonePrefix;
+        length = _selectedCountry.length;
         passwordController.text = '';
         loginController.text = '';
       });
@@ -459,7 +457,7 @@ class Countries extends StatelessWidget {
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   padding: EdgeInsets.only(left: 5),
                   child: Text(
-                    '${countries[index]['title']}',
+                    '${countries[index].title}',
                     style: TextStyle(
                       color: blackPurpleColor,
                       fontWeight: FontWeight.w400,
@@ -483,29 +481,5 @@ class Countries extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class Country {
-  int id;
-  String title;
-  String phonePrefix;
-  String code;
-
-  Country(int id, String name, String phonePrefix, String code) {
-    this.id = id;
-    this.title = name;
-    this.phonePrefix = phonePrefix;
-    this.code = code;
-  }
-
-  Country.fromJson(Map json)
-      : id = json['id'],
-        title = json['name'],
-        phonePrefix = json['phonePrefix'],
-        code = json['code'];
-
-  Map toJson() {
-    return {'id': id, 'title': title, 'phonePrefix': phonePrefix, 'code': code};
   }
 }
