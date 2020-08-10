@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -231,6 +232,36 @@ class _ChatsListPageState extends State<ChatsListPage>
     );
   }
 
+  showAlertDialog(BuildContext context, String message, var chat) {
+    Widget okButton = CupertinoDialogAction(
+      isDestructiveAction: true,
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+        ChatRoom.shared.deleteChat(chat);
+      },
+    );
+    Widget noButton = CupertinoDialogAction(
+      child: Text("${localization.no}"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("$message"),
+      actions: [
+        noButton,
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   _listView(context, status) {
     return myList.isEmpty
         // ? dbChats.isNotEmpty
@@ -295,25 +326,31 @@ class _ChatsListPageState extends State<ChatsListPage>
                       actionPane: SlidableDrawerActionPane(),
                       actionExtentRatio: 0.25,
                       secondaryActions: <Widget>[
-                        myList[i]['mute'].toString() == '0'
-                            ? IconSlideAction(
-                                caption: '${localization.mute}',
-                                color: Colors.red,
-                                icon: Icons.volume_mute,
-                                onTap: () {
-                                  ChatRoom.shared.muteChat(myList[i]['id'], 1);
-                                  ChatRoom.shared.forceGetChat();
-                                },
-                              )
-                            : IconSlideAction(
-                                caption: '${localization.unmute}',
-                                color: Colors.grey,
-                                icon: Icons.settings_backup_restore,
-                                onTap: () {
-                                  ChatRoom.shared.muteChat(myList[i]['id'], 0);
-                                  ChatRoom.shared.forceGetChat();
-                                },
-                              ),
+                        IconSlideAction(
+                          caption:
+                              '${myList[i]['mute'].toString() == '0' ? localization.mute : localization.unmute}',
+                          color: myList[i]['mute'].toString() == '0'
+                              ? redColor
+                              : Colors.grey,
+                          icon: myList[i]['mute'].toString() == '0'
+                              ? Icons.volume_mute
+                              : Icons.settings_backup_restore,
+                          onTap: () {
+                            myList[i]['mute'].toString() == '0'
+                                ? ChatRoom.shared.muteChat(myList[i]['id'], 1)
+                                : ChatRoom.shared.muteChat(myList[i]['id'], 0);
+                            ChatRoom.shared.forceGetChat();
+                          },
+                        ),
+                        IconSlideAction(
+                          caption: '${localization.delete}',
+                          color: Colors.red,
+                          icon: Icons.delete,
+                          onTap: () {
+                            showAlertDialog(context, '${localization.delete} ${localization.chat} ${myList[i]['name']}?', myList[i]['id']);
+                            ChatRoom.shared.forceGetChat();
+                          },
+                        )
                       ],
                       child: ListTile(
                         onTap: () {

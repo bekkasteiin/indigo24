@@ -14,28 +14,82 @@ class BalanceHistoryPage extends StatefulWidget {
 
 class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     with TickerProviderStateMixin {
-  String logoUrl = "";
-  bool emptyResponse = false;
+  bool _emptyResponse;
+
+  int _balanceHistoryPage;
+
+  List _historyBalanceList;
+
+  Api _api;
+
+  RefreshController _balanceRefreshController;
+
   @override
   void initState() {
-    api.getHistoryBalance(balanceHistoryPage).then((histories) {
+    _emptyResponse = false;
+
+    _balanceHistoryPage = 1;
+
+    _historyBalanceList = [];
+
+    _api = Api();
+
+    _balanceRefreshController = RefreshController(initialRefresh: false);
+
+    _api.getHistoryBalance(_balanceHistoryPage).then((histories) {
       if (histories['message'] == 'Not authenticated' &&
           histories['success'].toString() == 'false') {
         logOut(context);
       } else {
         setState(() {
           if (histories['result'].isEmpty) {
-            emptyResponse = true;
+            _emptyResponse = true;
           }
-          historyBalanceList.addAll(histories['result']);
+          _historyBalanceList.addAll(histories['result']);
         });
-        balanceHistoryPage++;
+        _balanceHistoryPage++;
       }
     });
+
     super.initState();
   }
 
-  Api api = Api();
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: _paymentHistroyBalance(_historyBalanceList),
+    );
+  }
+
+  void _onBalanceRefresh() {
+    print("_onRefresh ");
+    _balanceRefreshController.refreshCompleted();
+  }
+
+  void _onBalanceLoading() async {
+    print("_onBalanceLoading ");
+    _loadBalanceData();
+    _balanceRefreshController.loadComplete();
+  }
+
+  Future _loadBalanceData() async {
+    _api.getHistoryBalance(_balanceHistoryPage + 1).then((balanceHistory) {
+      print(balanceHistory);
+      if (balanceHistory['result'].isNotEmpty) {
+        _balanceHistoryPage++;
+        List temp = balanceHistory['result'].toList();
+        setState(() {
+          _historyBalanceList.addAll(temp);
+        });
+      }
+    });
+  }
 
   Widget _historyBalanceBuilder(BuildContext context, snapshot) {
     return Column(
@@ -48,8 +102,11 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
               _paymentLogo('https://api.indigo24.com/logos/${snapshot['logo']}',
                   type: '${snapshot['type']}'),
               _historyBalanceInfo(snapshot['description'], snapshot['date']),
-              _paymentAmount('${snapshot['amount']}', '${snapshot['status']}',
-                  type: '${snapshot['type']}'),
+              _paymentAmount(
+                '${snapshot['amount']}',
+                '${snapshot['status']}',
+                type: '${snapshot['type']}',
+              ),
               SizedBox(width: 20),
             ],
           ),
@@ -78,7 +135,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
               )
             : Image.network(
                 '${logo.replaceAll("AxB", "200x200")}',
-                width: 50.0,
+                width: 50,
                 height: 50,
               ),
       ),
@@ -122,12 +179,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
   Expanded _historyBalanceInfo(String title, String date) {
     return Expanded(
       child: Column(
@@ -135,7 +186,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Text(
-            "$title",
+            title,
             style: TextStyle(
               fontSize: 12,
               color: brightGreyColor2,
@@ -143,7 +194,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
             ),
           ),
           Text(
-            "$date",
+            date,
             style: TextStyle(
               fontSize: 10,
               color: blackPurpleColor,
@@ -156,7 +207,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  AppBar buildAppBar() {
+  AppBar _buildAppBar() {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -186,67 +237,9 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  List test = [];
-  List historyBalanceList = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: buildAppBar(),
-        body: _paymentHistroyBalance(historyBalanceList));
-  }
-
-  DateTime selectedDate = DateTime.now();
-
-  Future<Null> selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
-  }
-
-  void onRefresh() {
-    print("_onRefresh ");
-    _refreshController.refreshCompleted();
-  }
-
-  void _onBalanceLoading() async {
-    print("_onBalanceLoading ");
-    _loadBalanceData();
-    _balanceRefreshController.loadComplete();
-  }
-
-  bool isLoaded = false;
-  int page = 1;
-  int balanceHistoryPage = 1;
-
-  Future _loadBalanceData() async {
-    api.getHistoryBalance(balanceHistoryPage + 1).then((balanceHistory) {
-      print(balanceHistory);
-      if (balanceHistory['result'].isNotEmpty) {
-        balanceHistoryPage++;
-        List temp = balanceHistory['result'].toList();
-        setState(() {
-          historyBalanceList.addAll(temp);
-        });
-        print(balanceHistoryPage);
-      }
-    });
-  }
-
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  RefreshController _balanceRefreshController =
-      RefreshController(initialRefresh: false);
-
   SafeArea _paymentHistroyBalance(snapshot) {
-    return !emptyResponse
-        ? historyBalanceList.isNotEmpty
+    return !_emptyResponse
+        ? _historyBalanceList.isNotEmpty
             ? SafeArea(
                 child: SmartRefresher(
                   enablePullDown: false,
@@ -262,6 +255,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                   ),
                   controller: _balanceRefreshController,
                   onLoading: _onBalanceLoading,
+                  onRefresh: _onBalanceRefresh,
                   child: ListView.builder(
                     padding: const EdgeInsets.only(bottom: 10),
                     itemCount: snapshot != null ? snapshot.length : 0,

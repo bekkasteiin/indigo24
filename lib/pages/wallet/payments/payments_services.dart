@@ -17,52 +17,65 @@ class PaymentsGroupPage extends StatefulWidget {
 }
 
 class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
-  var test = logos;
-  Api api = Api();
+  Api _api;
+
+  Map<String, dynamic> _services;
+
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: api.getServices(widget.categoryID).then((services) {
-          if (services['message'] == 'Not authenticated' &&
-              services['success'].toString() == 'false') {
-            logOut(context);
-            return services;
-          } else {
-            return services;
-          }
-        }),
-        builder: (context, snapshot) {
-          return Scaffold(
-            appBar: buildAppBar(),
-            body: snapshot.hasData == true
-                ? SafeArea(
-                    child: Scrollbar(
-                      child: ListView.builder(
-                        padding: EdgeInsets.only(bottom: 20),
-                        shrinkWrap: true,
-                        itemCount: snapshot.data["services"] != null
-                            ? snapshot.data["services"].length
-                            : 0,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: _paymentsList(
-                              context,
-                              "$logos${snapshot.data["services"][index]['logo']}",
-                              "${snapshot.data["services"][index]['title']}",
-                              snapshot.data["services"][index]['id'],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  )
-                : Center(child: CircularProgressIndicator()),
-          );
+  void initState() {
+    super.initState();
+    _api = Api();
+    _api.getServices(widget.categoryID).then((services) {
+      if (services['message'] == 'Not authenticated' &&
+          services['success'].toString() == 'false') {
+        logOut(context);
+      } else {
+        setState(() {
+          _services = services;
         });
+      }
+    });
   }
 
-  AppBar buildAppBar() {
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: _services != null
+          ? SafeArea(
+              child: Scrollbar(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(bottom: 20),
+                  shrinkWrap: true,
+                  itemCount: _services["services"] != null
+                      ? _services["services"].length
+                      : 0,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: _paymentsList(
+                        context,
+                        "$logos${_services["services"][index]['logo']}",
+                        "${_services["services"][index]['title']}",
+                        _services["services"][index]['id'],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
+    );
+  }
+
+  AppBar _buildAppBar() {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -96,13 +109,16 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
       String _serviceTitle, int index) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
             color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+            offset: Offset(0.0, 0.0),
+          )
+        ],
+      ),
       child: ButtonTheme(
         height: 40,
         child: RaisedButton(
@@ -149,11 +165,5 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 }

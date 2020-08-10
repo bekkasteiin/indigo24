@@ -19,41 +19,20 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  Api api = Api();
-  CountryDao countryDao = CountryDao();
-
-  _getCountries() async {
-    await api.getCountries().then((response) async {
-      print("getCountries $response");
-      if (response == false) {
-        dioError(context);
-      } else {
-        response['countries'].forEach((element) async {
-          Country country2 = Country(
-            element['ID'],
-            element['length'],
-            element['title'],
-            element['prefix'],
-            element['code'],
-            element['mask'],
-            element['icon'],
-          );
-          await countryDao.updateOrInsert(country2);
-        });
-      }
-    });
-  }
+  Api _api;
+  CountryDao _countryDao;
 
   @override
   void initState() {
-    _getCountries();
     super.initState();
+    _api = Api();
+    _countryDao = CountryDao();
+    _getCountries();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -139,6 +118,28 @@ class _IntroPageState extends State<IntroPage> {
             ),
           ],
         ));
+  }
+
+  _getCountries() async {
+    await _api.getCountries().then((response) async {
+      print("getCountries $response");
+      if (response == false) {
+        dioError(context);
+      } else {
+        response['countries'].forEach((element) async {
+          Country country = Country(
+            element['ID'],
+            element['length'],
+            element['title'],
+            element['prefix'],
+            element['code'],
+            element['mask'],
+            element['icon'],
+          );
+          await _countryDao.updateOrInsert(country);
+        });
+      }
+    });
   }
 
   _space(double h) {

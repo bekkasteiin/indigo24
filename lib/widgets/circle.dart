@@ -35,11 +35,13 @@ class Circle extends StatelessWidget {
       width: circleUIConfig.circleSize,
       height: circleUIConfig.circleSize,
       decoration: BoxDecoration(
-          color: filled ? circleUIConfig.fillColor : Colors.transparent,
-          shape: BoxShape.circle,
-          border: Border.all(
-              color: circleUIConfig.borderColor,
-              width: circleUIConfig.borderWidth)),
+        color: filled ? circleUIConfig.fillColor : Colors.transparent,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: circleUIConfig.borderColor,
+          width: circleUIConfig.borderWidth,
+        ),
+      ),
     );
   }
 }

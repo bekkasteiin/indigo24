@@ -10,6 +10,8 @@ import 'package:indigo24/services/api.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'aspect_ratio_video.dart';
+
 class AddTapePage extends StatefulWidget {
   AddTapePage({Key key, this.title}) : super(key: key);
 
@@ -27,140 +29,16 @@ class _AddTapePageState extends State<AddTapePage> {
   bool isVideo = false;
   VideoPlayerController _controller;
   String _retrieveDataError;
-  TextEditingController titleController = new TextEditingController();
-  TextEditingController descriptionController = new TextEditingController();
-  var api = Api();
-  final picker = ImagePicker();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  Api api = Api();
+  ImagePicker picker = ImagePicker();
   PickedFile myFile;
   bool isNotPicked = true;
-
-  Future<void> _playVideo(File file) async {
-    if (file != null && mounted) {
-      await _disposeVideoController();
-      _controller = VideoPlayerController.file(file);
-      await _controller.setVolume(1.0);
-      await _controller.initialize();
-      await _controller.setLooping(true);
-      await _controller.play();
-      setState(() {});
-    }
-  }
-
-  Future<void> _pauseVideo() async {
-    await _controller.setVolume(0.0);
-    await _controller.initialize();
-    await _controller.setLooping(false);
-    await _controller.pause();
-    setState(() {
-      _controller = null;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-  }
-
-  action() {
-    FocusScopeNode currentFocus = FocusScope.of(context);
-    if (!currentFocus.hasPrimaryFocus) {
-      currentFocus.unfocus();
-    }
-    final act = CupertinoActionSheet(
-        title: Text('${localization.selectOption}'),
-        // message: Text('Which option?'),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: Text('${localization.camera}'),
-            onPressed: () {
-              _onImageButtonPressed(ImageSource.camera);
-              Navigator.pop(context);
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: Text('${localization.gallery}'),
-            onPressed: () {
-              _onImageButtonPressed(ImageSource.gallery);
-              Navigator.pop(context);
-            },
-          )
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          child: Text('${localization.back}'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ));
-    showCupertinoModalPopup(
-        context: context, builder: (BuildContext context) => act);
-  }
-
-  void _onImageButtonPressed(ImageSource source) async {
-    if (_controller != null) {
-      await _controller.setVolume(0.0);
-    }
-    if (isVideo) {
-      final pickedFile = await picker.getVideo(source: source);
-      print(File(pickedFile.path).lengthSync());
-
-      if (File(pickedFile.path).lengthSync() > 104857600) {
-        showAlertDialog(context, "Файл превышает 100 Мб");
-        return;
-      }
-
-      // final File file = await ImagePicker.pickVideo(source: source);
-      // _videoFile = file;
-      // _currentFile = file;
-      if (pickedFile != null) {
-        setState(() {
-          _videoFile = File(pickedFile.path);
-          _currentFile = File(pickedFile.path);
-          isNotPicked = false;
-        });
-
-        print("video file from $_videoFile");
-        await _playVideo(_videoFile);
-      }
-    } else {
-      try {
-        // _imageFile = await ImagePicker.pickImage(source: source);
-        // final pickedFile = await picker.getImage(source: source);
-        final pickedFile = await picker.getImage(source: source);
-        if (pickedFile != null) {
-          setState(() {
-            _imageFile = File(pickedFile.path);
-            _currentFile = File(pickedFile.path);
-            isNotPicked = false;
-          });
-          print("image file from $_imageFile");
-          setState(() {});
-        }
-      } catch (e) {
-        _pickImageError = e;
-      }
-    }
-  }
-
-  showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
   }
 
   @override
@@ -176,95 +54,6 @@ class _AddTapePageState extends State<AddTapePage> {
   void dispose() {
     _disposeVideoController();
     super.dispose();
-  }
-
-  Future<void> _disposeVideoController() async {
-    if (_controller != null) {
-      _controller = null;
-    }
-  }
-
-  Widget _previewVideo() {
-    final Text retrieveError = _getRetrieveErrorWidget();
-    if (retrieveError != null) {
-      return retrieveError;
-    }
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: AspectRatioVideo(_controller),
-    );
-  }
-
-  Widget _previewImage() {
-    final Text retrieveError = _getRetrieveErrorWidget();
-    if (retrieveError != null) {
-      return retrieveError;
-    }
-    if (_currentFile != null) {
-      return Container(
-        height: MediaQuery.of(context).size.width,
-        width: MediaQuery.of(context).size.width,
-        child: Image(
-          image: FileImage(_currentFile),
-        ),
-      );
-    } else if (_pickImageError != null) {
-      return Text(
-        'Pick image error: $_pickImageError',
-        textAlign: TextAlign.center,
-      );
-    } else {
-      return Container(
-        child: Text("${localization.error}"),
-      );
-    }
-  }
-
-  Future<void> retrieveLostData() async {
-    final LostData response = await picker.getLostData();
-    if (response.isEmpty) {
-      return;
-    }
-    if (response.file != null) {
-      if (response.type == RetrieveType.video) {
-        isVideo = true;
-        await _playVideo(File(response.file.path));
-      } else {
-        isVideo = false;
-        setState(() {
-          _imageFile = File(response.file.path);
-        });
-      }
-    } else {
-      _retrieveDataError = response.exception.code;
-    }
-  }
-
-  Future addTape(context) async {
-    print("MY current file ${_currentFile.path}");
-    _disposeVideoController();
-    api
-        .addTape(_currentFile.path, titleController.text,
-            descriptionController.text, context)
-        .then((r) {
-      if (r['message'] == 'Not authenticated' &&
-          r['success'].toString() == 'false') {
-        logOut(context);
-        return r;
-      } else {
-        if (r["success"]) {
-          titleController.text = "";
-          descriptionController.text = "";
-          isNotPicked = true;
-          // Navigator.pop(context, r['result']);
-          Navigator.of(context).pop(r['result']);
-        } else {
-          print("false false false ");
-          showAlertDialog(context, r["message"] ?? "");
-        }
-        return r;
-      }
-    });
   }
 
   @override
@@ -491,6 +280,219 @@ class _AddTapePageState extends State<AddTapePage> {
     );
   }
 
+  Future<void> _playVideo(File file) async {
+    if (file != null && mounted) {
+      await _disposeVideoController();
+      _controller = VideoPlayerController.file(file);
+      await _controller.setVolume(1.0);
+      await _controller.initialize();
+      await _controller.setLooping(true);
+      await _controller.play();
+      setState(() {});
+    }
+  }
+
+  Future<void> _pauseVideo() async {
+    await _controller.setVolume(0.0);
+    await _controller.initialize();
+    await _controller.setLooping(false);
+    await _controller.pause();
+    setState(() {
+      _controller = null;
+    });
+  }
+
+  action() {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    final act = CupertinoActionSheet(
+        title: Text('${localization.selectOption}'),
+        // message: Text('Which option?'),
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            child: Text('${localization.camera}'),
+            onPressed: () {
+              _onImageButtonPressed(ImageSource.camera);
+              Navigator.pop(context);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Text('${localization.gallery}'),
+            onPressed: () {
+              _onImageButtonPressed(ImageSource.gallery);
+              Navigator.pop(context);
+            },
+          )
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: Text('${localization.back}'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ));
+    showCupertinoModalPopup(
+        context: context, builder: (BuildContext context) => act);
+  }
+
+  void _onImageButtonPressed(ImageSource source) async {
+    if (_controller != null) {
+      await _controller.setVolume(0.0);
+    }
+    if (isVideo) {
+      final pickedFile = await picker.getVideo(source: source);
+      print(File(pickedFile.path).lengthSync());
+
+      if (File(pickedFile.path).lengthSync() > 104857600) {
+        showAlertDialog(context, "Файл превышает 100 Мб");
+        return;
+      }
+
+      // final File file = await ImagePicker.pickVideo(source: source);
+      // _videoFile = file;
+      // _currentFile = file;
+      if (pickedFile != null) {
+        setState(() {
+          _videoFile = File(pickedFile.path);
+          _currentFile = File(pickedFile.path);
+          isNotPicked = false;
+        });
+
+        print("video file from $_videoFile");
+        await _playVideo(_videoFile);
+      }
+    } else {
+      try {
+        // _imageFile = await ImagePicker.pickImage(source: source);
+        // final pickedFile = await picker.getImage(source: source);
+        final pickedFile = await picker.getImage(source: source);
+        if (pickedFile != null) {
+          setState(() {
+            _imageFile = File(pickedFile.path);
+            _currentFile = File(pickedFile.path);
+            isNotPicked = false;
+          });
+          print("image file from $_imageFile");
+          setState(() {});
+        }
+      } catch (e) {
+        _pickImageError = e;
+      }
+    }
+  }
+
+  showAlertDialog(BuildContext context, String message) {
+    Widget okButton = CupertinoDialogAction(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("${localization.error}"),
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future<void> _disposeVideoController() async {
+    if (_controller != null) {
+      _controller = null;
+    }
+  }
+
+  Widget _previewVideo() {
+    final Text retrieveError = _getRetrieveErrorWidget();
+    if (retrieveError != null) {
+      return retrieveError;
+    }
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: AspectRatioVideo(_controller),
+    );
+  }
+
+  Widget _previewImage() {
+    final Text retrieveError = _getRetrieveErrorWidget();
+    if (retrieveError != null) {
+      return retrieveError;
+    }
+    if (_currentFile != null) {
+      return Container(
+        height: MediaQuery.of(context).size.width,
+        width: MediaQuery.of(context).size.width,
+        child: Image(
+          image: FileImage(_currentFile),
+        ),
+      );
+    } else if (_pickImageError != null) {
+      return Text(
+        'Pick image error: $_pickImageError',
+        textAlign: TextAlign.center,
+      );
+    } else {
+      return Container(
+        child: Text("${localization.error}"),
+      );
+    }
+  }
+
+  Future<void> retrieveLostData() async {
+    final LostData response = await picker.getLostData();
+    if (response.isEmpty) {
+      return;
+    }
+    if (response.file != null) {
+      if (response.type == RetrieveType.video) {
+        isVideo = true;
+        await _playVideo(File(response.file.path));
+      } else {
+        isVideo = false;
+        setState(() {
+          _imageFile = File(response.file.path);
+        });
+      }
+    } else {
+      _retrieveDataError = response.exception.code;
+    }
+  }
+
+  Future addTape(context) async {
+    print("MY current file ${_currentFile.path}");
+    _disposeVideoController();
+    api
+        .addTape(_currentFile.path, titleController.text,
+            descriptionController.text, context)
+        .then((r) {
+      if (r['message'] == 'Not authenticated' &&
+          r['success'].toString() == 'false') {
+        logOut(context);
+        return r;
+      } else {
+        if (r["success"]) {
+          titleController.text = "";
+          descriptionController.text = "";
+          isNotPicked = true;
+          // Navigator.pop(context, r['result']);
+          Navigator.of(context).pop(r['result']);
+        } else {
+          print("false false false ");
+          showAlertDialog(context, r["message"] ?? "");
+        }
+        return r;
+      }
+    });
+  }
+
   // void settingModalBottomSheet(context) {
   //   showModalBottomSheet(
   //       context: context,
@@ -506,57 +508,5 @@ class _AddTapePageState extends State<AddTapePage> {
       return result;
     }
     return null;
-  }
-}
-
-class AspectRatioVideo extends StatefulWidget {
-  AspectRatioVideo(this.controller);
-
-  final VideoPlayerController controller;
-
-  @override
-  AspectRatioVideoState createState() => AspectRatioVideoState();
-}
-
-class AspectRatioVideoState extends State<AspectRatioVideo> {
-  VideoPlayerController get controller => widget.controller;
-  bool initialized = false;
-
-  void _onVideoControllerUpdate() {
-    if (!mounted) {
-      return;
-    }
-    if (initialized != controller.value.initialized) {
-      initialized = controller.value.initialized;
-      setState(() {});
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller.addListener(_onVideoControllerUpdate);
-  }
-
-  @override
-  void dispose() {
-    controller.removeListener(_onVideoControllerUpdate);
-
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (initialized) {
-      return Center(
-        child: AspectRatio(
-          aspectRatio: controller.value?.aspectRatio,
-          child: VideoPlayer(controller),
-        ),
-      );
-    } else {
-      return Container();
-    }
   }
 }

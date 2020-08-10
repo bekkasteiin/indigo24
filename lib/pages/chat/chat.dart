@@ -99,6 +99,7 @@ class _ChatPageState extends State<ChatPage> {
   bool isSomeoneTyping = false;
   List typingMembers = [];
   List typingName = [];
+  bool isGroup;
 
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
@@ -162,6 +163,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   initState() {
+    isGroup = widget.chatType.toString() == '1';
+
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
     ChatRoom.shared.chatMembers(widget.chatID);
@@ -267,9 +270,6 @@ class _ChatPageState extends State<ChatPage> {
                 setState(() {
                   element['write'] = '1';
                 });
-
-              //{id: message:104708:45, user_id: 104708, avatar: 104708.20200708115249_AxB.jpg, phone: 77789442439, avatar_url: https://indigo24.com/uploads/avatars/, user_name: Евгений, text: a, type: 0, chat_id: 45,
-              // time: 1594291093, attachments: null, attachment_url: null, reply_data: null, forward_data: null, write: 1, day: 09-07-2020, edit: 0, another_user_id: null, another_user_avatar: null, another_user_name: null}
             });
           }
           if (senderId != userId &&
@@ -587,7 +587,7 @@ class _ChatPageState extends State<ChatPage> {
         context: context, builder: (BuildContext context) => act);
   }
 
-  moreActions() {
+  cameraActions() {
     final act = CupertinoActionSheet(
         title: Text('${localization.selectOption}'),
         // message: Text('Which option?'),
@@ -688,7 +688,8 @@ class _ChatPageState extends State<ChatPage> {
                                   ],
                                 ),
                                 onPressed: () {
-                                  moreActions();
+                                  Navigator.pop(context);
+                                  cameraActions();
                                 },
                               ),
                             ),
@@ -984,7 +985,7 @@ class _ChatPageState extends State<ChatPage> {
                           )
                         ],
                       )
-                    : (widget.chatType == 1)
+                    : (widget.chatType.toString() == '1')
                         ? Column(
                             children: <Widget>[
                               Text(
@@ -995,7 +996,7 @@ class _ChatPageState extends State<ChatPage> {
                                     fontWeight: FontWeight.w400),
                               ),
                               Text(
-                                '${localization.online} ${onlineCount}',
+                                '${localization.online} $onlineCount',
                                 style: TextStyle(
                                     color: blackPurpleColor,
                                     fontSize: 14,
@@ -1669,7 +1670,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget message(m) {
-    bool isGroup = int.parse("${widget.memberCount}") > 2 ? true : false;
     // return DeviderMessageWidget(date: 'test');
     if ('${m['id']}' == 'chat:message:create' ||
         '${m['type']}' == '7' ||

@@ -362,7 +362,7 @@ class _TapesPageState extends State<TapesPage>
                                 onVisibilityChanged: (visibility) {
                                   if (visibility.visibleFraction == 0 &&
                                       this.mounted) {
-                                    print("A B C A B C A B C A B C A B C");
+                                    print("Tapes disposed");
                                     flickMultiManager.pause();
                                   }
                                 },

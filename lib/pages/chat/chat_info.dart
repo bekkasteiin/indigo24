@@ -44,13 +44,21 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   File _image;
   @override
   void initState() {
+    print('hollla ${widget.chatName}');
+    print('hollla ${widget.chatAvatar}');
+    print('hollla ${widget.chatId}');
+    print('hollla ${widget.chatType}');
+    print('hollla ${widget.memberCount}');
     _chatTitle = '${widget.chatName}';
     listen();
     ChatRoom.shared.chatMembers(widget.chatId, page: chatMembersPage);
-    chatTitleController.text =
-        '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}';
+    if (widget.chatName.length > 2) {
+      print('asdsad');
+      chatTitleController.text =
+          '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}';
+    }
+
     super.initState();
-    onlineCount = 0;
   }
 
   final picker = ImagePicker();
@@ -624,7 +632,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                         ],
                                       )
                                     : Text(
-                                        '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}',
+                                        widget.chatName.length > 2
+                                            ? '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}'
+                                            : '',
                                         style: fS26(c: 'ffffff'),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,

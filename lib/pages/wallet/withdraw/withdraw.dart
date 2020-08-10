@@ -13,71 +13,28 @@ class WithdrawPage extends StatefulWidget {
 }
 
 class _WithdrawPageState extends State<WithdrawPage> {
-  bool preLoaderForWithdraw = false;
-  String commission = '0';
-  TextEditingController amountController;
-  Api api;
+  bool prealodaer = false;
+
+  String _commission = '0';
+
+  TextEditingController _amountController;
+
+  Api _api;
 
   @override
   void initState() {
     super.initState();
-    api = Api();
-    amountController = TextEditingController();
+    _api = Api();
+
+    _amountController = TextEditingController();
   }
 
   @override
   void dispose() {
-    api.getBalance();
     super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
 
-  WillPopScope buildWebviewScaffold(url) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          brightness: Brightness.light,
-          title: Text(
-            "${localization.withdraw}",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          backgroundColor: Colors.white,
-        ),
-        body: SafeArea(
-          child: WebviewScaffold(
-            url: '$url',
-            withZoom: true,
-            withLocalStorage: true,
-            hidden: false,
-            initialChild: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ),
-      ),
-    );
+    _api.getBalance();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   @override
@@ -108,7 +65,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
           ),
           brightness: Brightness.light,
           title: Text(
-            "${localization.withdraw}",
+            localization.withdraw,
             style: TextStyle(
               color: Colors.black,
               fontSize: 22,
@@ -122,7 +79,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: EdgeInsets.symmetric(vertical: 10),
               ),
               Center(
                 child: Text('${localization.commission} $withdrawCommission%'),
@@ -149,21 +106,21 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   ],
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration.collapsed(
-                    hintText: '${localization.amount}',
+                    hintText: localization.amount,
                   ),
                   style: TextStyle(fontSize: 20),
-                  controller: amountController,
+                  controller: _amountController,
                   onChanged: (String text) async {
-                    if (amountController.text.isNotEmpty) {
-                      if (int.parse(amountController.text) > 0) {
-                        if (int.parse(amountController.text) < 1000) {
+                    if (_amountController.text.isNotEmpty) {
+                      if (int.parse(_amountController.text) > 0) {
+                        if (int.parse(_amountController.text) < 1000) {
                           setState(() {
-                            commission = '0';
+                            _commission = '0';
                           });
                         } else {
                           if (double.parse(text) <= double.parse(withdrawMax)) {
                             setState(() {
-                              commission = (int.parse(text) *
+                              _commission = (int.parse(text) *
                                       double.parse(withdrawCommission) /
                                       100)
                                   .toStringAsFixed(2);
@@ -171,21 +128,22 @@ class _WithdrawPageState extends State<WithdrawPage> {
                           }
                         }
                       }
-                      if (double.parse(commission) <=
+                      if (double.parse(_commission) <=
                           double.parse(withdrawMinCommission)) {
                         setState(() {
-                          commission = '$withdrawMinCommission';
+                          _commission = '$withdrawMinCommission';
                         });
                       }
                     } else {
                       setState(() {
-                        commission = '0';
+                        _commission = '0';
                       });
                     }
                   },
                 ),
               ),
-              Center(child: Text('${localization.commission} $commission KZT')),
+              Center(
+                  child: Text('${localization.commission} $_commission KZT')),
               Container(
                 height: 50,
                 width: 200,
@@ -204,33 +162,36 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 alignment: Alignment.center,
                 margin: EdgeInsets.only(top: 20, bottom: 10),
                 child: ButtonTheme(
-                  minWidth: double.infinity,
                   height: 100.0,
                   child: FlatButton(
                     onPressed: () async {
-                      if (amountController.text.isNotEmpty) {
+                      if (_amountController.text.isNotEmpty) {
                         FocusScopeNode currentFocus = FocusScope.of(context);
+
                         if (!currentFocus.hasPrimaryFocus) {
                           currentFocus.unfocus();
                         }
+
                         setState(() {
-                          preLoaderForWithdraw = true;
+                          prealodaer = true;
                         });
-                        api
-                            .withdraw(amountController.text)
+
+                        _api
+                            .withdraw(_amountController.text)
                             .then((withdrawResult) {
                           print('Withdraw result $withdrawResult');
+
                           setState(() {
-                            preLoaderForWithdraw = false;
+                            prealodaer = false;
                           });
+
                           if (withdrawResult['success'].toString() == 'true') {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => buildWebviewScaffold(
-                                  withdrawResult['result']['redirectURL'],
-                                ),
-                              ),
+                                  builder: (context) => buildWebviewScaffold(
+                                        withdrawResult['result']['redirectURL'],
+                                      )),
                             );
                           } else {
                             Widget okButton = CupertinoDialogAction(
@@ -240,11 +201,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
                               },
                             );
                             CupertinoAlertDialog alert = CupertinoAlertDialog(
-                              title: Text("${localization.attention}"),
+                              title: Text(localization.attention),
                               content: Text(withdrawResult['message']),
-                              actions: [
-                                okButton,
-                              ],
+                              actions: [okButton],
                             );
                             showDialog(
                               context: context,
@@ -257,19 +216,63 @@ class _WithdrawPageState extends State<WithdrawPage> {
                       }
                     },
                     child: Text(
-                      '${localization.withdraw}',
+                      localization.withdraw,
                       style: TextStyle(
-                        color: primaryColor,
-                        fontWeight: FontWeight.w800,
-                      ),
+                          color: primaryColor, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
               ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  WillPopScope buildWebviewScaffold(url) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
+                ),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          brightness: Brightness.light,
+          title: Text(
+            localization.withdraw,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+        ),
+        body: SafeArea(
+          child: WebviewScaffold(
+            url: '$url',
+            withZoom: true,
+            withLocalStorage: true,
+            hidden: false,
+            initialChild: Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
         ),
       ),

@@ -13,72 +13,31 @@ class RefillPage extends StatefulWidget {
 }
 
 class _RefillPageState extends State<RefillPage> {
-  final flutterWebViewPlugin = FlutterWebviewPlugin();
-  bool preLoaderForRefill = false;
-  TextEditingController amountController;
-  String commission = '0';
-  Api api;
+  bool _preloader;
+
+  String _commission;
+
+  Api _api;
+
+  final FlutterWebviewPlugin flutterWebViewPlugin = FlutterWebviewPlugin();
+
+  TextEditingController _amountController;
 
   @override
   void initState() {
-    api = Api();
-    amountController = TextEditingController();
     super.initState();
+    _preloader = false;
+    _commission = '0';
+    _api = Api();
+    _amountController = TextEditingController();
   }
 
   @override
   void dispose() {
-    api.getBalance();
     super.dispose();
+    _api.getBalance();
+    _amountController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  WillPopScope buildWebviewScaffold(url) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          brightness: Brightness.light,
-          title: Text(
-            "${localization.refill}",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          backgroundColor: Colors.white,
-        ),
-        body: SafeArea(
-          child: WebviewScaffold(
-            url: '$url',
-            withZoom: true,
-            withLocalStorage: true,
-            hidden: false,
-            initialChild: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -156,19 +115,19 @@ class _RefillPageState extends State<RefillPage> {
                         hintText: '${localization.amount}',
                       ),
                       style: TextStyle(fontSize: 20),
-                      controller: amountController,
+                      controller: _amountController,
                       onChanged: (String text) async {
-                        if (amountController.text.isNotEmpty) {
-                          if (int.parse(amountController.text) > 0) {
-                            if (int.parse(amountController.text) < 1000) {
+                        if (_amountController.text.isNotEmpty) {
+                          if (int.parse(_amountController.text) > 0) {
+                            if (int.parse(_amountController.text) < 1000) {
                               setState(() {
-                                commission = '0';
+                                _commission = '0';
                               });
                             } else {
                               if (double.parse(text) <=
                                   double.parse(refillMax)) {
                                 setState(() {
-                                  commission = (int.parse(text) *
+                                  _commission = (int.parse(text) *
                                           double.parse(refillCommission) /
                                           100)
                                       .toStringAsFixed(2);
@@ -176,22 +135,22 @@ class _RefillPageState extends State<RefillPage> {
                               }
                             }
                           }
-                          if (double.parse(commission) <=
+                          if (double.parse(_commission) <=
                               double.parse(refillMinCommission)) {
                             setState(() {
-                              commission = '$refillMinCommission';
+                              _commission = '$refillMinCommission';
                             });
                           }
                         } else {
                           setState(() {
-                            commission = '0';
+                            _commission = '0';
                           });
                         }
                       },
                     ),
                   ),
                   Center(
-                    child: Text('${localization.commission} $commission KZT'),
+                    child: Text('${localization.commission} $_commission KZT'),
                   ),
                   Container(
                     height: 50,
@@ -215,20 +174,20 @@ class _RefillPageState extends State<RefillPage> {
                       height: 100.0,
                       child: FlatButton(
                         onPressed: () async {
-                          if (amountController.text.isNotEmpty) {
+                          if (_amountController.text.isNotEmpty) {
                             FocusScopeNode currentFocus =
                                 FocusScope.of(context);
                             if (!currentFocus.hasPrimaryFocus) {
                               currentFocus.unfocus();
                             }
                             setState(() {
-                              preLoaderForRefill = true;
+                              _preloader = true;
                             });
-                            api
-                                .refill(amountController.text)
+                            _api
+                                .refill(_amountController.text)
                                 .then((refillResult) {
                               setState(() {
-                                preLoaderForRefill = false;
+                                _preloader = false;
                               });
                               if (refillResult['success'].toString() ==
                                   'true') {
@@ -281,12 +240,60 @@ class _RefillPageState extends State<RefillPage> {
                 ],
               ),
             ),
-            preLoaderForRefill
+            _preloader
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
                 : Center()
           ],
+        ),
+      ),
+    );
+  }
+
+  WillPopScope buildWebviewScaffold(url) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          leading: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(10),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/back.png',
+                ),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          brightness: Brightness.light,
+          title: Text(
+            "${localization.refill}",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+        ),
+        body: SafeArea(
+          child: WebviewScaffold(
+            url: '$url',
+            withZoom: true,
+            withLocalStorage: true,
+            hidden: false,
+            initialChild: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
         ),
       ),
     );

@@ -218,6 +218,17 @@ class ChatRoom {
     print('read message $messageId');
     print('read message $messageId');
     print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
+    print('read message $messageId');
     print('read message $messageId'); // TODO REMOVE
     channel.sink.add(data);
   }
@@ -462,6 +473,19 @@ class ChatRoom {
     channel.sink.add(data);
   }
 
+  deleteChat(chatId) {
+    var data = json.encode({
+      "cmd": "chat:delete",
+      "data": {
+        "user_id": '${user.id}',
+        "userToken": "${user.unique}",
+        "chat_id": '$chatId',
+      }
+    });
+    print('deleting chat $chatId');
+    channel.sink.add(data);
+  }
+
   searchChatMembers(search, chatId) {
     var data = json.encode({
       "cmd": "chat:member:search",
@@ -524,11 +548,11 @@ class ChatRoom {
               }
               break;
             case "chats:get":
-              changeController.add(new MyEvent(json));
+              changeController.add(MyEvent(json));
               break;
             case "chat:get":
               if (!cabinetController.isClosed) {
-                cabinetController.add(new MyCabinetEvent(json));
+                cabinetController.add(MyCabinetEvent(json));
               }
               break;
             case "message:create":
@@ -537,82 +561,84 @@ class ChatRoom {
               forceGetChat();
               if (cabinetController == null) {
                 // inSound();
-                changeController.add(new MyEvent(json));
+                changeController.add(MyEvent(json));
                 print("new message in CHATS null page");
               } else {
                 if (!cabinetController.isClosed) {
                   print("new message in CHAT page");
-                  // inSound();
-                  cabinetController.add(new MyCabinetEvent(json));
+                  cabinetController.add(MyCabinetEvent(json));
                 } else {
-                  // inSound();
-                  changeController.add(new MyEvent(json));
+                  changeController.add(MyEvent(json));
                   print("new message in CHATS page");
                 }
               }
               break;
             case "user:check":
               if (contactController != null) {
-                contactController.add(new MyContactEvent(json));
+                contactController.add(MyContactEvent(json));
               }
               if (cabinetInfoController != null) {
                 if (!cabinetInfoController.isClosed) {
                   print('added to cabinet info');
-                  cabinetInfoController.add(new MyCabinetInfoEvent(json));
+                  cabinetInfoController.add(MyCabinetInfoEvent(json));
                 }
               }
               if (changeController != null) {
-                changeController.add(new MyEvent(json));
+                changeController.add(MyEvent(json));
               }
               break;
             case "chat:members:add":
-              contactController.add(new MyContactEvent(json));
+              contactController.add(MyContactEvent(json));
               break;
             case "user:check:online":
-              cabinetController.add(new MyCabinetEvent(json));
+              cabinetController.add(MyCabinetEvent(json));
               break;
             case "chat:create":
               // this is bool for check load more is needed or not
               globalBoolForForceGetChat = false;
               forceGetChat();
-              contactController.add(new MyContactEvent(json));
+              contactController.add(MyContactEvent(json));
               break;
             case "chat:members":
               print('added to chatInfoController');
               if (chatInfoController != null) {
-                chatInfoController.add(new MyChatInfoEvent(json));
+                chatInfoController.add(MyChatInfoEvent(json));
               }
               if (cabinetController != null && !cabinetController.isClosed) {
-                cabinetController.add(new MyCabinetEvent(json));
+                cabinetController.add(MyCabinetEvent(json));
               }
               break;
             case "chat:member:search":
               print('added to chatInfoController');
-              chatInfoController.add(new MyChatInfoEvent(json));
+              chatInfoController.add(MyChatInfoEvent(json));
               break;
             case "chat:members:privileges":
               print('added to chatInfoController');
-              chatInfoController.add(new MyChatInfoEvent(json));
+              chatInfoController.add(MyChatInfoEvent(json));
               break;
             case "user:writing":
               if (cabinetController != null && !cabinetController.isClosed)
-                cabinetController.add(new MyCabinetEvent(json));
+                cabinetController.add(MyCabinetEvent(json));
               break;
             case "message:deleted:all":
               if (cabinetController != null)
-                cabinetController.add(new MyCabinetEvent(json));
+                cabinetController.add(MyCabinetEvent(json));
               break;
             case "message:edit":
               if (cabinetController != null)
-                cabinetController.add(new MyCabinetEvent(json));
+                cabinetController.add(MyCabinetEvent(json));
               break;
             case "chat:members:delete":
               print('added to chatInfoController');
-              chatInfoController.add(new MyChatInfoEvent(json));
+              chatInfoController.add(MyChatInfoEvent(json));
               break;
             case "chat:member:leave":
               print('added to chatInfoController');
-              chatInfoController.add(new MyChatInfoEvent(json));
+              chatInfoController.add(MyChatInfoEvent(json));
+              break;
+            case "message:write":
+              changeController.add(MyEvent(json));
+              print("adding message write to chat");
               break;
             default:
               print('default print cmd: $cmd json: $json');
@@ -621,7 +647,7 @@ class ChatRoom {
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        Future.delayed(const Duration(seconds: 15), () {
+        Future.delayed(const Duration(seconds: 1), () {
           connect(context);
           init();
         });

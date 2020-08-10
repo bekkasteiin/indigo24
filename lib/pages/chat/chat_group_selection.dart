@@ -7,6 +7,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 
+import '../../main.dart';
 import 'chat.dart';
 import 'chat_contacts.dart';
 
@@ -45,7 +46,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   @override
   void initState() {
     super.initState();
-    actualList.addAll(contacts);
+    actualList.addAll(myContacts);
     ChatRoom.shared.setContactsStream();
     _saved2.add({
       "phone": "${user.phone}",
@@ -269,7 +270,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                         scrollDirection: Axis.horizontal,
                         itemCount: _saved2.length != null ? _saved2.length : 0,
                         itemBuilder: (BuildContext context, int index) {
-                          // print(_saved2[index]);
                           return Stack(
                             children: <Widget>[
                               Container(
@@ -390,8 +390,11 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       child: ListView.builder(
                         itemCount: actualList.length,
                         itemBuilder: (BuildContext context, int index) {
-                          if ('${user.phone}' ==
-                              '+${actualList[index]['phone']}') return Center();
+                          if (actualList[index].phone == null &&
+                              actualList[index].name == null)
+                            return Container();
+                          if ('${user.phone}' == '+${actualList[index].phone}')
+                            return Center();
                           return Padding(
                             padding: const EdgeInsets.only(top: 2),
                             child: Container(
@@ -399,32 +402,28 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                 title: Wrap(
                                   children: <Widget>[
                                     Text(
-                                      '${actualList[index]['name']}',
+                                      '${actualList[index].name}',
                                       style: TextStyle(fontSize: 16.0),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
                                 subtitle: Text(
-                                  '${actualList[index]['phone']}',
+                                  '${actualList[index].phone}',
                                   style: TextStyle(fontSize: 14.0),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                value: valu(index),
+                                value: value(index),
                                 onChanged: (val) {
-                                  // print(_savedList.contains({'phone': '77479918574'},));
-                                  // print(_savedList);
-                                  print(_saved2);
                                   setState(() {
                                     if (val == true) {
                                       tempIndex = index;
-                                      ChatRoom.shared.userCheck(
-                                          actualList[index]['phone']);
+                                      ChatRoom.shared
+                                          .userCheck(actualList[index].phone);
                                     } else {
-                                      print(_saved2);
                                       _saved2.removeWhere((item) {
                                         return '${item['phone']}' ==
-                                            '${actualList[index]['phone']}';
+                                            '${actualList[index].phone}';
                                       });
                                     }
                                   });
@@ -446,10 +445,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             : Center(child: Text('${localization.emptyContacts}')));
   }
 
-  valu(index) {
+  value(index) {
     bool tempo = false;
     _saved2.forEach((element) {
-      if ('${element['phone']}' == '${actualList[index]['phone']}') {
+      if ('${element['phone']}' == '${actualList[index].phone}') {
         tempo = true;
       }
     });

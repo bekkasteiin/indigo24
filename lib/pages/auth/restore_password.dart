@@ -1,5 +1,3 @@
-// home: TimerPage()
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,13 +5,12 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
-import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 
-import '../../main.dart';
+import 'countries.dart';
 
 class RestorePasswordPage extends StatefulWidget {
   @override
@@ -22,39 +19,23 @@ class RestorePasswordPage extends StatefulWidget {
 
 class _RestorePasswordPageState extends State<RestorePasswordPage> {
   var api = Api();
-  TextEditingController loginController;
-  TextEditingController passwordController;
+  TextEditingController _loginController;
+  TextEditingController _passwordController;
   var countryId = 0;
   var country;
-  var countries = new List<Country>();
+  var countries = List<Country>();
   var _countries;
   var phonePrefix = '77';
   var smsCode = 0;
-  List _titles = [];
   List<DropdownMenuItem<String>> dropDownMenuItems;
   String _currentCountry = "Казахстан";
 
-  List<DropdownMenuItem<String>> getDropDownMenuItems(List titles) {
-    List<DropdownMenuItem<String>> items = new List();
-    for (var i = 0; i < titles.length; i++) {
-      items.add(
-          new DropdownMenuItem(value: titles[i], child: new Text(titles[i])));
-    }
-    return items;
-  }
-
-  CountryDao countryDao = CountryDao();
+  CountryDao _countryDao = CountryDao();
   var length;
   _getCountries() async {
-    var list = await countryDao.getAll();
-    // response['countries'].forEach((element) {
-    // countryDao.insertOne(Country.fromJson(element));
-    // });
+    var list = await _countryDao.getAll();
     setState(() {
       countries = list;
-      countries.forEach((element) {
-        _titles.add(element.title);
-      });
       country = countries[countryId];
       length = country.length;
     });
@@ -63,15 +44,42 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   @override
   void initState() {
     super.initState();
-    loginController = new TextEditingController();
-    passwordController = new TextEditingController();
+    _loginController = TextEditingController();
+    _passwordController = TextEditingController();
     _getCountries();
   }
 
   @override
   void dispose() {
     super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    _loginController.dispose();
+    _passwordController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(0.0),
+          child: AppBar(
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            brightness: Brightness.light,
+          ),
+        ),
+        body: Stack(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: introBackgroundProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            _buildForeground()
+          ],
+        ));
   }
 
   Future<void> _showError(BuildContext context, m, type) {
@@ -90,7 +98,9 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                 Navigator.of(context).pop();
                 if (type == 1)
                   Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(),
+                      ),
                       (r) => false);
               },
             ),
@@ -98,29 +108,6 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
         );
       },
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0.0),
-          child: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.white,
-            brightness: Brightness.light,
-          ),
-        ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-                decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: introBackgroundProvider, fit: BoxFit.cover),
-            )),
-            _buildForeground()
-          ],
-        ));
   }
 
   var _selectedCountry;
@@ -134,7 +121,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        phonePrefix = _selectedCountry.phonePrefix;
+        phonePrefix = _selectedCountry._phonePrefix;
       });
   }
 
@@ -214,7 +201,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                                     color: Colors.black, fontSize: 15),
                               ),
                               TextField(
-                                controller: loginController,
+                                controller: _loginController,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
                                     color: Colors.black, fontSize: 15),
@@ -247,7 +234,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                         onPressed: () async {
                           await api
                               .restorePassword(
-                                  phonePrefix + loginController.text)
+                                  phonePrefix + _loginController.text)
                               .then((restorePasswordResponse) async {
                             if (restorePasswordResponse['success'] == true) {
                               _showError(context,
@@ -269,21 +256,6 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
         ),
       ),
     );
-  }
-
-  void changedDropDownItem(String selectedCountry) {
-    print("Selected county $selectedCountry, we are going to refresh the UI");
-    print("TEST $_countries");
-    for (var i = 0; i < _countries.length; i++) {
-      if (_countries[i]['title'] == selectedCountry) {
-        countryId = i;
-        phonePrefix = _countries[countryId]['prefix'];
-      }
-    }
-    setState(() {
-      _currentCountry = selectedCountry;
-    });
-    print("Current country is $_currentCountry and prefix $phonePrefix");
   }
 
   _space(double h) {
