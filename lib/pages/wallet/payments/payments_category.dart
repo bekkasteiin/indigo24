@@ -23,7 +23,6 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
     _api = Api();
 
     _api.getCategories().then((categories) {
-      print('this is categories $categories');
       if (categories['message'] == 'Not authenticated' &&
           categories['success'].toString() == 'false') {
         logOut(context);

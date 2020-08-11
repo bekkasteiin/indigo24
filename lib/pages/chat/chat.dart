@@ -161,10 +161,11 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  int membersCount;
   @override
   initState() {
     isGroup = widget.chatType.toString() == '1';
-
+    membersCount = widget.memberCount;
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
     ChatRoom.shared.chatMembers(widget.chatID);
@@ -265,6 +266,7 @@ class _ChatPageState extends State<ChatPage> {
           var userId = user.id.toString();
           if ('${e.json['data']['chat_id']}' == '${widget.chatID}' &&
               senderId != userId) {
+            ChatRoom.shared.readMessage(widget.chatID, e.json['data']['id']);
             myList.forEach((element) {
               if (element['write'].toString() == '0')
                 setState(() {
@@ -281,8 +283,6 @@ class _ChatPageState extends State<ChatPage> {
           ChatRoom.shared.getMessages(widget.chatID);
           break;
         case "user:check:online":
-          // print('${e.json['data']['online']}');
-          print(e.json);
           setState(() {
             hiddenId = '${e.json['data'][0]['user_id']}';
             online = '${e.json['data'][0]['online']}';
@@ -358,7 +358,16 @@ class _ChatPageState extends State<ChatPage> {
                 curve: Curves.linear,
                 alignment: 0.9);
           });
-
+          break;
+        case "message:write":
+          print('message read');
+          var mId = e.json['data']['message_id'];
+          var i = myList.indexWhere((element) =>
+              (element['id'] == null ? element['message_id'] : element['id']) ==
+              mId);
+          setState(() {
+            myList[i]['write'] = '1';
+          });
           break;
         default:
           print('CABINET EVENT DEFAULT');
@@ -972,7 +981,7 @@ class _ChatPageState extends State<ChatPage> {
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          (widget.memberCount > 2)
+                          (membersCount > 2)
                               ? Text("${typingName.join(' ')} ",
                                   style: TextStyle(
                                       color: blackPurpleColor,
@@ -989,7 +998,7 @@ class _ChatPageState extends State<ChatPage> {
                         ? Column(
                             children: <Widget>[
                               Text(
-                                '${localization.members} ${widget.memberCount}',
+                                '${localization.members} ${membersCount}',
                                 style: TextStyle(
                                     color: blackPurpleColor,
                                     fontSize: 14,
@@ -1018,16 +1027,16 @@ class _ChatPageState extends State<ChatPage> {
                               ),
               ],
             ),
-            onTap: () {
+            onTap: () async {
               ChatRoom.shared.setChatInfoStream();
               ChatRoom.shared.cabinetController.close();
-              Navigator.push(
+              var chatProfileResult = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatProfileInfo(
                     chatType: widget.chatType,
                     chatName: widget.name,
-                    memberCount: widget.memberCount,
+                    memberCount: membersCount,
                     chatAvatar:
                         widget.avatar == null ? 'noAvatar.png' : widget.avatar,
                     chatId: widget.chatID,
@@ -1038,6 +1047,11 @@ class _ChatPageState extends State<ChatPage> {
                   ChatRoom.shared.getMessages('${widget.chatID}');
                 });
               });
+              if (chatProfileResult != null) {
+                setState(() {
+                  membersCount = chatProfileResult;
+                });
+              }
             },
           ),
           actions: <Widget>[
@@ -1072,7 +1086,7 @@ class _ChatPageState extends State<ChatPage> {
                     builder: (context) => ChatProfileInfo(
                       chatType: widget.chatType,
                       chatName: widget.name,
-                      memberCount: widget.memberCount,
+                      memberCount: membersCount,
                       chatAvatar: widget.avatar == null
                           ? 'noAvatar.png'
                           : widget.avatar,

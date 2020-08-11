@@ -278,6 +278,29 @@ class _FileMessageState extends State<FileMessage> {
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
+      height: MediaQuery.of(context).size.width * 0.1,
+      child: Material(
+        child: InkWell(
+          onTap: globalTask.status == DownloadTaskStatus.complete
+              ? () {
+                  _openDownloadedFile(globalTask).then((success) {
+                    if (!success) {
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(content: Text('Cannot open this file')));
+                    }
+                  });
+                }
+              : null,
+          child: _buildActionForTask(globalTask),
+        ),
+      ),
+    );
+  }
+
   void _bindBackgroundIsolate() {
     bool isSuccess = IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
@@ -345,11 +368,12 @@ class _FileMessageState extends State<FileMessage> {
         onReceiveProgress: showDownloadProgress,
         //Received data with List<int>
         options: Options(
-            responseType: ResponseType.bytes,
-            followRedirects: false,
-            validateStatus: (status) {
-              return status < 500;
-            }),
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       );
 
       print(response.headers);
@@ -378,45 +402,24 @@ class _FileMessageState extends State<FileMessage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        width: MediaQuery.of(context).size.width * 0.5,
-        height: MediaQuery.of(context).size.width * 0.1,
-        child: Material(
-            child: InkWell(
-                onTap: globalTask.status == DownloadTaskStatus.complete
-                    ? () {
-                        _openDownloadedFile(globalTask).then((success) {
-                          if (!success) {
-                            Scaffold.of(context).showSnackBar(SnackBar(
-                                content: Text('Cannot open this file')));
-                          }
-                        });
-                      }
-                    : null,
-                child: _buildActionForTask(globalTask))));
-  }
-
   Widget _buildActionForTask(_TaskInfo task) {
     if (task.status == DownloadTaskStatus.undefined) {
       return RaisedButton.icon(
-          onPressed: () async {
-            var tempDir = await getTemporaryDirectory();
-            String fullPath = tempDir.path + "/boo2.pdf'";
-            print('full path $fullPath');
-
-            _requestDownload(task);
-
-            // download2(dio, widget.url, fullPath);
-          },
-          icon: Icon(
-            Icons.file_download,
-            color: Colors.white,
-          ),
-          color: Colors.green,
-          textColor: Colors.white,
-          label: Text('Download $percent'));
+        onPressed: () async {
+          var tempDir = await getTemporaryDirectory();
+          String fullPath = tempDir.path + "/boo2.pdf'";
+          print('full path $fullPath');
+          _requestDownload(task);
+          // download2(dio, widget.url, fullPath);
+        },
+        icon: Icon(
+          Icons.file_download,
+          color: whiteColor,
+        ),
+        color: Colors.green,
+        textColor: whiteColor,
+        label: Text('Download $percent'),
+      );
     } else if (task.status == DownloadTaskStatus.running) {
       return new RawMaterialButton(
         onPressed: () {
@@ -426,29 +429,29 @@ class _FileMessageState extends State<FileMessage> {
           Icons.pause,
           color: Colors.red,
         ),
-        shape: new CircleBorder(),
-        constraints: new BoxConstraints(minHeight: 32.0, minWidth: 32.0),
+        shape: CircleBorder(),
+        constraints: BoxConstraints(minHeight: 32.0, minWidth: 32.0),
       );
     } else if (task.status == DownloadTaskStatus.paused) {
-      return new RawMaterialButton(
+      return RawMaterialButton(
         onPressed: () {
           _resumeDownload(task);
         },
-        child: new Icon(
+        child: Icon(
           Icons.play_arrow,
           color: Colors.green,
         ),
-        shape: new CircleBorder(),
-        constraints: new BoxConstraints(minHeight: 32.0, minWidth: 32.0),
+        shape: CircleBorder(),
+        constraints: BoxConstraints(minHeight: 32.0, minWidth: 32.0),
       );
     } else if (task.status == DownloadTaskStatus.complete) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          new Text(
+          Text(
             'Ready',
-            style: new TextStyle(color: Colors.green),
+            style: TextStyle(color: Colors.green),
           ),
           RawMaterialButton(
             onPressed: () {
@@ -458,19 +461,19 @@ class _FileMessageState extends State<FileMessage> {
               Icons.delete_forever,
               color: Colors.red,
             ),
-            shape: new CircleBorder(),
-            constraints: new BoxConstraints(minHeight: 32.0, minWidth: 32.0),
+            shape: CircleBorder(),
+            constraints: BoxConstraints(minHeight: 32.0, minWidth: 32.0),
           )
         ],
       );
     } else if (task.status == DownloadTaskStatus.canceled) {
-      return new Text('Canceled', style: new TextStyle(color: Colors.red));
+      return Text('Canceled', style: TextStyle(color: Colors.red));
     } else if (task.status == DownloadTaskStatus.failed) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          new Text('Failed', style: new TextStyle(color: Colors.red)),
+          Text('Failed', style: TextStyle(color: Colors.red)),
           RawMaterialButton(
             onPressed: () {
               _retryDownload(task);
@@ -479,8 +482,8 @@ class _FileMessageState extends State<FileMessage> {
               Icons.refresh,
               color: Colors.green,
             ),
-            shape: new CircleBorder(),
-            constraints: new BoxConstraints(minHeight: 32.0, minWidth: 32.0),
+            shape: CircleBorder(),
+            constraints: BoxConstraints(minHeight: 32.0, minWidth: 32.0),
           )
         ],
       );

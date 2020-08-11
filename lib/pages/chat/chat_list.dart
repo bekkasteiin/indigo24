@@ -34,40 +34,20 @@ bool globalBoolForForceGetChat = false;
 class _ChatsListPageState extends State<ChatsListPage>
     with AutomaticKeepAliveClientMixin {
   bool isOffline = false;
-
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  final TextStyle initialStyle = TextStyle(
+    fontSize: 20.0,
+    color: Colors.blue,
+    fontWeight: FontWeight.bold,
+  );
 
-  void _onRefresh() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-
-    print("_onRefresh");
-
-    // if failed,use refreshFailed()
-    _refreshController.refreshCompleted();
-  }
-
-  void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-
-    // items.add((items.length+1).toString());
-    print("_onLoading");
-    print(myList.length);
-    if (myList.length % 20 == 0) {
-      globalBoolForForceGetChat = true;
-      chatsPage++;
-      if (mounted)
-        setState(() {
-          print("_onLoading CHATS with page $chatsPage");
-          ChatRoom.shared.forceGetChat(page: chatsPage);
-        });
-      _refreshController.loadComplete();
-    }
-  }
-
+  final TextStyle finalStyle = TextStyle(
+    fontSize: 22.0,
+    color: Colors.red,
+    fontWeight: FontWeight.bold,
+  );
+  bool isTapped = false;
   @override
   void initState() {
     super.initState();
@@ -79,50 +59,7 @@ class _ChatsListPageState extends State<ChatsListPage>
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  goToChat(name, chatID,
-      {phone, chatType, memberCount, userIds, avatar, avatarUrl, members}) {
-    ChatRoom.shared.setCabinetStream();
-    ChatRoom.shared.checkUserOnline(userIds);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ChatPage(
-                name,
-                chatID,
-                phone: phone,
-                members: members,
-                chatType: chatType,
-                memberCount: memberCount,
-                userIds: userIds,
-                avatar: avatar,
-                avatarUrl: avatarUrl,
-              )),
-    ).whenComplete(() {
-      setState(() {
-        uploadingImage = null;
-      });
-
-      // this is bool for check load more is needed or not
-      globalBoolForForceGetChat = false;
-
-      ChatRoom.shared.forceGetChat();
-      ChatRoom.shared.closeCabinetStream();
-    });
-  }
-
-  final TextStyle initialStyle = TextStyle(
-    fontSize: 20.0,
-    color: Colors.blue,
-    fontWeight: FontWeight.bold,
-  );
-  final TextStyle finalStyle = TextStyle(
-    fontSize: 22.0,
-    color: Colors.red,
-    fontWeight: FontWeight.bold,
-  );
-  bool isTapped = false;
   @override
-  // ignore: must_call_super
   Widget build(BuildContext context) {
     String string = '${localization.chats}';
     return Scaffold(
@@ -230,6 +167,65 @@ class _ChatsListPageState extends State<ChatsListPage>
         ],
       ),
     );
+  }
+
+  void _onRefresh() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    print("_onRefresh");
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    print("_onLoading");
+    if (myList.length % 20 == 0) {
+      globalBoolForForceGetChat = true;
+      chatsPage++;
+      if (mounted)
+        setState(() {
+          print("_onLoading CHATS with page $chatsPage");
+          ChatRoom.shared.forceGetChat(page: chatsPage);
+        });
+      _refreshController.loadComplete();
+    }
+  }
+
+  goToChat(
+    name,
+    chatID, {
+    phone,
+    chatType,
+    memberCount,
+    userIds,
+    avatar,
+    avatarUrl,
+    members,
+  }) {
+    ChatRoom.shared.setCabinetStream();
+    ChatRoom.shared.checkUserOnline(userIds);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChatPage(
+                name,
+                chatID,
+                phone: phone,
+                members: members,
+                chatType: chatType,
+                memberCount: memberCount,
+                userIds: userIds,
+                avatar: avatar,
+                avatarUrl: avatarUrl,
+              )),
+    ).whenComplete(() {
+      setState(() {
+        uploadingImage = null;
+      });
+      // this is bool for check load more is needed or not
+      globalBoolForForceGetChat = false;
+      ChatRoom.shared.forceGetChat();
+      ChatRoom.shared.closeCabinetStream();
+    });
   }
 
   showAlertDialog(BuildContext context, String message, var chat) {
@@ -347,7 +343,10 @@ class _ChatsListPageState extends State<ChatsListPage>
                           color: Colors.red,
                           icon: Icons.delete,
                           onTap: () {
-                            showAlertDialog(context, '${localization.delete} ${localization.chat} ${myList[i]['name']}?', myList[i]['id']);
+                            showAlertDialog(
+                                context,
+                                '${localization.delete} ${localization.chat} ${myList[i]['name']}?',
+                                myList[i]['id']);
                             ChatRoom.shared.forceGetChat();
                           },
                         )

@@ -40,29 +40,45 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   List membersList = [];
   List actualMembersList = [];
   String _chatTitle;
+  TextEditingController chatTitleController = TextEditingController();
+  TextEditingController _searchController = TextEditingController();
+
+  int onlineCount = 0;
+  String myPrivilege = '';
+  bool isEditing = false;
 
   File _image;
+  final picker = ImagePicker();
+  var api = Api();
+  var anotherUserObject;
+  int chatMembersPage = 1;
+
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+  int membersCount;
   @override
   void initState() {
-    print('hollla ${widget.chatName}');
-    print('hollla ${widget.chatAvatar}');
-    print('hollla ${widget.chatId}');
-    print('hollla ${widget.chatType}');
-    print('hollla ${widget.memberCount}');
+    // print('chatName ${widget.chatName}');
+    // print('chatAvatar ${widget.chatAvatar}');
+    // print('chatId ${widget.chatId}');
+    // print('chatType ${widget.chatType}');
+    // print('memberCount ${widget.memberCount}');
+    membersCount = widget.memberCount;
     _chatTitle = '${widget.chatName}';
     listen();
     ChatRoom.shared.chatMembers(widget.chatId, page: chatMembersPage);
     if (widget.chatName.length > 2) {
-      print('asdsad');
       chatTitleController.text =
           '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}';
     }
-
     super.initState();
   }
 
-  final picker = ImagePicker();
-  var api = Api();
+  @override
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
 
   listen() {
     ChatRoom.shared.onChatInfoChange.listen((e) {
@@ -98,8 +114,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           ChatRoom.shared.chatMembers(widget.chatId);
           break;
         case "chat:member:search":
-          // ADD TO SEARCH VALUE
-          // print('a');
           setState(() {
             actualMembersList = [];
             if (message.isNotEmpty) {
@@ -124,16 +138,11 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     });
   }
 
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
   void _onRefresh() async {
     await Future.delayed(Duration(milliseconds: 1000));
     print("_onRefresh");
     _refreshController.refreshCompleted();
   }
-
-  int chatMembersPage = 1;
 
   void _onLoading() async {
     await Future.delayed(Duration(milliseconds: 1000));
@@ -143,11 +152,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         setState(() {
           print("_onLoading chat members with page $chatMembersPage");
           ChatRoom.shared.chatMembers(widget.chatId, page: chatMembersPage);
-
-          // for(int i = 0; i < 20; i++){
-          //   membersList.add({'name' : 'test'});
-          //   print(membersList.length);
-          // }
         });
       _refreshController.loadComplete();
     }
@@ -182,14 +186,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  var anotherUserObject;
-
   Widget _buildProfileImage() {
     return InkWell(
       onTap: () {
@@ -207,35 +203,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
             });
           }
         }
-
-        // Navigator.push(context,MaterialPageRoute(builder: (context) => ChatUserProfilePage(membersList[0])));
       },
-      // onTap: () => PlatformActionSheet().displaySheet(
-      //     context: context,
-      //     message: Text("${localization.selectOption}"),
-      //     actions: [
-      //       ActionSheetAction(
-      //         text: "Сфотографировать",
-      //         onPressed: () {
-      //           getImage(ImageSource.camera);
-      //           Navigator.pop(context);
-      //         },
-      //         hasArrow: true,
-      //       ),
-      //       ActionSheetAction(
-      //         text: "Выбрать из галереи",
-      //         onPressed: () {
-      //           getImage(ImageSource.gallery);
-      //           Navigator.pop(context);
-      //         },
-      //       ),
-      //       ActionSheetAction(
-      //         text: "Назад",
-      //         onPressed: () => Navigator.pop(context),
-      //         isCancel: true,
-      //         defaultAction: true,
-      //       )
-      //     ]),
       child: Center(
         child: Container(
           width: 100.0,
@@ -331,6 +299,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                   isDestructiveAction: true,
                   child: Text('${localization.delete}'),
                   onPressed: () {
+                    setState(() {
+                      membersCount -= 1;
+                    });
                     ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
                     Navigator.pop(context);
                   },
@@ -503,6 +474,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
             isDestructiveAction: true,
             child: Text('${localization.delete}'),
             onPressed: () {
+              setState(() {
+                membersCount -= 1;
+              });
               ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
               Navigator.pop(context);
             },
@@ -517,40 +491,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     showCupertinoModalPopup(
         context: context, builder: (BuildContext context) => act);
   }
-
-  TextEditingController chatTitleController = TextEditingController();
-  TextEditingController _searchController = TextEditingController();
-
-  int onlineCount = 0;
-  String myPrivilege = '';
-  bool isEditing = false;
-
-  // var actualList = List<dynamic>();
-
-  // void search(String query) {
-  //   if (query.isNotEmpty) {
-  //     List<dynamic> matches = List<dynamic>();
-
-  //     membersList.forEach((item) {
-  //       if (item.name.toLowerCase().contains(query.toLowerCase()) ||
-  //           item.phone.toLowerCase().contains(query.toLowerCase())) {
-  //         matches.add(item);
-  //       }
-  //     });
-
-  //     setState(() {
-  //       actualList = [];
-  //       actualList.addAll(matches);
-  //     });
-
-  //     return;
-  //   } else {
-  //     setState(() {
-  //       actualList.clear();
-  //       actualList.addAll(membersList);
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -586,7 +526,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                           ),
                           color: Colors.white,
                           onPressed: () {
-                            Navigator.pop(context);
+                            Navigator.pop(context, membersCount);
                           },
                         ),
                         Flexible(
@@ -690,7 +630,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.only(left: 20),
                             child: Text(
-                              '${localization.members} ${widget.memberCount}',
+                              '${localization.members} $membersCount',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,

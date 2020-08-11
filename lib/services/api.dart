@@ -416,15 +416,27 @@ class Api {
     }
   }
 
-  doTransfer(toID, amount, {transferChat}) async {
+  doTransfer(toID, amount, {transferChat, String comment}) async {
     try {
+      var data;
       if (transferChat == null) {
-        response = await dio.post("/check/send/money", data: {
-          "customerID": "${user.id}",
-          "unique": "${user.unique}",
-          "toID": "$toID",
-          "amount": "$amount",
-        });
+        if (comment != null) {
+          data = {
+            "customerID": "${user.id}",
+            "unique": "${user.unique}",
+            "toID": "$toID",
+            "amount": "$amount",
+            "comment": comment,
+          };
+        } else {
+          data = {
+            "customerID": "${user.id}",
+            "unique": "${user.unique}",
+            "toID": "$toID",
+            "amount": "$amount",
+          };
+        }
+        response = await dio.post("/check/send/money", data: data);
       } else {
         response = await dio.post("/check/send/money", data: {
           "customerID": "${user.id}",

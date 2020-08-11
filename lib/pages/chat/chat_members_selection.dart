@@ -24,6 +24,33 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
   var _saved = List<dynamic>();
   var _saved2 = List<dynamic>();
 
+  TextEditingController _searchController = TextEditingController();
+
+  var actualList = List<dynamic>();
+  @override
+  void initState() {
+    super.initState();
+    if (contacts.isNotEmpty) {
+      actualList.addAll(contacts);
+
+      widget.currentChatMembers.forEach((value) {
+        actualList.removeWhere((element) {
+          return '${value['phone']}' == '${element['phone']}';
+        });
+      });
+    }
+    ChatRoom.shared.setContactsStream();
+    listen();
+    print('listened');
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    ChatRoom.shared.contactController.close();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
   showAlertDialog(BuildContext context, String message) {
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
@@ -44,23 +71,6 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
         return alert;
       },
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (contacts.isNotEmpty) {
-      actualList.addAll(contacts);
-
-      widget.currentChatMembers.forEach((value) {
-        actualList.removeWhere((element) {
-          return '${value['phone']}' == '${element['phone']}';
-        });
-      });
-    }
-    ChatRoom.shared.setContactsStream();
-    listen();
-    print('listened');
   }
 
   var tempIndex = 0;
@@ -131,13 +141,6 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    ChatRoom.shared.contactController.close();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
   String formatPhone(String phone) {
     String r = phone.replaceAll(" ", "");
     r = r.replaceAll("(", "");
@@ -149,10 +152,6 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     }
     return r;
   }
-
-  TextEditingController _searchController = TextEditingController();
-
-  var actualList = List<dynamic>();
 
   void search(String query) {
     if (query.isNotEmpty) {
@@ -178,230 +177,228 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
               ),
             ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
           ),
-          centerTitle: true,
-          brightness: Brightness.light,
-          title: Text(
-            "${localization.addToGroup}",
-            style: TextStyle(
-              color: blackPurpleColor,
-              fontWeight: FontWeight.w400,
-              fontSize: 22,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.group_add),
-                iconSize: 30,
-                color: blackPurpleColor,
-                onPressed: () {
-                  print(_saved2);
-                  String userIds = '';
-                  _saved2.forEach((element) {
-                    userIds += '${element['user_id']}' + ',';
-                  });
-                  userIds = userIds.substring(0, userIds.length - 1);
-                  print('$userIds');
-                  ChatRoom.shared.addMembers('${widget.chatId}', '$userIds');
-                })
-          ],
-          backgroundColor: Colors.white,
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: contacts.isNotEmpty
-            ? SafeArea(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                        padding: EdgeInsets.only(top: 10, left: 10),
-                        child:
-                            Text('${_saved2.length} ${localization.contacts}')),
-                    Container(
-                      height: _saved2.length == 0 ? 0 : 82,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _saved2.length != null ? _saved2.length : 0,
-                        itemBuilder: (BuildContext context, int index) {
-                          // print(_saved2[index]);
-                          return Stack(
-                            children: <Widget>[
-                              Container(
-                                width: 80,
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      child: Container(
-                                        color: primaryColor,
-                                        width: 35,
-                                        height: 35,
+        centerTitle: true,
+        brightness: Brightness.light,
+        title: Text(
+          "${localization.addToGroup}",
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontWeight: FontWeight.w400,
+            fontSize: 22,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.group_add),
+              iconSize: 30,
+              color: blackPurpleColor,
+              onPressed: () {
+                String userIds = '';
+                _saved2.forEach((element) {
+                  userIds += '${element['user_id']}' + ',';
+                });
+                userIds = userIds.substring(0, userIds.length - 1);
+                ChatRoom.shared.addMembers('${widget.chatId}', '$userIds');
+              })
+        ],
+        backgroundColor: Colors.white,
+      ),
+      body: contacts.isNotEmpty
+          ? SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(top: 10, left: 10),
+                      child:
+                          Text('${_saved2.length} ${localization.contacts}')),
+                  Container(
+                    height: _saved2.length == 0 ? 0 : 82,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _saved2.length != null ? _saved2.length : 0,
+                      itemBuilder: (BuildContext context, int index) {
+                        // print(_saved2[index]);
+                        return Stack(
+                          children: <Widget>[
+                            Container(
+                              width: 80,
+                              padding: EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    child: Container(
+                                      color: primaryColor,
+                                      width: 35,
+                                      height: 35,
+                                      child: Center(
+                                        child: Text(
+                                          '${_saved2[index]['name'][0].toUpperCase()}',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Container(
+                                    child: Text(
+                                      // '${_saved2[index]['data']['data']['name']} asd',
+                                      '${_saved2[index]['name']}',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  // Text("${_saved2[index][0]}")
+                                ],
+                              ),
+                            ),
+                            _saved2[index]['user_id'] == '${user.id}'
+                                ? Center()
+                                : Positioned(
+                                    bottom: 30,
+                                    right: 20,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(
+                                          color: primaryColor,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      width: 22,
+                                      height: 22,
+                                      child: Center(
                                         child: Center(
-                                          child: Text(
-                                            '${_saved2[index]['name'][0].toUpperCase()}',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.w500),
+                                          child: InkWell(
+                                            child: Icon(
+                                              Icons.close,
+                                              size: 14,
+                                              color: primaryColor,
+                                            ),
+                                            onTap: () {
+                                              setState(() {
+                                                _saved2.removeWhere((item) {
+                                                  return '${item['phone']}' ==
+                                                      '${_saved2[index]['phone']}';
+                                                });
+                                              });
+                                            },
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Container(
-                                      child: Text(
-                                        // '${_saved2[index]['data']['data']['name']} asd',
-                                        '${_saved2[index]['name']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                    // Text("${_saved2[index][0]}")
-                                  ],
-                                ),
-                              ),
-                              _saved2[index]['user_id'] == '${user.id}'
-                                  ? Center()
-                                  : Positioned(
-                                      bottom: 30,
-                                      right: 20,
-                                      child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                              color: primaryColor,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                          ),
-                                          width: 22,
-                                          height: 22,
-                                          child: Center(
-                                            child: Center(
-                                              child: InkWell(
-                                                child: Icon(
-                                                  Icons.close,
-                                                  size: 14,
-                                                  color: primaryColor,
-                                                ),
-                                                onTap: () {
-                                                  setState(() {
-                                                    _saved2.removeWhere((item) {
-                                                      return '${item['phone']}' ==
-                                                          '${_saved2[index]['phone']}';
-                                                    });
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          )),
-                                    ),
-                            ],
-                          );
-                        },
-                      ),
+                                  ),
+                          ],
+                        );
+                      },
                     ),
-                    Container(
-                      height: 50,
-                      padding: const EdgeInsets.only(
-                          top: 10.0, left: 10.0, right: 10, bottom: 0),
-                      child: Center(
-                        child: TextField(
-                          decoration: new InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: blackPurpleColor,
-                            ),
-                            hintText: "${localization.search}",
-                            fillColor: blackPurpleColor,
+                  ),
+                  Container(
+                    height: 50,
+                    padding: const EdgeInsets.only(
+                        top: 10.0, left: 10.0, right: 10, bottom: 0),
+                    child: Center(
+                      child: TextField(
+                        decoration: new InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: blackPurpleColor,
                           ),
-                          onChanged: (value) {
-                            search(value);
-                          },
-                          controller: _searchController,
+                          hintText: "${localization.search}",
+                          fillColor: blackPurpleColor,
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: actualList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          if ('${user.phone}' ==
-                              '+${actualList[index]['phone']}') return Center();
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Container(
-                              child: CheckboxListTile(
-                                title: Wrap(
-                                  children: <Widget>[
-                                    Text(
-                                      '${actualList[index]['name']}',
-                                      style: TextStyle(fontSize: 16.0),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                                subtitle: Text(
-                                  '${actualList[index]['phone']}',
-                                  style: TextStyle(fontSize: 14.0),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                value: valu(index),
-                                onChanged: (val) {
-                                  // print(_savedList.contains({'phone': '77479918574'},));
-                                  // print(_savedList);
-                                  print(_saved2);
-                                  setState(() {
-                                    if (val == true) {
-                                      tempIndex = index;
-                                      ChatRoom.shared.userCheck(
-                                          actualList[index]['phone']);
-                                    } else {
-                                      print(_saved2);
-                                      _saved2.removeWhere((item) {
-                                        return '${item['phone']}' ==
-                                            '${actualList[index]['phone']}';
-                                      });
-                                    }
-                                  });
-                                },
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-                              margin: EdgeInsets.only(left: 10, right: 10),
-                            ),
-                          );
+                        onChanged: (value) {
+                          search(value);
                         },
+                        controller: _searchController,
                       ),
                     ),
-                  ],
-                ),
-              )
-            : Center(child: CircularProgressIndicator()));
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: actualList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        if ('${user.phone}' == '+${actualList[index]['phone']}')
+                          return Center();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Container(
+                            child: CheckboxListTile(
+                              title: Wrap(
+                                children: <Widget>[
+                                  Text(
+                                    '${actualList[index]['name']}',
+                                    style: TextStyle(fontSize: 16.0),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                              subtitle: Text(
+                                '${actualList[index]['phone']}',
+                                style: TextStyle(fontSize: 14.0),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              value: value(index),
+                              onChanged: (val) {
+                                setState(() {
+                                  if (val == true) {
+                                    tempIndex = index;
+                                    ChatRoom.shared
+                                        .userCheck(actualList[index]['phone']);
+                                  } else {
+                                    _saved2.removeWhere((item) {
+                                      return '${item['phone']}' ==
+                                          '${actualList[index]['phone']}';
+                                    });
+                                  }
+                                });
+                              },
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.white,
+                            ),
+                            margin: EdgeInsets.only(left: 10, right: 10),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
+    );
   }
 
-  valu(index) {
+  value(index) {
     bool tempo = false;
     _saved2.forEach((element) {
       if ('${element['phone']}' == '${actualList[index]['phone']}') {

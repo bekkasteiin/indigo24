@@ -142,6 +142,9 @@ String conversion = 'Conversion';
 String mute = 'Mute'; // TODO ADD LOCALIZATION
 String unmute = 'Unmute'; // TODO ADD LOCALIZATION
 String open = 'Open';
+String thankYou = 'Thank you';
+String returning = 'Returning';
+String withLove = 'With love';
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -293,6 +296,10 @@ setLanguage(code) {
       mute = 'Mute';
       unmute = 'Unmute';
       open = 'Open';
+      thankYou = 'Thank you';
+      returning = 'Returning';
+      withLove = 'With love';
+
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -431,6 +438,9 @@ setLanguage(code) {
       toPay = 'К оплате';
       conversion = 'Конвертация';
       open = 'Открыть';
+      thankYou = 'Спасибо';
+      returning = 'Возвращаю';
+      withLove = 'С любовью';
       print('ru');
       break;
     case 'kz':
@@ -570,6 +580,10 @@ setLanguage(code) {
       toPay = 'Төлемге';
       conversion = 'Айырбастау';
       open = 'Ашу';
+      thankYou = 'Рахмет';
+      returning = 'Қайтарып жатырмын';
+      withLove = 'Махаббатпен';
+
       print('kz');
       break;
     case 'uz':
@@ -708,6 +722,9 @@ setLanguage(code) {
       toPay = 'Тўлов учун';
       conversion = 'Конверсия';
       open = 'Очиқ';
+      thankYou = 'Шукр. гов. ве';
+      returning = 'Қайтиш';
+      withLove = 'Севги билан';
       print('uz');
       break;
     case 'uzb':
@@ -847,6 +864,9 @@ setLanguage(code) {
       toPay = 'To\'lov uchun';
       conversion = 'Konvertatsiya qilish';
       open = 'Ochiq';
+      thankYou = 'Rahmat';
+      returning = 'Qaytib kelaman';
+      withLove = 'Sevgi bilan';
       print('uzb');
       break;
     default:

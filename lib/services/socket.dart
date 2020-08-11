@@ -209,27 +209,6 @@ class ChatRoom {
         "message_id": '$messageId',
       }
     });
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId');
-    print('read message $messageId'); // TODO REMOVE
     channel.sink.add(data);
   }
 

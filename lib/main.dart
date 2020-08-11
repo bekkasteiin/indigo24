@@ -156,7 +156,6 @@ inAppPush(m) {
       isInAppPushActive = false;
     });
     if (m['mute'].toString() == '0') {
-
     } else {
       ChatRoom.shared.inSound();
       showOverlayNotification((context) {
@@ -297,17 +296,14 @@ List<MyContact> myContacts = [];
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   bool isAuthenticated = false;
   TabController tabController;
-  var api = Api();
+  Api api = Api();
   MyConnectivity _connectivity = MyConnectivity.instance;
-  // ignore: unused_field
   Map _source = {ConnectivityResult.none: false};
 
   // StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   StreamSubscription _intentDataStreamSubscription;
-  // ignore: unused_field
   List<SharedMediaFile> _sharedFiles;
-  // ignore: unused_field
   String _sharedText;
   bool isSharedVideo = false;
 
@@ -365,7 +361,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  var chatsDB = ChatsDB();
+  ChatsDB chatsDB = ChatsDB();
 
   setUser() async {
     user.id = await SharedPreferencesHelper.getCustomerID();
@@ -398,20 +394,18 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     );
   }
 
-  bool withPin;
-
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
-  var temp;
+  var _temp;
   _onPasscodeEntered(String enteredPasscode) {
-    if (user.pin == 'waiting' && temp == enteredPasscode) {
+    if (user.pin == 'waiting' && _temp == enteredPasscode) {
       print('creating');
       api.createPin(enteredPasscode);
       Future.delayed(const Duration(milliseconds: 250), () {
         Navigator.pop(context);
       });
     }
-    if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
+    if ('${user.pin}'.toString() == 'waiting' && _temp != enteredPasscode) {
       return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -432,8 +426,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
     if ('${user.pin}'.toString() == 'false') {
       user.pin = 'waiting';
-      temp = enteredPasscode;
-      print('first set pin $temp');
+      _temp = enteredPasscode;
+      print('first set pin $_temp');
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
@@ -529,9 +523,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
   }
 
-  initDownloader() async {
-    await FlutterDownloader.initialize(debug: true);
-  }
+  // initDownloader() async {
+  //   await FlutterDownloader.initialize(debug: true);
+  // }
 
   @override
   void initState() {
@@ -539,16 +533,16 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     permissions();
     pushPermission();
     share();
-    initDownloader();
+    // initDownloader();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    // var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
-    // fcmTokenStream.listen((token) {
-    //   if (user.id.toString() != null.toString() &&
-    //       user.unique.toString() != null.toString() &&
-    //       user.phone.toString() != null.toString()) {
-    //     api.updateFCM(token);
-    //   }
-    // });
+    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
+    fcmTokenStream.listen((token) {
+      if (user.id.toString() != null.toString() &&
+          user.unique.toString() != null.toString() &&
+          user.phone.toString() != null.toString()) {
+        api.updateFCM(token);
+      }
+    });
 
     Timer.run(() {
       '${user.pin}' == 'false'
@@ -559,17 +553,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   style: TextStyle(fontSize: 16, color: blackPurpleColor),
                   semanticsLabel: '${localization.cancel}'))
           : Text('');
-      // _showLockScreen(
-      //     context,
-      //     '${localization.enterPin}',
-      //     opaque: false,
-      //     cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color:blackPurpleColor),semanticsLabel: 'Cancel'));
     });
 
     getContacts(context).then((getContactsResult) {
-      // Future.delayed(Duration(seconds: 5)).then((value) {
-      // ChatRoom.shared.userCheck(getContactsResult[306]['phone']);
-      // });
       var result = getContactsResult is List ? false : !getContactsResult;
 
       for (int i = 0; i < getContactsResult.length; i++) {
@@ -673,10 +659,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   _connect() async {
-    // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
       var cmd = e.json["cmd"];
-      // print('user check : ${e.json}');
       switch (cmd) {
         case 'message:create':
           print(e.json["data"]);
@@ -702,15 +686,15 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           break;
         case 'user:check':
           var data = e.json["data"];
-          // print("USER CHECK ${data['status']}");
           if (data['status'].toString() == 'true') {
             MyContact contact = MyContact(
-                phone: data['phone'],
-                id: data['user_id'],
-                avatar: data['avatar'],
-                name: data['name'],
-                chatId: data['chat_id'],
-                online: data['online']);
+              phone: data['phone'],
+              id: data['user_id'],
+              avatar: data['avatar'],
+              name: data['name'],
+              chatId: data['chat_id'],
+              online: data['online'],
+            );
             await contactsDB.updateOrInsert(contact);
           }
           break;
@@ -745,26 +729,18 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  // Future _getChats() async {
-  //   Future<List<ChatsModel>> chats = chatsDB.getAllChats();
-  //   chats.then((value) {
-  //     setState(() {
-  //       dbChats.addAll(value);
-  //     });
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.light) // Or Brightness.dark
-        );
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     return Scaffold(
       body: TabBarView(
         physics: NeverScrollableScrollPhysics(),
         children: [
           ChatsListPage(),
-          // Developing(),
           UserProfilePage(),
           TapesPage(),
           WalletTab(),

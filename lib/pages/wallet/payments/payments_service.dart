@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,16 +23,23 @@ class PaymentsServicePage extends StatefulWidget {
   final String title;
   final String account;
   final String amount;
+  final isConvertable;
 
-  PaymentsServicePage(this.serviceID, this._logo, this.title,
-      {this.account, this.amount});
+  PaymentsServicePage(
+    this.serviceID,
+    this._logo,
+    this.title, {
+    this.account,
+    this.amount,
+    this.isConvertable,
+  });
 
   @override
   _PaymentsServicePageState createState() => _PaymentsServicePageState();
 }
 
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
-  bool isCalculated = false;
+  bool isCalculated;
 
   int _accountLength;
 
@@ -49,14 +57,15 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   TextEditingController _receiverController;
   TextEditingController _sumController;
 
-  double _amount;
-  double _exchangeRate;
-  double _expectedAmount;
-  String _expectedCurrency;
+  double _amount = 0.0;
+  double _exchangeRate = 0.0;
+  double _expectedAmount = 0.0;
+  String _expectedCurrency = '';
 
   @override
   void initState() {
     super.initState();
+    isCalculated = false;
     _verificationNotifier = StreamController<bool>.broadcast();
 
     _receiverController = TextEditingController();
@@ -78,7 +87,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           } else {
             print('else else $element');
             _accountLength = element['mask'].replaceAll(' ', '').length;
-  
+
             _loginFormatter = MaskTextInputFormatter(
                 mask: '${element['mask']}', filter: {"*": _accountRegex});
           }
@@ -494,12 +503,19 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   if (int.parse(_sumController.text) <=
                       _service['service']['max']) {
                     if (matches) {
-                      await _showLockScreen(context, '${localization.enterPin}',
-                          opaque: false,
-                          cancelButton: Text('Cancel',
-                              style: const TextStyle(
-                                  fontSize: 16, color: Color(0xFF001D52)),
-                              semanticsLabel: 'Cancel'));
+                      await _showLockScreen(
+                        context,
+                        '${localization.enterPin}',
+                        opaque: false,
+                        cancelButton: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF001D52),
+                          ),
+                          semanticsLabel: 'Cancel',
+                        ),
+                      );
                     } else {
                       showAlertDialog(
                           context, '0', '${localization.enterValidAccount}');
@@ -512,56 +528,56 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   showAlertDialog(
                       context, '0', '${localization.enterAboveMin}');
                 }
-                // if (isCalculated) {
-                //   String str =
-                //       "${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
-                //   bool matches = accountRegex.hasMatch(str);
-                //   if (int.parse(sumController.text) >=
-                //       _service['service']['min']) {
-                //     if (int.parse(sumController.text) <=
-                //         _service['service']['max']) {
-                //       if (matches) {
-                //         await _showLockScreen(context, '${localization.enterPin}',
-                //             opaque: false,
-                //             cancelButton: Text('Cancel',
-                //                 style: const TextStyle(
-                //                     fontSize: 16, color: Color(0xFF001D52)),
-                //                 semanticsLabel: 'Cancel'));
-                //       } else {
-                //         showAlertDialog(
-                //             context, '0', '${localization.enterValidAccount}');
-                //       }
-                //     } else {
-                //       showAlertDialog(
-                //           context, '0', '${localization.enterBelowMax}');
-                //     }
-                //   } else {
-                //     showAlertDialog(
-                //         context, '0', '${localization.enterAboveMin}');
-                //   }
-                // } else {
-                //   api
-                //       .calculateSum(
-                //           widget.serviceID,
-                //           '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-                //           sumController.text)
-                //       .then((result) {
-                //     result = json.decode(result);
-                //     if (result['message'] == 'Not authenticated' &&
-                //         result['success'].toString() == 'false') {
-                //       logOut(context);
-                //     } else {
-                //       print('this is $result');
-                //       setState(() {
-                //         isCalculated = true;
-                //         amount = result['Amount'];
-                //         exchangeRate = result['ExchangeRate'];
-                //         expectedAmount = result['ExpectedAmount'];
-                //         expectedCurrency = result['ExpectedCurrency'];
-                //       });
-                //     }
-                //   });
-                // }
+                if (widget.isConvertable == 0) {
+                  String str =
+                      "${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
+                  bool matches = _accountRegex.hasMatch(str);
+                  if (int.parse(_sumController.text) >=
+                      _service['service']['min']) {
+                    if (int.parse(_sumController.text) <=
+                        _service['service']['max']) {
+                      if (matches) {
+                        await _showLockScreen(
+                            context, '${localization.enterPin}',
+                            opaque: false,
+                            cancelButton: Text('Cancel',
+                                style: const TextStyle(
+                                    fontSize: 16, color: Color(0xFF001D52)),
+                                semanticsLabel: 'Cancel'));
+                      } else {
+                        showAlertDialog(
+                            context, '0', '${localization.enterValidAccount}');
+                      }
+                    } else {
+                      showAlertDialog(
+                          context, '0', '${localization.enterBelowMax}');
+                    }
+                  } else {
+                    showAlertDialog(
+                        context, '0', '${localization.enterAboveMin}');
+                  }
+                } else {
+                  api
+                      .calculateSum(
+                          widget.serviceID,
+                          '${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
+                          _sumController.text)
+                      .then((result) {
+                    if (result['message'] == 'Not authenticated' &&
+                        result['success'].toString() == 'false') {
+                      logOut(context);
+                    } else {
+                      print('this is $result');
+                      setState(() {
+                        isCalculated = true;
+                        _amount = result['Amount'];
+                        _exchangeRate = result['ExchangeRate'];
+                        _expectedAmount = result['ExpectedAmount'];
+                        _expectedCurrency = result['ExpectedCurrency'];
+                      });
+                    }
+                  });
+                }
               }
             }
           },
@@ -570,7 +586,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             width: 200,
             child: Center(
               child: Text(
-                '${isCalculated ? localization.pay : localization.calculate}',
+                '${isCalculated == false && widget.isConvertable == 1 ? localization.calculate : localization.pay}',
                 style: TextStyle(
                     color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
               ),

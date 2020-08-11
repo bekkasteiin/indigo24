@@ -63,6 +63,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                         "$logos${_services["services"][index]['logo']}",
                         "${_services["services"][index]['title']}",
                         _services["services"][index]['id'],
+                        _services["services"][index]['is_convertable'],
                       ),
                     );
                   },
@@ -106,7 +107,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
   }
 
   Container _paymentsList(BuildContext context, String _serviceLogo,
-      String _serviceTitle, int index) {
+      String _serviceTitle, int index, isConvertable) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
       decoration: BoxDecoration(
@@ -126,8 +127,9 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    PaymentsServicePage(index, _serviceLogo, _serviceTitle),
+                builder: (context) => PaymentsServicePage(
+                    index, _serviceLogo, _serviceTitle,
+                    isConvertable: isConvertable),
               ),
             );
           },

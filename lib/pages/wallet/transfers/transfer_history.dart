@@ -246,7 +246,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  Expanded _transferInfo(String name, String date, String phone) {
+  Expanded _transferInfo(
+      String name, String date, String phone, String comment) {
     date = date.substring(0, date.length - 3);
     return Expanded(
       child: Column(
@@ -271,6 +272,18 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             ),
             overflow: TextOverflow.ellipsis,
           ),
+          comment.toString() != null.toString()
+              ? Text(
+                  '$comment',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: blackPurpleColor,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : Center(),
           Text(
             "$date",
             style: TextStyle(
@@ -283,8 +296,17 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  Widget _historyBuilder(BuildContext context, String logo, String amount,
-      String title, String phone, String type, String date, int index) {
+  Widget _historyBuilder(
+    BuildContext context,
+    String logo,
+    String amount,
+    String title,
+    String phone,
+    String type,
+    String date,
+    String comment,
+    int index,
+  ) {
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -296,7 +318,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               children: <Widget>[
                 SizedBox(width: 20),
                 _transferLogo(logo),
-                _transferInfo(title, date, phone),
+                _transferInfo(title, date, phone, comment),
                 _transferAmount(type, amount, phone),
                 SizedBox(width: 20),
               ],
@@ -362,6 +384,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                       "${snapshot[index]['phone']}",
                       '${snapshot[index]['type']}',
                       "${snapshot[index]['data']}",
+                      '${snapshot[index]['comment']}',
                       index,
                     ),
                   );
