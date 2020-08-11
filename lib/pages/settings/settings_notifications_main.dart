@@ -12,8 +12,21 @@ class SettingsNotificationsMainPage extends StatefulWidget {
 
 class _SettingsNotificationsMainPageState
     extends State<SettingsNotificationsMainPage> {
-  bool isShowNotificationsSwitched = false;
-  bool isPreviewMessageSwitched = false;
+  bool isShowNotificationsSwitched;
+  bool isPreviewMessageSwitched;
+
+  @override
+  void initState() {
+    super.initState();
+    isShowNotificationsSwitched = false;
+    isPreviewMessageSwitched = false;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,8 +50,10 @@ class _SettingsNotificationsMainPageState
           ),
           title: Text(
             "${localization.notifications}",
-            style:
-                TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontWeight: FontWeight.w400,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -127,36 +142,38 @@ class _SettingsNotificationsMainPageState
                         padding: EdgeInsets.only(
                             left: 20, right: 20, bottom: 10, top: 10),
                         child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '${localization.sound}',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackPurpleColor),
-                              ),
-                              Row(mainAxisSize: MainAxisSize.min, children: [
-                                // Text('${localization.sound}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
-                                IconButton(
-                                  icon: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 10),
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/back.png',
-                                      ),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              '${localization.sound}',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: blackPurpleColor),
+                            ),
+                            Row(mainAxisSize: MainAxisSize.min, children: [
+                              // Text('${localization.sound}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
+                              IconButton(
+                                icon: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  child: Image(
+                                    image: AssetImage(
+                                      'assets/images/back.png',
                                     ),
                                   ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                SettingsSoundPage()));
-                                  },
                                 ),
-                              ])
-                            ]),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SettingsSoundPage(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ])
+                          ],
+                        ),
                       ),
                       Text('hi'),
                       Text('hi'),

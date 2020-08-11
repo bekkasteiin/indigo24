@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/db/contact.dart';
+import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_list.dart';
@@ -75,26 +76,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         );
       }
     });
-  }
-
-  Future<void> _showError(BuildContext context, m) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('${localization.error}'),
-          content: Text(m),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   listen() {
@@ -235,6 +216,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     }
   }
 
+  var contactsDB = ContactsDB();
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -283,41 +266,14 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                 ),
                 iconSize: 30,
                 color: blackPurpleColor,
-                onPressed: () {
+                onPressed: () async {
                   print('update contacts');
+                  await contactsDB.getAll().then((value) {
+                    myContacts = value;
+                  });
                   setState(() {
                     actualList.clear();
-                    actualList.addAll(myContacts); // TODO CHECK
-                    // getContacts(context).then((getContactsResult) {
-                    //   var result = getContactsResult is List
-                    //       ? false
-                    //       : !getContactsResult;
-                    //   if (result) {
-                    //     Widget okButton = CupertinoDialogAction(
-                    //       child: Text("${localization.openSettings}"),
-                    //       onPressed: () {
-                    //         Navigator.pop(context);
-                    //         AppSettings.openAppSettings();
-                    //       },
-                    //     );
-                    //     CupertinoAlertDialog alert = CupertinoAlertDialog(
-                    //       title: Text("${localization.error}"),
-                    //       content: Text('${localization.allowContacts}'),
-                    //       actions: [
-                    //         okButton,
-                    //       ],
-                    //     );
-                    //     showDialog(
-                    //       context: context,
-                    //       builder: (BuildContext context) {
-                    //         return alert;
-                    //       },
-                    //     );
-                    //   } else {
-                    //     // actualList.clear();
-                    //     // actualList.addAll(getContactsResult);
-                    //   }
-                    // });
+                    actualList.addAll(myContacts);
                   });
                 },
               )
@@ -346,7 +302,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   ),
                 ),
                 Expanded(
-                    child: true
+                    child: actualList.isNotEmpty
                         ? ListView.builder(
                             itemCount:
                                 actualList != null ? actualList.length : 0,

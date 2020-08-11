@@ -15,34 +15,58 @@ class TransferHistoryPage extends StatefulWidget {
 }
 
 class _TransferHistoryPageState extends State<TransferHistoryPage> {
-  Api api = Api();
-  List transferHistories = [];
-  String avatarUrl = "";
-  bool emptyResponse = false;
+  Api _api;
+  List _transferHistories;
+  String _avatarUrl;
+  bool _emptyResponse;
+  RefreshController _refreshController;
+
+  int _page;
+
+  MaskTextInputFormatter _filterFormatter;
 
   @override
   void initState() {
     super.initState();
-    api.getTransactions(page).then((transactions) {
+
+    _page = 1;
+    _emptyResponse = false;
+    _api = Api();
+    _transferHistories = [];
+    _avatarUrl = "";
+
+    _refreshController = RefreshController(initialRefresh: false);
+
+    _filterFormatter = MaskTextInputFormatter(
+      mask: '****-**-** / ****-**-**',
+      filter: {
+        "*": RegExp(r'[0-9]'),
+      },
+    );
+
+    _api.getTransactions(_page).then((transactions) {
       if (transactions['message'] == 'Not authenticated' &&
           transactions['success'].toString() == 'false') {
         logOut(context);
-        return transactions;
       } else {
         setState(() {
-          avatarUrl = transactions['avatarURL'];
-          if (page == 1) {
-            transferHistories = transactions['transactions'].toList();
+          _avatarUrl = transactions['avatarURL'];
+          if (_page == 1) {
+            _transferHistories = transactions['transactions'].toList();
             if (transactions['transactions'].isEmpty) {
-              emptyResponse = true;
+              _emptyResponse = true;
             }
-            page++;
+            _page++;
           }
         });
-
-        return transactions;
       }
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _refreshController.dispose();
   }
 
   @override
@@ -118,10 +142,10 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
           //   ),
           // ),
           // SizedBox(height: 10),
-          !emptyResponse
-              ? transferHistories.isNotEmpty
+          !_emptyResponse
+              ? _transferHistories.isNotEmpty
                   ? Flexible(
-                      child: _transferHistoryBody(transferHistories, context))
+                      child: _transferHistoryBody(_transferHistories, context))
                   : Center(child: CircularProgressIndicator())
               : SafeArea(
                   child: Container(
@@ -222,7 +246,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  Expanded _transferInfo(String name, String date, String phone) {
+  Expanded _transferInfo(
+      String name, String date, String phone, String comment) {
     date = date.substring(0, date.length - 3);
     return Expanded(
       child: Column(
@@ -247,6 +272,18 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             ),
             overflow: TextOverflow.ellipsis,
           ),
+          comment.toString() != null.toString()
+              ? Text(
+                  '$comment',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: blackPurpleColor,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                )
+              : Center(),
           Text(
             "$date",
             style: TextStyle(
@@ -259,8 +296,17 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  Widget _historyBuilder(BuildContext context, String logo, String amount,
-      String title, String phone, String type, String date, int index) {
+  Widget _historyBuilder(
+    BuildContext context,
+    String logo,
+    String amount,
+    String title,
+    String phone,
+    String type,
+    String date,
+    String comment,
+    int index,
+  ) {
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -272,7 +318,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               children: <Widget>[
                 SizedBox(width: 20),
                 _transferLogo(logo),
-                _transferInfo(title, date, phone),
+                _transferInfo(title, date, phone, comment),
                 _transferAmount(type, amount, phone),
                 SizedBox(width: 20),
               ],
@@ -288,34 +334,20 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
   void _onLoading() async {
-    print("_onLoading ");
     _loadData();
     _refreshController.loadComplete();
   }
 
-  bool isLoaded = false;
-  int page = 1;
-
   Future _loadData() async {
-    api.getTransactions(page).then((histories) {
+    _api.getTransactions(_page).then((histories) {
       List temp = histories['transactions'].toList();
       setState(() {
-        transferHistories.addAll(temp);
+        _transferHistories.addAll(temp);
       });
-      page++;
+      _page++;
     });
   }
-
-  MaskTextInputFormatter filterFormatter = MaskTextInputFormatter(
-    mask: '****-**-** / ****-**-**',
-    filter: {
-      "*": RegExp(r'[0-9]'),
-    },
-  );
 
   SafeArea _transferHistoryBody(snapshot, context) {
     return SafeArea(
@@ -346,12 +378,13 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     padding: const EdgeInsets.only(top: 10),
                     child: _historyBuilder(
                       context,
-                      "${avatarUrl + snapshot[index]['avatar']}",
+                      "${_avatarUrl + snapshot[index]['avatar']}",
                       "${snapshot[index]['amount']}",
                       "${snapshot[index]['name']}",
                       "${snapshot[index]['phone']}",
                       '${snapshot[index]['type']}',
                       "${snapshot[index]['data']}",
+                      '${snapshot[index]['comment']}',
                       index,
                     ),
                   );
@@ -362,12 +395,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   AppBar buildAppBar() {

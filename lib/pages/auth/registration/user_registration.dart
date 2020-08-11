@@ -17,31 +17,67 @@ class UserRegistrationPage extends StatefulWidget {
 }
 
 class _UserRegistrationPageState extends State<UserRegistrationPage> {
-  var api = Api();
-  TextEditingController nameController;
-  TextEditingController lastNameController;
-  TextEditingController emailController;
-  TextEditingController passwordController;
-  TextEditingController passwordController2;
+  Api _api = Api();
+  TextEditingController _nameController;
+  TextEditingController _lastNameController;
+  TextEditingController _emailController;
+  TextEditingController _passwordController;
+  TextEditingController _passwordController2;
 
   bool _obscureText = true;
   bool _obscureText2 = true;
-  bool confirm = false;
+  bool _confirm = false;
   var password;
   @override
   void initState() {
     super.initState();
-    nameController = new TextEditingController();
-    emailController = new TextEditingController();
-    lastNameController = new TextEditingController();
-    passwordController = new TextEditingController();
-    passwordController2 = new TextEditingController();
+    _nameController = new TextEditingController();
+    _emailController = new TextEditingController();
+    _lastNameController = new TextEditingController();
+    _passwordController = new TextEditingController();
+    _passwordController2 = new TextEditingController();
   }
 
   @override
   void dispose() {
     super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    _nameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordController2.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          brightness: Brightness.light,
+        ),
+      ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Stack(
+          children: <Widget>[
+            Container(
+                decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: introBackgroundProvider, fit: BoxFit.cover),
+            )),
+            _buildForeground()
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _showError(BuildContext context, m) {
@@ -76,37 +112,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
   String emailError = "";
   String firstPasswordError = "";
   String secondPasswordError = "";
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0.0),
-          child: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.white, // status bar color
-            brightness: Brightness.light, // status bar brightness
-          ),
-        ),
-        body: GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
-          child: Stack(
-            children: <Widget>[
-              Container(
-                  decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: introBackgroundProvider, fit: BoxFit.cover),
-              )),
-              _buildForeground()
-            ],
-          ),
-        ));
-  }
 
   Widget _buildForeground() {
     return Center(
@@ -167,7 +172,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             ],
                           ),
                           TextField(
-                            controller: nameController,
+                            controller: _nameController,
                             decoration: InputDecoration(hintText: ""),
                           ),
                           Text(
@@ -209,7 +214,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             ],
                           ),
                           TextField(
-                            controller: lastNameController,
+                            controller: _lastNameController,
                             decoration: InputDecoration(hintText: ""),
                           ),
                           Text(
@@ -251,7 +256,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             ],
                           ),
                           TextField(
-                            controller: emailController,
+                            controller: _emailController,
                             decoration: InputDecoration(hintText: ""),
                           ),
                           Text(
@@ -293,7 +298,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             ],
                           ),
                           TextField(
-                            controller: passwordController,
+                            controller: _passwordController,
                             obscureText: _obscureText,
                             decoration: InputDecoration(
                               hintText: '•••••••',
@@ -353,7 +358,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             ],
                           ),
                           TextField(
-                            controller: passwordController2,
+                            controller: _passwordController2,
                             obscureText: _obscureText2,
                             decoration: InputDecoration(
                               hintText: '•••••••',
@@ -415,10 +420,10 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                           Checkbox(
                             onChanged: (value) {
                               setState(() {
-                                confirm = value;
+                                _confirm = value;
                               });
                             },
-                            value: confirm,
+                            value: _confirm,
                           )
                         ],
                       ),
@@ -436,27 +441,28 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                       //   ),
                       // ),
                       child: ProgressButton(
-                        defaultWidget: Text("${localization.next}",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 22)),
+                        defaultWidget: Text(
+                          "${localization.next}",
+                          style: TextStyle(color: Colors.white, fontSize: 22),
+                        ),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: primaryColor,
-                        onPressed: !confirm
+                        onPressed: !_confirm
                             ? null
                             : () async {
-                                if (passwordController.text.isNotEmpty &&
-                                    passwordController2.text.isNotEmpty &&
-                                    nameController.text.isNotEmpty &&
-                                    lastNameController.text.isNotEmpty &&
-                                    emailController.text.isNotEmpty) {
+                                if (_passwordController.text.isNotEmpty &&
+                                    _passwordController2.text.isNotEmpty &&
+                                    _nameController.text.isNotEmpty &&
+                                    _lastNameController.text.isNotEmpty &&
+                                    _emailController.text.isNotEmpty) {
                                   setState(() {
                                     globalError = '';
                                   });
                                   print('is not empty ');
-                                  if (passwordController.text ==
-                                      passwordController2.text) {
-                                    password = passwordController.text;
+                                  if (_passwordController.text ==
+                                      _passwordController2.text) {
+                                    password = _passwordController.text;
                                     setState(() {
                                       secondPasswordError = '';
                                       emailError = '';
@@ -465,12 +471,12 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                       firstPasswordError = '';
                                       emailError = '';
                                     });
-                                    await api
+                                    await _api
                                         .register(
                                             "${widget.phone}",
-                                            "${nameController.text + ' ' + lastNameController.text}",
+                                            "${_nameController.text + ' ' + _lastNameController.text}",
                                             "$password",
-                                            "${emailController.text}")
+                                            "${_emailController.text}")
                                         .then((registerResponse) {
                                       print(
                                           'this is register result $registerResponse');
@@ -535,29 +541,5 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
     return Container(
       height: h,
     );
-  }
-}
-
-class Country {
-  int id;
-  String title;
-  String phonePrefix;
-  String code;
-
-  Country(int id, String name, String phonePrefix, String code) {
-    this.id = id;
-    this.title = name;
-    this.phonePrefix = phonePrefix;
-    this.code = code;
-  }
-
-  Country.fromJson(Map json)
-      : id = json['id'],
-        title = json['name'],
-        phonePrefix = json['phonePrefix'],
-        code = json['code'];
-
-  Map toJson() {
-    return {'id': id, 'title': title, 'phonePrefix': phonePrefix, 'code': code};
   }
 }

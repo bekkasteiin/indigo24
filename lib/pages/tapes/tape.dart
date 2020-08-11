@@ -17,6 +17,17 @@ class TapePage extends StatefulWidget {
 class _TapePageState extends State<TapePage>
     with AutomaticKeepAliveClientMixin {
   Future _future;
+  var _saved = List<dynamic>();
+
+  TextEditingController _commentController = TextEditingController();
+  var commentResult;
+  var tapeResult;
+  List com = [];
+  int letterCount = 100;
+  var api = Api();
+  String tempCount = " ";
+  var commentCount;
+  int maxLine = 5;
 
   @override
   void initState() {
@@ -34,32 +45,13 @@ class _TapePageState extends State<TapePage>
     super.initState();
   }
 
-  Future setTape(result) async {
-    setState(() {
-      // print('this is result $result');
-      tapeResult = result["result"];
-      com = result["result"]["comments"].toList();
-      _future = Future(foo);
-    });
-  }
-
-  int foo() {
-    return 1;
-  }
-
-  var _saved = List<dynamic>();
-
-  TextEditingController _commentController = TextEditingController();
-  var commentResult;
-  var tapeResult;
-  List com = [];
-  int letterCount = 100;
-  var api = Api();
-  String tempCount = " ";
-  var commentCount;
-  int maxLine = 5;
   @override
-  // ignore: must_call_super
+  void dispose() {
+    super.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool keyboardIsOpened = MediaQuery.of(context).viewInsets.bottom != 0.0;
     if (_commentController.text.isEmpty) letterCount = 100;
@@ -358,10 +350,17 @@ class _TapePageState extends State<TapePage>
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  Future setTape(result) async {
+    setState(() {
+      // print('this is result $result');
+      tapeResult = result["result"];
+      com = result["result"]["comments"].toList();
+      _future = Future(foo);
+    });
+  }
+
+  int foo() {
+    return 1;
   }
 
   @override

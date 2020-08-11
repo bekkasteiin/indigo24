@@ -416,15 +416,27 @@ class Api {
     }
   }
 
-  doTransfer(toID, amount, {transferChat}) async {
+  doTransfer(toID, amount, {transferChat, String comment}) async {
     try {
+      var data;
       if (transferChat == null) {
-        response = await dio.post("/check/send/money", data: {
-          "customerID": "${user.id}",
-          "unique": "${user.unique}",
-          "toID": "$toID",
-          "amount": "$amount",
-        });
+        if (comment != null) {
+          data = {
+            "customerID": "${user.id}",
+            "unique": "${user.unique}",
+            "toID": "$toID",
+            "amount": "$amount",
+            "comment": comment,
+          };
+        } else {
+          data = {
+            "customerID": "${user.id}",
+            "unique": "${user.unique}",
+            "toID": "$toID",
+            "amount": "$amount",
+          };
+        }
+        response = await dio.post("/check/send/money", data: data);
       } else {
         response = await dio.post("/check/send/money", data: {
           "customerID": "${user.id}",
@@ -504,15 +516,12 @@ class Api {
   calculateSum(serviceID, account, amount) async {
     try {
       Response response = await Dio().get(
-        "https://api.indigo24.com/hermes/sum/calculate", // TODO FIX BASE URL
+        "https://api.indigo24.xyz/hermes/sum/calculate", // TODO FIX BASE URL
         queryParameters: {
           "customerID": "${user.id}",
           "unique": "${user.unique}",
-          // "serviceID": "$serviceID", // TODO TURN ON THIS AFTER TESTS
-          "serviceID": "100014",
+          "serviceID": "$serviceID",
           "amount": "$amount",
-          "currency":
-              "KZT", // TODO REMOVE FIELD 'CURRENCY' AFTER BACK END DEPLOY
           "account": "$account",
         },
       );

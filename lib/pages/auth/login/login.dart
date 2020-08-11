@@ -6,11 +6,12 @@ import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/restore_password.dart';
-import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
+
+import '../countries.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,77 +19,43 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  var api = Api();
+  Api _api;
   TextEditingController loginController;
   TextEditingController passwordController;
-  bool _obscureText = true;
-  var singInResult;
-  var countryId = 0;
+  bool _obscureText;
+  var _singInResult;
+  int countryId;
   var country;
-  var countries = new List<Country>();
+  List countries;
   var phonePrefix = '77';
-  List _titles = [];
-  String _currentCountry = "Казахстан";
-  String loginError = "";
-  String passwordError = "";
-  CountryDao countryDao = CountryDao();
+
+  String _currentCountry;
+  String loginError;
+  String passwordError;
+  CountryDao _countryDao;
 
   var length;
-  _getCountries() async {
-    var list = await countryDao.getAll();
-    // response['countries'].forEach((element) {
-    // countryDao.insertOne(Country.fromJson(element));
-    // });
-    setState(() {
-      countries = list;
-      countries.forEach((element) {
-        _titles.add(element.title);
-      });
-      country = countries[countryId];
-      length = country.length;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = true;
+    loginController = TextEditingController();
+    passwordController = TextEditingController();
+    countries = List<Country>();
+    countryId = 0;
+    _currentCountry = "Казахстан";
+    loginError = "";
+    passwordError = "";
+
+    _api = Api();
+    _countryDao = CountryDao();
+    _getCountries();
   }
 
   @override
   void dispose() {
     super.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  List<DropdownMenuItem<String>> getDropDownMenuItems(List titles) {
-    List<DropdownMenuItem<String>> items = List();
-    for (var i = 0; i < titles.length; i++) {
-      items.add(DropdownMenuItem(value: titles[i], child: Text(titles[i])));
-    }
-    return items;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loginController = TextEditingController();
-    passwordController = TextEditingController();
-    _getCountries();
-  }
-
-  Future<void> showError(BuildContext context, m) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('${localization.error}'),
-          content: Text(m),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -126,6 +93,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  _getCountries() async {
+    var list = await _countryDao.getAll();
+    setState(() {
+      countries = list;
+      country = countries[countryId];
+      length = country.length;
+    });
+  }
+
   Widget _buildForeground() {
     return Center(
       child: SingleChildScrollView(
@@ -157,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: Row(
                                 children: <Widget>[
                                   Text(
-                                    '$_currentCountry ',
+                                    '$_currentCountry',
                                     style: TextStyle(
                                       color: blackPurpleColor,
                                       fontSize: 18,
@@ -351,15 +327,15 @@ class _LoginPageState extends State<LoginPage> {
                               loginError = '';
                               passwordError = '';
                             });
-                            await api
+                            await _api
                                 .signIn("$phonePrefix${loginController.text}",
                                     passwordController.text)
                                 .then((response) async {
-                              singInResult = response;
+                              _singInResult = response;
                               print(
                                   "LOGIN RESULT $phonePrefix${loginController.text} $response");
                               if ('${response['success']}' == 'true') {
-                                await api.getBalance();
+                                await _api.getBalance();
                                 Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                     builder: (context) => Tabs(),
@@ -368,7 +344,7 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                               } else {
                                 setState(() {
-                                  passwordError = singInResult["message"];
+                                  passwordError = _singInResult["message"];
                                 });
                               }
                             });
@@ -398,7 +374,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        phonePrefix = _selectedCountry.phonePrefix;
+        phonePrefix = _selectedCountry._phonePrefix;
         length = _selectedCountry.length;
         passwordController.text = '';
         loginController.text = '';
@@ -408,78 +384,6 @@ class _LoginPageState extends State<LoginPage> {
   _space(double h) {
     return Container(
       height: h,
-    );
-  }
-}
-
-class Countries extends StatelessWidget {
-  final countries;
-  Countries(this.countries);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        brightness: Brightness.light,
-        title: Text(
-          "${localization.country}",
-          style: TextStyle(
-            color: blackPurpleColor,
-            fontSize: 22,
-            fontWeight: FontWeight.w400,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.white,
-      ),
-      body: SafeArea(
-        child: Container(
-          margin: EdgeInsets.symmetric(vertical: 10),
-          child: ListView.separated(
-            itemCount: countries.length,
-            itemBuilder: (BuildContext context, int index) {
-              return InkWell(
-                child: Container(
-                  height: 20,
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  padding: EdgeInsets.only(left: 5),
-                  child: Text(
-                    '${countries[index].title}',
-                    style: TextStyle(
-                      color: blackPurpleColor,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  Navigator.of(context).pop(countries[index]);
-                },
-              );
-            },
-            separatorBuilder: (context, index) {
-              return Container(
-                margin: EdgeInsets.only(left: 20),
-                height: 0.2,
-                color: Colors.black,
-              );
-            },
-          ),
-        ),
-      ),
     );
   }
 }

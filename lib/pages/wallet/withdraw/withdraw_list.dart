@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/pages/wallet/withdraw/withdraw.dart';
 import 'package:indigo24/style/colors.dart';
-import 'transfer.dart';
-import 'transfer_history.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-class TransferListPage extends StatefulWidget {
+class WithdrawListPage extends StatefulWidget {
   @override
-  _TransferListPageState createState() => _TransferListPageState();
+  _WithdrawListPageState createState() => _WithdrawListPageState();
 }
 
-class _TransferListPageState extends State<TransferListPage> {
+class _WithdrawListPageState extends State<WithdrawListPage> {
   @override
   void initState() {
     super.initState();
@@ -47,7 +46,7 @@ class _TransferListPageState extends State<TransferListPage> {
       ),
       brightness: Brightness.light,
       title: Text(
-        "${localization.transfers}",
+        "${localization.withdraw}",
         style: TextStyle(
           color: blackPurpleColor,
           fontSize: 22,
@@ -55,26 +54,6 @@ class _TransferListPageState extends State<TransferListPage> {
         ),
         textAlign: TextAlign.center,
       ),
-      actions: <Widget>[
-        IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(5),
-            child: Image(
-              image: AssetImage(
-                'assets/images/history.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TransferHistoryPage(),
-              ),
-            );
-          },
-        )
-      ],
       backgroundColor: whiteColor,
     );
   }
@@ -92,7 +71,15 @@ class _TransferListPageState extends State<TransferListPage> {
           SizedBox(
             height: 10,
           ),
-          transferlist(context),
+          Flexible(
+            child: ListView.builder(
+              itemCount: 2,
+              shrinkWrap: false,
+              itemBuilder: (BuildContext context, int index) {
+                return _withdrawElement(context);
+              },
+            ),
+          ),
           SizedBox(
             height: 10,
           ),
@@ -101,7 +88,7 @@ class _TransferListPageState extends State<TransferListPage> {
     );
   }
 
-  Container transferlist(BuildContext context) {
+  Container _withdrawElement(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
       decoration: BoxDecoration(
@@ -120,7 +107,7 @@ class _TransferListPageState extends State<TransferListPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => TransferPage()),
+              MaterialPageRoute(builder: (context) => WithdrawPage()),
             );
           },
           child: Container(
@@ -135,7 +122,7 @@ class _TransferListPageState extends State<TransferListPage> {
                 ),
                 Container(width: 10),
                 Text(
-                  '${localization.toIndigo24Client}',
+                  'title',
                   style: TextStyle(fontSize: 14, color: blackPurpleColor),
                 ),
               ],

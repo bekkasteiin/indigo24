@@ -44,7 +44,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'style/colors.dart';
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-
+bool isInAppPushActive = false;
 String formatPhone(String phone) {
   String r = phone.replaceAll(" ", "");
   r = r.replaceAll("(", "");
@@ -151,46 +151,60 @@ class MyApp extends StatelessWidget {
 
 inAppPush(m) {
   print('_________________In App Push $m');
-  // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:243, user_id: 113626, time: 1593593566, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, attachments: [{"filename":"NQet2z6UFBunjjrn25mm7cKd48L9g2Vi.mp3"}], attachment_url: https://media.chat.indigo24.xyz/media/voice/, type: 3}
-  // flutter: _________________In App Push {status: true, write: 0, chat_id: 235, message_id: message:113626:244, user_id: 113626, time: 1593593587, avatar: noAvatar.png, avatar_url: https://indigo24.xyz/uploads/avatars/, user_name: test, text: asvs, type: 0}
-  ChatRoom.shared.inSound();
-  showOverlayNotification((context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: SafeArea(
-        child: ListTile(
-          onTap: () {
-            OverlaySupportEntry.of(context).dismiss();
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
-            ChatRoom.shared.getMessages(m['chat_id']);
-            goToChat("${m['user_name']}", "${m['chat_id']}", context,
-                memberCount: "${m['type']}" == "0" ? 2 : 3,
-                chatType: "${m['type']}",
-                avatar: "${m['avatar']}",
-                userIds: "${m['user_id']}");
-          },
-          leading: SizedBox.fromSize(
-            size: const Size(40, 40),
-            child: ClipOval(
-              child: CachedNetworkImage(
-                imageUrl: "${avatarUrl}noAvatar.png",
+  if (!isInAppPushActive) {
+    isInAppPushActive = true;
+    Future.delayed(Duration(seconds: 4)).then((value) {
+      isInAppPushActive = false;
+    });
+    if (m['mute'].toString() == '0') {
+    } else {
+      ChatRoom.shared.inSound();
+      showOverlayNotification((context) {
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          child: SafeArea(
+            child: ListTile(
+              onTap: () {
+                OverlaySupportEntry.of(context).dismiss();
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => Tabs()),
+                    (r) => false);
+                ChatRoom.shared.getMessages(m['chat_id']);
+                goToChat(
+                  "${m['chat_name']}",
+                  "${m['chat_id']}",
+                  context,
+                  memberCount: "${m['type']}" == "0" ? 2 : 3,
+                  chatType: "${m['chat_type']}",
+                  avatar: "${m['avatar']}",
+                  userIds: "${m['user_id']}",
+                );
+              },
+              leading: SizedBox.fromSize(
+                size: Size(40, 40),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: "${avatarUrl}noAvatar.png",
+                  ),
+                ),
               ),
+              title: Text("${m['user_name']}"),
+              subtitle: Text(
+                m['attachments'] == null
+                    ? "${m["text"]}"
+                    : identifyType(m['type']),
+              ),
+              trailing: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    OverlaySupportEntry.of(context).dismiss();
+                  }),
             ),
           ),
-          title: Text("${m['user_name']}"),
-          subtitle: Text(
-            m['attachments'] == null ? "${m["text"]}" : identifyType(m['type']),
-          ),
-          trailing: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                OverlaySupportEntry.of(context).dismiss();
-              }),
-        ),
-      ),
-    );
-  }, duration: Duration(milliseconds: 4000));
+        );
+      }, duration: Duration(seconds: 4));
+    }
+  }
 }
 
 goToChat(name, chatID, context,
@@ -283,17 +297,14 @@ List<MyContact> myContacts = [];
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   bool isAuthenticated = false;
   TabController tabController;
-  var api = Api();
+  Api api = Api();
   MyConnectivity _connectivity = MyConnectivity.instance;
-  // ignore: unused_field
   Map _source = {ConnectivityResult.none: false};
 
   // StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   StreamSubscription _intentDataStreamSubscription;
-  // ignore: unused_field
   List<SharedMediaFile> _sharedFiles;
-  // ignore: unused_field
   String _sharedText;
   bool isSharedVideo = false;
 
@@ -351,7 +362,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  var chatsDB = ChatsDB();
+  ChatsDB chatsDB = ChatsDB();
 
   setUser() async {
     user.id = await SharedPreferencesHelper.getCustomerID();
@@ -384,20 +395,18 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     );
   }
 
-  bool withPin;
-
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
-  var temp;
+  var _temp;
   _onPasscodeEntered(String enteredPasscode) {
-    if (user.pin == 'waiting' && temp == enteredPasscode) {
+    if (user.pin == 'waiting' && _temp == enteredPasscode) {
       print('creating');
       api.createPin(enteredPasscode);
       Future.delayed(const Duration(milliseconds: 250), () {
         Navigator.pop(context);
       });
     }
-    if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
+    if ('${user.pin}'.toString() == 'waiting' && _temp != enteredPasscode) {
       return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -418,8 +427,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
     if ('${user.pin}'.toString() == 'false') {
       user.pin = 'waiting';
-      temp = enteredPasscode;
-      print('first set pin $temp');
+      _temp = enteredPasscode;
+      print('first set pin $_temp');
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
@@ -503,7 +512,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         return false;
       }
     }
-
     permissionForPush();
   }
 
@@ -516,57 +524,27 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
   }
 
-  initDownloader() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await FlutterDownloader.initialize(debug: true);
-  }
+  // initDownloader() async {
+  //   await FlutterDownloader.initialize(debug: true);
+  // }
 
   @override
   void initState() {
     api.getConfig();
     _getChats();
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
-    print('___________ TABS INIT STATE____________');
     permissions();
     pushPermission();
     share();
-    initDownloader();
+    // initDownloader();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    // var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
-    // fcmTokenStream.listen((token) {
-    //   if (user.id.toString() != null.toString() &&
-    //       user.unique.toString() != null.toString() &&
-    //       user.phone.toString() != null.toString()) {
-    //     api.updateFCM(token);
-    //   }
-    // });
+    var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
+    fcmTokenStream.listen((token) {
+      if (user.id.toString() != null.toString() &&
+          user.unique.toString() != null.toString() &&
+          user.phone.toString() != null.toString()) {
+        api.updateFCM(token);
+      }
+    });
 
     Timer.run(() {
       '${user.pin}' == 'false'
@@ -577,17 +555,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   style: TextStyle(fontSize: 16, color: blackPurpleColor),
                   semanticsLabel: '${localization.cancel}'))
           : Text('');
-      // _showLockScreen(
-      //     context,
-      //     '${localization.enterPin}',
-      //     opaque: false,
-      //     cancelButton: Text('Cancel',style: const TextStyle(fontSize: 16, color:blackPurpleColor),semanticsLabel: 'Cancel'));
     });
 
     getContacts(context).then((getContactsResult) {
-      // Future.delayed(Duration(seconds: 5)).then((value) {
-      // ChatRoom.shared.userCheck(getContactsResult[306]['phone']);
-      // });
       var result = getContactsResult is List ? false : !getContactsResult;
 
       for (int i = 0; i < getContactsResult.length; i++) {
@@ -691,12 +661,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   _connect() async {
-    // ChatRoom.shared.listen();
     ChatRoom.shared.onChange.listen((e) async {
-      if (e.json["cmd"] != 'user:check')
-        print("LISTENING EVENT ${e.json["cmd"]}");
       var cmd = e.json["cmd"];
-      // print('user check : ${e.json}');
       switch (cmd) {
         case 'message:create':
           print(e.json["data"]);
@@ -725,38 +691,22 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           break;
         case 'user:check':
           var data = e.json["data"];
-          // print("USER CHECK ${data['status']}");
           if (data['status'].toString() == 'true') {
             MyContact contact = MyContact(
-                phone: data['phone'],
-                id: data['user_id'],
-                avatar: data['avatar'],
-                name: data['name'],
-                chatId: data['chat_id'],
-                online: data['online']);
+              phone: data['phone'],
+              id: data['user_id'],
+              avatar: data['avatar'],
+              name: data['name'],
+              chatId: data['chat_id'],
+              online: data['online'],
+            );
             await contactsDB.updateOrInsert(contact);
           }
           break;
         default:
-          print("default in main");
+          print("default in main ${e.json}");
           break;
       }
-
-      // if (chatsPage == 1) {
-      //   setState(() {
-      //     chatsPage += 1;
-      //     myList = e.json['data'].toList();
-      //     chatsModel = myList.map((i) => ChatsModel.fromJson(i)).toList();
-      //   });
-      // } else {
-      //   print(
-      //       '____________________________________________________________$chatsPage');
-      //   // setState(() {
-      //   //   chatsPage += 1;
-      //   //   myList.addAll(e.json['data'].toList());
-      //   // });
-      // }
-      // await chatsDB.insertChats(chatsModel);
     });
   }
 
@@ -771,15 +721,16 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ChatPage(
-                name,
-                chatID,
-                chatType: chatType,
-                memberCount: memberCount,
-                userIds: userIds,
-                avatar: avatar,
-                avatarUrl: avatarUrl,
-              )),
+        builder: (context) => ChatPage(
+          name,
+          chatID,
+          chatType: chatType,
+          memberCount: memberCount,
+          userIds: userIds,
+          avatar: avatar,
+          avatarUrl: avatarUrl,
+        ),
+      ),
     ).whenComplete(() {
       // this is bool for check load more is needed or not
       globalBoolForForceGetChat = false;
@@ -801,75 +752,78 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.light) // Or Brightness.dark
-        );
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     return Scaffold(
-        body: TabBarView(
-          physics: NeverScrollableScrollPhysics(),
-          children: [
-            ChatsListPage(),
-            // Developing(),
-            UserProfilePage(),
-            TapesPage(),
-            WalletTab(),
-          ],
-          controller: tabController,
-        ),
-        bottomNavigationBar: SafeArea(
-          child: PreferredSize(
-            preferredSize: Size.fromHeight(50.0),
-            child: Container(
-              padding: EdgeInsets.only(
-                top: 5,
-                left: 0,
-                right: 0,
-              ),
-              height: 55,
-              child: TabBar(
-                  indicatorPadding: EdgeInsets.all(1),
-                  labelPadding: EdgeInsets.all(0),
-                  indicatorWeight: 0.0000000000001,
-                  controller: tabController,
-                  unselectedLabelColor: blackPurpleColor,
-                  labelColor: primaryColor,
-                  tabs: [
-                    new Tab(
-                      icon: new Image(
-                        image: AssetImage("assets/images/chat.png"),
-                        width: 20,
-                      ),
-                      child: Text("${localization.chat}",
-                          style: TextStyle(fontSize: 12)),
-                    ),
-                    new Tab(
-                      icon: new Image(
-                        image: AssetImage("assets/images/profile.png"),
-                        width: 20,
-                      ),
-                      child: Text("${localization.profile}",
-                          style: TextStyle(fontSize: 12)),
-                    ),
-                    new Tab(
-                      icon: new Image(
-                        image: AssetImage("assets/images/tape.png"),
-                        width: 20,
-                      ),
-                      child: Text("${localization.tape}",
-                          style: TextStyle(fontSize: 12)),
-                    ),
-                    new Tab(
-                      icon: new Image(
-                        image: AssetImage("assets/images/wallet.png"),
-                        width: 20,
-                      ),
-                      child: Text("${localization.wallet}",
-                          style: TextStyle(fontSize: 12)),
-                    )
-                  ]),
+      body: TabBarView(
+        physics: NeverScrollableScrollPhysics(),
+        children: [
+          ChatsListPage(),
+          UserProfilePage(),
+          TapesPage(),
+          WalletTab(),
+        ],
+        controller: tabController,
+      ),
+      bottomNavigationBar: SafeArea(
+        child: PreferredSize(
+          preferredSize: Size.fromHeight(50.0),
+          child: Container(
+            padding: EdgeInsets.only(
+              top: 5,
+              left: 0,
+              right: 0,
+            ),
+            height: 55,
+            child: TabBar(
+              indicatorPadding: EdgeInsets.all(1),
+              labelPadding: EdgeInsets.all(0),
+              indicatorWeight: 0.0000000000001,
+              controller: tabController,
+              unselectedLabelColor: blackPurpleColor,
+              labelColor: primaryColor,
+              tabs: [
+                Tab(
+                  icon: Image(
+                    image: AssetImage("assets/images/chat.png"),
+                    width: 20,
+                  ),
+                  child: Text("${localization.chat}",
+                      style: TextStyle(fontSize: 12)),
+                ),
+                Tab(
+                  icon: Image(
+                    image: AssetImage("assets/images/profile.png"),
+                    width: 20,
+                  ),
+                  child: Text("${localization.profile}",
+                      style: TextStyle(fontSize: 12)),
+                ),
+                Tab(
+                  icon: Image(
+                    image: AssetImage("assets/images/tape.png"),
+                    width: 20,
+                  ),
+                  child: Text("${localization.tape}",
+                      style: TextStyle(fontSize: 12)),
+                ),
+                Tab(
+                  icon: Image(
+                    image: AssetImage("assets/images/wallet.png"),
+                    width: 20,
+                  ),
+                  child: Text("${localization.wallet}",
+                      style: TextStyle(fontSize: 12)),
+                )
+              ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   @override
@@ -907,9 +861,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                                       MediaQuery.of(context).size.width * 0.2,
                                 ),
                       Container(width: 10),
-                      Flexible(child: TextField()
-                          // Text("Отправка медиа"),
-                          )
+                      Flexible(child: TextField())
                     ],
                   ),
                 ),
@@ -991,10 +943,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 child: Text('${localization.cancel}'),
                 onPressed: () {
                   Navigator.pop(context);
-                  // setState(() {
                   _sharedFiles.clear();
                   isSharedVideo = false;
-                  // });
                 },
               ),
             );
@@ -1017,21 +967,12 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   "r_filename": "${r["resize_file_name"]}"
                 }
         ];
-        // setState(() {
-        //   isUploaded = true;
-        // });
         var mediaType = isSharedVideo ? "video" : "image";
         ChatRoom.shared.sendMessage('$chatId', "$mediaType",
             type: type, attachments: jsonDecode(jsonEncode(a)));
-        // setState(() {
         _sharedFiles.clear();
         isSharedVideo = false;
-        // });
         Navigator.pop(context);
-        // setState(() {
-        // _sharedFiles.clear();
-        // isSharedVideo = false;
-        // });
       } else {
         showAlertDialog(context, r["message"]);
         print("error");
@@ -1172,6 +1113,7 @@ logOut(BuildContext context) async {
     ],
   );
   showDialog(
+    barrierDismissible: false,
     context: context,
     builder: (BuildContext context) {
       return alert;
@@ -1179,10 +1121,7 @@ logOut(BuildContext context) async {
   );
 }
 
-// ignore: must_be_immutable
 class Developing extends StatelessWidget {
-  String string = '${localization.chats}';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1191,7 +1130,7 @@ class Developing extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0.5,
         title: Text(
-          string,
+          localization.chats,
           style: TextStyle(color: blackPurpleColor),
         ),
         brightness: Brightness.light,

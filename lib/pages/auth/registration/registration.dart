@@ -6,14 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
-import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/auth/login/login.dart';
-import 'dart:convert';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import '../countries.dart';
 import 'phone_confirm.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -34,59 +32,31 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var country;
   var countries = new List<Country>();
   var _countries = [];
-  var phonePrefix = '77';
+  var _phonePrefix = '77';
   var smsCode = 0;
-  List _titles = [];
   List<DropdownMenuItem<String>> dropDownMenuItems;
   String _currentCountry = "Казахстан";
   String loginError = "";
 
   var mask;
   var loginFormatter;
-  String prefix = '77';
-  List _response = [];
   String _hintText = '+77';
   var length;
   CountryDao countryDao = CountryDao();
   var _selectedCountry;
-  _getCountries() async {
-    var list = await countryDao.getAll();
-    // response['countries'].forEach((element) {
-    // countryDao.insertOne(Country.fromJson(element));
-    // });
-    setState(() {
-      countries = list;
-      _selectedCountry = countries[1];
-      loginFormatter = MaskTextInputFormatter(
-          mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});
-      countries.forEach((element) {
-        _titles.add(element.title);
-      });
-      country = countries[countryId];
-      length = country.length;
-    });
-  }
 
   bool isPageOpened = true;
 
-  List<DropdownMenuItem<String>> getDropDownMenuItems(List titles) {
-    List<DropdownMenuItem<String>> items = new List();
-    for (var i = 0; i < titles.length; i++) {
-      items.add(
-          new DropdownMenuItem(value: titles[i], child: new Text(titles[i])));
-    }
-    return items;
-  }
-
   Color timerColor = primaryColor;
+
   @override
   void initState() {
     super.initState();
     if (start != 59) {
       startTimer();
     }
-    loginController = new TextEditingController();
-    passwordController = new TextEditingController();
+    loginController = TextEditingController();
+    passwordController = TextEditingController();
     _getCountries();
   }
 
@@ -95,27 +65,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     super.dispose();
     isPageOpened = false;
     _timer = null;
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  Future<void> showError(BuildContext context, m) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('${localization.error}'),
-          content: Text(m),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    loginController.dispose();
+    passwordController.dispose();
   }
 
   @override
@@ -125,8 +76,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
             centerTitle: true,
-            backgroundColor: Colors.white, // status bar color
-            brightness: Brightness.light, // status bar brightness
+            backgroundColor: Colors.white,
+            brightness: Brightness.light,
           ),
         ),
         body: GestureDetector(
@@ -149,18 +100,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ));
   }
 
+  _getCountries() async {
+    var list = await countryDao.getAll();
+    setState(() {
+      countries = list;
+      _selectedCountry = countries[0];
+      _currentCountry = countries[0].title;
+      loginFormatter = MaskTextInputFormatter(
+          mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});
+      country = countries[countryId];
+      length = country.length;
+    });
+  }
+
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => Countries(countries)),
     );
-
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        phonePrefix = _selectedCountry.phonePrefix;
-        _hintText = _selectedCountry.mask;
-        prefix = _selectedCountry.phonePrefix;
+        _phonePrefix = _selectedCountry.phonePrefix;
         _hintText = _selectedCountry.mask;
         loginFormatter = MaskTextInputFormatter(
             mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});
@@ -172,10 +133,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void startTimer() {
     const oneSec = const Duration(seconds: 1);
     if (_timer == null) {
-      print('staring time');
       _timer = Timer.periodic(oneSec, (Timer timer) {
         if (isPageOpened) {
-          print('if sec');
           setState(() {
             if (start < 1) {
               timer.cancel();
@@ -185,7 +144,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
             }
           });
         } else {
-          print('else sec');
           if (start < 1) {
             timer.cancel();
           } else {
@@ -206,7 +164,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
             Center(
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
-                // height: MediaQuery.of(context).size.height*0.4,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -228,10 +185,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                  Text('$_currentCountry ',
-                                      style: TextStyle(
-                                          color: blackPurpleColor,
-                                          fontSize: 18)),
+                                  Text(
+                                    '$_currentCountry ',
+                                    style: TextStyle(
+                                      color: blackPurpleColor,
+                                      fontSize: 18,
+                                    ),
+                                  ),
                                   SizedBox(
                                     width: 10,
                                   ),
@@ -259,9 +219,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("${localization.phoneNumber}",
-                                  style: TextStyle(
-                                      color: blackPurpleColor, fontSize: 16))
+                              Text(
+                                "${localization.phoneNumber}",
+                                style: TextStyle(
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
+                                ),
+                              )
                             ],
                           ),
                           Stack(
@@ -276,7 +240,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   loginFormatter,
                                 ],
                                 decoration: InputDecoration(
-                                  hintText: '${_hintText}',
+                                  hintText: '$_hintText',
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
                                   hoverColor: Colors.black,
@@ -288,9 +252,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           Text(
                             '$loginError',
                             style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10),
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -309,11 +274,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
-                        defaultWidget: Text("${localization.next}",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w300)),
+                        defaultWidget: Text(
+                          "${localization.next}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: primaryColor,
@@ -324,7 +292,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               var temp = loginController.text
                                   .replaceAll(' ', '')
                                   .replaceAll('+', '');
-
                               if (temp.length == length) {
                                 await api
                                     .checkRegistration(temp)
@@ -358,12 +325,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                         setState(() {
                                           loginError = sendSmsResult['message'];
                                         });
-                                        // _showError(context, sendSmsResult['message']);
                                       }
                                     });
                                   } else {
                                     setState(() {
-                                      // loginError = 'Пользователь ';
                                       loginError =
                                           '${checkPhoneResult['message']}';
                                     });
@@ -401,21 +366,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
     );
-  }
-
-  void changedDropDownItem(String selectedCountry) {
-    print("Selected county $selectedCountry, we are going to refresh the UI");
-    print("TEST $_countries");
-    for (var i = 0; i < _countries.length; i++) {
-      if (_countries[i]['title'] == selectedCountry) {
-        countryId = i;
-        phonePrefix = _countries[countryId]['prefix'];
-      }
-    }
-    setState(() {
-      _currentCountry = selectedCountry;
-    });
-    print("Current country is $_currentCountry and prefix $phonePrefix");
   }
 
   _space(double h) {

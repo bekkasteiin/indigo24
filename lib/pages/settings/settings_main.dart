@@ -19,91 +19,9 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
     super.initState();
   }
 
-  _buildLanguage() {
-    return Material(
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SettingsLanguagePage()))
-              .whenComplete(() => setState(() {}));
-        },
-        child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
-          height: 60,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '${localization.language}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: blackPurpleColor),
-                ),
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(
-                    '${localization.currentLanguage}',
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: blackPurpleColor),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(right: 15),
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/forward.png',
-                      ),
-                      width: 15,
-                      height: 15,
-                    ),
-                  ),
-                ])
-              ]),
-        ),
-      ),
-    );
-  }
-
-  _buildTermsOfUse() {
-    return Material(
-      child: InkWell(
-        onTap: () {
-          Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SettingsTermsPage()))
-              .whenComplete(() => setState(() {}));
-        },
-        child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
-          height: 60,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '${localization.terms}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: blackPurpleColor),
-                ),
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  Container(
-                    margin: EdgeInsets.only(right: 15),
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/forward.png',
-                      ),
-                      width: 15,
-                      height: 15,
-                    ),
-                  ),
-                ])
-              ]),
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -129,8 +47,10 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
           ),
           title: Text(
             "${localization.settings}",
-            style:
-                TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontWeight: FontWeight.w400,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -230,5 +150,92 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
             ),
           ),
         ));
+  }
+
+  _buildLanguage() {
+    return Material(
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SettingsLanguagePage()))
+              .whenComplete(() => setState(() {}));
+        },
+        child: Container(
+          padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
+          height: 60,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  '${localization.language}',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: blackPurpleColor),
+                ),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(
+                    '${localization.currentLanguage}',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: blackPurpleColor),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 15),
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/forward.png',
+                      ),
+                      width: 15,
+                      height: 15,
+                    ),
+                  ),
+                ])
+              ]),
+        ),
+      ),
+    );
+  }
+
+  _buildTermsOfUse() {
+    return Material(
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SettingsTermsPage()))
+              .whenComplete(() => setState(() {}));
+        },
+        child: Container(
+          padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
+          height: 60,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  '${localization.terms}',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: blackPurpleColor),
+                ),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    margin: EdgeInsets.only(right: 15),
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/forward.png',
+                      ),
+                      width: 15,
+                      height: 15,
+                    ),
+                  ),
+                ])
+              ]),
+        ),
+      ),
+    );
   }
 }

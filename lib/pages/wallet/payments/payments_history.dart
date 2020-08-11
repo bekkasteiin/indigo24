@@ -1,11 +1,7 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
@@ -21,77 +17,124 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     with TickerProviderStateMixin {
-  bool emptyResponse = false;
-  String logoUrl = "";
+  bool _emptyResponse;
+
+  String _logoUrl;
+
+  Api api;
+  List resultList = [];
+  RefreshController _refreshController;
+
+  int _page;
+
+  MaskTextInputFormatter _filterFormatter;
   @override
   void initState() {
-    api.getHistories(page).then((histories) {
+    _emptyResponse = false;
+
+    _page = 1;
+    _logoUrl = "";
+
+    api = Api();
+
+    _refreshController = RefreshController(initialRefresh: false);
+
+    _filterFormatter = MaskTextInputFormatter(
+      mask: '****-**-** / ****-**-**',
+      filter: {
+        "*": RegExp(r'[0-9]'),
+      },
+    );
+
+    api.getHistories(_page).then((histories) {
       if (histories['message'] == 'Not authenticated' &&
           histories['success'].toString() == 'false') {
         logOut(context);
       } else {
         setState(() {
-          logoUrl = histories['logoURL'];
+          _logoUrl = histories['logoURL'];
+
           if (histories['payments'].toList().isEmpty) {
-            emptyResponse = true;
+            _emptyResponse = true;
           }
-          if (page == 1) resultList = histories['payments'].toList();
+
+          if (_page == 1) resultList = histories['payments'].toList();
         });
-        page++;
+        _page++;
       }
     });
 
     super.initState();
   }
 
-  Api api = Api();
-
-  void showDownloadProgress(received, total) {
-    if (total != -1) {
-      print((received / total * 100).toStringAsFixed(0) + "%");
-    }
+  @override
+  void dispose() {
+    super.dispose();
   }
 
-  Future download2(Dio dio, String url, String savePath) async {
-    try {
-      Response response = await dio.get(
-        url,
-        onReceiveProgress: showDownloadProgress,
-        options: Options(
-            responseType: ResponseType.bytes,
-            followRedirects: false,
-            validateStatus: (status) {
-              return status < 500;
-            }),
-      );
-      print(response.headers);
-      File file = File(savePath);
-      var raf = file.openSync(mode: FileMode.write);
-      raf.writeFromSync(response.data);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
-      );
-      await raf.close();
-    } catch (e) {
-      print(e);
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: _buildAppBar(), body: _paymentHistroyBody(resultList));
   }
 
-  Dio dio = Dio();
+  void _onRefresh() {
+    print("_onRefresh ");
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    print("_onLoading ");
+    _loadData();
+    _refreshController.loadComplete();
+  }
+
+  // TODO ADD THIS WHEN WE CAN ABLE TO DOWNLOAD PDF
+  // void _showDownloadProgress(received, total) {
+  //   if (total != -1) {
+  //     print((received / total * 100).toStringAsFixed(0) + "%");
+  //   }
+  // }
+
+  // Future _download(Dio dio, String url, String savePath) async {
+  //   try {
+  //     Response response = await dio.get(
+  //       url,
+  //       onReceiveProgress: _showDownloadProgress,
+  //       options: Options(
+  //           responseType: ResponseType.bytes,
+  //           followRedirects: false,
+  //           validateStatus: (status) {
+  //             return status < 500;
+  //           }),
+  //     );
+  //     print(response.headers);
+  //     File file = File(savePath);
+  //     var raf = file.openSync(mode: FileMode.write);
+  //     raf.writeFromSync(response.data);
+
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => PDFViewer(raf.path)),
+  //     );
+  //     await raf.close();
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   Widget _historyBuilder(
-      BuildContext context,
-      String logo,
-      String account,
-      String amount,
-      String title,
-      String date,
-      String status,
-      int index,
-      String url,
-      int serviceID) {
+    BuildContext context,
+    String logo,
+    String account,
+    String amount,
+    String title,
+    String date,
+    String status,
+    int index,
+    String url,
+    int serviceID,
+  ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -119,7 +162,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                         ),
                         FittedBox(
                           child: Text(
-                            '${localization.repeat}',
+                            localization.repeat,
                             style: TextStyle(
                               color: Color(0xFF0543B8),
                             ),
@@ -147,13 +190,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
               SizedBox(width: 20),
             ],
           ),
-          // onTap: () async{
-          //   var tempDir = await getTemporaryDirectory();
-          //   String fullPath = tempDir.path + "/boo2.pdf'";
-          //   print('full path ${fullPath}');
-
-          //   download2(dio, url, fullPath);
-          // },
         ),
         Container(
           margin: EdgeInsets.only(top: 10, right: 20, left: 20),
@@ -219,12 +255,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
   Expanded _paymentInfo(String title, String account, String date) {
     return Expanded(
       child: Column(
@@ -263,7 +293,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     );
   }
 
-  AppBar buildAppBar() {
+  AppBar _buildAppBar() {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -293,56 +323,25 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     );
   }
 
-  List resultList = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: buildAppBar(), body: _paymentHistroyBody(resultList));
-  }
-
-  void onRefresh() {
-    print("_onRefresh ");
-    _refreshController.refreshCompleted();
-  }
-
-  void _onLoading() async {
-    print("_onLoading ");
-    _loadData();
-    _refreshController.loadComplete();
-  }
-
-  bool isLoaded = false;
-  int page = 1;
-
   Future _loadData() async {
-    api.getHistories(page).then((histories) {
+    api.getHistories(_page).then((histories) {
       print(histories);
       if (histories['payments'].isNotEmpty) {
         List temp = histories['payments'].toList();
         setState(() {
           resultList.addAll(temp);
         });
-        page++;
-        print(page);
+        _page++;
+        print(_page);
       }
     });
   }
-
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
-  MaskTextInputFormatter filterFormatter = MaskTextInputFormatter(
-    mask: '****-**-** / ****-**-**',
-    filter: {
-      "*": RegExp(r'[0-9]'),
-    },
-  );
 
   Widget _paymentHistroyBody(snapshot) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // TURN ON THIS AFTER FILTERS
         // Container(
         //   width: MediaQuery.of(context).size.width / 1.5,
         //   margin: EdgeInsets.symmetric(horizontal: 20),
@@ -351,7 +350,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         //     children: [
         //       Flexible(
         //         child: TextFormField(
-        //           inputFormatters: [filterFormatter],
+        //           inputFormatters: [_filterFormatter],
         //         ),
         //       ),
         //       InkWell(
@@ -371,14 +370,14 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         //           ),
         //         ),
         //         onTap: () {
-        //           String maskedText =
-        //               filterFormatter.getMaskedText().replaceAll(' ', '');
+        //           String _maskedText =
+        //               _filterFormatter.getMaskedText().replaceAll(' ', '');
 
-        //           var splittedDates = maskedText.split("/");
-        //           page = 1;
+        //           List splittedDates = _maskedText.split("/");
+        //           _page = 1;
 
         //           api
-        //               .getHistories(page,
+        //               .getHistories(_page,
         //                   fromDate: splittedDates[0], toDate: splittedDates[1])
         //               .then((histories) {
         //             print(histories);
@@ -387,14 +386,14 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         //               logOut(context);
         //             } else {
         //               setState(() {
-        //                 logoUrl = histories['logoURL'];
+        //                 _logoUrl = histories['logoURL'];
         //                 if (histories['payments'].toList().isEmpty) {
-        //                   emptyResponse = true;
+        //                   _emptyResponse = true;
         //                 }
-        //                 if (page == 1)
+        //                 if (_page == 1)
         //                   resultList = histories['payments'].toList();
         //               });
-        //               page++;
+        //               _page++;
         //             }
         //           });
         //         },
@@ -403,7 +402,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         //   ),
         // ),
         // SizedBox(height: 10),
-        !emptyResponse
+        !_emptyResponse
             ? resultList.isNotEmpty
                 ? Flexible(
                     child: SafeArea(
@@ -429,7 +428,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                               padding: const EdgeInsets.only(top: 10),
                               child: _historyBuilder(
                                 context,
-                                "$logoUrl${snapshot[index]['logo']}",
+                                "$_logoUrl${snapshot[index]['logo']}",
                                 "${snapshot[index]['account']}",
                                 "${snapshot[index]['amount']}",
                                 "${snapshot[index]['title']}",

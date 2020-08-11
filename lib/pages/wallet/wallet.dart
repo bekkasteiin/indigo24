@@ -35,6 +35,55 @@ double _amount = double.parse(user.balance);
 class _WalletTabState extends State<WalletTab> {
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
+
+  @override
+  void initState() {
+    api.getBalance();
+    if ('${user.pin}'.toString() == 'false') {
+      withPin = false;
+    }
+    Timer.run(() {
+      withPin == false
+          ? _showLockScreen(context, '${localization.createPin}',
+              withPin: withPin,
+              opaque: false,
+              cancelButton: Text('${localization.cancel}',
+                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+                  semanticsLabel: '${localization.cancel}'))
+          : _showLockScreen(context, '${localization.enterPin}',
+              opaque: false,
+              cancelButton: Text('${localization.cancel}',
+                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+                  semanticsLabel: '${localization.cancel}'));
+    });
+
+    _symbol = '₸';
+    _realAmount = double.parse(user.balance);
+    _blockedAmount = double.parse(user.balanceInBlock);
+    api.getExchangeRate().then((v) {
+      if (v['message'] == 'Not authenticated' &&
+          v['success'].toString() == 'false') {
+        logOut(context);
+        return true;
+      } else {
+        var ex = v["exchangeRates"];
+        _euroCoef = double.parse(ex['EUR']);
+        _rubleCoef = double.parse(ex['RUB']);
+        _dollarCoef = double.parse(ex['USD']);
+        return false;
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    api.getBalance();
+    _verificationNotifier.close();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    super.dispose();
+  }
+
   bool isAuthenticated = false;
 
   double _blockedAmount = 0;
@@ -43,9 +92,9 @@ class _WalletTabState extends State<WalletTab> {
   static double _realAmount = 0;
   double _globalCoef = 1;
   double _tengeCoef = 1;
-  double _euroCoef = 0;
-  double _rubleCoef = 0;
-  double _dollarCoef = 0;
+  double _euroCoef = 1;
+  double _rubleCoef = 1;
+  double _dollarCoef = 1;
   var withPin;
   var api = Api();
 
@@ -125,25 +174,6 @@ class _WalletTabState extends State<WalletTab> {
     } else {
       _verificationNotifier.add(isValid);
     }
-    // if (!isValid){
-    // return showDialog<void>(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return CupertinoAlertDialog(
-    //       title: Text('${localization.error}'),
-    //       content: Text('${localization.incorrectPin}'),
-    //       actions: <Widget>[
-    //         CupertinoDialogAction(
-    //           child: Text('Ok'),
-    //           onPressed: () {
-    //             Navigator.of(context).pop();
-    //           },
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
-    // }
   }
 
   _onPasscodeCancelled() {
@@ -153,54 +183,6 @@ class _WalletTabState extends State<WalletTab> {
       ),
       (r) => false,
     );
-  }
-
-  @override
-  void dispose() {
-    api.getBalance();
-    _verificationNotifier.close();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    api.getBalance();
-    if ('${user.pin}'.toString() == 'false') {
-      withPin = false;
-    }
-    Timer.run(() {
-      withPin == false
-          ? _showLockScreen(context, '${localization.createPin}',
-              withPin: withPin,
-              opaque: false,
-              cancelButton: Text('${localization.cancel}',
-                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-                  semanticsLabel: '${localization.cancel}'))
-          : _showLockScreen(context, '${localization.enterPin}',
-              opaque: false,
-              cancelButton: Text('${localization.cancel}',
-                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-                  semanticsLabel: '${localization.cancel}'));
-    });
-
-    _symbol = '₸';
-    _realAmount = double.parse(user.balance);
-    _blockedAmount = double.parse(user.balanceInBlock);
-    api.getExchangeRate().then((v) {
-      if (v['message'] == 'Not authenticated' &&
-          v['success'].toString() == 'false') {
-        logOut(context);
-        return true;
-      } else {
-        var ex = v["exchangeRates"];
-        _euroCoef = double.parse(ex['EUR']);
-        _rubleCoef = double.parse(ex['RUB']);
-        _dollarCoef = double.parse(ex['USD']);
-        return false;
-      }
-    });
-    super.initState();
   }
 
   @override

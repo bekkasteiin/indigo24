@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -34,40 +35,20 @@ bool globalBoolForForceGetChat = false;
 class _ChatsListPageState extends State<ChatsListPage>
     with AutomaticKeepAliveClientMixin {
   bool isOffline = false;
-
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  final TextStyle initialStyle = TextStyle(
+    fontSize: 20.0,
+    color: Colors.blue,
+    fontWeight: FontWeight.bold,
+  );
 
-  void _onRefresh() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-
-    print("_onRefresh");
-
-    // if failed,use refreshFailed()
-    _refreshController.refreshCompleted();
-  }
-
-  void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-
-    // items.add((items.length+1).toString());
-    print("_onLoading");
-    print(myList.length);
-    if (myList.length % 20 == 0) {
-      globalBoolForForceGetChat = true;
-      chatsPage++;
-      if (mounted)
-        setState(() {
-          print("_onLoading CHATS with page $chatsPage");
-          ChatRoom.shared.forceGetChat(page: chatsPage);
-        });
-      _refreshController.loadComplete();
-    }
-  }
-
+  final TextStyle finalStyle = TextStyle(
+    fontSize: 22.0,
+    color: Colors.red,
+    fontWeight: FontWeight.bold,
+  );
+  bool isTapped = false;
   @override
   void initState() {
     super.initState();
@@ -79,50 +60,7 @@ class _ChatsListPageState extends State<ChatsListPage>
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  goToChat(name, chatID,
-      {phone, chatType, memberCount, userIds, avatar, avatarUrl, members}) {
-    ChatRoom.shared.setCabinetStream();
-    ChatRoom.shared.checkUserOnline(userIds);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ChatPage(
-                name,
-                chatID,
-                phone: phone,
-                members: members,
-                chatType: chatType,
-                memberCount: memberCount,
-                userIds: userIds,
-                avatar: avatar,
-                avatarUrl: avatarUrl,
-              )),
-    ).whenComplete(() {
-      setState(() {
-        uploadingImage = null;
-      });
-
-      // this is bool for check load more is needed or not
-      globalBoolForForceGetChat = false;
-
-      ChatRoom.shared.forceGetChat();
-      ChatRoom.shared.closeCabinetStream();
-    });
-  }
-
-  final TextStyle initialStyle = TextStyle(
-    fontSize: 20.0,
-    color: Colors.blue,
-    fontWeight: FontWeight.bold,
-  );
-  final TextStyle finalStyle = TextStyle(
-    fontSize: 22.0,
-    color: Colors.red,
-    fontWeight: FontWeight.bold,
-  );
-  bool isTapped = false;
   @override
-  // ignore: must_call_super
   Widget build(BuildContext context) {
     String string = '${localization.chats}';
     return Scaffold(
@@ -234,6 +172,95 @@ class _ChatsListPageState extends State<ChatsListPage>
     );
   }
 
+  void _onRefresh() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    print("_onRefresh");
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    print("_onLoading");
+    if (myList.length % 20 == 0) {
+      globalBoolForForceGetChat = true;
+      chatsPage++;
+      if (mounted)
+        setState(() {
+          print("_onLoading CHATS with page $chatsPage");
+          ChatRoom.shared.forceGetChat(page: chatsPage);
+        });
+      _refreshController.loadComplete();
+    }
+  }
+
+  goToChat(
+    name,
+    chatID, {
+    phone,
+    chatType,
+    memberCount,
+    userIds,
+    avatar,
+    avatarUrl,
+    members,
+  }) {
+    ChatRoom.shared.setCabinetStream();
+    ChatRoom.shared.checkUserOnline(userIds);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChatPage(
+                name,
+                chatID,
+                phone: phone,
+                members: members,
+                chatType: chatType,
+                memberCount: memberCount,
+                userIds: userIds,
+                avatar: avatar,
+                avatarUrl: avatarUrl,
+              )),
+    ).whenComplete(() {
+      setState(() {
+        uploadingImage = null;
+      });
+      // this is bool for check load more is needed or not
+      globalBoolForForceGetChat = false;
+      ChatRoom.shared.forceGetChat();
+      ChatRoom.shared.closeCabinetStream();
+    });
+  }
+
+  showAlertDialog(BuildContext context, String message, var chat) {
+    Widget okButton = CupertinoDialogAction(
+      isDestructiveAction: true,
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+        ChatRoom.shared.deleteChat(chat);
+      },
+    );
+    Widget noButton = CupertinoDialogAction(
+      child: Text("${localization.no}"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      title: Text("$message"),
+      actions: [
+        noButton,
+        okButton,
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   _listView(context, status, {myList}) {
     return myList.isEmpty
         // ? dbChats.isNotEmpty
@@ -298,25 +325,34 @@ class _ChatsListPageState extends State<ChatsListPage>
                       actionPane: SlidableDrawerActionPane(),
                       actionExtentRatio: 0.25,
                       secondaryActions: <Widget>[
-                        myList[i]['mute'].toString() == '0'
-                            ? IconSlideAction(
-                                caption: '${localization.mute}',
-                                color: Colors.red,
-                                icon: Icons.volume_mute,
-                                onTap: () {
-                                  ChatRoom.shared.muteChat(myList[i]['id'], 1);
-                                  ChatRoom.shared.forceGetChat();
-                                },
-                              )
-                            : IconSlideAction(
-                                caption: '${localization.unmute}',
-                                color: Colors.grey,
-                                icon: Icons.settings_backup_restore,
-                                onTap: () {
-                                  ChatRoom.shared.muteChat(myList[i]['id'], 0);
-                                  ChatRoom.shared.forceGetChat();
-                                },
-                              ),
+                        IconSlideAction(
+                          caption:
+                              '${myList[i]['mute'].toString() == '0' ? localization.mute : localization.unmute}',
+                          color: myList[i]['mute'].toString() == '0'
+                              ? redColor
+                              : Colors.grey,
+                          icon: myList[i]['mute'].toString() == '0'
+                              ? Icons.volume_mute
+                              : Icons.settings_backup_restore,
+                          onTap: () {
+                            myList[i]['mute'].toString() == '0'
+                                ? ChatRoom.shared.muteChat(myList[i]['id'], 1)
+                                : ChatRoom.shared.muteChat(myList[i]['id'], 0);
+                            ChatRoom.shared.forceGetChat();
+                          },
+                        ),
+                        IconSlideAction(
+                          caption: '${localization.delete}',
+                          color: Colors.red,
+                          icon: Icons.delete,
+                          onTap: () {
+                            showAlertDialog(
+                                context,
+                                '${localization.delete} ${localization.chat} ${myList[i]['name']}?',
+                                myList[i]['id']);
+                            ChatRoom.shared.forceGetChat();
+                          },
+                        )
                       ],
                       child: ListTile(
                         onTap: () {

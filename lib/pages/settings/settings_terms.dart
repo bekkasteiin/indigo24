@@ -11,6 +11,16 @@ class SettingsTermsPage extends StatefulWidget {
 
 class _SettingsTermsPageState extends State<SettingsTermsPage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -94,10 +104,10 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  FlatButton(
-                    onPressed: () {},
-                    child: Text('Скачать на устройство'),
-                  ),
+                  // FlatButton(
+                  //   onPressed: () {},
+                  //   child: Text('Скачать на устройство'),
+                  // ),
                   FlatButton(
                     onPressed: () async {
                       Navigator.push(
@@ -118,7 +128,7 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                       //   throw 'Could not launch https://indigo24.com/rules.html';
                       // }
                     },
-                    child: Text('Открыть'),
+                    child: Text('${localization.open}'),
                   )
                 ],
               ),

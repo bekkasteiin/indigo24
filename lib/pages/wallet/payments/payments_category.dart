@@ -14,155 +14,66 @@ class PaymentsCategoryPage extends StatefulWidget {
 }
 
 class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
-  var logoUrl;
-
-  Api api = Api();
+  Api _api;
+  Map<String, dynamic> _categories;
 
   @override
   void initState() {
     super.initState();
+    _api = Api();
+
+    _api.getCategories().then((categories) {
+      if (categories['message'] == 'Not authenticated' &&
+          categories['success'].toString() == 'false') {
+        logOut(context);
+      } else {
+        setState(() {
+          _categories = categories;
+        });
+      }
+    });
   }
 
-  Widget mainScreen2(BuildContext context, String logo, String account,
-      String amount, String title, String date, int index) {
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                "$date",
-                style: TextStyle(fontSize: 14),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.only(left: 20, right: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-          height: 60,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Container(
-                            width: 35,
-                            margin: EdgeInsets.only(right: 20),
-                            padding: EdgeInsets.only(top: 5),
-                            alignment: Alignment.topCenter,
-                            child: Image.network('$logo', width: 30.0),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  "$title",
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                                Text(
-                                  "${localization.account} $account",
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                                Text(
-                                  "$amount ₸",
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            width: 60,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  "",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.only(left: 20, right: 20),
-          margin: EdgeInsets.only(left: 20, right: 20),
-        ),
-      ],
-    );
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: api.getCategories().then((categories) {
-        print(categories);
-        if (categories['message'] == 'Not authenticated' &&
-            categories['success'].toString() == 'false') {
-          logOut(context);
-          return categories;
-        } else {
-          return categories;
-        }
-      }),
-      builder: (context, snapshot) {
-        return Scaffold(
-          appBar: buildAppBar(),
-          body: snapshot.hasData == true
-              ? SafeArea(
-                  child: Scrollbar(
-                    child: ListView.builder(
-                      padding: EdgeInsets.only(bottom: 20),
-                      shrinkWrap: true,
-                      itemCount: snapshot.data["categories"] != null
-                          ? snapshot.data["categories"].length
-                          : 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: _paymentsList(
-                            context,
-                            snapshot.data["logoURL"] +
-                                snapshot.data["categories"][index]['logo'],
-                            snapshot.data["categories"][index]['title'],
-                            snapshot.data["categories"][index]['ID'],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                )
-              : Center(child: CircularProgressIndicator()),
-        );
-      },
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: _categories != null
+          ? SafeArea(
+              child: Scrollbar(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(bottom: 20),
+                  shrinkWrap: true,
+                  itemCount: _categories["categories"] != null
+                      ? _categories["categories"].length
+                      : 0,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: _paymentsList(
+                        context,
+                        _categories["logoURL"] +
+                            _categories["categories"][index]['logo'],
+                        _categories["categories"][index]['title'],
+                        _categories["categories"][index]['ID'],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 
-  AppBar buildAppBar() {
+  AppBar _buildAppBar() {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -201,7 +112,9 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PaymentHistoryPage()),
+              MaterialPageRoute(
+                builder: (context) => PaymentHistoryPage(),
+              ),
             );
           },
         )
@@ -269,11 +182,5 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 }

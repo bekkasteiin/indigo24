@@ -22,27 +22,71 @@ class PhoneConfirmPage extends StatefulWidget {
 }
 
 class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
-  bool isPageOpened;
-  var api = Api();
-  TextEditingController smsController;
-  TextEditingController passwordController;
-  String smsError = "";
+  bool _isPageOpened;
+  Api _api;
+  TextEditingController _smsController;
+  TextEditingController _passwordController;
+  String smsError;
+  Timer _timer;
+  Color _smsColor;
+
   @override
   void initState() {
     super.initState();
-    startTimer();
-    isPageOpened = true;
-    smsController = new TextEditingController();
-    passwordController = new TextEditingController();
+    _isPageOpened = true;
+    smsError = "";
+    _smsColor = greyColor;
+    _api = Api();
+    _smsController = TextEditingController();
+    _passwordController = TextEditingController();
+    _startTimer();
   }
 
   @override
   void dispose() {
     super.dispose();
-    isPageOpened = false;
+    _isPageOpened = false;
+    _smsController.dispose();
+    _passwordController.dispose();
     _timer.cancel();
     _timer = null;
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.white, // status bar color
+          brightness: Brightness.light, // status bar brightness
+        ),
+      ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Stack(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: introBackgroundProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Center(
+              child: _buildForeground(),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> showError(BuildContext context, m) {
@@ -65,50 +109,17 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0.0),
-          child: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.white, // status bar color
-            brightness: Brightness.light, // status bar brightness
-          ),
-        ),
-        body: GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
-          child: Stack(
-            children: <Widget>[
-              Container(
-                  decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: introBackgroundProvider, fit: BoxFit.cover),
-              )),
-              Center(child: _buildForeground())
-            ],
-          ),
-        ));
-  }
-
-  Timer _timer;
-
-  void startTimer() {
+  void _startTimer() {
     const oneSec = const Duration(seconds: 1);
     if (_timer == null) {
       print('staring time');
-      print(isPageOpened);
+      print(_isPageOpened);
       _timer = Timer.periodic(oneSec, (Timer timer) {
         if (start == 0) {
           _timer.cancel();
           _timer = null;
         }
-        if (isPageOpened) {
+        if (_isPageOpened) {
           setState(() {});
           if (tamer == null) {
             setState(() {
@@ -122,8 +133,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
     }
   }
 
-  Color smsColor = greyColor;
-
   Widget _buildForeground() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -132,42 +141,41 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
         Center(
           child: Container(
             width: MediaQuery.of(context).size.width * 0.9,
-            // height: MediaQuery.of(context).size.height*0.4,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(5.0),
-                topLeft: Radius.circular(5.0),
-                bottomRight: Radius.circular(5.0),
-                bottomLeft: Radius.circular(5.0),
-              ),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: Column(
               children: <Widget>[
                 SizedBox(height: 50),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text("${localization.keyFromSms}",
-                              style: TextStyle(
-                                  color: blackPurpleColor, fontSize: 16))
+                          Text(
+                            "${localization.keyFromSms}",
+                            style: TextStyle(
+                              color: blackPurpleColor,
+                              fontSize: 16,
+                            ),
+                          )
                         ],
                       ),
                       TextField(
-                        controller: smsController,
+                        controller: _smsController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(hintText: ""),
                       ),
                       Text(
                         '$smsError',
                         style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10),
+                          color: Colors.red,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 10,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -188,7 +196,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                 SizedBox(height: 10),
                 Text(
                   '$start',
-                  style: TextStyle(color: smsColor),
+                  style: TextStyle(color: _smsColor),
                 ),
                 Container(
                   padding: EdgeInsets.only(bottom: 10),
@@ -197,27 +205,27 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     child: RaisedButton(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
-                          10.0,
+                          10,
                         ),
                       ),
                       color: whiteColor,
                       onPressed: () async {
                         if (start == 0) {
-                          api.sendSms(widget.phone).then((sendSmsResult) {
+                          _api.sendSms(widget.phone).then((sendSmsResult) {
                             print(sendSmsResult);
                             setState(() {
                               start = 59;
-                              startTimer();
+                              _startTimer();
                             });
                           });
                         } else {
                           setState(() {
-                            if (smsColor != redColor) {
-                              smsColor = redColor;
+                            if (_smsColor != redColor) {
+                              _smsColor = redColor;
                             }
                             Future.delayed(const Duration(seconds: 2), () {
-                              if (smsColor == greyColor) {
-                                smsColor = greyColor;
+                              if (_smsColor == greyColor) {
+                                _smsColor = greyColor;
                               }
                             });
                           });
@@ -248,9 +256,9 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     color: primaryColor,
                     onPressed: () async {
                       //@TODO REMOVE CONDITION
-                      if (smsController.text.isNotEmpty) {
-                        await api
-                            .checkSms(widget.phone, smsController.text)
+                      if (_smsController.text.isNotEmpty) {
+                        await _api
+                            .checkSms(widget.phone, _smsController.text)
                             .then((checkSmsResponse) async {
                           print('this is checkSmsResponse $checkSmsResponse');
                           if (checkSmsResponse['success'] == true) {
