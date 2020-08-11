@@ -15,6 +15,8 @@ class PaymentHistoryPage extends StatefulWidget {
   _PaymentHistoryPageState createState() => _PaymentHistoryPageState();
 }
 
+List resultList = [];
+
 class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     with TickerProviderStateMixin {
   bool _emptyResponse;
@@ -22,7 +24,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   String _logoUrl;
 
   Api api;
-  List resultList = [];
+
   RefreshController _refreshController;
 
   int _page;

@@ -190,7 +190,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     } else {
       setState(() {
         actualList.clear();
-        actualList.addAll(contacts);
+        actualList.addAll(myContacts);
       });
     }
   }

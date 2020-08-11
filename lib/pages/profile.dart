@@ -708,6 +708,10 @@ class CustomDialog extends StatelessWidget {
                           // await api.updateFCM('logoutToken');
                           preferences.setString('phone', 'null');
                           ChatRoom.shared.channel = null;
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => IntroPage()),
+                              (r) => false);
                           await api.logOutHttp().then((result) {
                             print(result);
                             if (result['message'] == 'Not authenticated' &&
@@ -715,10 +719,6 @@ class CustomDialog extends StatelessWidget {
                               logOut(context);
                             } else {
                               if (result['success'] == true) {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => IntroPage()),
-                                    (r) => false);
                               } else {
                                 print(
                                     'else because we cannot log out with no reason $result');

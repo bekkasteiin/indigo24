@@ -509,8 +509,12 @@ class _TransferPageState extends State<TransferPage> {
             } else {
               if (result["success"].toString() == 'true') {
                 api
-                    .doTransfer(result["toID"], sumController.text,
-                        transferChat: widget.transferChat, comment: 'hello')
+                    .doTransfer(
+                  result["toID"],
+                  sumController.text,
+                  transferChat: widget.transferChat,
+                  comment: _commentController.text,
+                )
                     .then((res) {
                   setState(() {
                     boolForPreloader = false;

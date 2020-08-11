@@ -12,13 +12,13 @@ class BalanceHistoryPage extends StatefulWidget {
   _BalanceHistoryPageState createState() => _BalanceHistoryPageState();
 }
 
+List _historyBalanceList = [];
+
 class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     with TickerProviderStateMixin {
   bool _emptyResponse;
 
   int _balanceHistoryPage;
-
-  List _historyBalanceList;
 
   Api _api;
 
@@ -29,8 +29,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     _emptyResponse = false;
 
     _balanceHistoryPage = 1;
-
-    _historyBalanceList = [];
 
     _api = Api();
 

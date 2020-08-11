@@ -14,9 +14,10 @@ class TransferHistoryPage extends StatefulWidget {
   _TransferHistoryPageState createState() => _TransferHistoryPageState();
 }
 
+List _transferHistories;
+
 class _TransferHistoryPageState extends State<TransferHistoryPage> {
   Api _api;
-  List _transferHistories;
   String _avatarUrl;
   bool _emptyResponse;
   RefreshController _refreshController;

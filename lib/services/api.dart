@@ -39,7 +39,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -113,7 +112,6 @@ class Api {
         return e.response.data;
       } else {
         print('This is error $e when response is null');
-        print(response.statusCode);
         print(e.response.statusCode);
         return false;
       }
@@ -136,7 +134,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -157,7 +154,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -178,7 +174,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -198,7 +193,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -216,7 +210,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
       return e.response.data;
@@ -239,7 +232,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
       return e.response.data;
@@ -259,7 +251,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
       return e.response.data;
@@ -286,7 +277,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
       return e.response.data;
@@ -318,7 +308,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
       return e.response.data;
@@ -410,7 +399,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -454,7 +442,6 @@ class Api {
         print(e.response.headers);
         print(e.response.request.uri);
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -486,7 +473,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -507,7 +493,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -515,8 +500,8 @@ class Api {
 
   calculateSum(serviceID, account, amount) async {
     try {
-      Response response = await Dio().get(
-        "https://api.indigo24.xyz/hermes/sum/calculate", // TODO FIX BASE URL
+      Response response = await dio.get(
+        "/hermes/sum/calculate",
         queryParameters: {
           "customerID": "${user.id}",
           "unique": "${user.unique}",
@@ -530,47 +515,6 @@ class Api {
     } catch (e) {
       print('${e.response} this is e $e');
       return e.response.data;
-    }
-  }
-
-  paymentProceed(serviceID, account, amount) async {
-    try {
-      Response response = await Dio().post(
-        "https://api.indigo24.com/hermes/payment/proceed",
-        queryParameters: {
-          "customerID": "${user.id}",
-          "unique": "${user.unique}",
-          // "serviceID": "$serviceID", // TODO TURN ON THIS AFTER TESTS
-          "serviceID": "100014",
-          "amount": "$amount",
-          "currency": "KZT",
-          "account": "$account",
-        },
-      );
-      print(response.data);
-      return response.data;
-    } catch (e) {
-      print('${e.response} this is e $e');
-    }
-  }
-
-  transactionStatus(serviceID, account, amount) async {
-    try {
-      Response response = await Dio().get(
-        "https://api.indigo24.xyz/transaction/status",
-        queryParameters: {
-          "transactionID": '1',
-          // "customerID": "${user.id}",
-          // "unique": "${user.unique}",
-          // "serviceID": "$serviceID",
-          // "amount": "$amount",
-          // "currency": "KZT",
-          // "account": "$account",
-        },
-      );
-      print(response);
-    } catch (e) {
-      print('${e.response} this is e $e');
     }
   }
 
@@ -592,7 +536,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -613,7 +556,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -646,7 +588,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -669,7 +610,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -687,7 +627,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -729,7 +668,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -752,7 +690,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -773,7 +710,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -794,7 +730,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -914,7 +849,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }
@@ -936,7 +870,6 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
-        print(response.statusCode);
         print(e.response.statusCode);
       }
     }

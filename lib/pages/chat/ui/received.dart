@@ -281,10 +281,20 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                         .indexOf(test));
                                               }())
                                             : (type == "2")
-                                                ? FileMessage(
-                                                    url: "$mediaUrl$media")
+                                                ? Container(
+                                                    color: Colors.pinkAccent.withOpacity(0.2),
+                                                    padding: EdgeInsets.all(5),
+                                                    child: Text(
+                                                      '${localization.document} ${localization.error}',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  )
+                                                // FileMessage(
+                                                // url: "$mediaUrl$media") // TODO FIX FILES
                                                 : (type == "3")
-                                                    ? new AudioMessage(
+                                                    ? AudioMessage(
                                                         "$mediaUrl$media")
                                                     : (type == "4")
                                                         ?

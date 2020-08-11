@@ -212,10 +212,23 @@ class SendedMessageWidget extends StatelessWidget {
                                           imageCount: imageCount.indexOf(test));
                                     }())
                                   : (type == "2")
-                                      ? new FileMessage(
-                                          url: "$mediaUrl/$media",
-                                          key: Key("$mediaUrl/$media"),
+                                      ? Container(
+                                          color: Colors.pinkAccent
+                                              .withOpacity(0.2),
+                                          padding: EdgeInsets.all(5),
+                                          child: Text(
+                                            '${localization.document} ${localization.error}',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
                                         )
+                                      // TODO FIX FILES
+
+                                      //  FileMessage(
+                                      //     url: "$mediaUrl/$media",
+                                      //     key: Key("$mediaUrl/$media"),
+                                      //   )
                                       : (type == "3")
                                           ? new AudioMessage("$mediaUrl$media")
                                           : (type == "4")

@@ -122,7 +122,7 @@ class _IntroPageState extends State<IntroPage> {
 
   _getCountries() async {
     await _api.getCountries().then((response) async {
-      print("getCountries $response");
+      print("getCountries false is it? $response");
       if (response == false) {
         dioError(context);
       } else {

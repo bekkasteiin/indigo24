@@ -87,7 +87,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           } else {
             print('else else $element');
             _accountLength = element['mask'].replaceAll(' ', '').length;
-
+          
             _loginFormatter = MaskTextInputFormatter(
                 mask: '${element['mask']}', filter: {"*": _accountRegex});
           }
@@ -267,11 +267,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                           ),
                                         ],
                                       ),
-                                      Container(
-                                        height: 10,
-                                        width: 10,
-                                        color: Colors.red,
-                                      ),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -340,7 +335,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                   style: TextStyle(color: Color(0xFF001D52)))),
                           _transferButton(_service),
                           SizedBox(
-                            height: 10,
+                            height: 20,
                           )
                         ],
                       ),
@@ -493,11 +488,12 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               if (!currentFocus.hasPrimaryFocus) {
                 currentFocus.unfocus();
               }
+
               if (_receiverController.text.isNotEmpty &
                   _sumController.text.isNotEmpty) {
-                String str =
-                    "${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
-                bool matches = _accountRegex.hasMatch(str);
+                // String str =
+                //     "${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
+                // bool matches = _accountRegex.hasMatch(str);
                 // if (int.parse(_sumController.text) >=
                 //     _service['service']['min']) {
                 //   if (int.parse(_sumController.text) <=
@@ -528,7 +524,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 //   showAlertDialog(
                 //       context, '0', '${localization.enterAboveMin}');
                 // }
-                if (widget.isConvertable == 0) {
+                if (widget.isConvertable == 0 || isCalculated == true) {
                   String str =
                       "${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
                   bool matches = _accountRegex.hasMatch(str);
@@ -538,12 +534,17 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         _service['service']['max']) {
                       if (matches) {
                         await _showLockScreen(
-                            context, '${localization.enterPin}',
-                            opaque: false,
-                            cancelButton: Text('Cancel',
-                                style: const TextStyle(
-                                    fontSize: 16, color: Color(0xFF001D52)),
-                                semanticsLabel: 'Cancel'));
+                          context,
+                          '${localization.enterPin}',
+                          opaque: false,
+                          cancelButton: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF001D52),
+                            ),
+                          ),
+                        );
                       } else {
                         showAlertDialog(
                             context, '0', '${localization.enterValidAccount}');
@@ -557,12 +558,14 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         context, '0', '${localization.enterAboveMin}');
                   }
                 } else {
+                  print('ptinr');
                   api
                       .calculateSum(
                           widget.serviceID,
                           '${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
                           _sumController.text)
                       .then((result) {
+                    result = json.decode(result);
                     if (result['message'] == 'Not authenticated' &&
                         result['success'].toString() == 'false') {
                       logOut(context);

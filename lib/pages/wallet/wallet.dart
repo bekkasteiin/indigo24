@@ -35,7 +35,7 @@ double _amount = double.parse(user.balance);
 class _WalletTabState extends State<WalletTab> {
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
-
+  bool needToPreloade = false;
   @override
   void initState() {
     api.getBalance();
@@ -200,106 +200,124 @@ class _WalletTabState extends State<WalletTab> {
           ),
           preferredSize: Size.fromHeight(0.0),
         ),
-        body: ScrollConfiguration(
-          behavior: MyBehavior(),
-          child: SingleChildScrollView(
-            child: Container(
-              child: Stack(
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/walletBackground.png',
-                    fit: BoxFit.fill,
-                  ),
-                  Container(
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(height: 10),
-                        Stack(
-                          children: [
-                            Container(
-                              alignment: Alignment.topCenter,
-                              child: Text(
-                                '${localization.wallet}',
-                                style: fS26(c: 'ffffff'),
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.topRight,
-                              child: InkWell(
-                                child: Container(
-                                  margin: EdgeInsets.only(right: 30, top: 2),
-                                  color: whiteColor,
-                                  width: 40,
-                                  padding: EdgeInsets.all(5),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Container(
-                                        child: Image.asset(
-                                          'assets/images/refresh.png',
-                                          width: 20,
-                                          height: 20,
-                                        ),
-                                      ),
-                                    ],
+        body: Stack(
+          children: <Widget>[
+            ScrollConfiguration(
+              behavior: MyBehavior(),
+              child: SingleChildScrollView(
+                child: Container(
+                  child: Stack(
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/images/walletBackground.png',
+                        fit: BoxFit.fill,
+                      ),
+                      Container(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(height: 10),
+                            Stack(
+                              children: [
+                                Container(
+                                  alignment: Alignment.topCenter,
+                                  child: Text(
+                                    '${localization.wallet}',
+                                    style: fS26(c: 'ffffff'),
                                   ),
                                 ),
-                                onTap: () async {
-                                  await api.getBalance();
-                                  setState(() {
-                                    // _amount = double.parse(user.balance);
-                                    _realAmount = double.parse(user.balance);
-                                    _blockedAmount =
-                                        double.parse(user.balanceInBlock);
-                                  });
-                                },
+                                Container(
+                                  alignment: Alignment.topRight,
+                                  child: InkWell(
+                                    child: Container(
+                                      margin:
+                                          EdgeInsets.only(right: 30, top: 2),
+                                      color: whiteColor,
+                                      width: 40,
+                                      padding: EdgeInsets.all(5),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            child: Image.asset(
+                                              'assets/images/refresh.png',
+                                              width: 20,
+                                              height: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      setState(() {
+                                        needToPreloade = true;
+                                      });
+                                      await api.getBalance().then((result) {
+                                        setState(() {
+                                          needToPreloade = false;
+                                        });
+                                      });
+                                      setState(() {
+                                        // _amount = double.parse(user.balance);
+                                        _realAmount =
+                                            double.parse(user.balance);
+                                        _blockedAmount =
+                                            double.parse(user.balanceInBlock);
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            _devider(),
+                            _balance(),
+                            SizedBox(height: 10),
+                            _balanceAmount(),
+                            _exchangeButtons(),
+                            _symbol == _tengeSymbol
+                                ? Container(
+                                    width: size.width,
+                                    color: darkPrimaryColor,
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.symmetric(vertical: 5),
+                                    child: Text(
+                                      '',
+                                    ),
+                                  )
+                                : _exchangeCurrency(size),
+                            _blockedBalance(size),
+                            Container(
+                              color: Colors.white,
+                              padding: EdgeInsets.only(
+                                left: size.width * 0.05,
+                                right: size.width * 0.05,
+                                top: 20,
+                              ),
+                              child: Column(
+                                children: <Widget>[
+                                  _payInOut(size),
+                                  SizedBox(height: 20),
+                                  _payments(size),
+                                  SizedBox(height: 20),
+                                  _transfer(size),
+                                  SizedBox(height: 20),
+                                  historyBalance(size),
+                                  SizedBox(height: 20),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                        _devider(),
-                        _balance(),
-                        SizedBox(height: 10),
-                        _balanceAmount(),
-                        _exchangeButtons(),
-                        _symbol == _tengeSymbol
-                            ? Container(
-                                width: size.width,
-                                color: darkPrimaryColor,
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                                child: Text(
-                                  '',
-                                ),
-                              )
-                            : _exchangeCurrency(size),
-                        _blockedBalance(size),
-                        Container(
-                          color: Colors.white,
-                          padding: EdgeInsets.only(
-                            left: size.width * 0.05,
-                            right: size.width * 0.05,
-                            top: 20,
-                          ),
-                          child: Column(
-                            children: <Widget>[
-                              _payInOut(size),
-                              SizedBox(height: 20),
-                              _payments(size),
-                              SizedBox(height: 20),
-                              _transfer(size),
-                              SizedBox(height: 20),
-                              historyBalance(size),
-                              SizedBox(height: 20),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+            needToPreloade
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Center(),
+          ],
         ),
       ),
     );

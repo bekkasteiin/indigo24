@@ -131,7 +131,7 @@ class MyApp extends StatelessWidget {
     ]);
     return OverlaySupport(
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: domen == 'com' ? false : true,
         title: 'Indigo24',
         builder: (context, child) {
           return MediaQuery(
@@ -151,12 +151,14 @@ class MyApp extends StatelessWidget {
 
 inAppPush(m) {
   print('_________________In App Push $m');
+
   if (!isInAppPushActive) {
     isInAppPushActive = true;
     Future.delayed(Duration(seconds: 4)).then((value) {
       isInAppPushActive = false;
     });
-    if (m['mute'].toString() == '0') {
+    print(m['mute'].toString() == '1');
+    if (m['mute'].toString() == '1') {
     } else {
       ChatRoom.shared.inSound();
       showOverlayNotification((context) {
