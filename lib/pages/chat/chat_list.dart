@@ -25,6 +25,7 @@ class ChatsListPage extends StatefulWidget {
 
 List<ChatsModel> dbChats = [];
 List myList = [];
+List chatList = [];
 List<ChatsModel> chatsModel = [];
 int chatsPage = 1;
 
@@ -225,13 +226,15 @@ class _ChatsListPageState extends State<ChatsListPage>
               },
             ),
           ),
-          Expanded(child: _listView(context, string)),
+          Expanded(
+              child: _listView(context, string,
+                  myList: myList.isEmpty ? chatList : myList)),
         ],
       ),
     );
   }
 
-  _listView(context, status) {
+  _listView(context, status, {myList}) {
     return myList.isEmpty
         // ? dbChats.isNotEmpty
         //     ? localChatBuilder(dbChats)

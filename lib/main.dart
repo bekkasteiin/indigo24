@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:indigo24/db/chats_model.dart';
 import 'package:indigo24/db/contact.dart';
 import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/pages/auth/intro.dart';
@@ -523,6 +524,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     api.getConfig();
+    _getChats();
     print('___________ TABS INIT STATE____________');
     print('___________ TABS INIT STATE____________');
     print('___________ TABS INIT STATE____________');
@@ -714,6 +716,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               });
             } else {
               myList = e.json['data'].toList();
+              myList.map((element) {
+                updateOrInsertChat(ChatsModel.fromJson(element));
+              }).toList();
             }
             chatsPage += 1;
           });
@@ -755,6 +760,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
+  updateOrInsertChat(ChatsModel chat) async {
+    // await chatsDB.deleteAll();
+    await chatsDB.updateOrInsert(chat);
+  }
+
   goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
     ChatRoom.shared.setCabinetStream();
     ChatRoom.shared.checkUserOnline(userIds);
@@ -778,14 +788,16 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  // Future _getChats() async {
-  //   Future<List<ChatsModel>> chats = chatsDB.getAllChats();
-  //   chats.then((value) {
-  //     setState(() {
-  //       dbChats.addAll(value);
-  //     });
-  //   });
-  // }
+  Future _getChats() async {
+    Future<List<ChatsModel>> chats = chatsDB.getAllSortedByTime();
+    chats.then((value) {
+      setState(() {
+        value.forEach((element) {
+          chatList.add(element.toJson());
+        });
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

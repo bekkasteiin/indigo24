@@ -8,42 +8,43 @@ class ChatsModel {
   var phone;
   var lastMessage;
   var anotherUserID;
-  ChatsModel({
-    this.id,
-    this.name,
-    this.avatar,
-    this.type,
-    this.membersCount,
-    this.unreadMessage,
-    this.phone,
-    this.lastMessage,
-    this.anotherUserID
-  });
+  var time;
+  ChatsModel(
+      {this.id,
+      this.name,
+      this.avatar,
+      this.type,
+      this.membersCount,
+      this.unreadMessage,
+      this.phone,
+      this.lastMessage,
+      this.anotherUserID,
+      this.time});
 
   factory ChatsModel.fromJson(Map<String, dynamic> json) => ChatsModel(
-    id: json["id"],
-    name: json["name"],
-    avatar: json["avatar"],
-    type: json["type"],
-    membersCount: json["members_count"],
-    unreadMessage: json["unread_messages"],
-    phone: json["phone"],
-    lastMessage: json["last_message"],
-    anotherUserID: json["another_user_id"],
-  );
+      id: json["id"],
+      name: json["name"],
+      avatar: json["avatar"],
+      type: json["type"],
+      membersCount: json["members_count"],
+      unreadMessage: json["unread_messages"],
+      phone: json["phone"],
+      lastMessage: json["last_message"],
+      anotherUserID: json["another_user_id"],
+      time: int.parse(json["time"].toString()));
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "avatar": avatar,
-    "type": type,
-    "members_count": membersCount,
-    "unread_messages": unreadMessage,
-    "phone": phone,
-    "last_message": lastMessage,
-    "another_user_id": anotherUserID,
-  };
-
+        "id": id,
+        "name": name,
+        "avatar": avatar,
+        "type": type,
+        "members_count": membersCount,
+        "unread_messages": unreadMessage,
+        "phone": phone,
+        "last_message": lastMessage,
+        "another_user_id": anotherUserID,
+        "time": time
+      };
 
   @override
   String toString() {
@@ -52,11 +53,12 @@ class ChatsModel {
       "name": $name,
       "avatar": $avatar,
       "type": $type,
-      "membersCount": $membersCount,
-      "unreadMessage": $unreadMessage,
+      "members_count": $membersCount,
+      "unread_message": $unreadMessage,
       "phone": $phone,
-      "lastMessage": $lastMessage,
-      "anotherUserID": $anotherUserID,
+      "last_message": $lastMessage,
+      "another_user_id": $anotherUserID,
+      "time": $time
     }""";
   }
 }
