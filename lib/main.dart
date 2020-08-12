@@ -190,7 +190,7 @@ inAppPush(m) {
                   ),
                 ),
               ),
-              title: Text("${m['user_name']}"),
+              title: Text("${m['chat_name']}"),
               subtitle: Text(
                 m['attachments'] == null
                     ? "${m["text"]}"
