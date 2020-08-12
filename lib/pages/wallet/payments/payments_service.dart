@@ -86,8 +86,10 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 MaskTextInputFormatter(filter: {"*": _accountRegex});
           } else {
             print('else else $element');
-            _accountLength = element['mask'].replaceAll(' ', '').length;
-          
+            if (element['mask'].toString() != 'null') {
+              _accountLength = element['mask'].replaceAll(' ', '').length;
+            }
+
             _loginFormatter = MaskTextInputFormatter(
                 mask: '${element['mask']}', filter: {"*": _accountRegex});
           }
@@ -637,7 +639,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                       child: TextFormField(
                         inputFormatters: [
                           // _loginFormatter,
-                          LengthLimitingTextInputFormatter(_accountLength),
+                          _accountLength != null
+                              ? LengthLimitingTextInputFormatter(_accountLength)
+                              : LengthLimitingTextInputFormatter(50),
                         ],
                         decoration: InputDecoration.collapsed(
                           hintText: _accountPlaceholder,

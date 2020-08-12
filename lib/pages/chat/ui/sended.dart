@@ -13,12 +13,12 @@ import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-var parser = EmojiParser();
-
 class Sended extends StatelessWidget {
   final m;
   final chatId;
+
   Sended(this.m, {this.chatId});
+
   @override
   Widget build(BuildContext context) {
     var a = (m['attachments'] == false || m['attachments'] == null)
@@ -27,7 +27,6 @@ class Sended extends StatelessWidget {
     var replyData = (m['reply_data'] == false || m['reply_data'] == null)
         ? false
         : m['reply_data'];
-
     return Align(
         alignment: Alignment(1, 0),
         child: Container(
@@ -40,9 +39,9 @@ class Sended extends StatelessWidget {
                   children: [
                     Text(
                       '${localization.delete}',
-                      style: TextStyle(color: Colors.red, fontSize: 14),
+                      style: TextStyle(color: redColor, fontSize: 14),
                     ),
-                    Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
+                    Icon(CupertinoIcons.delete, color: redColor, size: 20)
                   ],
                 ),
                 onPressed: () {
@@ -57,8 +56,10 @@ class Sended extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text('${localization.edit}',
-                          style: TextStyle(fontSize: 14)),
+                      Text(
+                        '${localization.edit}',
+                        style: TextStyle(fontSize: 14),
+                      ),
                       Icon(
                         CupertinoIcons.pen,
                         size: 20,
@@ -76,8 +77,10 @@ class Sended extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('${localization.reply}',
-                        style: TextStyle(fontSize: 14)),
+                    Text(
+                      '${localization.reply}',
+                      style: TextStyle(fontSize: 14),
+                    ),
                     Icon(CupertinoIcons.reply_thick_solid, size: 20)
                   ],
                 ),
@@ -91,7 +94,7 @@ class Sended extends StatelessWidget {
               color: Colors.transparent,
               child: SendedMessageWidget(
                   content: '${m['text']}',
-                  time: time('${m['time']}'),
+                  time: _time('${m['time']}'),
                   write: '${m['write']}',
                   type: "${m["type"]}",
                   media: (a == false || a == null)
@@ -122,7 +125,7 @@ class Sended extends StatelessWidget {
         ));
   }
 
-  String time(timestamp) {
+  String _time(timestamp) {
     var date = DateTime.fromMillisecondsSinceEpoch(
       int.parse(timestamp) * 1000,
     );
@@ -138,6 +141,8 @@ class Sended extends StatelessWidget {
     return '$hours:$minutes';
   }
 }
+
+EmojiParser _parser = EmojiParser();
 
 class SendedMessageWidget extends StatelessWidget {
   final String content;
@@ -167,7 +172,7 @@ class SendedMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var a = parser.unemojify(content);
+    var a = _parser.unemojify(content);
     int l = a.length - 1;
 
     return ConstrainedBox(
@@ -176,23 +181,29 @@ class SendedMessageWidget extends StatelessWidget {
       ),
       child: Container(
         child: Padding(
-          padding: const EdgeInsets.only(
-              right: 8.0, left: 50.0, top: 4.0, bottom: 4.0),
+          padding: EdgeInsets.only(
+            right: 8.0,
+            left: 50.0,
+            top: 4.0,
+            bottom: 4.0,
+          ),
           child: ClipRRect(
             borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(15),
-                bottomRight: Radius.circular(0),
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15)),
+              bottomLeft: Radius.circular(15),
+              bottomRight: Radius.circular(0),
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
             child: Container(
-              color: type == '11' ? primaryColor : Colors.white,
+              color: type == '11' ? primaryColor : whiteColor,
               child: Stack(children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
-                      right: (type == "3") ? 5 : 12.0,
-                      left: (type == "3") ? 2 : 8.0,
-                      top: (type == "3") ? 2 : 8.0,
-                      bottom: (type == "3") ? 1.0 : 15.0),
+                    right: (type == "3") ? 5 : 12.0,
+                    left: (type == "3") ? 2 : 8.0,
+                    top: (type == "3") ? 2 : 8.0,
+                    bottom: (type == "3") ? 1.0 : 15.0,
+                  ),
                   child: (type == "12")
                       ? LinkMessage("$media")
                       : (a[0] == ":" && a[l] == ":" && content.length < 9)
@@ -230,12 +241,13 @@ class SendedMessageWidget extends StatelessWidget {
                                       //     key: Key("$mediaUrl/$media"),
                                       //   )
                                       : (type == "3")
-                                          ? new AudioMessage("$mediaUrl$media")
+                                          ? AudioMessage("$mediaUrl$media")
                                           : (type == "4")
                                               ? Container(
                                                   child: VideoPlayerWidget(
                                                       "$mediaUrl$media",
-                                                      "network"))
+                                                      "network"),
+                                                )
                                               : (type == "10")
                                                   ? ReplyMessage(
                                                       content, replyData)
@@ -282,7 +294,7 @@ class SendedMessageWidget extends StatelessWidget {
                                                                           fontWeight: FontWeight
                                                                               .w600,
                                                                           color:
-                                                                              Colors.white),
+                                                                              whiteColor),
                                                                     ),
                                                                   )
                                                                 ],
@@ -296,27 +308,19 @@ class SendedMessageWidget extends StatelessWidget {
                                                                   overflow:
                                                                       TextOverflow
                                                                           .ellipsis,
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                      color: Colors
-                                                                          .white),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
                                                                 ),
                                                               )
                                                             ],
                                                           ),
                                                         )
-                                                      // Text(
-                                                      //     '$content KZT',
-                                                      //     style: TextStyle(
-                                                      //         fontWeight:
-                                                      //             FontWeight
-                                                      //                 .w600,
-                                                      //         color:
-                                                      //             Colors.white),
-                                                      //   )
-                                                      // MoneyMessage(content)
                                                       : (type == "uploading")
                                                           ? Container(
                                                               width: MediaQuery.of(
@@ -329,41 +333,28 @@ class SendedMessageWidget extends StatelessWidget {
                                                                       .size
                                                                       .width *
                                                                   0.7,
-                                                              child: uploadingImage !=
-                                                                      null
-                                                                  ? Stack(
-                                                                      children: [
-                                                                        Container(
-                                                                          width:
-                                                                              MediaQuery.of(context).size.width * 0.7,
-                                                                          height:
-                                                                              MediaQuery.of(context).size.width * 0.7,
-                                                                          child:
-                                                                              Image.file(
-                                                                            uploadingImage,
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                          ),
-                                                                        ),
-                                                                        Container(
-                                                                          width:
-                                                                              MediaQuery.of(context).size.width * 0.7,
-                                                                          height:
-                                                                              MediaQuery.of(context).size.width * 0.7,
-                                                                          color: Colors
-                                                                              .grey
-                                                                              .withOpacity(0.5),
-                                                                        ),
-                                                                        Center(
-                                                                            // child: Image.asset("assets/preloader.gif", width: MediaQuery.of(context).size.width * 0.3),
+                                                              child:
+                                                                  uploadingImage !=
+                                                                          null
+                                                                      ? Stack(
+                                                                          children: [
+                                                                            Container(
+                                                                              width: MediaQuery.of(context).size.width * 0.7,
+                                                                              height: MediaQuery.of(context).size.width * 0.7,
+                                                                              child: Image.file(
+                                                                                uploadingImage,
+                                                                                fit: BoxFit.cover,
+                                                                              ),
                                                                             ),
-                                                                      ],
-                                                                    )
-                                                                  : Center(
-                                                                      //   child: Image.asset(
-                                                                      //       "assets/preloader.gif",
-                                                                      //       width: MediaQuery.of(context).size.width * 0.3),
-                                                                      ),
+                                                                            Container(
+                                                                              width: MediaQuery.of(context).size.width * 0.7,
+                                                                              height: MediaQuery.of(context).size.width * 0.7,
+                                                                              color: Colors.grey.withOpacity(0.5),
+                                                                            ),
+                                                                            Center(),
+                                                                          ],
+                                                                        )
+                                                                      : Center(),
                                                             )
                                                           : SelectableText(
                                                               content,
@@ -376,12 +367,12 @@ class SendedMessageWidget extends StatelessWidget {
                       ? Icon(
                           Icons.done_all,
                           size: 16,
-                          color: type == '11' ? Colors.white : Colors.blue,
+                          color: type == '11' ? whiteColor : Colors.blue,
                         )
                       : Icon(
                           Icons.done,
                           size: 16,
-                          color: type == '11' ? Colors.white : Colors.grey[500],
+                          color: type == '11' ? whiteColor : Colors.grey[500],
                         ),
                 ),
                 Positioned(
@@ -394,14 +385,17 @@ class SendedMessageWidget extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 10,
                             color: type == '11'
-                                ? Colors.white
+                                ? whiteColor
                                 : Colors.black.withOpacity(0.6)),
                       ),
                       edit == '1'
-                          ? Text(" ред.",
+                          ? Text(
+                              " ред.",
                               style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.black.withOpacity(0.6)))
+                                fontSize: 10,
+                                color: Colors.black.withOpacity(0.6),
+                              ),
+                            )
                           : Container()
                     ],
                   ),
@@ -414,9 +408,3 @@ class SendedMessageWidget extends StatelessWidget {
     );
   }
 }
-// id: message:116222:159, user_id: 116222, avatar: 116222.20200710222515_AxB.jpeg,
-// phone: 77759112603, avatar_url: https://indigo24.com/uploads/avatars/,
-// user_name: Геннадий, text: 1, type: 11, chat_id: 2, time: 1594398083,
-// attachments: null, attachment_url: null, reply_data: null, forward_data: null,
-// write: 1, day: 10-07-2020, edit: 0, another_user_id: 105744, another_user_avatar: 105744.20200702103319_AxB.jpg,
-// another_user_name: A}

@@ -16,8 +16,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:flutter_downloader/flutter_downloader.dart';
 
-var parserChat = EmojiParser();
-
 class DeviderMessageWidget extends StatelessWidget {
   final date;
   const DeviderMessageWidget({Key key, this.date}) : super(key: key);
@@ -30,15 +28,17 @@ class DeviderMessageWidget extends StatelessWidget {
         padding: EdgeInsets.all(5),
         width: MediaQuery.of(context).size.width / 2,
         decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
-            borderRadius: BorderRadius.all(
-              Radius.circular(12.0),
-            )),
+          color: Colors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.all(
+            Radius.circular(12.0),
+          ),
+        ),
         child: Center(
-            child: Text(
-          '$date',
-          style: TextStyle(fontSize: 16, color: darkGreyColor2),
-        )),
+          child: Text(
+            '$date',
+            style: TextStyle(fontSize: 16, color: darkGreyColor2),
+          ),
+        ),
       ),
     );
   }
@@ -55,6 +55,14 @@ class AudioMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(url);
+    print(url);
+    print(url);
+    print(url);
+    print(url);
+    print(url);
+    print(url);
+    print(url);
     return PlayerWidget(url: url);
   }
 }
@@ -80,19 +88,12 @@ class ImageMessage extends StatelessWidget {
                   height: MediaQuery.of(context).size.width * 0.7,
                   color: Colors.grey.withOpacity(0.5),
                 ),
-                Center(
-                    // child: Image.asset("assets/preloader.gif",
-                    //     width: MediaQuery.of(context).size.width * 0.3),
-                    ),
+                Center(),
               ],
             )
-          : Center(
-              // child: Image.asset("assets/preloader.gif",
-              //     width: MediaQuery.of(context).size.width * 0.3),
-              ),
+          : Center(),
       width: MediaQuery.of(context).size.width * 0.7,
       height: MediaQuery.of(context).size.width * 0.7,
-      // padding: EdgeInsets.all(70.0),
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.all(
@@ -112,12 +113,6 @@ class ImageMessage extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: CachedNetworkImage(
-            // progressIndicatorBuilder: (context, url, progress) {
-            //   if(progress.progress == 1){
-            //     uploadingImage = null;
-            //   }
-            //   return placeholder(context);
-            // },
             placeholder: (context, url) => placeholder(context),
             errorWidget: (context, url, error) => Material(
               child: Image.asset(
@@ -143,13 +138,14 @@ class ImageMessage extends StatelessWidget {
         ),
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => FullPhoto(url: fullImageUrl)));
+            context,
+            MaterialPageRoute(
+              builder: (context) => FullPhoto(url: fullImageUrl),
+            ),
+          );
         },
         padding: EdgeInsets.all(0),
       ),
-      // margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
     );
   }
 }
@@ -168,6 +164,7 @@ class _VideoMessageState extends State<VideoMessage> {
   @override
   void initState() {
     super.initState();
+
     _controller = VideoPlayerController.network(widget.url);
 
     _controller.addListener(() {
@@ -237,8 +234,6 @@ class _PlayPauseOverlay extends StatelessWidget {
   }
 }
 
-var dio = Dio();
-
 class FileMessage extends StatefulWidget {
   FileMessage({Key key, this.url}) : super(key: key);
 
@@ -301,7 +296,7 @@ class _FileMessageState extends State<FileMessage> {
     );
   }
 
-  void _bindBackgroundIsolate() {
+  _bindBackgroundIsolate() {
     bool isSuccess = IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     if (!isSuccess) {
@@ -410,7 +405,6 @@ class _FileMessageState extends State<FileMessage> {
           String fullPath = tempDir.path + "/boo2.pdf'";
           print('full path $fullPath');
           _requestDownload(task);
-          // download2(dio, widget.url, fullPath);
         },
         icon: Icon(
           Icons.file_download,
@@ -543,26 +537,6 @@ class _FileMessageState extends State<FileMessage> {
     }
     return false;
   }
-
-  // Future<bool> _checkPermission() async {
-  //   if (Theme.of(context).platform == TargetPlatform.android) {
-  //     PermissionStatus permission = await PermissionHandler()
-  //         .checkPermissionStatus(PermissionGroup.storage);
-  //     if (permission != PermissionStatus.granted) {
-  //       Map<PermissionGroup, PermissionStatus> permissions =
-  //           await PermissionHandler()
-  //               .requestPermissions([PermissionGroup.storage]);
-  //       if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
-  //         return true;
-  //       }
-  //     } else {
-  //       return true;
-  //     }
-  //   } else {
-  //     return true;
-  //   }
-  //   return false;
-  // }
 
   Future<Null> _prepare() async {
     final tasks = await FlutterDownloader.loadTasks();

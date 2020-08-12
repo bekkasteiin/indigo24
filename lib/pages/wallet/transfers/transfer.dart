@@ -27,7 +27,7 @@ class TransferContactsDialogPageState
     extends State<TransferContactsDialogPage> {
   TextEditingController _searchController = TextEditingController();
 
-  var actualList = List<dynamic>();
+  List actualList = List<dynamic>();
 
   search(String query) {
     if (query.isNotEmpty) {
@@ -501,13 +501,18 @@ class _TransferPageState extends State<TransferPage> {
           });
           api.checkPhoneForSendMoney(receiverController.text).then((result) {
             print('transfer result $result');
-
+            setState(() {
+              boolForPreloader = false;
+            });
             if (result['message'] == 'Not authenticated' &&
                 result['success'].toString() == 'false') {
               logOut(context);
               return result;
             } else {
               if (result["success"].toString() == 'true') {
+                setState(() {
+                  boolForPreloader = true;
+                });
                 api
                     .doTransfer(
                   result["toID"],

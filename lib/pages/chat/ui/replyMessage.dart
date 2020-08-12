@@ -15,7 +15,11 @@ class _ReplyMessageState extends State<ReplyMessage> {
   @override
   void initState() {
     super.initState();
-    print("Reply data ${widget.replyData}");
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -60,16 +64,18 @@ class _ReplyMessageState extends State<ReplyMessage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                            "${widget.replyData == null ? "" : widget.replyData["user_name"]}",
-                            style: TextStyle(color: primaryColor),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            softWrap: false),
+                          "${widget.replyData == null ? "" : widget.replyData["user_name"]}",
+                          style: TextStyle(color: primaryColor),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          softWrap: false,
+                        ),
                         Text(
-                            "${widget.replyData == null ? "" : widget.replyData["message_text_for_type"] == null ? widget.replyData["text"] : widget.replyData["message_text_for_type"]}",
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            softWrap: false)
+                          "${widget.replyData == null ? "" : widget.replyData["message_text_for_type"] == null ? widget.replyData["text"] : widget.replyData["message_text_for_type"]}",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          softWrap: false,
+                        )
                       ],
                     ),
                   ),

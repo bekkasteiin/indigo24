@@ -78,55 +78,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // Row(
-            //   mainAxisSize: MainAxisSize.min,
-            //   children: [
-            //     IconButton(
-            //       key: Key('play_button'),
-            //       onPressed: _isPlaying ? null : () => _play(),
-            //       iconSize: 40.0,
-            //       icon: Icon(Icons.play_arrow),
-            //       color: Colors.cyan,
-            //     ),
-            // IconButton(
-            //   key: Key('pause_button'),
-            //   onPressed: _isPlaying ? () => _pause() : null,
-            //   iconSize: 40.0,
-            //   icon: Icon(Icons.pause),
-            //   color: Colors.cyan,
-            // ),
-            // IconButton(
-            //   key: Key('stop_button'),
-            //   onPressed: _isPlaying || _isPaused ? () => _stop() : null,
-            //   iconSize: 40.0,
-            //   icon: Icon(Icons.stop),
-            //   color: Colors.cyan,
-            // ),
-            //     IconButton(
-            //       onPressed: _earpieceOrSpeakersToggle,
-            //       iconSize: 40.0,
-            //       icon: _isPlayingThroughEarpiece
-            //           ? Icon(Icons.volume_up)
-            //           : Icon(Icons.hearing),
-            //       color: Colors.cyan,
-            //     ),
-            //   ],
-            // ),
-            // _isPlaying
-            //     ? IconButton(
-            //         key: Key('pause_button'),
-            //         onPressed: _isPlaying ? () => _pause() : null,
-            //         iconSize: 35.0,
-            //         icon: Icon(Icons.pause),
-            //         color: Colors.cyan,
-            //       )
-            //     : IconButton(
-            //         key: Key('play_button'),
-            //         onPressed: _isPlaying ? null : () => _play(),
-            //         iconSize: 35.0,
-            //         icon: Icon(Icons.play_arrow),
-            //         color: Colors.cyan,
-            //       ),
             Padding(
               padding: EdgeInsets.all(0),
               child: _isPlaying
@@ -226,7 +177,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       }
     });
     print('_____________ audioPlayers length ${audioPlayers.length}');
-    if(!audioPlayers.contains(_audioPlayer)){
+    if (!audioPlayers.contains(_audioPlayer)) {
       audioPlayers.add(_audioPlayer);
     }
     int result = 0;

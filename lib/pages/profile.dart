@@ -52,9 +52,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
   );
   Future<void> _initPackageInfo() async {
     final PackageInfo info = await PackageInfo.fromPlatform();
-    setState(() {
-      _packageInfo = info;
-    });
+    if (mounted) {
+      setState(() {
+        _packageInfo = info;
+      });
+    }
   }
 
   final String _fullName = '${user.name}';

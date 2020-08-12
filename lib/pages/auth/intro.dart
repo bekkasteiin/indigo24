@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/db/country_dao.dart';
@@ -10,6 +12,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/custom_dropdown.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../main.dart';
 
@@ -21,7 +24,7 @@ class IntroPage extends StatefulWidget {
 class _IntroPageState extends State<IntroPage> {
   Api _api;
   CountryDao _countryDao;
-
+  int _tempCounter = 0; // TODO FIX REMOVE
   @override
   void initState() {
     super.initState();
@@ -65,7 +68,35 @@ class _IntroPageState extends State<IntroPage> {
                     _signInButton(size),
                     _space(10),
                     _signUpButton(size),
-                    _space(size.height / 5),
+                    Container(
+                      child: InkWell(
+                        child: Container(
+                          height: 20,
+                          width: 100,
+                        ),
+                        onTap: () async {
+                          _tempCounter++;
+                          if (_tempCounter == 9) {
+                            SharedPreferences preferences =
+                                await SharedPreferences.getInstance();
+                            String _domen3 = preferences.getString('domen');
+                            print(_tempCounter);
+                            print(_domen3);
+                            if (_domen3 == null) {
+                              preferences.setString('domen', 'com');
+                            } else {
+                              if (_domen3 == 'xyz') {
+                                preferences.setString('domen', 'com');
+                              } else {
+                                preferences.setString('domen', 'xyz');
+                              }
+                            }
+                            exit(0);
+                          }
+                        },
+                      ),
+                    ),
+                    _space(size.height / 3),
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(

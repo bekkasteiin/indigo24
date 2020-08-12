@@ -20,28 +20,32 @@ class ChatMembersSelection extends StatefulWidget {
 }
 
 class _ChatMembersSelectionState extends State<ChatMembersSelection> {
-  var arrays = [];
-  var _saved = List<dynamic>();
-  var _saved2 = List<dynamic>();
+  List _saved;
 
-  TextEditingController _searchController = TextEditingController();
+  TextEditingController _searchController;
 
-  var actualList = List<dynamic>();
+  List _actualList;
   @override
   void initState() {
     super.initState();
-    if (contacts.isNotEmpty) {
-      actualList.addAll(contacts);
 
+    _saved = List<dynamic>();
+    _actualList = List<dynamic>();
+
+    _searchController = TextEditingController();
+
+    if (contacts.isNotEmpty) {
+      _actualList.addAll(contacts);
       widget.currentChatMembers.forEach((value) {
-        actualList.removeWhere((element) {
+        _actualList.removeWhere((element) {
           return '${value['phone']}' == '${element['phone']}';
         });
       });
     }
+
     ChatRoom.shared.setContactsStream();
-    listen();
-    print('listened');
+
+    _listen();
   }
 
   @override
@@ -51,31 +55,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
-  showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  var tempIndex = 0;
-
-  listen() {
+  _listen() {
     ChatRoom.shared.onContactChange.listen((e) {
       print("MEMBER SELECTION EVENT");
       print(e.json);
@@ -87,9 +67,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
             print('________ user check is valid __________');
             print('________ user check is valid __________');
             setState(() {
-              _saved.add(
-                  {"index": tempIndex, "user_id": e.json['data']['user_id']});
-              _saved2.add({
+              _saved.add({
                 'phone': e.json['data']['phone'],
                 'user_id': e.json['data']['user_id'],
                 'name': e.json['data']['name'],
@@ -141,19 +119,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     );
   }
 
-  String formatPhone(String phone) {
-    String r = phone.replaceAll(" ", "");
-    r = r.replaceAll("(", "");
-    r = r.replaceAll(")", "");
-    r = r.replaceAll("+", "");
-    r = r.replaceAll("-", "");
-    if (r.startsWith("8")) {
-      r = r.replaceFirst("8", "7");
-    }
-    return r;
-  }
-
-  void search(String query) {
+  void _search(String query) {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
       contacts.forEach((item) {
@@ -163,13 +129,13 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
         }
       });
       setState(() {
-        actualList.clear();
-        actualList.addAll(matches);
+        _actualList.clear();
+        _actualList.addAll(matches);
       });
     } else {
       setState(() {
-        actualList.clear();
-        actualList.addAll(contacts);
+        _actualList.clear();
+        _actualList.addAll(contacts);
       });
     }
   }
@@ -204,17 +170,18 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
         ),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.group_add),
-              iconSize: 30,
-              color: blackPurpleColor,
-              onPressed: () {
-                String userIds = '';
-                _saved2.forEach((element) {
-                  userIds += '${element['user_id']}' + ',';
-                });
-                userIds = userIds.substring(0, userIds.length - 1);
-                ChatRoom.shared.addMembers('${widget.chatId}', '$userIds');
-              })
+            icon: Icon(Icons.group_add),
+            iconSize: 30,
+            color: blackPurpleColor,
+            onPressed: () {
+              String userIds = '';
+              _saved.forEach((element) {
+                userIds += '${element['user_id']}' + ',';
+              });
+              userIds = userIds.substring(0, userIds.length - 1);
+              ChatRoom.shared.addMembers('${widget.chatId}', '$userIds');
+            },
+          )
         ],
         backgroundColor: Colors.white,
       ),
@@ -226,16 +193,15 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                      padding: EdgeInsets.only(top: 10, left: 10),
-                      child:
-                          Text('${_saved2.length} ${localization.contacts}')),
+                    padding: EdgeInsets.only(top: 10, left: 10),
+                    child: Text('${_saved.length} ${localization.contacts}'),
+                  ),
                   Container(
-                    height: _saved2.length == 0 ? 0 : 82,
+                    height: _saved.length == 0 ? 0 : 82,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: _saved2.length != null ? _saved2.length : 0,
+                      itemCount: _saved.length != null ? _saved.length : 0,
                       itemBuilder: (BuildContext context, int index) {
-                        // print(_saved2[index]);
                         return Stack(
                           children: <Widget>[
                             Container(
@@ -252,11 +218,12 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                       height: 35,
                                       child: Center(
                                         child: Text(
-                                          '${_saved2[index]['name'][0].toUpperCase()}',
+                                          '${_saved[index]['name'][0].toUpperCase()}',
                                           style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.w500),
+                                            color: Colors.white,
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -266,17 +233,15 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                   ),
                                   Container(
                                     child: Text(
-                                      // '${_saved2[index]['data']['data']['name']} asd',
-                                      '${_saved2[index]['name']}',
+                                      '${_saved[index]['name']}',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                     ),
                                   ),
-                                  // Text("${_saved2[index][0]}")
                                 ],
                               ),
                             ),
-                            _saved2[index]['user_id'] == '${user.id}'
+                            _saved[index]['user_id'] == '${user.id}'
                                 ? Center()
                                 : Positioned(
                                     bottom: 30,
@@ -302,9 +267,9 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                             ),
                                             onTap: () {
                                               setState(() {
-                                                _saved2.removeWhere((item) {
+                                                _saved.removeWhere((item) {
                                                   return '${item['phone']}' ==
-                                                      '${_saved2[index]['phone']}';
+                                                      '${_saved[index]['phone']}';
                                                 });
                                               });
                                             },
@@ -321,7 +286,11 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                   Container(
                     height: 50,
                     padding: const EdgeInsets.only(
-                        top: 10.0, left: 10.0, right: 10, bottom: 0),
+                      top: 10,
+                      left: 10,
+                      right: 10,
+                      bottom: 0,
+                    ),
                     child: Center(
                       child: TextField(
                         decoration: new InputDecoration(
@@ -333,7 +302,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                           fillColor: blackPurpleColor,
                         ),
                         onChanged: (value) {
-                          search(value);
+                          _search(value);
                         },
                         controller: _searchController,
                       ),
@@ -341,10 +310,10 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                   ),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: actualList.length,
+                      itemCount: _actualList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        if ('${user.phone}' == '+${actualList[index]['phone']}')
-                          return Center();
+                        if ('${user.phone}' ==
+                            '+${_actualList[index]['phone']}') return Center();
                         return Padding(
                           padding: const EdgeInsets.only(top: 2),
                           child: Container(
@@ -352,28 +321,27 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                               title: Wrap(
                                 children: <Widget>[
                                   Text(
-                                    '${actualList[index]['name']}',
+                                    '${_actualList[index]['name']}',
                                     style: TextStyle(fontSize: 16.0),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                               subtitle: Text(
-                                '${actualList[index]['phone']}',
+                                '${_actualList[index]['phone']}',
                                 style: TextStyle(fontSize: 14.0),
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              value: value(index),
+                              value: _value(index),
                               onChanged: (val) {
                                 setState(() {
                                   if (val == true) {
-                                    tempIndex = index;
                                     ChatRoom.shared
-                                        .userCheck(actualList[index]['phone']);
+                                        .userCheck(_actualList[index]['phone']);
                                   } else {
-                                    _saved2.removeWhere((item) {
+                                    _saved.removeWhere((item) {
                                       return '${item['phone']}' ==
-                                          '${actualList[index]['phone']}';
+                                          '${_actualList[index]['phone']}';
                                     });
                                   }
                                 });
@@ -398,10 +366,10 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     );
   }
 
-  value(index) {
+  _value(index) {
     bool tempo = false;
-    _saved2.forEach((element) {
-      if ('${element['phone']}' == '${actualList[index]['phone']}') {
+    _saved.forEach((element) {
+      if ('${element['phone']}' == '${_actualList[index]['phone']}') {
         tempo = true;
       }
     });

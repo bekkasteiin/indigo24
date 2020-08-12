@@ -25,15 +25,21 @@ class ChatUserProfilePage extends StatefulWidget {
 }
 
 class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
-  bool isInMyPhoneBook = false;
+  bool isInMyPhoneBook;
 
-  var percent = "0 %";
-  double uploadPercent = 0.0;
-  bool isUploading = false;
+  double uploadPercent;
+
+  String percent;
 
   @override
   void initState() {
     super.initState();
+    isInMyPhoneBook = false;
+
+    uploadPercent = 0.0;
+
+    percent = "0 %";
+
     contacts.forEach((element) {
       if (element['phone'].toString() == widget.phone.toString()) {
         print(widget.phone);
@@ -41,7 +47,8 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
         isInMyPhoneBook = true;
       }
     });
-    listen();
+
+    _listen();
   }
 
   @override
@@ -70,8 +77,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
                         children: <Widget>[
                           SizedBox(height: 160),
                           _buildPhoneSection(screenSize),
-                          // _buildEmailSection(screenSize),
-                          // _buildSeparator(screenSize),
                         ],
                       ),
                       Column(
@@ -120,7 +125,7 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     );
   }
 
-  listen() {
+  _listen() {
     ChatRoom.shared.onCabinetInfoChange.listen((e) {
       print("CHAT USER INFO EVENT");
       print(e.json);
@@ -191,16 +196,18 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
                   print("посмотреть ${widget.image}");
                   Navigator.pop(context);
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FullScreenWrapper(
-                                imageProvider: CachedNetworkImageProvider(
-                                    "${widget.image}"),
-                                minScale: PhotoViewComputedScale.contained,
-                                maxScale: PhotoViewComputedScale.contained * 3,
-                                backgroundDecoration:
-                                    BoxDecoration(color: Colors.transparent),
-                              )));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FullScreenWrapper(
+                        imageProvider:
+                            CachedNetworkImageProvider("${widget.image}"),
+                        minScale: PhotoViewComputedScale.contained,
+                        maxScale: PhotoViewComputedScale.contained * 3,
+                        backgroundDecoration:
+                            BoxDecoration(color: Colors.transparent),
+                      ),
+                    ),
+                  );
                 },
               ),
               CupertinoActionSheetAction(
@@ -253,21 +260,6 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
     return Text(
       '${widget.name}',
       style: _nameTextStyle,
-    );
-  }
-
-  Widget buildEmailSection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("${localization.email}"),
-          SizedBox(height: 5),
-          Text('${widget.email}'),
-          SizedBox(height: 5)
-        ],
-      ),
     );
   }
 

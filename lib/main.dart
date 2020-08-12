@@ -35,6 +35,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
+import 'pages/chat/chat_page_view_test.dart';
 import 'pages/profile.dart';
 import 'services/api.dart';
 import 'services/my_connectivity.dart';
@@ -105,20 +106,31 @@ Future<void> main() async {
   var phone = preferences.getString('phone');
   var unique = preferences.getString('unique');
   var customerID = preferences.getString('customerID');
+  var domen2 = preferences.getString('domen');
+  domen = domen2;
+  print(domen);
   print('phone: $phone');
   print('unuque: $unique');
   print('customerID: $customerID');
 
-  runApp(MyApp(phone: phone));
+  runApp(MyApp(phone: phone, domen: domen));
 }
+
+// class TestClass extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return AudioMessage("$mediaUrl$media");
+//   }
+// }
 
 // ignore: must_be_immutable
 class MyApp extends StatelessWidget {
   MyApp({
     Key key,
+    this.domen,
     @required this.phone,
   }) : super(key: key);
-
+  String domen;
   bool authenticated;
   String phone;
   String tempString = '';
@@ -530,6 +542,10 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   //   await FlutterDownloader.initialize(debug: true);
   // }
 
+  getUserSettings() {
+    ChatRoom.shared.getUserSettings();
+  }
+
   @override
   void initState() {
     api.getConfig();
@@ -660,6 +676,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.setStream();
     _connect();
     ChatRoom.shared.init();
+    getUserSettings();
   }
 
   _connect() async {

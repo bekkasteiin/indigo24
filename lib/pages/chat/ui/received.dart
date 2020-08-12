@@ -15,7 +15,7 @@ import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-var parser = EmojiParser();
+EmojiParser _parser = EmojiParser();
 
 class Received extends StatelessWidget {
   final m;
@@ -30,41 +30,11 @@ class Received extends StatelessWidget {
     var replyData = (m['reply_data'] == false || m['reply_data'] == null)
         ? false
         : m['reply_data'];
-
     return Align(
-        alignment: Alignment(-1, 0),
-        child: Container(
-            child: CupertinoContextMenu(
+      alignment: Alignment(-1, 0),
+      child: Container(
+        child: CupertinoContextMenu(
           actions: [
-            // CupertinoContextMenuAction(
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     crossAxisAlignment: CrossAxisAlignment.center,
-            //     children: [
-            //       const Text('Удалить', style: TextStyle(color:Colors.red, fontSize: 14),),
-            //       const Icon(CupertinoIcons.delete, color: Colors.red, size: 20)
-            //     ],
-            //   ),
-            //   onPressed: () {
-            //     ChatRoom.shared.deleteFromAll(chatId, m['id']==null?m['message_id']:m['id']);
-            //     Navigator.pop(context);
-            //   },
-            // ),
-            // CupertinoContextMenuAction(
-            //   child: Container(
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         const Text('Редактировать', style: TextStyle(fontSize: 14)),
-            //         const Icon(CupertinoIcons.pen, size: 20,)
-            //       ],
-            //     ),
-            //   ),
-            //   onPressed: () {
-            //     Navigator.pop(context);
-            //   },
-            // ),
             CupertinoContextMenuAction(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -116,7 +86,9 @@ class Received extends StatelessWidget {
                     ? null
                     : replyData),
           ),
-        )));
+        ),
+      ),
+    );
   }
 
   String time(timestamp) {
@@ -170,7 +142,7 @@ class ReceivedMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var a = parser.unemojify(content);
+    var a = _parser.unemojify(content);
     int l = a.length - 1;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -201,10 +173,10 @@ class ReceivedMessageWidget extends StatelessWidget {
                   backgroundImage: NetworkImage(image),
                   child: ClipOval(
                     child: CachedNetworkImage(
-                        imageUrl: image,
-                        errorWidget: (context, url, error) =>
-                            CachedNetworkImage(
-                                imageUrl: "${avatarUrl}noAvatar.png")),
+                      imageUrl: image,
+                      errorWidget: (context, url, error) => CachedNetworkImage(
+                          imageUrl: "${avatarUrl}noAvatar.png"),
+                    ),
                   ),
                 ),
               )
@@ -216,16 +188,21 @@ class ReceivedMessageWidget extends StatelessWidget {
             ),
             child: Container(
               child: Padding(
-                padding: const EdgeInsets.only(
-                    right: 75.0, left: 8.0, top: 8.0, bottom: 8.0),
+                padding: EdgeInsets.only(
+                  right: 75.0,
+                  left: 8.0,
+                  top: 8.0,
+                  bottom: 8.0,
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(0),
-                      bottomRight: Radius.circular(15),
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15)),
+                    bottomLeft: Radius.circular(0),
+                    bottomRight: Radius.circular(15),
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
                   child: Container(
-                    color: type == '11' ? primaryColor : Colors.white,
+                    color: type == '11' ? primaryColor : whiteColor,
                     child: Stack(children: <Widget>[
                       Column(
                         mainAxisSize: MainAxisSize.min,
@@ -238,13 +215,16 @@ class ReceivedMessageWidget extends StatelessWidget {
                                       left: 8.0,
                                       top: 5.0,
                                       bottom: 0.0),
-                                  child: Text(name,
-                                      style: TextStyle(
-                                          color: Colors.amber,
-                                          fontWeight: FontWeight.w500)),
+                                  child: Text(
+                                    name,
+                                    style: TextStyle(
+                                      color: Colors.amber,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 )
                               : Padding(
-                                  padding: const EdgeInsets.only(top: 5.0),
+                                  padding: EdgeInsets.only(top: 5.0),
                                 ),
                           Padding(
                             padding: EdgeInsets.only(
@@ -282,7 +262,8 @@ class ReceivedMessageWidget extends StatelessWidget {
                                               }())
                                             : (type == "2")
                                                 ? Container(
-                                                    color: Colors.pinkAccent.withOpacity(0.2),
+                                                    color: Colors.pinkAccent
+                                                        .withOpacity(0.2),
                                                     padding: EdgeInsets.all(5),
                                                     child: Text(
                                                       '${localization.document} ${localization.error}',
@@ -297,22 +278,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                     ? AudioMessage(
                                                         "$mediaUrl$media")
                                                     : (type == "4")
-                                                        ?
-                                                        // Container(
-                                                        //     width: MediaQuery.of(
-                                                        //                 context)
-                                                        //             .size
-                                                        //             .width *
-                                                        //         0.7,
-                                                        //     height: MediaQuery.of(
-                                                        //                 context)
-                                                        //             .size
-                                                        //             .width *
-                                                        //         0.7,
-                                                        //     child: DefaultPlayer(
-                                                        //         url:
-                                                        //             "$mediaUrl$media")
-                                                        VideoPlayerWidget(
+                                                        ? VideoPlayerWidget(
                                                             "$mediaUrl$media",
                                                             "network")
                                                         : (type == "10")
@@ -346,7 +312,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                                                 "${anotherUser["name"]}",
                                                                                 maxLines: 1,
                                                                                 overflow: TextOverflow.ellipsis,
-                                                                                style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                                                                                style: TextStyle(fontWeight: FontWeight.w600, color: whiteColor),
                                                                               ),
                                                                             )
                                                                           ],
@@ -363,22 +329,12 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                                             overflow:
                                                                                 TextOverflow.ellipsis,
                                                                             style:
-                                                                                TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                                                                                TextStyle(fontWeight: FontWeight.w600, color: whiteColor),
                                                                           ),
                                                                         )
                                                                       ],
                                                                     ),
                                                                   )
-                                                                // Text(
-                                                                //     '$content KZT',
-                                                                //     style: TextStyle(
-                                                                //         fontWeight:
-                                                                //             FontWeight
-                                                                //                 .w600,
-                                                                //         color: Colors
-                                                                //             .white),
-                                                                //   )
-                                                                // MoneyMessage(content)
                                                                 : SelectableText(
                                                                     content,
                                                                   ),
@@ -404,7 +360,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 10,
                                 color: type == '11'
-                                    ? Colors.white
+                                    ? whiteColor
                                     : Colors.black.withOpacity(0.6),
                               ),
                             ),

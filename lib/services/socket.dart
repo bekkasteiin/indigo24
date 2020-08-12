@@ -10,8 +10,8 @@ import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/user.dart' as user;
 
 class ChatRoom {
-  static var shared = ChatRoom();
-  var channel = new IOWebSocketChannel.connect('$socket');
+  static ChatRoom shared = ChatRoom();
+  IOWebSocketChannel channel = new IOWebSocketChannel.connect('$socket');
 
   var changeController;
   var cabinetController;
@@ -25,8 +25,6 @@ class ChatRoom {
   Stream<MyChatInfoEvent> get onChatInfoChange => chatInfoController.stream;
   Stream<MyCabinetInfoEvent> get onCabinetInfoChange =>
       cabinetInfoController.stream;
-
-  var lastMessage;
 
   void outSound() {
     print("msg out sound is called");
@@ -102,22 +100,29 @@ class ChatRoom {
     channel.sink.close();
   }
 
+  sendSocketData(data) {
+    channel.sink.add(data);
+  }
+
+  connect(context) {
+    channel = new IOWebSocketChannel.connect('$socket');
+    listen(context);
+  }
+
   init() {
     print("Init is called");
-
-    var data = json.encode({
+    String data = json.encode({
       "cmd": 'init',
       "data": {
         "user_id": "${user.id}",
         "userToken": "${user.unique}",
       }
     });
-    print("INIT DATA $data");
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   changePrivileges(chatId, members, role) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": 'chat:members:privileges',
       "data": {
         "user_id": '${user.id}',
@@ -127,11 +132,22 @@ class ChatRoom {
         "members": "$members",
       }
     });
-    channel.sink.add(data);
+    sendSocketData(data);
+  }
+
+  getUserSettings() {
+    String data = json.encode({
+      "cmd": 'user:settings:get',
+      "data": {
+        "user_id": '${user.id}',
+        "userToken": "${user.unique}",
+      }
+    });
+    sendSocketData(data);
   }
 
   checkUserOnline(ids) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": 'user:check:online',
       "data": {
         "user_id": '${user.id}',
@@ -139,13 +155,12 @@ class ChatRoom {
         "userToken": "${user.unique}",
       }
     });
-    print('user:check:online ids $ids');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   deleteMembers(String chatID, members) {
     print("delete members is called $chatID $members");
-    var data = json.encode({
+    String data = json.encode({
       "cmd": 'chat:members:delete',
       "data": {
         "chat_id": "$chatID",
@@ -154,11 +169,11 @@ class ChatRoom {
         "members": "$members",
       }
     });
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   leaveChat(chatID) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": 'chat:member:leave',
       "data": {
         "chat_id": "$chatID",
@@ -166,12 +181,11 @@ class ChatRoom {
         "userToken": "${user.unique}",
       }
     });
-    channel.sink.add(data);
-    print("leave ${user.id} member from chat $chatID is called");
+    sendSocketData(data);
   }
 
   addMembers(String chatID, members) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": 'chat:members:add',
       "data": {
         "chat_id": "$chatID",
@@ -180,13 +194,12 @@ class ChatRoom {
         "members_id": "$members",
       }
     });
-    channel.sink.add(data);
-    print("add members is added $chatID $members");
+    sendSocketData(data);
   }
 
   getMessages(String chatID, {page}) {
     print("getMessages is called");
-    var data = json.encode({
+    String data = json.encode({
       "cmd": 'chat:get',
       "data": {
         "chat_id": "$chatID",
@@ -195,12 +208,11 @@ class ChatRoom {
         "page": page == null ? 1 : page,
       }
     });
-    print(data);
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   readMessage(chatId, messageId) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "message:write",
       "data": {
         "userToken": "${user.unique}",
@@ -209,7 +221,7 @@ class ChatRoom {
         "message_id": '$messageId',
       }
     });
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   sendMessage(String chatID, String message,
@@ -220,7 +232,7 @@ class ChatRoom {
     message = message.trimLeft();
     message = message.trimRight();
     if (message.isNotEmpty) {
-      var data = json.encode({
+      String data = json.encode({
         "cmd": 'message:create',
         "data": {
           "user_id": "${user.id}",
@@ -234,14 +246,14 @@ class ChatRoom {
       });
       print('added message');
       print("$data");
-      channel.sink.add(data);
+      sendSocketData(data);
     } else {
       print('message is empty');
     }
   }
 
   chatMembers(chatId, {page}) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "chat:members",
       "data": {
         "userToken": "${user.unique}",
@@ -251,11 +263,11 @@ class ChatRoom {
       }
     });
     print('chat members');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   deleteChatMember(chatId, memberId) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "chat:members:delete",
       "data": {
         "userToken": "${user.unique}",
@@ -265,11 +277,11 @@ class ChatRoom {
       }
     });
     print('deleted members');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   userCheck(phone) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "user:check",
       "data": {
         "user_id": "${user.id}",
@@ -277,13 +289,11 @@ class ChatRoom {
         "phone": phone,
       }
     });
-    // USER:CHECK test print
-    // print('added user check with data ${json.decode(data)['data']['phone']}');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   changeChatName(chatId, chatName) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "chat:change:name",
       "data": {
         "user_id": "${user.id}",
@@ -293,11 +303,11 @@ class ChatRoom {
       }
     });
     print('chat name changed $data');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   deleteFromAll(chatId, messageId) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "message:deleted:all",
       "data": {
         "user_id": "${user.id}",
@@ -307,11 +317,11 @@ class ChatRoom {
       }
     });
     print('message deleted from all $data');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   typing(chatId) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "user:writing",
       "data": {
         "user_id": "${user.id}",
@@ -320,11 +330,11 @@ class ChatRoom {
       }
     });
     print('sending status with $data');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   cabinetCreate(ids, type, {title}) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "chat:create",
       "data": {
         "user_id": "${user.id}",
@@ -335,25 +345,20 @@ class ChatRoom {
       }
     });
     print('cabinet created $data');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   forceGetChat({page}) {
     print("Force updating chats");
-    var data = {
+    String data = json.encode({
       "cmd": 'chats:get',
       "data": {
         "user_id": "${user.id}",
         "userToken": "${user.unique}",
         "page": page == null ? 1 : page,
       }
-    };
-    channel.sink.add(jsonEncode(data));
-  }
-
-  connect(context) {
-    channel = new IOWebSocketChannel.connect('$socket');
-    listen(context);
+    });
+    sendSocketData(data);
   }
 
   editingMessage(m) {
@@ -402,7 +407,7 @@ class ChatRoom {
     message = message.trimLeft();
     message = message.trimRight();
     if (message.isNotEmpty) {
-      var data = json.encode({
+      String data = json.encode({
         "cmd": 'message:edit',
         "data": {
           "user_id": "${user.id}",
@@ -417,14 +422,14 @@ class ChatRoom {
       });
       print('added message');
       print("$data");
-      channel.sink.add(data);
+      sendSocketData(data);
     } else {
       print('message is empty');
     }
   }
 
   sendMoney(token, chatId) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "message:create",
       "data": {
         "user_id": "${user.id}",
@@ -435,11 +440,11 @@ class ChatRoom {
       }
     });
     print('send money to chat created $data');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   muteChat(chatId, mute) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "chat:mute",
       "data": {
         "userToken": "${user.unique}",
@@ -449,11 +454,11 @@ class ChatRoom {
       }
     });
     print('muting chat $chatId');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   deleteChat(chatId) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "chat:delete",
       "data": {
         "user_id": '${user.id}',
@@ -462,11 +467,11 @@ class ChatRoom {
       }
     });
     print('deleting chat $chatId');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   searchChatMembers(search, chatId) {
-    var data = json.encode({
+    String data = json.encode({
       "cmd": "chat:member:search",
       "data": {
         "user_id": "${user.id}",
@@ -476,7 +481,7 @@ class ChatRoom {
       }
     });
     print('searching $search chat members in chat N$chatId $data');
-    channel.sink.add(data);
+    sendSocketData(data);
   }
 
   replyMessage(message, chatID, type, mId) {
@@ -486,7 +491,7 @@ class ChatRoom {
     message = message.trimLeft();
     message = message.trimRight();
     if (message.isNotEmpty) {
-      var data = json.encode({
+      String data = json.encode({
         "cmd": 'message:create',
         "data": {
           "user_id": "${user.id}",
@@ -499,7 +504,7 @@ class ChatRoom {
       });
       print('added message');
       print("$data");
-      channel.sink.add(data);
+      sendSocketData(data);
     } else {
       print('message is empty');
     }

@@ -34,23 +34,11 @@ bool globalBoolForForceGetChat = false;
 
 class _ChatsListPageState extends State<ChatsListPage>
     with AutomaticKeepAliveClientMixin {
-  bool isOffline = false;
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  final TextStyle initialStyle = TextStyle(
-    fontSize: 20.0,
-    color: Colors.blue,
-    fontWeight: FontWeight.bold,
-  );
+  RefreshController _refreshController;
 
-  final TextStyle finalStyle = TextStyle(
-    fontSize: 22.0,
-    color: Colors.red,
-    fontWeight: FontWeight.bold,
-  );
-  bool isTapped = false;
   @override
   void initState() {
+    _refreshController = RefreshController(initialRefresh: false);
     super.initState();
   }
 
@@ -61,6 +49,7 @@ class _ChatsListPageState extends State<ChatsListPage>
   }
 
   @override
+  // ignore: must_call_super
   Widget build(BuildContext context) {
     String string = '${localization.chats}';
     return Scaffold(
@@ -68,20 +57,12 @@ class _ChatsListPageState extends State<ChatsListPage>
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
-        title: GestureDetector(
-          onTap: () {
-            setState(() {
-              isTapped = !isTapped;
-              print('hi $isTapped');
-            });
-          },
-          child: AnimatedDefaultTextStyle(
-            style: isTapped ? initialStyle : finalStyle,
-            duration: Duration(milliseconds: 500),
-            child: Text(
-              string,
-              style: TextStyle(color: blackPurpleColor),
-            ),
+        title: Text(
+          string,
+          style: TextStyle(
+            fontSize: 22.0,
+            color: blackPurpleColor,
+            fontWeight: FontWeight.bold,
           ),
         ),
         brightness: Brightness.light,
@@ -101,16 +82,19 @@ class _ChatsListPageState extends State<ChatsListPage>
             onPressed: () {
               ChatRoom.shared.setCabinetInfoStream();
               Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChatContactsPage()))
-                  .whenComplete(() {
-                ChatRoom.shared.contactController.close();
-                // this is bool for check load more is needed or not
-                globalBoolForForceGetChat = false;
-                ChatRoom.shared.forceGetChat();
-                ChatRoom.shared.closeContactsStream();
-              });
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatContactsPage(),
+                ),
+              ).whenComplete(
+                () {
+                  ChatRoom.shared.contactController.close();
+                  // this is bool for check load more is needed or not
+                  globalBoolForForceGetChat = false;
+                  ChatRoom.shared.forceGetChat();
+                  ChatRoom.shared.closeContactsStream();
+                },
+              );
             },
           )
         ],
@@ -122,7 +106,7 @@ class _ChatsListPageState extends State<ChatsListPage>
             margin: EdgeInsets.only(left: 10, top: 10),
             child: InkWell(
               child: Container(
-                padding: EdgeInsets.only(left: 10, right: 10),
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -158,15 +142,21 @@ class _ChatsListPageState extends State<ChatsListPage>
               ),
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChatGroupSelection()));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatGroupSelection(),
+                  ),
+                );
               },
             ),
           ),
           Expanded(
-              child: _listView(context, string,
-                  myList: myList.isEmpty ? chatList : myList)),
+            child: _listView(
+              context,
+              string,
+              myList: myList.isEmpty ? chatList : myList,
+            ),
+          ),
         ],
       ),
     );
@@ -193,7 +183,7 @@ class _ChatsListPageState extends State<ChatsListPage>
     }
   }
 
-  goToChat(
+  _goToChat(
     name,
     chatID, {
     phone,
@@ -209,29 +199,32 @@ class _ChatsListPageState extends State<ChatsListPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ChatPage(
-                name,
-                chatID,
-                phone: phone,
-                members: members,
-                chatType: chatType,
-                memberCount: memberCount,
-                userIds: userIds,
-                avatar: avatar,
-                avatarUrl: avatarUrl,
-              )),
-    ).whenComplete(() {
-      setState(() {
-        uploadingImage = null;
-      });
-      // this is bool for check load more is needed or not
-      globalBoolForForceGetChat = false;
-      ChatRoom.shared.forceGetChat();
-      ChatRoom.shared.closeCabinetStream();
-    });
+        builder: (context) => ChatPage(
+          name,
+          chatID,
+          phone: phone,
+          members: members,
+          chatType: chatType,
+          memberCount: memberCount,
+          userIds: userIds,
+          avatar: avatar,
+          avatarUrl: avatarUrl,
+        ),
+      ),
+    ).whenComplete(
+      () {
+        setState(() {
+          uploadingImage = null;
+        });
+        // this is bool for check load more is needed or not
+        globalBoolForForceGetChat = false;
+        ChatRoom.shared.forceGetChat();
+        ChatRoom.shared.closeCabinetStream();
+      },
+    );
   }
 
-  showAlertDialog(BuildContext context, String message, var chat) {
+  _showAlertDialog(BuildContext context, String message, var chat) {
     Widget okButton = CupertinoDialogAction(
       isDestructiveAction: true,
       child: Text("OK"),
@@ -346,30 +339,32 @@ class _ChatsListPageState extends State<ChatsListPage>
                           color: Colors.red,
                           icon: Icons.delete,
                           onTap: () {
-                            showAlertDialog(
-                                context,
-                                '${localization.delete} ${localization.chat} ${myList[i]['name']}?',
-                                myList[i]['id']);
+                            _showAlertDialog(
+                              context,
+                              '${localization.delete} ${localization.chat} ${myList[i]['name']}?',
+                              myList[i]['id'],
+                            );
                             ChatRoom.shared.forceGetChat();
                           },
                         )
                       ],
                       child: ListTile(
                         onTap: () {
-                          // ChatRoom.shared.checkUserOnline(ids);
                           print('get message');
                           ChatRoom.shared.getMessages(myList[i]['id']);
-                          goToChat(myList[i]['name'], myList[i]['id'],
-                              phone: myList[i]
-                                  ['another_user_phone'], //@TODO CHECK DIS
-                              members: myList[i]['members'],
-                              memberCount: myList[i]['members_count'],
-                              chatType: myList[i]['type'],
-                              userIds: myList[i]['another_user_id'],
-                              avatar: myList[i]['avatar']
-                                  .toString()
-                                  .replaceAll("AxB", "200x200"),
-                              avatarUrl: myList[i]['avatar_url']);
+                          _goToChat(
+                            myList[i]['name'],
+                            myList[i]['id'],
+                            phone: myList[i]['another_user_phone'],
+                            members: myList[i]['members'],
+                            memberCount: myList[i]['members_count'],
+                            chatType: myList[i]['type'],
+                            userIds: myList[i]['another_user_id'],
+                            avatar: myList[i]['avatar']
+                                .toString()
+                                .replaceAll("AxB", "200x200"),
+                            avatarUrl: myList[i]['avatar_url'],
+                          );
                         },
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(25.0),
@@ -387,7 +382,8 @@ class _ChatsListPageState extends State<ChatsListPage>
                                     CircularProgressIndicator(),
                                 errorWidget: (context, url, error) =>
                                     CachedNetworkImage(
-                                        imageUrl: "${avatarUrl}noAvatar.png"),
+                                  imageUrl: "${avatarUrl}noAvatar.png",
+                                ),
                               ),
                             ),
                           ),
@@ -423,31 +419,30 @@ class _ChatsListPageState extends State<ChatsListPage>
                             Text(
                               myList[i]['last_message']["time"] == null
                                   ? "null"
-                                  : time(myList[i]['last_message']["time"]),
+                                  : _time(myList[i]['last_message']["time"]),
                               style: TextStyle(color: blackPurpleColor),
                             ),
                             myList[i]['unread_messages'] == 0
                                 ? Container()
-                                // :
-                                // myList[i]['unread_messages'].toString().startsWith('-')?
-                                // Container()
                                 : Container(
                                     decoration: BoxDecoration(
                                         color: brightGreyColor4,
                                         borderRadius:
                                             BorderRadius.circular(10)),
                                     child: Text(
-                                        " ${myList[i]['unread_messages']} ",
-                                        style: TextStyle(color: Colors.white)),
+                                      " ${myList[i]['unread_messages']} ",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   )
                           ],
                         ),
                       ),
                     ),
                     Container(
-                        margin: EdgeInsets.only(left: 80, right: 20),
-                        height: 1,
-                        color: Colors.grey.shade300)
+                      margin: EdgeInsets.only(left: 80, right: 20),
+                      height: 1,
+                      color: Colors.grey.shade300,
+                    )
                   ],
                 );
               },
@@ -455,7 +450,7 @@ class _ChatsListPageState extends State<ChatsListPage>
           );
   }
 
-  String time(timestamp) {
+  String _time(timestamp) {
     if (timestamp != null) {
       if (timestamp != '') {
         var date = DateTime.fromMillisecondsSinceEpoch(

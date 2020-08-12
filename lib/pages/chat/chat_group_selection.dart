@@ -20,29 +20,11 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   var arrays = [];
   var _saved = List<dynamic>();
   var _saved2 = List<dynamic>();
+  var tempIndex = 0;
+  TextEditingController _searchController = TextEditingController();
+  TextEditingController _titleController = TextEditingController();
 
-  showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
+  var actualList = List<dynamic>();
   @override
   void initState() {
     super.initState();
@@ -53,13 +35,17 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
       "user_id": "${user.id}",
       "name": "${user.name}"
     });
-    listen();
-    print('listened');
+    _listen();
   }
 
-  var tempIndex = 0;
+  @override
+  void dispose() {
+    super.dispose();
+    ChatRoom.shared.contactController.close();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
 
-  listen() {
+  _listen() {
     ChatRoom.shared.onContactChange.listen((e) {
       print("GROUP SELECTION EVENT");
       print(e.json);
@@ -150,13 +136,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    ChatRoom.shared.contactController.close();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
   String formatPhone(String phone) {
     String r = phone.replaceAll(" ", "");
     r = r.replaceAll("(", "");
@@ -168,11 +147,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     }
     return r;
   }
-
-  TextEditingController _searchController = TextEditingController();
-  TextEditingController _titleController = TextEditingController();
-
-  var actualList = List<dynamic>();
 
   void search(String query) {
     if (query.isNotEmpty) {
@@ -352,7 +326,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
+                      padding: EdgeInsets.only(
                           top: 10.0, left: 10.0, right: 10, bottom: 0),
                       child: TextField(
                         inputFormatters: [
@@ -367,11 +341,11 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                     ),
                     Container(
                       height: 50,
-                      padding: const EdgeInsets.only(
+                      padding: EdgeInsets.only(
                           top: 10.0, left: 10.0, right: 10, bottom: 0),
                       child: Center(
                         child: TextField(
-                          decoration: new InputDecoration(
+                          decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.search,
                               color: blackPurpleColor,
@@ -413,10 +387,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                   style: TextStyle(fontSize: 14.0),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                value: value(index),
-                                onChanged: (val) {
+                                value: _value(index),
+                                onChanged: (value) {
                                   setState(() {
-                                    if (val == true) {
+                                    if (value == true) {
                                       tempIndex = index;
                                       ChatRoom.shared
                                           .userCheck(actualList[index].phone);
@@ -433,7 +407,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                 borderRadius: BorderRadius.circular(5),
                                 color: Colors.white,
                               ),
-                              margin: EdgeInsets.only(left: 10, right: 10),
+                              margin: EdgeInsets.symmetric(horizontal: 10),
                             ),
                           );
                         },
@@ -445,7 +419,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
             : Center(child: Text('${localization.emptyContacts}')));
   }
 
-  value(index) {
+  _value(index) {
     bool tempo = false;
     _saved2.forEach((element) {
       if ('${element['phone']}' == '${actualList[index].phone}') {

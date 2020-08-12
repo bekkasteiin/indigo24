@@ -1,19 +1,19 @@
-const String domen = 'com';
-// const String domen = 'xyz';
+//  String domen = 'com';
+String domen = 'xyz';
 
-const String avatarUrl = domen == 'com'
+String avatarUrl = domen == 'com'
     ? 'https://media.indigo24.com/avatars/'
     : 'https://indigo24.xyz/uploads/avatars/';
 
-const String uploadTapes = 'https://indigo24.$domen/uploads/tapes/';
+String uploadTapes = 'https://indigo24.$domen/uploads/tapes/';
 
-const String socket = 'wss://chat.indigo24.$domen:9502';
+String socket = 'wss://chat.indigo24.$domen:9502';
 
-const String baseUrl = 'https://api.indigo24.$domen/api/v2.1';
+String baseUrl = 'https://api.indigo24.$domen/api/v2.1';
 
-const String mediaChat = 'https://media.chat.indigo24.$domen/upload';
+String mediaChat = 'https://media.chat.indigo24.$domen/upload';
 
-const String logos = 'https://api.indigo24.$domen/logos/';
+String logos = 'https://api.indigo24.$domen/logos/';
 
 const String ownerRole = '100';
 const String adminRole = '50';
