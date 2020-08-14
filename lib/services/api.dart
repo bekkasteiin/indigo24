@@ -32,6 +32,7 @@ class Api {
     Response response;
     try {
       response = await _dio.post(path, data: data);
+      print('post result $response');
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -40,6 +41,7 @@ class Api {
         print(e.response.request);
         return e.response.data;
       } else {
+        print('error while getting value');
         print(e.request.baseUrl);
         print(e.request.data);
         print(e.request.method);

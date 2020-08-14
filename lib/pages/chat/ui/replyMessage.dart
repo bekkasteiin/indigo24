@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat.dart';
+import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 
 class ReplyMessage extends StatefulWidget {
@@ -10,6 +11,8 @@ class ReplyMessage extends StatefulWidget {
   @override
   _ReplyMessageState createState() => _ReplyMessageState();
 }
+
+var replyMessage;
 
 class _ReplyMessageState extends State<ReplyMessage> {
   @override
@@ -32,11 +35,17 @@ class _ReplyMessageState extends State<ReplyMessage> {
         children: [
           InkWell(
             onTap: () {
-              var id = widget.replyData['message_id'];
-              int i = listMessages.indexWhere(
-                  (e) => e['id'] == null ? e['message_id'] : e['id'] == id);
-              print("index of message is $i");
-              // ChatRoom.shared.scrolling(i);
+              // var id = widget.replyData['message_id'];
+              // int i = listMessages.indexWhere(
+              //     (e) => e['id'] == null ? e['message_id'] : e['id'] == id);
+              // print("index of message is $i");
+              // print(widget.replyData);
+              // if (i != -1) {
+              replyMessage = widget.replyData;
+              ChatRoom.shared.findMessage(widget.replyData);
+              // } else {
+              //   // ChatRoom.shared.getMessages(widget.chatID, page: messagesPage);
+              // }
             },
             child: Container(
               height: 50,

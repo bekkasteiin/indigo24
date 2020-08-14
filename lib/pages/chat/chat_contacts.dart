@@ -68,6 +68,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
+  bool boolForPrevenceUserCheck = true;
   _listen() {
     ChatRoom.shared.onContactChange.listen((e) {
       print("Contact EVENT");
@@ -76,37 +77,41 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
       switch (cmd) {
         case "user:check":
-          if (e.json['data']['chat_id'].toString() != 'false' &&
-              e.json['data']['status'].toString() == 'true') {
-            ChatRoom.shared.setCabinetStream();
-            ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
+          if (!boolForPrevenceUserCheck) {
+          } else {
+            if (e.json['data']['chat_id'].toString() != 'false' &&
+                e.json['data']['status'].toString() == 'true') {
+              ChatRoom.shared.setCabinetStream();
+              ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
 
-            print("USER CHECK DATA: ${e.json['data']}");
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                      '${e.json['data']['name']}', e.json['data']['chat_id'],
-                      memberCount: 2,
-                      userIds: e.json['data']['user_id'],
-                      avatar: '${e.json['data']['avatar']}',
-                      chatType: 0,
-                      avatarUrl: '${e.json['data']['avatar_url']}')),
-            ).whenComplete(() {
-              // this is bool for check load more is needed or not
-              globalBoolForForceGetChat = false;
-              ChatRoom.shared.forceGetChat();
-              ChatRoom.shared.closeCabinetStream();
-            });
-          } else if (e.json['data']['status'].toString() == 'true') {
-            // print('____________________');
-            // print('else if e.jsonDataStatus == true');
-            // print({e.json['data']['user_id']});
-            // print('____________________');
-            ChatRoom.shared.setCabinetStream();
-            ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
+              print("USER CHECK DATA: ${e.json['data']}");
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                        '${e.json['data']['name']}', e.json['data']['chat_id'],
+                        memberCount: 2,
+                        userIds: e.json['data']['user_id'],
+                        avatar: '${e.json['data']['avatar']}',
+                        chatType: 0,
+                        avatarUrl: '${e.json['data']['avatar_url']}')),
+              ).whenComplete(() {
+                // this is bool for check load more is needed or not
+                globalBoolForForceGetChat = false;
+                ChatRoom.shared.forceGetChat();
+                ChatRoom.shared.closeCabinetStream();
+              });
+            } else if (e.json['data']['status'].toString() == 'true') {
+              // print('____________________');
+              // print('else if e.jsonDataStatus == true');
+              // print({e.json['data']['user_id']});
+              // print('____________________');
+              ChatRoom.shared.setCabinetStream();
+              ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
+            }
           }
+
           break;
         case "chat:create":
           print("CHAT CREATE ${e.json['data']}");
@@ -245,13 +250,15 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               iconSize: 30,
               color: blackPurpleColor,
               onPressed: () async {
+                boolForPrevenceUserCheck = false;
                 print('update contacts');
+                await getContactsTemplate(context);
                 await contactsDB.getAll().then((value) {
                   myContacts = value;
-                });
-                setState(() {
-                  actualList.clear();
-                  actualList.addAll(myContacts);
+                  setState(() {
+                    actualList.clear();
+                    actualList.addAll(value);
+                  });
                 });
               },
             )
@@ -367,6 +374,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                   ],
                                 ),
                                 onPressed: () {
+                                  boolForPrevenceUserCheck = true;
                                   ChatRoom.shared
                                       .userCheck(actualList[index].phone);
                                 },

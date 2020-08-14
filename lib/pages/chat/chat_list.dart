@@ -231,6 +231,7 @@ class _ChatsListPageState extends State<ChatsListPage>
       onPressed: () {
         Navigator.pop(context);
         ChatRoom.shared.deleteChat(chat);
+        ChatRoom.shared.forceGetChat();
       },
     );
     Widget noButton = CupertinoDialogAction(
@@ -371,19 +372,14 @@ class _ChatsListPageState extends State<ChatsListPage>
                           child: Container(
                             height: 50,
                             width: 50,
+                            color: greyColor,
                             child: ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: (myList[i]["avatar"] == null ||
+                              child: Image.network(
+                                (myList[i]["avatar"] == null ||
                                         myList[i]["avatar"] == '' ||
                                         myList[i]["avatar"] == false)
-                                    ? "${avatarUrl}noAvatar.png"
+                                    ? '${avatarUrl}noAvatar.png'
                                     : '$avatarUrl${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    CachedNetworkImage(
-                                  imageUrl: "${avatarUrl}noAvatar.png",
-                                ),
                               ),
                             ),
                           ),

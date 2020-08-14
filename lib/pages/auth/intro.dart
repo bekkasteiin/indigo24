@@ -81,17 +81,17 @@ class _IntroPageState extends State<IntroPage> {
                                 await SharedPreferences.getInstance();
                             String _domen3 = preferences.getString('domen');
                             print(_tempCounter);
-                            print(_domen3);
-                            if (_domen3 == null) {
+                            print('$_domen3');
+                            if ('$_domen3' == null) {
                               preferences.setString('domen', 'com');
                             } else {
-                              if (_domen3 == 'xyz') {
+                              if ('$_domen3' == 'xyz') {
                                 preferences.setString('domen', 'com');
                               } else {
                                 preferences.setString('domen', 'xyz');
                               }
                             }
-                            exit(0);
+                            // exit(0); // TODO TURN ON THIS
                           }
                         },
                       ),

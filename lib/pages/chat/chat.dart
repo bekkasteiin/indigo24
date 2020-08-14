@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat_info.dart';
 import 'package:indigo24/pages/chat/ui/received.dart';
+import 'package:indigo24/pages/chat/ui/replyMessage.dart';
 import 'package:indigo24/pages/chat/ui/sended.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/test_timer.dart';
@@ -59,6 +60,8 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
+int messagesPage;
+
 class _ChatPageState extends State<ChatPage> {
   Dependencies _dependencies = Dependencies();
   List _myList = [];
@@ -71,7 +74,6 @@ class _ChatPageState extends State<ChatPage> {
   bool _isTyping = false;
   bool _isRecording = false;
   Api _api = Api();
-  int _page = 1;
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
@@ -100,10 +102,11 @@ class _ChatPageState extends State<ChatPage> {
   bool _isUploaded = false;
   int _onlineCount = 0;
   File _image;
-
+  bool messageFinding = false;
   ImagePicker _picker = ImagePicker();
   @override
   initState() {
+    messagesPage = 1;
     _isGroup = widget.chatType.toString() == '1';
     _membersCount = widget.memberCount;
 
@@ -123,6 +126,8 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
     audioPlayers = [];
   }
+
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -322,35 +327,70 @@ class _ChatPageState extends State<ChatPage> {
                             : Column(
                                 children: [
                                   Expanded(
-                                    child: SmartRefresher(
-                                      enablePullDown: false,
-                                      enablePullUp: true,
-                                      // header: WaterDropHeader(),
-                                      footer: CustomFooter(
-                                        builder: (BuildContext context,
-                                            LoadStatus mode) {
-                                          Widget body;
-                                          return Container(
-                                            height: 55.0,
-                                            child: Center(child: body),
-                                          );
+                                    child: NotificationListener<
+                                            ScrollNotification>(
+                                        onNotification:
+                                            (ScrollNotification scrollInfo) {
+                                          if (!isLoading &&
+                                              scrollInfo.metrics.pixels ==
+                                                  scrollInfo.metrics
+                                                      .maxScrollExtent) {
+                                            _loadData();
+                                            // start loading data
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+                                          }
                                         },
-                                      ),
-                                      controller: _refreshController,
-                                      onRefresh: _onRefresh,
-                                      onLoading: _onLoading,
-                                      child: ListView.builder(
-                                        controller: _scrollController,
-                                        // itemScrollController: itemScrollController,
-                                        // itemPositionsListener: itemPositionsListener,
-                                        itemCount: _myList.length,
-                                        reverse: true,
-                                        itemBuilder: (context, i) {
-                                          return _message(_myList[i]);
-                                        },
-                                      ),
-                                    ),
+                                        child: ScrollablePositionedList.builder(
+                                          itemScrollController:
+                                              _itemScrollController,
+                                          reverse: true,
+                                          itemCount: _myList.length,
+                                          itemBuilder: (context, index) {
+                                            return _message(_myList[index]);
+                                          },
+                                        )
+
+                                        // ListView.builder(
+                                        //   itemCount: _myList.length,
+                                        //   reverse: true,
+                                        //   itemBuilder: (context, index) {
+                                        //     return _message(_myList[index]);
+                                        //   },
+                                        // ),
+                                        ),
                                   ),
+                                  // Expanded(
+                                  //   child: SmartRefresher(
+                                  //     enablePullDown: false,
+                                  //     enablePullUp: true,
+                                  //     // header: WaterDropHeader(),
+                                  //     footer: CustomFooter(
+                                  //       builder: (BuildContext context,
+                                  //           LoadStatus mode) {
+                                  //         Widget body;
+                                  //         return Container(
+                                  //           height: 55.0,
+                                  //           child: Center(child: body),
+                                  //         );
+                                  //       },
+                                  //     ),
+                                  //     controller: _refreshController,
+                                  //     onRefresh: _onRefresh,
+                                  //     onLoading: _onLoading,
+                                  //     child: ListView.builder(
+                                  //       controller: _scrollController,
+                                  //       // itemScrollController: itemScrollController,
+                                  //       // itemPositionsListener: itemPositionsListener,
+                                  //       itemCount: _myList.length,
+                                  //       reverse: true,
+                                  //       itemBuilder: (context, i) {
+                                  //         return _message(_myList[i]);
+                                  //       },
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   _isEditing
                                       ? Container(
                                           height: 50,
@@ -574,6 +614,8 @@ class _ChatPageState extends State<ChatPage> {
                               !_isRecording
                                   ? Flexible(
                                       child: TextField(
+                                        textCapitalization:
+                                            TextCapitalization.sentences,
                                         maxLines: 6,
                                         minLines: 1,
                                         controller: _text,
@@ -796,21 +838,54 @@ class _ChatPageState extends State<ChatPage> {
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:get":
-          if (_page == 1) {
+          if (messagesPage == 1) {
             setState(() {
               print(e.json['data']);
-              _page += 1;
+              messagesPage += 1;
               _myList = e.json['data'].toList();
               listMessages = e.json['data'].toList();
             });
           } else {
             print(
-                '____________________________________________________________$_page');
+                '____________________________________________________________$messagesPage');
             print(e.json['data']);
+            if (e.json['data'].isNotEmpty) {
+              boolToLoadData = false;
+              setState(() {
+                messagesPage += 1;
+                _myList.addAll(e.json['data'].toList());
+                listMessages.addAll(e.json['data'].toList());
+              });
+            }
+            print('this is before finding');
+            if (messageFinding) {
+              print('this is founded process');
+              var id = replyMessage['message_id'];
+              bool contains = false;
+              e.json['data'].forEach((element) {
+                contains = false;
+                if (element['id'] == replyMessage['message_id']) {
+                  contains = true;
+                  Future.delayed(Duration(milliseconds: 500)).then((value) {
+                    ChatRoom.shared.findMessage(replyMessage);
+                  });
+                }
+              });
+              if (!contains) {
+                _loadData();
+              }
+            }
+
+            // int i = e.json['data'].toList().indexWhere(
+            //     (e) => e['id'] == null ? e['message_id'] : e['id'] == id);
+            // print("index of message is $i");
+            // print("index of message is $i");
+            // print("index of message is $i");
+
+            // if (i != -1) {}
+            // messageFound
             setState(() {
-              _page += 1;
-              _myList.addAll(e.json['data'].toList());
-              listMessages.addAll(e.json['data'].toList());
+              isLoading = false;
             });
           }
           break;
@@ -865,6 +940,9 @@ class _ChatPageState extends State<ChatPage> {
                   element['write'] = '1';
                 });
             });
+          } else {
+            _itemScrollController.scrollTo(
+                index: 0, duration: Duration(milliseconds: 500));
           }
           if (senderId != userId &&
               '${widget.chatID}' != '${e.json['data']['chat_id']}') {
@@ -940,15 +1018,26 @@ class _ChatPageState extends State<ChatPage> {
             _replyMessage = e.json['message'];
           });
           break;
-        case "scrolling":
-          print("Scrolling to ${e.json['index']}");
-          setState(() {
-            _itemScrollController.scrollTo(
-                index: e.json['index'],
-                duration: Duration(milliseconds: 300),
-                curve: Curves.linear,
-                alignment: 0.9);
-          });
+        case "findMessage":
+          messageFinding = true;
+
+          print("Scrolling to ${e.json['index']['message_id']}");
+          // while(_myLis
+          var id = e.json['index']['message_id'];
+          int i = _myList.indexWhere(
+              (e) => e['id'] == null ? e['message_id'] : e['id'] == id);
+
+          if (i != -1) {
+            messageFinding = false;
+
+            setState(() {
+              _itemScrollController.scrollTo(
+                  index: i, duration: Duration(milliseconds: 500));
+            });
+          } else {
+            _loadData();
+          }
+
           break;
         case "message:write":
           print('message read');
@@ -974,11 +1063,18 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  bool boolToLoadData = false;
   Future _loadData() async {
-    setState(() {
-      ChatRoom.shared.getMessages(widget.chatID, page: _page);
-    });
-    print("load more with page $_page");
+    print("load more with page $messagesPage");
+    if (!boolToLoadData) {
+      boolToLoadData = true;
+      print('getting message');
+      setState(() {
+        ChatRoom.shared.getMessages(widget.chatID, page: messagesPage);
+      });
+    } else {
+      print('not getting message');
+    }
   }
 
   var uploadingMessage = json.decode(

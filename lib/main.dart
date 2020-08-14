@@ -58,6 +58,39 @@ String formatPhone(String phone) {
   return r;
 }
 
+getContactsTemplate(context) async {
+  return await getContacts(context).then((getContactsResult) {
+    var result = getContactsResult is List ? false : !getContactsResult;
+
+    for (int i = 0; i < getContactsResult.length; i++) {
+      ChatRoom.shared.userCheck(getContactsResult[i]['phone']);
+    }
+
+    if (result) {
+      Widget okButton = CupertinoDialogAction(
+        child: Text("${localization.openSettings}"),
+        onPressed: () {
+          Navigator.pop(context);
+          AppSettings.openAppSettings();
+        },
+      );
+      CupertinoAlertDialog alert = CupertinoAlertDialog(
+        title: Text("${localization.error}"),
+        content: Text('${localization.allowContacts}'),
+        actions: [
+          okButton,
+        ],
+      );
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+  });
+}
+
 getContacts(context) async {
   try {
     contacts.clear();
@@ -106,8 +139,12 @@ Future<void> main() async {
   var phone = preferences.getString('phone');
   var unique = preferences.getString('unique');
   var customerID = preferences.getString('customerID');
-  var domen2 = preferences.getString('domen');
-  domen = domen2;
+  String domen2 = preferences.getString('domen');
+  if ('$domen2' == 'null') {
+    domen = 'com';
+  } else {
+    domen = domen2;
+  }
   print(domen);
   print('phone: $phone');
   print('unuque: $unique');
@@ -165,58 +202,63 @@ inAppPush(m) {
   print('_________________In App Push $m');
 
   if (!isInAppPushActive) {
+    // Check if inAppPush is alreadyExist
     isInAppPushActive = true;
     Future.delayed(Duration(seconds: 4)).then((value) {
       isInAppPushActive = false;
     });
-    print(m['mute'].toString() == '1');
-    if (m['mute'].toString() == '1') {
+    if (user.settings['settings']['chat_all_mute'].toString() == '1') {
+      // check user muted all of chats or not
     } else {
-      ChatRoom.shared.inSound();
-      showOverlayNotification((context) {
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          child: SafeArea(
-            child: ListTile(
-              onTap: () {
-                OverlaySupportEntry.of(context).dismiss();
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => Tabs()),
-                    (r) => false);
-                ChatRoom.shared.getMessages(m['chat_id']);
-                goToChat(
-                  "${m['chat_name']}",
-                  "${m['chat_id']}",
-                  context,
-                  memberCount: "${m['type']}" == "0" ? 2 : 3,
-                  chatType: "${m['chat_type']}",
-                  avatar: "${m['avatar']}",
-                  userIds: "${m['user_id']}",
-                );
-              },
-              leading: SizedBox.fromSize(
-                size: Size(40, 40),
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: "${avatarUrl}noAvatar.png",
+      print(m['mute'].toString() == '1');
+      if (m['mute'].toString() == '1') {
+      } else {
+        ChatRoom.shared.inSound();
+        showOverlayNotification((context) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            child: SafeArea(
+              child: ListTile(
+                onTap: () {
+                  OverlaySupportEntry.of(context).dismiss();
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => Tabs()),
+                      (r) => false);
+                  ChatRoom.shared.getMessages(m['chat_id']);
+                  goToChat(
+                    "${m['chat_name']}",
+                    "${m['chat_id']}",
+                    context,
+                    memberCount: "${m['type']}" == "0" ? 2 : 3,
+                    chatType: "${m['chat_type']}",
+                    avatar: "${m['avatar']}",
+                    userIds: "${m['user_id']}",
+                  );
+                },
+                leading: SizedBox.fromSize(
+                  size: Size(40, 40),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: "${avatarUrl}noAvatar.png",
+                    ),
                   ),
                 ),
+                title: Text("${m['chat_name']}"),
+                subtitle: Text(
+                  m['attachments'] == null
+                      ? "${m["text"]}"
+                      : identifyType(m['type']),
+                ),
+                trailing: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      OverlaySupportEntry.of(context).dismiss();
+                    }),
               ),
-              title: Text("${m['chat_name']}"),
-              subtitle: Text(
-                m['attachments'] == null
-                    ? "${m["text"]}"
-                    : identifyType(m['type']),
-              ),
-              trailing: IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    OverlaySupportEntry.of(context).dismiss();
-                  }),
             ),
-          ),
-        );
-      }, duration: Duration(seconds: 4));
+          );
+        }, duration: Duration(seconds: 4));
+      }
     }
   }
 }
@@ -575,36 +617,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           : Text('');
     });
 
-    getContacts(context).then((getContactsResult) {
-      var result = getContactsResult is List ? false : !getContactsResult;
-
-      for (int i = 0; i < getContactsResult.length; i++) {
-        ChatRoom.shared.userCheck(getContactsResult[i]['phone']);
-      }
-
-      if (result) {
-        Widget okButton = CupertinoDialogAction(
-          child: Text("${localization.openSettings}"),
-          onPressed: () {
-            Navigator.pop(context);
-            AppSettings.openAppSettings();
-          },
-        );
-        CupertinoAlertDialog alert = CupertinoAlertDialog(
-          title: Text("${localization.error}"),
-          content: Text('${localization.allowContacts}'),
-          actions: [
-            okButton,
-          ],
-        );
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return alert;
-          },
-        );
-      }
-    });
+    getContactsTemplate(context);
 
     // _firebaseMessaging.getToken().then((value) async {
     //   print("MY FCM TOKEN $value");

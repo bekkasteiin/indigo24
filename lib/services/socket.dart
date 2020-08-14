@@ -18,6 +18,8 @@ class ChatRoom {
   var contactController;
   var chatInfoController;
   var cabinetInfoController;
+  var notificationSettingsController;
+  var settingsController;
 
   Stream<MyEvent> get onChange => changeController.stream;
   Stream<MyContactEvent> get onContactChange => contactController.stream;
@@ -25,6 +27,9 @@ class ChatRoom {
   Stream<MyChatInfoEvent> get onChatInfoChange => chatInfoController.stream;
   Stream<MyCabinetInfoEvent> get onCabinetInfoChange =>
       cabinetInfoController.stream;
+  Stream<NotificationSettingsEvent> get onNotificationSettingsChange =>
+      notificationSettingsController.stream;
+  Stream<SettingsEvent> get onSettingsChange => settingsController.stream;
 
   void outSound() {
     print("msg out sound is called");
@@ -43,9 +48,6 @@ class ChatRoom {
     final player = AudioCache();
     await player.play("sound/message_in.mp3");
   }
-
-  // var userId = user.id;
-  // var userToken = user.unique;
 
   setStream() {
     print("Setting StreamController for Events");
@@ -72,6 +74,17 @@ class ChatRoom {
     cabinetController = new StreamController<MyCabinetEvent>();
   }
 
+  setSettingsStream() {
+    print("Setting StreamController for Settings Event");
+    settingsController = new StreamController<SettingsEvent>();
+  }
+
+  setNotificationSettingsStream() {
+    print("Setting StreamController for Notifcation Settings Event");
+    notificationSettingsController =
+        new StreamController<NotificationSettingsEvent>();
+  }
+
   csIsClosed() {
     return cabinetController.isClosed ? true : false;
   }
@@ -96,11 +109,20 @@ class ChatRoom {
     changeController.close();
   }
 
+  closeNotificationSettingsStream() {
+    notificationSettingsController.close();
+  }
+
+  closeSettingsStream() {
+    settingsController.close();
+  }
+
   closeConnection() {
     channel.sink.close();
   }
 
   sendSocketData(data) {
+    print('adding $data');
     channel.sink.add(data);
   }
 
@@ -143,6 +165,7 @@ class ChatRoom {
         "userToken": "${user.unique}",
       }
     });
+    print('getting user data');
     sendSocketData(data);
   }
 
@@ -250,6 +273,21 @@ class ChatRoom {
     } else {
       print('message is empty');
     }
+  }
+
+  setUserSettings(int boolean) {
+    String data = json.encode({
+      "cmd": "user:settings:set",
+      "data": {
+        "userToken": "${user.unique}",
+        "user_id": int.parse(user.id),
+        "settings": {
+          "chat_all_mute": '$boolean',
+        },
+      }
+    });
+    print('settings setted $boolean');
+    sendSocketData(data);
   }
 
   chatMembers(chatId, {page}) {
@@ -375,9 +413,9 @@ class ChatRoom {
       cabinetController.add(new MyCabinetEvent(json));
   }
 
-  scrolling(i) {
+  findMessage(i) {
     var object = {
-      "cmd": "scrolling",
+      "cmd": "findMessage",
       "index": i,
     };
     var json = jsonDecode(jsonEncode(object));
@@ -624,6 +662,16 @@ class ChatRoom {
               changeController.add(MyEvent(json));
               print("adding message write to chat");
               break;
+            case 'user:settings:get':
+              user.settings = data;
+
+              if (settingsController != null) {
+                settingsController.add(SettingsEvent(json));
+              }
+              user.settings = data;
+              print("adding settings get to settings");
+              break;
+
             default:
               print('default print cmd: $cmd json: $json');
           }
@@ -676,6 +724,22 @@ class MyCabinetInfoEvent {
   var json;
 
   MyCabinetInfoEvent(var json) {
+    this.json = json;
+  }
+}
+
+class NotificationSettingsEvent {
+  var json;
+
+  NotificationSettingsEvent(var json) {
+    this.json = json;
+  }
+}
+
+class SettingsEvent {
+  var json;
+
+  SettingsEvent(var json) {
     this.json = json;
   }
 }

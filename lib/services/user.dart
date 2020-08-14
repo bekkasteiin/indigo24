@@ -8,6 +8,7 @@ var balance = "";
 var balanceInBlock = "";
 var pin = "false";
 var avatarUrl = "https://indigo24.com/uploads/avatars/";
+Map<String, dynamic> settings;
 
 void delete() {
   id = "";

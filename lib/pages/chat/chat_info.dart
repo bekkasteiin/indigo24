@@ -625,8 +625,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                     widget.chatType == 1
                         ? Padding(
                             padding: const EdgeInsets.only(
-                              top: 10,
-                              left: 10,
+                              top: 10.0,
+                              left: 10.0,
                               right: 10,
                               bottom: 0,
                             ),

@@ -553,10 +553,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
+                            ChatRoom.shared.setSettingsStream();
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SettingsMainPage()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SettingsMainPage(),
+                              ),
+                            ).whenComplete(
+                              () => setState(() {
+                                ChatRoom.shared.closeSettingsStream();
+                              }),
+                            );
                           },
                           child: Ink(
                             child: Image.asset(

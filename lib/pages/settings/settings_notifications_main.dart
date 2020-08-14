@@ -2,9 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/settings/settings_sound.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 
 class SettingsNotificationsMainPage extends StatefulWidget {
+  final Map<String, dynamic> settings;
+
+  const SettingsNotificationsMainPage({Key key, this.settings})
+      : super(key: key);
+
   @override
   _SettingsNotificationsMainPageState createState() =>
       _SettingsNotificationsMainPageState();
@@ -14,11 +20,16 @@ class _SettingsNotificationsMainPageState
     extends State<SettingsNotificationsMainPage> {
   bool isShowNotificationsSwitched;
   bool isPreviewMessageSwitched;
-
+  Map<String, dynamic> settings;
   @override
   void initState() {
     super.initState();
-    isShowNotificationsSwitched = false;
+    settings = widget.settings['settings'];
+    print(settings['chat_all_mute'].toString() == '1');
+    print(settings['chat_all_mute'].toString() == '1');
+
+    isShowNotificationsSwitched =
+        settings['chat_all_mute'].toString() == '1' ? true : false;
     isPreviewMessageSwitched = false;
   }
 
@@ -100,84 +111,83 @@ class _SettingsNotificationsMainPageState
                                 onChanged: (value) {
                                   setState(() {
                                     isShowNotificationsSwitched = value;
+                                    int boolean = value ? 1 : 0;
+                                    ChatRoom.shared.setUserSettings(boolean);
                                   });
                                 },
                               ),
                             ]),
                       ),
-                      Container(
-                          margin: EdgeInsets.only(left: 20),
-                          height: 0.5,
-                          color: greyColor),
-                      Container(
-                        padding: EdgeInsets.only(
-                            left: 20, right: 20, bottom: 10, top: 10),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '${localization.messagePreview}',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackPurpleColor),
-                              ),
-                              CupertinoSwitch(
-                                trackColor: brightGreyColor3,
-                                activeColor: primaryColor,
-                                value: isPreviewMessageSwitched,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isPreviewMessageSwitched = value;
-                                  });
-                                },
-                              ),
-                            ]),
-                      ),
-                      Container(
-                          margin: EdgeInsets.only(left: 20),
-                          height: 0.5,
-                          color: greyColor),
-                      Container(
-                        padding: EdgeInsets.only(
-                            left: 20, right: 20, bottom: 10, top: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              '${localization.sound}',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: blackPurpleColor),
-                            ),
-                            Row(mainAxisSize: MainAxisSize.min, children: [
-                              // Text('${localization.sound}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
-                              IconButton(
-                                icon: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Image(
-                                    image: AssetImage(
-                                      'assets/images/back.png',
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SettingsSoundPage(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ])
-                          ],
-                        ),
-                      ),
-                      Text('hi'),
-                      Text('hi'),
-                      Text('hi'),
+                      // Container(
+                      //     margin: EdgeInsets.only(left: 20),
+                      //     height: 0.5,
+                      //     color: greyColor),
+                      // Container(
+                      //   padding: EdgeInsets.only(
+                      //       left: 20, right: 20, bottom: 10, top: 10),
+                      //   child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //       children: <Widget>[
+                      //         Text(
+                      //           '${localization.messagePreview}',
+                      //           style: TextStyle(
+                      //               fontSize: 16,
+                      //               fontWeight: FontWeight.w400,
+                      //               color: blackPurpleColor),
+                      //         ),
+                      //         CupertinoSwitch(
+                      //           trackColor: brightGreyColor3,
+                      //           activeColor: primaryColor,
+                      //           value: isPreviewMessageSwitched,
+                      //           onChanged: (value) {
+                      //             setState(() {
+                      //               isPreviewMessageSwitched = value;
+                      //             });
+                      //           },
+                      //         ),
+                      //       ]),
+                      // ),
+                      // Container(
+                      //     margin: EdgeInsets.only(left: 20),
+                      //     height: 0.5,
+                      //     color: greyColor),
+                      // Container(
+                      //   padding: EdgeInsets.only(
+                      //       left: 20, right: 20, bottom: 10, top: 10),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: <Widget>[
+                      //       Text(
+                      //         '${localization.sound}',
+                      //         style: TextStyle(
+                      //             fontSize: 16,
+                      //             fontWeight: FontWeight.w400,
+                      //             color: blackPurpleColor),
+                      //       ),
+                      //       Row(mainAxisSize: MainAxisSize.min, children: [
+                      //         // Text('${localization.sound}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
+                      //         IconButton(
+                      //           icon: Container(
+                      //             padding: EdgeInsets.symmetric(vertical: 10),
+                      //             child: Image(
+                      //               image: AssetImage(
+                      //                 'assets/images/back.png',
+                      //               ),
+                      //             ),
+                      //           ),
+                      //           onPressed: () {
+                      //             Navigator.push(
+                      //               context,
+                      //               MaterialPageRoute(
+                      //                 builder: (context) => SettingsSoundPage(),
+                      //               ),
+                      //             );
+                      //           },
+                      //         ),
+                      //       ])
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

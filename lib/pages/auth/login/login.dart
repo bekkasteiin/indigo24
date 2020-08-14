@@ -49,7 +49,10 @@ class _LoginPageState extends State<LoginPage> {
 
     _api = Api();
     _countryDao = CountryDao();
-    _getCountries();
+    _getCountries().then((value) {
+      print(value);
+      setState(() {});
+    });
   }
 
   @override
@@ -374,7 +377,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        phonePrefix = _selectedCountry._phonePrefix;
+        phonePrefix = _selectedCountry.phonePrefix;
         length = _selectedCountry.length;
         passwordController.text = '';
         loginController.text = '';
