@@ -96,7 +96,7 @@ class _IntroPageState extends State<IntroPage> {
                         },
                       ),
                     ),
-                    _space(size.height / 3),
+                    _space(size.height / 6),
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(

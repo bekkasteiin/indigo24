@@ -1,0 +1,19 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by Даурен on 8/14/20.
+  
+*/
+CFBundleName = "Индиго24";
+NSAppleMusicUsageDescription = "Играйте, пока вы путешествуете";
+NSCalendarsUsageDescription = "Этому приложению необходим доступ к событиям вашего календаря";
+NSCameraUsageDescription = "Этому приложению требуется камера, чтобы делиться фотографиями из вашей библиотеки и сохранять фотографии в альбоме камеры.";
+NSContactsUsageDescription = "Это приложение требует доступа к контактам для отображения контактов в чате.";
+NSLocationAlwaysUsageDescription = "Ваше местоположение необходимо для чата.";
+NSLocationWhenInUseUsageDescription= "Ваше местоположение необходимо для чата.";
+NSMicrophoneUsageDescription = "Это приложение требует микрофона для голосовых сообщений.";
+NSMotionUsageDescription = "Это приложение требует доступа к вашему использованию движения";
+NSPhotoLibraryAddUsageDescription = "Это приложение требует фотографий, чтобы делиться фотографиями из вашей библиотеки и сохранять фотографии в альбоме «Фотопленка».";
+NSPhotoLibraryUsageDescription = "Это приложение требует фотографий, чтобы делиться фотографиями из вашей библиотеки и сохранять фотографии в альбоме «Фотопленка».";
+NSSpeechRecognitionUsageDescription = "Это приложение требует распознавания речи";
