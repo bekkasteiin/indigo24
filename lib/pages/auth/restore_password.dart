@@ -24,7 +24,6 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   var countryId = 0;
   var country;
   var countries = List<Country>();
-  var _countries;
   var phonePrefix = '77';
   var smsCode = 0;
   List<DropdownMenuItem<String>> dropDownMenuItems;

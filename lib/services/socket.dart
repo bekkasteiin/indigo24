@@ -679,7 +679,8 @@ class ChatRoom {
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        Future.delayed(const Duration(seconds: 1), () {
+        // TODO CHANGE DURATION TO 1 SEC
+        Future.delayed(const Duration(seconds: 60), () {
           connect(context);
           init();
         });

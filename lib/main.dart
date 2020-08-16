@@ -34,7 +34,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
-import 'pages/chat/chat_page_view_test.dart';
 import 'pages/profile.dart';
 import 'services/api.dart';
 import 'services/my_connectivity.dart';

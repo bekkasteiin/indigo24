@@ -339,6 +339,16 @@ class Api {
     return _postRequest('/service/pay', data);
   }
 
+  searchServices(String query) {
+    // TODO FIX THIS
+    dynamic data = {
+      'customerID': '${user.id}',
+      'unique': '${user.unique}',
+      'categoryID': query
+    };
+    // return _postRequest('/get/services', data);
+  }
+
   getServices(categoryID) async {
     dynamic data = {
       'customerID': '${user.id}',

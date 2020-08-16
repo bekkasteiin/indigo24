@@ -72,77 +72,79 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: buildAppBar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Container(
-          //   width: MediaQuery.of(context).size.width / 1.5,
-          //   margin: EdgeInsets.symmetric(horizontal: 20),
-          //   child: Row(
-          //     children: [
-          //       Flexible(
-          //         child: TextFormField(
-          //           inputFormatters: [filterFormatter],
-          //         ),
-          //       ),
-          //       InkWell(
-          //         child: Container(
-          //           width: 40,
-          //           padding: EdgeInsets.all(5),
-          //           child: Column(
-          //             children: <Widget>[
-          //               Container(
-          //                 child: Image.asset(
-          //                   'assets/images/filter.png',
-          //                   width: 20,
-          //                   height: 20,
-          //                 ),
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //         onTap: () {
-          //           String maskedText =
-          //               filterFormatter.getMaskedText().replaceAll(' ', '');
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Container(
+                  width: size.width * 0.8 - 20,
+                  child: TextFormField(
+                    textAlign: TextAlign.center,
+                    inputFormatters: [_filterFormatter],
+                  ),
+                ),
+                InkWell(
+                  child: Container(
+                    width: size.width * 0.2 - 20,
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Image.asset(
+                            'assets/images/filter.png',
+                            width: 20,
+                            height: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    String maskedText =
+                        _filterFormatter.getMaskedText().replaceAll(' ', '');
 
-          //           var splittedDates = maskedText.split("/");
-          //           page = 1;
-          //           api
-          //               .getTransactions(page,
-          //                   fromDate: splittedDates[0],
-          //                   toDate: splittedDates[1])
-          //               .then((transactions) {
-          //             print(transactions);
-          //             if (transactions['message'] == 'Not authenticated' &&
-          //                 transactions['success'].toString() == 'false') {
-          //               logOut(context);
-          //               return transactions;
-          //             } else {
-          //               setState(() {
-          //                 avatarUrl = transactions['avatarURL'];
-          //                 if (page == 1) {
-          //                   print('setStates');
+                    var splittedDates = maskedText.split("/");
+                    _page = 1;
+                    api
+                        .getTransactions(_page,
+                            fromDate: splittedDates[0],
+                            toDate: splittedDates[1])
+                        .then((transactions) {
+                      print(transactions);
+                      if (transactions['message'] == 'Not authenticated' &&
+                          transactions['success'].toString() == 'false') {
+                        logOut(context);
+                        return transactions;
+                      } else {
+                        setState(() {
+                          _avatarUrl = transactions['avatarURL'];
+                          if (_page == 1) {
+                            print('setStates');
 
-          //                   transferHistories =
-          //                       transactions['transactions'].toList();
-          //                   if (transactions['transactions'].isEmpty) {
-          //                     emptyResponse = true;
-          //                   }
-          //                   page++;
-          //                 }
-          //               });
+                            _transferHistories =
+                                transactions['transactions'].toList();
+                            if (transactions['transactions'].isEmpty) {
+                              _emptyResponse = true;
+                            }
+                            _page++;
+                          }
+                        });
 
-          //               return transactions;
-          //             }
-          //           });
-          //         },
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // SizedBox(height: 10),
+                        return transactions;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
           !_emptyResponse
               ? _transferHistories.isNotEmpty
                   ? Flexible(

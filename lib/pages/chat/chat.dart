@@ -22,7 +22,6 @@ import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:record_mp3/record_mp3.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
@@ -32,7 +31,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:vibration/vibration.dart';
 import 'chat_page_view_test.dart';
-import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
 List listMessages = [];

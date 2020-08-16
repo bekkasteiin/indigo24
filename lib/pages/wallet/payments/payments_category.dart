@@ -16,10 +16,12 @@ class PaymentsCategoryPage extends StatefulWidget {
 class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   Api _api;
   Map<String, dynamic> _categories;
+  TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
+    _searchController = TextEditingController();
     _api = Api();
 
     _api.getCategories().then((categories) {
@@ -36,6 +38,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -45,32 +48,65 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       appBar: _buildAppBar(),
       body: _categories != null
           ? SafeArea(
-              child: Scrollbar(
-                child: ListView.builder(
-                  padding: EdgeInsets.only(bottom: 20),
-                  shrinkWrap: true,
-                  itemCount: _categories["categories"] != null
-                      ? _categories["categories"].length
-                      : 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: _paymentsList(
-                        context,
-                        _categories["logoURL"] +
-                            _categories["categories"][index]['logo'],
-                        _categories["categories"][index]['title'],
-                        _categories["categories"][index]['ID'],
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 10.0, left: 20.0, right: 20, bottom: 0),
+                    child: TextField(
+                      decoration: new InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: blackPurpleColor,
+                        ),
+                        hintText: "${localization.search}",
+                        fillColor: blackPurpleColor,
                       ),
-                    );
-                  },
-                ),
+                      onChanged: (value) {
+                        search(value);
+                      },
+                      controller: _searchController,
+                    ),
+                  ),
+                  Flexible(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: 20),
+                      shrinkWrap: true,
+                      itemCount: _categories["categories"] != null
+                          ? _categories["categories"].length
+                          : 0,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: _paymentsList(
+                            context,
+                            _categories["logoURL"] +
+                                _categories["categories"][index]['logo'],
+                            _categories["categories"][index]['title'],
+                            _categories["categories"][index]['ID'],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             )
           : Center(
               child: CircularProgressIndicator(),
             ),
     );
+  }
+
+  bool isReadyToSend = true;
+  search(String query) {
+    if (isReadyToSend) {
+      isReadyToSend = false;
+      _api.searchServices(query);
+      Future.delayed(Duration(seconds: 3)).then((value) {
+        isReadyToSend = true;
+      });
+    }
   }
 
   AppBar _buildAppBar() {

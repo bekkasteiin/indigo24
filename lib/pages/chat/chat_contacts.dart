@@ -1,9 +1,7 @@
-import 'dart:async';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/db/contact.dart';
 import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat.dart';

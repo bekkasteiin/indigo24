@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 

@@ -77,7 +77,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(), body: _paymentHistroyBody(resultList));
+        appBar: _buildAppBar(), body: _paymentHistroyBody(resultList, context));
   }
 
   void _onRefresh() {
@@ -339,71 +339,73 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     });
   }
 
-  Widget _paymentHistroyBody(snapshot) {
+  Widget _paymentHistroyBody(snapshot, context) {
+    Size size = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // TURN ON THIS AFTER FILTERS
-        // Container(
-        //   width: MediaQuery.of(context).size.width / 1.5,
-        //   margin: EdgeInsets.symmetric(horizontal: 20),
-        //   child: Row(
-        //     crossAxisAlignment: CrossAxisAlignment.center,
-        //     children: [
-        //       Flexible(
-        //         child: TextFormField(
-        //           inputFormatters: [_filterFormatter],
-        //         ),
-        //       ),
-        //       InkWell(
-        //         child: Container(
-        //           width: 40,
-        //           padding: EdgeInsets.all(5),
-        //           child: Column(
-        //             children: <Widget>[
-        //               Container(
-        //                 child: Image.asset(
-        //                   'assets/images/filter.png',
-        //                   width: 20,
-        //                   height: 20,
-        //                 ),
-        //               ),
-        //             ],
-        //           ),
-        //         ),
-        //         onTap: () {
-        //           String _maskedText =
-        //               _filterFormatter.getMaskedText().replaceAll(' ', '');
+        Container(
+          // width: MediaQuery.of(context).size.width / 1.5,
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: size.width * 0.8 - 20,
+                child: TextFormField(
+                  textAlign: TextAlign.center,
+                  inputFormatters: [_filterFormatter],
+                ),
+              ),
+              InkWell(
+                child: Container(
+                  width: size.width * 0.2 - 20,
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: Image.asset(
+                          'assets/images/filter.png',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                onTap: () {
+                  String _maskedText =
+                      _filterFormatter.getMaskedText().replaceAll(' ', '');
 
-        //           List splittedDates = _maskedText.split("/");
-        //           _page = 1;
+                  List splittedDates = _maskedText.split("/");
+                  _page = 1;
 
-        //           api
-        //               .getHistories(_page,
-        //                   fromDate: splittedDates[0], toDate: splittedDates[1])
-        //               .then((histories) {
-        //             print(histories);
-        //             if (histories['message'] == 'Not authenticated' &&
-        //                 histories['success'].toString() == 'false') {
-        //               logOut(context);
-        //             } else {
-        //               setState(() {
-        //                 _logoUrl = histories['logoURL'];
-        //                 if (histories['payments'].toList().isEmpty) {
-        //                   _emptyResponse = true;
-        //                 }
-        //                 if (_page == 1)
-        //                   resultList = histories['payments'].toList();
-        //               });
-        //               _page++;
-        //             }
-        //           });
-        //         },
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // SizedBox(height: 10),
+                  api
+                      .getHistories(_page,
+                          fromDate: splittedDates[0], toDate: splittedDates[1])
+                      .then((histories) {
+                    print(histories);
+                    if (histories['message'] == 'Not authenticated' &&
+                        histories['success'].toString() == 'false') {
+                      logOut(context);
+                    } else {
+                      setState(() {
+                        _logoUrl = histories['logoURL'];
+                        if (histories['payments'].toList().isEmpty) {
+                          _emptyResponse = true;
+                        }
+                        if (_page == 1)
+                          resultList = histories['payments'].toList();
+                      });
+                      _page++;
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 10),
         !_emptyResponse
             ? resultList.isNotEmpty
                 ? Flexible(

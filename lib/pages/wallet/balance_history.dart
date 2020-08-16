@@ -5,6 +5,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class BalanceHistoryPage extends StatefulWidget {
@@ -12,10 +13,10 @@ class BalanceHistoryPage extends StatefulWidget {
   _BalanceHistoryPageState createState() => _BalanceHistoryPageState();
 }
 
-List _historyBalanceList = [];
-
 class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     with TickerProviderStateMixin {
+  List _historyBalanceList = [];
+
   bool _emptyResponse;
 
   int _balanceHistoryPage;
@@ -23,6 +24,8 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
   Api _api;
 
   RefreshController _balanceRefreshController;
+
+  MaskTextInputFormatter _filterFormatter;
 
   @override
   void initState() {
@@ -34,6 +37,12 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
 
     _balanceRefreshController = RefreshController(initialRefresh: false);
 
+    _filterFormatter = MaskTextInputFormatter(
+      mask: '****-**-** / ****-**-**',
+      filter: {
+        "*": RegExp(r'[0-9]'),
+      },
+    );
     _api.getHistoryBalance(_balanceHistoryPage).then((histories) {
       if (histories['message'] == 'Not authenticated' &&
           histories['success'].toString() == 'false') {
@@ -61,7 +70,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _paymentHistroyBalance(_historyBalanceList),
+      body: _paymentHistroyBalance(_historyBalanceList, context),
     );
   }
 
@@ -235,38 +244,115 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  SafeArea _paymentHistroyBalance(snapshot) {
+  SafeArea _paymentHistroyBalance(snapshot, context) {
+    Size size = MediaQuery.of(context).size;
     return !_emptyResponse
         ? _historyBalanceList.isNotEmpty
             ? SafeArea(
-                child: SmartRefresher(
-                  enablePullDown: false,
-                  enablePullUp: true,
-                  footer: CustomFooter(
-                    builder: (BuildContext context, LoadStatus mode) {
-                      Widget body;
-                      return Container(
-                        height: 55.0,
-                        child: Center(child: body),
-                      );
-                    },
-                  ),
-                  controller: _balanceRefreshController,
-                  onLoading: _onBalanceLoading,
-                  onRefresh: _onBalanceRefresh,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    itemCount: snapshot != null ? snapshot.length : 0,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: _historyBalanceBuilder(
-                          context,
-                          snapshot[index],
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: size.width * 0.8 - 20,
+                            child: TextFormField(
+                              textAlign: TextAlign.center,
+                              inputFormatters: [_filterFormatter],
+                            ),
+                          ),
+                          InkWell(
+                            child: Container(
+                              width: size.width * 0.2 - 20,
+                              padding: EdgeInsets.all(5),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    child: Image.asset(
+                                      'assets/images/filter.png',
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            onTap: () {
+                              String maskedText = _filterFormatter
+                                  .getMaskedText()
+                                  .replaceAll(' ', '');
+
+                              var splittedDates = maskedText.split("/");
+                              _balanceHistoryPage = 1;
+                              api
+                                  .getTransactions(_balanceHistoryPage,
+                                      fromDate: splittedDates[0],
+                                      toDate: splittedDates[1])
+                                  .then((transactions) {
+                                print(transactions);
+                                if (transactions['message'] ==
+                                        'Not authenticated' &&
+                                    transactions['success'].toString() ==
+                                        'false') {
+                                  logOut(context);
+                                  return transactions;
+                                } else {
+                                  setState(() {
+                                    if (_balanceHistoryPage == 1) {
+                                      print('setStates');
+
+                                      _historyBalanceList =
+                                          transactions['transactions'].toList();
+                                      if (transactions['transactions']
+                                          .isEmpty) {
+                                        _emptyResponse = true;
+                                      }
+                                      _balanceHistoryPage++;
+                                    }
+                                  });
+
+                                  return transactions;
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Flexible(
+                      child: SmartRefresher(
+                        enablePullDown: false,
+                        enablePullUp: true,
+                        footer: CustomFooter(
+                          builder: (BuildContext context, LoadStatus mode) {
+                            Widget body;
+                            return Container(
+                              height: 55.0,
+                              child: Center(child: body),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
+                        controller: _balanceRefreshController,
+                        onLoading: _onBalanceLoading,
+                        onRefresh: _onBalanceRefresh,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          itemCount: snapshot != null ? snapshot.length : 0,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: _historyBalanceBuilder(
+                                context,
+                                snapshot[index],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               )
             : SafeArea(
