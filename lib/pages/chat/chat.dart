@@ -64,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
   Dependencies _dependencies = Dependencies();
   List _myList = [];
   List _temp;
-
+  int _lastMessageTime;
   TextEditingController _text = TextEditingController();
   var _online;
   ScrollController _scrollController;
@@ -255,19 +255,24 @@ class _ChatPageState extends State<ChatPage> {
               textColor: Colors.white,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(25.0),
-                child: ClipOval(
-                    child: Image.network(
-                  '${widget.avatarUrl.toString()}${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                  width: 35,
-                  height: 35,
-                )
-                    // child: CachedNetworkImage(
-                    //   height: 50,
-                    //   width: 50,
-                    //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                    //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
-                    // ),
-                    ),
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  color: greyColor,
+                  child: ClipOval(
+                      child: Image.network(
+                    '${widget.avatarUrl.toString()}${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                    width: 35,
+                    height: 35,
+                  )
+                      // child: CachedNetworkImage(
+                      //   height: 50,
+                      //   width: 50,
+                      //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                      //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
+                      // ),
+                      ),
+                ),
               ),
               // padding: EdgeInsets.all(16),
               shape: CircleBorder(),
@@ -303,12 +308,15 @@ class _ChatPageState extends State<ChatPage> {
             fit: StackFit.loose,
             children: <Widget>[
               Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: const Image(
-                    image: chatBackgroundProvider,
-                    fit: BoxFit.fill,
-                  )),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: Image(
+                  image: user.chatBackground == 'ligth'
+                      ? AssetImage("assets/images/background_chat.png")
+                      : AssetImage("assets/images/background_chat_2.png"),
+                  fit: BoxFit.fill,
+                ),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -346,7 +354,53 @@ class _ChatPageState extends State<ChatPage> {
                                           reverse: true,
                                           itemCount: _myList.length,
                                           itemBuilder: (context, index) {
-                                            return _message(_myList[index]);
+                                            if (_myList[index]['time']
+                                                    .toString() !=
+                                                '') {
+                                              if (_lastMessageTime != null) {
+                                                if (_myList[index]['time']
+                                                        .toString() !=
+                                                    '1') {
+                                                } else {
+                                                  var messageUnixDate = DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                    int.parse(_myList[index]
+                                                                ['time']
+                                                            .toString()) *
+                                                        1000,
+                                                  );
+                                                  var lastMessageUnixDate = DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                    _lastMessageTime * 1000,
+                                                  );
+                                                  var diff = lastMessageUnixDate
+                                                      .difference(
+                                                          messageUnixDate);
+                                                  int differenceInDays =
+                                                      diff.inDays;
+                                                  if (differenceInDays > 0)
+                                                    return Column(
+                                                      children: <Widget>[
+                                                        Devider({
+                                                          'text':
+                                                              '$messageUnixDate'
+                                                                  .substring(
+                                                                      0, 10)
+                                                                  .replaceAll(
+                                                                      '-', '.')
+                                                        }),
+                                                        _message(
+                                                            _myList[index]),
+                                                      ],
+                                                    );
+                                                }
+                                                _lastMessageTime = int.parse(
+                                                    _myList[index]['time']
+                                                        .toString());
+                                              }
+
+                                              return _message(_myList[index]);
+                                            }
                                           },
                                         )
 
@@ -1094,7 +1148,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ).whenComplete(() {});
 
-      if (popResult == "sending") {
+      if (popResult['cmd'] == "sending") {
         setState(() {
           uploadingImage = _image;
           _myList.insert(0, uploadingMessage);
@@ -1112,7 +1166,8 @@ class _ChatPageState extends State<ChatPage> {
             setState(() {
               _isUploaded = true;
             });
-            ChatRoom.shared.sendMessage('${widget.chatID}', "image",
+            ChatRoom.shared.sendMessage(
+                '${widget.chatID}', "${popResult['text']}",
                 type: 1, attachments: jsonDecode(jsonEncode(a)));
           } else {
             _showAlertDialog(context, r["message"]);
@@ -1141,7 +1196,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ).whenComplete(() {});
 
-      if (popResult == "sending") {
+      if (popResult['cmd'] == "sending") {
         setState(() {
           _myList.insert(0, uploadingMessage);
         });
@@ -1155,7 +1210,8 @@ class _ChatPageState extends State<ChatPage> {
             setState(() {
               _isUploaded = true;
             });
-            ChatRoom.shared.sendMessage('${widget.chatID}', "video",
+            ChatRoom.shared.sendMessage(
+                '${widget.chatID}', "${popResult['text']}",
                 type: 4, attachments: jsonDecode(jsonEncode(a)));
           } else {
             _showAlertDialog(context, r["message"]);
@@ -1712,13 +1768,5 @@ class Devider extends StatelessWidget {
         date: m['text'],
       ),
     );
-  }
-
-  String time(timestamp) {
-    var date = DateTime.fromMillisecondsSinceEpoch(
-      int.parse(timestamp) * 1000,
-    );
-    TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
-    return '${roomBooked.hour}:${roomBooked.minute}';
   }
 }

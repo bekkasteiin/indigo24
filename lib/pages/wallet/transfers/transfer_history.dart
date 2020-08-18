@@ -19,10 +19,12 @@ List _transferHistories;
 class _TransferHistoryPageState extends State<TransferHistoryPage> {
   Api _api;
   String _avatarUrl;
+  String _text;
   bool _emptyResponse;
   RefreshController _refreshController;
-
+  String maskedText;
   int _page;
+  var splittedDates;
 
   MaskTextInputFormatter _filterFormatter;
 
@@ -33,8 +35,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     _page = 1;
     _emptyResponse = false;
     _api = Api();
-    _transferHistories = [];
     _avatarUrl = "";
+    _text = "";
+    maskedText = '';
 
     _refreshController = RefreshController(initialRefresh: false);
 
@@ -85,6 +88,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                 Container(
                   width: size.width * 0.8 - 20,
                   child: TextFormField(
+                    decoration: InputDecoration(
+                      hintText: 'YYYY-MM-DD / YYYY-MM-DD',
+                    ),
                     textAlign: TextAlign.center,
                     inputFormatters: [_filterFormatter],
                   ),
@@ -106,39 +112,66 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     ),
                   ),
                   onTap: () {
-                    String maskedText =
+                    maskedText =
                         _filterFormatter.getMaskedText().replaceAll(' ', '');
-
-                    var splittedDates = maskedText.split("/");
-                    _page = 1;
-                    api
-                        .getTransactions(_page,
-                            fromDate: splittedDates[0],
-                            toDate: splittedDates[1])
-                        .then((transactions) {
-                      print(transactions);
-                      if (transactions['message'] == 'Not authenticated' &&
-                          transactions['success'].toString() == 'false') {
-                        logOut(context);
-                        return transactions;
-                      } else {
-                        setState(() {
-                          _avatarUrl = transactions['avatarURL'];
-                          if (_page == 1) {
-                            print('setStates');
-
-                            _transferHistories =
-                                transactions['transactions'].toList();
-                            if (transactions['transactions'].isEmpty) {
-                              _emptyResponse = true;
+                    if (maskedText.length == 0) {
+                      _page = 1;
+                      _api.getTransactions(_page).then((transactions) {
+                        if (transactions['message'] == 'Not authenticated' &&
+                            transactions['success'].toString() == 'false') {
+                          logOut(context);
+                        } else {
+                          setState(() {
+                            _avatarUrl = transactions['avatarURL'];
+                            if (_page == 1) {
+                              _transferHistories =
+                                  transactions['transactions'].toList();
+                              if (transactions['transactions'].isEmpty) {
+                                _emptyResponse = true;
+                              }
+                              _page++;
                             }
-                            _page++;
-                          }
-                        });
+                          });
+                        }
+                      });
+                    }
 
-                        return transactions;
-                      }
-                    });
+                    if (maskedText.length == 21) {
+                      splittedDates = maskedText.split("/");
+                      _page = 1;
+                      api
+                          .getFilteredTransactions(
+                              _page, splittedDates[0], splittedDates[1])
+                          .then((transactions) {
+                        print(transactions);
+                        if (transactions['message'] == 'Not authenticated' &&
+                            transactions['success'].toString() == 'false') {
+                          logOut(context);
+                          return transactions;
+                        } else {
+                          if (transactions['success'].toString() == 'true') {
+                            setState(() {
+                              if (_page == 1) {
+                                print('setStates');
+
+                                _transferHistories =
+                                    transactions['transactions'].toList();
+                                if (transactions['transactions'].isEmpty) {
+                                  _emptyResponse = true;
+                                }
+                                _page++;
+                              }
+                            });
+                          } else {
+                            setState(() {
+                              _transferHistories = null;
+
+                              _text = transactions['message'];
+                            });
+                          }
+                        }
+                      });
+                    }
                   },
                 ),
               ],
@@ -146,10 +179,10 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
           ),
           SizedBox(height: 10),
           !_emptyResponse
-              ? _transferHistories.isNotEmpty
+              ? _transferHistories != null
                   ? Flexible(
                       child: _transferHistoryBody(_transferHistories, context))
-                  : Center(child: CircularProgressIndicator())
+                  : Center(child: Text('$_text'))
               : SafeArea(
                   child: Container(
                     child: Center(child: Text('${localization.empty}')),
@@ -338,7 +371,11 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   }
 
   void _onLoading() async {
-    _loadData();
+    if (maskedText.length == 21) {
+      _loadFilteredData();
+    } else {
+      _loadData();
+    }
     _refreshController.loadComplete();
   }
 
@@ -350,6 +387,22 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       });
       _page++;
     });
+  }
+
+  Future _loadFilteredData() async {
+    print('page $_page');
+    _api
+        .getFilteredTransactions(_page, splittedDates[0], splittedDates[1])
+        .then((histories) {
+      List temp = histories['transactions'].toList();
+      setState(() {
+        _transferHistories.addAll(temp);
+      });
+      _page++;
+    });
+    // _api.getTransactions(_page).then((histories) {
+    //
+    // });
   }
 
   SafeArea _transferHistoryBody(snapshot, context) {

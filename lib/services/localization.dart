@@ -145,6 +145,17 @@ String open = 'Open';
 String thankYou = 'Thank you';
 String returning = 'Returning';
 String withLove = 'With love';
+String methods = 'Methods'; // TODO ADD LOCALIZATION;
+String identification = 'Identification'; // TODO ADD LOCALIZATION;
+String identified = 'Identified'; // TODO ADD LOCALIZATION;
+String notIdentified = 'Not identified'; // TODO ADD LOCALIZATION;
+String decor = 'Decor'; // TODO ADD LOCALIZATION;
+String decorForChat = 'Decor for chat'; // TODO ADD LOCALIZATION;
+String hello = 'Hello'; // TODO ADD LOCALIZATION;
+String hi = 'Hi'; // TODO ADD LOCALIZATION;
+String ago = 'Ago'; // TODO ADD LOCALIZATION;
+String days = 'Days'; // TODO ADD LOCALIZATION;
+
 var languages = [
   {"title": "English", "code": "en"},
   {"title": "Русский", "code": "ru"},
@@ -299,7 +310,18 @@ setLanguage(code) {
       thankYou = 'Thank you';
       returning = 'Returning';
       withLove = 'With love';
-
+      mute = 'Mute';
+      unmute = 'Unmute';
+      methods = 'Methods';
+      identification = 'Identification';
+      identified = 'Identified';
+      notIdentified = 'Not identified';
+      decor = 'Decor';
+      decorForChat = 'Decor for chat';
+      hello = 'Hello';
+      hi = 'Hi';
+      ago = 'Ago';
+      days = 'Days';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -315,7 +337,7 @@ setLanguage(code) {
       support = 'СЛУЖБА ПОДДЕРЖКИ';
       chats = 'Чаты';
       chat = 'Чат';
-      profile = 'Профиль';
+      profile = 'Пр иль';
       tape = 'Лента';
       wallet = 'Кошелек';
       comments = 'Комментарии';
@@ -441,6 +463,18 @@ setLanguage(code) {
       thankYou = 'Спасибо';
       returning = 'Возвращаю';
       withLove = 'С любовью';
+      mute = 'Mute';
+      unmute = 'Unmute';
+      methods = 'Методы';
+      identification = 'Идентификация';
+      identified = 'Идентифицирован';
+      notIdentified = 'Не идентифицирован';
+      decor = 'Оформление';
+      decorForChat = 'Оформление чата';
+      hello = 'Здравствуй';
+      hi = 'Привет';
+      ago = 'Назад';
+      days = 'Дней';
       print('ru');
       break;
     case 'kz':
@@ -583,7 +617,18 @@ setLanguage(code) {
       thankYou = 'Рахмет';
       returning = 'Қайтарып жатырмын';
       withLove = 'Махаббатпен';
-
+      mute = 'Mute';
+      unmute = 'Unmute';
+      methods = 'Әдістер';
+      identification = 'Сәйкестендіру';
+      identified = 'Анықталған';
+      notIdentified = 'Анықталмаған';
+      decor = 'Дизайн';
+      decorForChat = 'Чат дизайны';
+      hello = 'Сәлеметсіз бе';
+      hi = 'Сәлем';
+      ago = 'Бұрын';
+      days = 'Күн';
       print('kz');
       break;
     case 'uz':
@@ -607,7 +652,7 @@ setLanguage(code) {
       withdraw = 'Чиқариш';
       refill = 'Тўлдириш';
       payments = 'Бошқа тўловлар';
-      transfers = 'Ўтказишлар';
+      transfers = 'Ўтказмалар';
       balanceInBlock = 'Қайта ишлашдаги баланс';
       balance = 'Баланс';
       account = 'Аккаунт';
@@ -624,7 +669,7 @@ setLanguage(code) {
       members = 'Иштирокчиларнинг минимал сони: 3';
       creator = 'Яратувчи';
       member = 'Иштирокчи';
-      contacts = 'Алоқалар';
+      contacts = 'Контактлар';
       search = 'Излаш';
       createGroup = 'Гуруҳ яратиш';
       chatName = 'Чат номи';
@@ -634,7 +679,7 @@ setLanguage(code) {
       incorrectPin = 'PIN-код нотўғри';
       chatNotifications = 'Чат хабарномалари';
       notifications = 'Хабарномалар';
-      showNotifications = 'Хабарномаларни кўрсатищ';
+      showNotifications = 'Хабарномаларни кўрсатиш';
       error = 'Xaтo';
       messagePreview = 'Матнни кўрсатиш';
       sound = 'Овоз';
@@ -651,41 +696,41 @@ setLanguage(code) {
       selectOption = 'Бирор вариантни танланг';
       gallery = 'Галерея';
       wantToExit = 'Ҳақиқатан ҳам чиқмоқчимисиз?';
-      uploaded = 'Юкланилган';
-      somethingWentWrong = 'Бир нарса нотўғри кетди';
-      save = 'Ҳозирги тил';
-      share = 'Насиб қилса';
+      uploaded = 'Юкланди';
+      somethingWentWrong = 'Хато юз берди';
+      save = 'Сақлаш';
+      share = 'Бўлишиш';
       photo = 'Сурат';
-      sessionIsOver = 'Сизнинг ҳисоб бошқа қурилма орқали кирган';
+      sessionIsOver = 'Сизнинг ҳисоб бошқа қурилма орқали кирган'; // НЕТ
       cancel = 'Бекор қилиш';
       allowContacts = 'Контактларга рухсат бериш';
-      openSettings = 'Очиқ Созламалар';
-      document = 'Ҳужжат. гов. ве';
+      openSettings = 'Созламаларни очиш';
+      document = 'Ҳужжат';
       textMessage = 'Матнли хабар';
-      voiceMessage = 'Овозли х���бар ъ';
-      location = 'Узбекона. ве';
+      voiceMessage = 'Овозли хабар';
+      location = 'Манзил';
       reply = 'Жавоб бериш';
-      money = 'Пул-Саисият';
-      link = 'Линк';
-      forwardedMessage = 'Жўнатилган хабар';
+      money = 'Пул';
+      link = 'Ҳавола';
+      forwardedMessage = 'Қайта йўналтирилган хабар';
       message = 'Хабар';
       systemMessage = 'Тизим хабари';
       back = 'Орқага';
       camera = 'Камера';
-      watch = 'Қаранглар';
+      watch = 'Қараш';
       no = 'Йўқ';
       yes = 'Ҳа';
       fillAllFields = 'Барча майдонларни тўлдиринг';
       description = 'Тавсифи';
       goToChat = 'Чатга ўтиш';
       userNotInSystem = 'Бу фойдаланувчи тизимда йўқ';
-      file = 'Фай хақида"';
-      addToGroup = 'Гуруҳга қўшиш учун';
+      file = 'Файл"';
+      addToGroup = 'Гуруҳга қўшиш';
       clickToStart = 'Чатни бошлаш учун босинг';
       setAdmin = 'Администратор сифатида тайинлаш';
       makeMember = 'Аъзо бўлинг';
-      exitGroup = 'Гуруҳдан чиқиш учун';
-      sureExitGroup = 'Гуруҳдан чиқмоқчи еканлигингизга ишончингиз комилми?';
+      exitGroup = 'Гуруҳдан чиқиш';
+      sureExitGroup = 'Гуруҳдан чиқиб кетмоқчимисиз?';
       delete = 'Ўчириш';
       noChatName = 'Чат номи йўқ';
       minMembersCount = 'Иштирокчиларнинг минимал сони: 3';
@@ -695,19 +740,19 @@ setLanguage(code) {
       surname = 'Фамилия';
       passwordNotMatch = 'Махфий сўз мос келмаяпти';
       weSentToEmail =
-          'Електрон почтангизга 10 сония ичида қабул қилинадиган СМС-калит юбордик';
-      keyFromSms = 'SMS коди';
+          'Биз сизнинг электрон почтангизга 10 сония ичида келадиган СМС-калитни юбордик';
+      keyFromSms = 'СМС коди';
       country = 'Мамлакат';
-      status = 'Статуслари';
-      selectFile = 'Танланган файл';
+      status = 'Статус';
+      selectFile = 'Файлни танланг';
       userNotFound = 'Фойдаланувчи топилмади';
-      history = 'Тарих. уз';
-      youSended = 'Сиз юборган';
-      youReceived = 'Сиз олган';
-      online = 'onlayn';
-      enterValidAccount = 'Тўғри ҳисоб рақамини киритинг';
-      enterBelowMax = 'Максимал белгидан паст миқдорни киритинг';
-      enterAboveMin = 'Minimal белгидан юқори миқдорни киритинг';
+      history = 'Тарих';
+      youSended = 'Сиз юбордингиз';
+      youReceived = 'Сиз олдингиз';
+      online = 'Тармоқда';
+      enterValidAccount = 'Тўғри аккаунт рақамини киритинг';
+      enterBelowMax = 'Максимал белгидан паст суммани киритинг';
+      enterAboveMin = 'Минимал белгидан юқори суммани киритинг';
       appVersion = 'Mobil дастур версияси';
       httpError = 'Маълумотларни юклашда хатолик';
       historyBalance = 'Мувозанат тарихи';
@@ -725,12 +770,24 @@ setLanguage(code) {
       thankYou = 'Шукр. гов. ве';
       returning = 'Қайтиш';
       withLove = 'Севги билан';
+      mute = 'Mute';
+      unmute = 'Unmute';
+      methods = 'Усуллари';
+      identification = 'Аниқлаш';
+      identified = 'Кашф етилган';
+      notIdentified = 'Ўрнатилмаган';
+      decor = 'Тасаримнотлари';
+      decorForChat = 'Суҳбат дизайн';
+      hello = 'Қандай қилиб?';
+      hi = 'Салом алайкум';
+      ago = 'Илгари';
+      days = 'Кун';
       print('uz');
       break;
     case 'uzb':
       registration = 'Ro\'yxatdan o\'tish';
       login = 'Kirish';
-      phoneNumber = 'Телефон рақами';
+      phoneNumber = 'Telefon raqami';
       title = 'Nomi';
       password = 'Maxfiy so\'z';
       forgotPassword = 'Maxfiy so\'zni unutdingizmi?';
@@ -867,6 +924,18 @@ setLanguage(code) {
       thankYou = 'Rahmat';
       returning = 'Qaytib kelaman';
       withLove = 'Sevgi bilan';
+      mute = 'Mute';
+      unmute = 'Unmute';
+      methods = 'Usullari';
+      identification = 'Aniqlash';
+      identified = 'Kashf etilgan';
+      notIdentified = 'O\'rnatilmagan';
+      decor = 'Tasarimnotlari';
+      decorForChat = 'Suhbat dizayn';
+      hello = 'Qanday qilib?';
+      hi = 'Salom alaykum';
+      ago = 'Ilgari';
+      days = 'Kun';
       print('uzb');
       break;
     default:

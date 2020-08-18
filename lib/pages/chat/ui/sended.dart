@@ -219,8 +219,11 @@ class SendedMessageWidget extends StatelessWidget {
                                         }
                                       });
                                       return ImageMessage(
-                                          "$mediaUrl$rMedia", "$mediaUrl$media",
-                                          imageCount: imageCount.indexOf(test));
+                                        "$mediaUrl$rMedia",
+                                        "$mediaUrl$media",
+                                        content: content,
+                                        imageCount: imageCount.indexOf(test),
+                                      );
                                     }())
                                   : (type == "2")
                                       ? Container(

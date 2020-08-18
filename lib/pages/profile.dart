@@ -32,15 +32,20 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
+  TextEditingController _nameController;
+  bool _isEditing;
   @override
   void dispose() {
     super.dispose();
+    _nameController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   @override
   void initState() {
     super.initState();
+    _isEditing = false;
+    _nameController = TextEditingController();
     _initPackageInfo();
   }
 
@@ -58,8 +63,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       });
     }
   }
-
-  final String _fullName = '${user.name}';
 
   File _image;
 
@@ -141,7 +144,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // _sendingMsgProgressBar.show(context, "");
 
       response = await dio.post(
-        "/avatar/upload",
+        "api/v2.1/avatar/upload",
         data: formData,
         onSendProgress: (int sent, int total) {
           String p = (sent / total * 100).toStringAsFixed(2);
@@ -167,7 +170,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
-        print(e.response.data);
+        print(e.response.statusCode);
       } else {
         print(e.request);
         print(e.message);
@@ -327,17 +330,55 @@ class _UserProfilePageState extends State<UserProfilePage> {
       fontFamily: 'Roboto',
       color: Colors.white,
       fontSize: 20.0,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.bold,
     );
 
-    return Text(
-      _fullName,
-      style: _nameTextStyle,
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isEditing = true;
+          _nameController.text = user.name;
+        });
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        // mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            user.name,
+            style: _nameTextStyle,
+            overflow: TextOverflow.ellipsis,
+          ),
+          _isEditing
+              ? Center()
+              : Container(
+                  height: 1,
+                  color: whiteColor,
+                ),
+        ],
+      ),
     );
   }
 
   TextEditingController emailController =
       TextEditingController(text: '${user.email}');
+
+  Widget _buildIdentifcation(Size screenSize) {
+    return Container(
+      width: screenSize.width / 1.3,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text("${localization.identification}"),
+          SizedBox(height: 5),
+          user.identified
+              ? Text("${localization.identified}")
+              : Text("${localization.notIdentified}"),
+          SizedBox(height: 5)
+        ],
+      ),
+    );
+  }
 
   Widget _buildEmailSection(Size screenSize) {
     return Container(
@@ -403,6 +444,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         SizedBox(height: 10),
                         _buildEmailSection(screenSize),
                         _buildSeparator(screenSize),
+                        SizedBox(height: 10),
+                        _buildIdentifcation(screenSize),
+                        _buildSeparator(screenSize),
                       ],
                     ),
 
@@ -445,6 +489,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       children: <Widget>[
                         Container(
                           padding: EdgeInsets.only(bottom: 10),
+                          height: 50,
                           child: Material(
                             color: Colors.transparent,
                             child: RaisedButton(
@@ -479,20 +524,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 )),
                           ),
                         ),
-                        Text(
-                            '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
-                            style: TextStyle(color: Colors.grey)),
                         SizedBox(
-                          height: 20,
+                          height: 10,
                         ),
                         Container(
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 10.0,
-                                spreadRadius: -2,
-                                offset: Offset(0.0, 0.0))
-                          ]),
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 10.0,
+                                  spreadRadius: -2,
+                                  offset: Offset(0.0, 0.0))
+                            ],
+                          ),
                           child: ButtonTheme(
                             minWidth: MediaQuery.of(context).size.width * 0.42,
                             height: 50,
@@ -525,8 +569,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              color: whiteColor,
-                              textColor: primaryColor,
+                              color: primaryColor,
+                              textColor: whiteColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                   10.0,
@@ -535,7 +579,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             ),
                           ),
                         ),
-                        Container(height: 20)
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Container(height: 0)
                       ],
                     ),
                   ],
@@ -584,7 +637,46 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     SizedBox(width: 10),
                     _buildProfileImage(),
                     SizedBox(width: 10),
-                    _buildFullName(),
+                    _isEditing
+                        ? Flexible(
+                            child: Row(
+                              children: <Widget>[
+                                Flexible(
+                                  child: TextField(
+                                    style: TextStyle(color: whiteColor),
+                                    controller: _nameController,
+                                  ),
+                                ),
+                                FlatButton(
+                                  child: Text(
+                                    '${localization.save}',
+                                    style: TextStyle(
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    api
+                                        .settingsSave(_nameController.text)
+                                        .then((result) {
+                                      print(result);
+                                      if (result['success'].toString() ==
+                                          'true') {
+                                        user.name = _nameController.text;
+                                        SharedPreferencesHelper.setString(
+                                            'name', _nameController.text);
+                                      }
+                                      setState(() {
+                                        _isEditing = false;
+                                      });
+                                    });
+                                  },
+                                )
+                              ],
+                            ),
+                          )
+                        : Flexible(
+                            child: _buildFullName(),
+                          ),
                   ],
                 ),
               ],

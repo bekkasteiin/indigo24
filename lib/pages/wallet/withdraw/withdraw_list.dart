@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/wallet/withdraw/withdraw.dart';
+import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -10,8 +12,20 @@ class WithdrawListPage extends StatefulWidget {
 }
 
 class _WithdrawListPageState extends State<WithdrawListPage> {
+  Api _api;
+  List _withdrawList;
+  bool _isLoaded;
   @override
   void initState() {
+    _isLoaded = false;
+    _withdrawList = [];
+    _api = Api();
+    _api.getWithdraws().then((withdrawResult) {
+      setState(() {
+        _isLoaded = true;
+        _withdrawList = withdrawResult;
+      });
+    });
     super.initState();
   }
 
@@ -66,29 +80,34 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
           currentFocus.unfocus();
         }
       },
-      child: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 10,
-          ),
-          Flexible(
-            child: ListView.builder(
-              itemCount: 2,
-              shrinkWrap: false,
-              itemBuilder: (BuildContext context, int index) {
-                return _withdrawElement(context);
-              },
+      child: _isLoaded
+          ? Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 10,
+                ),
+                Flexible(
+                  child: ListView.builder(
+                    itemCount: _withdrawList.length,
+                    shrinkWrap: false,
+                    itemBuilder: (BuildContext context, int index) {
+                      return _withdrawElement(context, _withdrawList[index]);
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+              ],
+            )
+          : Center(
+              child: CircularProgressIndicator(),
             ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-        ],
-      ),
     );
   }
 
-  Container _withdrawElement(BuildContext context) {
+  Container _withdrawElement(BuildContext context, dynamic provider) {
+    print(provider);
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
       decoration: BoxDecoration(
@@ -107,7 +126,7 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => WithdrawPage()),
+              MaterialPageRoute(builder: (context) => WithdrawPage(provider)),
             );
           },
           child: Container(
@@ -118,11 +137,15 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
                   width: 35,
                   height: 40,
                   margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
-                  child: Image.asset('assets/images/profile.png', width: 30.0),
+                  child: Image.network(
+                    '$logos${provider['logo']}',
+                    width: 30.0,
+                    height: 30,
+                  ),
                 ),
                 Container(width: 10),
                 Text(
-                  'title',
+                  '${provider['title']}',
                   style: TextStyle(fontSize: 14, color: blackPurpleColor),
                 ),
               ],

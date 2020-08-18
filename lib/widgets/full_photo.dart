@@ -109,7 +109,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
   }
 
   var url1;
-
+  int inter = 4;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -167,31 +167,57 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
               ),
             )),
         Expanded(
-            flex: 10,
-            child: new Swiper(
-              loop: false,
-              itemCount: itemCounter(),
-              itemBuilder: (BuildContext context, int index) {
-                var a = jsonDecode(tempList[index]['attachments']);
-                url1 =
-                    '${tempList[index]['attachment_url']}${a[0]['filename']}';
+          flex: 10,
+          child: Swiper(
+            loop: false,
+            itemCount: itemCounter(),
+            itemBuilder: (BuildContext context, int index) {
+              var a = jsonDecode(tempList[index]['attachments']);
+              url1 = '${tempList[index]['attachment_url']}${a[0]['filename']}';
 
-                return PhotoView(
-                  imageProvider: CachedNetworkImageProvider(
-                      currentIndex == null ? url : url1),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained * 3,
-                  backgroundDecoration:
-                      BoxDecoration(color: Colors.transparent),
-                );
-              },
-              onIndexChanged: (i) {
-                setState(() {
-                  currentIndex = i;
-                });
-              },
-              controller: _controller,
-            )),
+              return Container(
+                child: Stack(
+                  children: <Widget>[
+                    RotatedBox(
+                      quarterTurns: inter,
+                      child: PhotoView(
+                        imageProvider: CachedNetworkImageProvider(
+                            currentIndex == null ? url : url1),
+                        minScale: PhotoViewComputedScale.contained,
+                        maxScale: PhotoViewComputedScale.contained * 3,
+                        backgroundDecoration:
+                            BoxDecoration(color: Colors.transparent),
+                      ),
+                    ),
+                    Container(
+                        alignment: Alignment.bottomRight,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.rotate_right,
+                            color: whiteColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (inter == 4) {
+                                inter = 1;
+                              } else {
+                                inter = 4;
+                              }
+                            });
+                          },
+                        ))
+                  ],
+                ),
+              );
+            },
+            onIndexChanged: (i) {
+              setState(() {
+                currentIndex = i;
+              });
+            },
+            controller: _controller,
+          ),
+        ),
         Expanded(
             flex: 2,
             child: ListView.builder(

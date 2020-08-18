@@ -46,13 +46,27 @@ class Countries extends StatelessWidget {
                   height: 20,
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   padding: EdgeInsets.only(left: 5),
-                  child: Text(
-                    '${countries[index].title}',
-                    style: TextStyle(
-                      color: blackPurpleColor,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 18,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        '${countries[index].title}',
+                        style: TextStyle(
+                          color: blackPurpleColor,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        '+${countries[index].phonePrefix}',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          color: blackPurpleColor,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 onTap: () {

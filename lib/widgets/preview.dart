@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 import 'package:photo_view/photo_view.dart';
 
 class PreviewMedia extends StatefulWidget {
@@ -14,12 +16,20 @@ class PreviewMedia extends StatefulWidget {
 }
 
 class _PreviewMediaState extends State<PreviewMedia> {
+  TextEditingController _messageController;
   File file;
 
   @override
   void initState() {
     super.initState();
+    _messageController = TextEditingController();
     file = File(widget.filePath);
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -75,23 +85,43 @@ class _PreviewMediaState extends State<PreviewMedia> {
               ],
             ),
           ),
-          floatingActionButton: Container(
-            padding: EdgeInsets.only(bottom: 10),
-            width: 70,
-            height: 70,
-            child: FittedBox(
-              child: FloatingActionButton(
-                heroTag: "btn1",
-                backgroundColor: Colors.white,
-                child: Image.asset(
-                  'assets/images/send.png',
-                  width: 30,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop("sending");
-                },
+          floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              SizedBox(
+                width: 30,
               ),
-            ),
+              Flexible(
+                child: TextField(
+                  controller: _messageController,
+                  style: TextStyle(color: whiteColor),
+                  decoration: InputDecoration(
+                    hintText: "${localization.enterMessage}",
+                    hintStyle: TextStyle(color: greyColor),
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(bottom: 10),
+                width: 70,
+                height: 70,
+                child: FittedBox(
+                  child: FloatingActionButton(
+                    heroTag: "btn1",
+                    backgroundColor: Colors.white,
+                    child: Image.asset(
+                      'assets/images/send.png',
+                      width: 30,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(
+                          {'cmd': 'sending', 'text': _messageController.text});
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

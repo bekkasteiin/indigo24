@@ -5,6 +5,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 
 import 'payments_history.dart';
+import 'payments_service.dart';
 import 'payments_services.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -16,11 +17,15 @@ class PaymentsCategoryPage extends StatefulWidget {
 class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   Api _api;
   Map<String, dynamic> _categories;
+  List services;
+  String _logoUrl;
   TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
+
+    _logoUrl = '';
     _searchController = TextEditingController();
     _api = Api();
 
@@ -31,6 +36,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       } else {
         setState(() {
           _categories = categories;
+          _logoUrl = _categories["logoURL"];
         });
       }
     });
@@ -47,50 +53,97 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: _categories != null
-          ? SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: 10.0, left: 20.0, right: 20, bottom: 0),
-                    child: TextField(
-                      decoration: new InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: blackPurpleColor,
+          ? Stack(
+              children: <Widget>[
+                SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: 10,
+                          left: 20,
+                          right: 20,
+                          bottom: 0,
                         ),
-                        hintText: "${localization.search}",
-                        fillColor: blackPurpleColor,
+                        child: Row(
+                          children: <Widget>[
+                            Flexible(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.search,
+                                    color: blackPurpleColor,
+                                  ),
+                                  hintText: "${localization.search}",
+                                  fillColor: blackPurpleColor,
+                                ),
+                                onChanged: (value) {
+                                  searchOnChanged();
+                                },
+                                controller: _searchController,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.search),
+                              onPressed: () {
+                                search(_searchController.text);
+                              },
+                            )
+                          ],
+                        ),
                       ),
-                      onChanged: (value) {
-                        search(value);
-                      },
-                      controller: _searchController,
-                    ),
+                      needToShowServices
+                          ? Flexible(
+                              child: ListView.builder(
+                                padding: EdgeInsets.only(bottom: 20),
+                                shrinkWrap: true,
+                                itemCount:
+                                    services != null ? services.length : 0,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: _servicesList(
+                                      context,
+                                      _logoUrl + services[index]['logo'],
+                                      services[index]['title'],
+                                      services[index]['id'],
+                                      services[index]['is_convertable'],
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          : Flexible(
+                              child: ListView.builder(
+                                padding: EdgeInsets.only(bottom: 20),
+                                shrinkWrap: true,
+                                itemCount: _categories["categories"] != null
+                                    ? _categories["categories"].length
+                                    : 0,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: _paymentsList(
+                                      context,
+                                      _categories["logoURL"] +
+                                          _categories["categories"][index]
+                                              ['logo'],
+                                      _categories["categories"][index]['title'],
+                                      _categories["categories"][index]['ID'],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                    ],
                   ),
-                  Flexible(
-                    child: ListView.builder(
-                      padding: EdgeInsets.only(bottom: 20),
-                      shrinkWrap: true,
-                      itemCount: _categories["categories"] != null
-                          ? _categories["categories"].length
-                          : 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: _paymentsList(
-                            context,
-                            _categories["logoURL"] +
-                                _categories["categories"][index]['logo'],
-                            _categories["categories"][index]['title'],
-                            _categories["categories"][index]['ID'],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                isReadyToSend
+                    ? Center()
+                    : Center(
+                        child: CircularProgressIndicator(),
+                      ),
+              ],
             )
           : Center(
               child: CircularProgressIndicator(),
@@ -99,11 +152,29 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   }
 
   bool isReadyToSend = true;
+  bool needToShowServices = false;
+  searchOnChanged() {
+    if (_searchController.text.isEmpty) {
+      setState(() {
+        needToShowServices = false;
+      });
+    }
+  }
+
   search(String query) {
+    setState(() {
+      needToShowServices = true;
+    });
     if (isReadyToSend) {
-      isReadyToSend = false;
-      _api.searchServices(query);
-      Future.delayed(Duration(seconds: 3)).then((value) {
+      setState(() {
+        isReadyToSend = false;
+      });
+      _api.searchServices(query).then((result) {
+        setState(() {
+          services = result;
+        });
+      });
+      setState(() {
         isReadyToSend = true;
       });
     }
@@ -156,6 +227,65 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         )
       ],
       backgroundColor: Colors.white,
+    );
+  }
+
+  Container _servicesList(BuildContext context, String logo, String name,
+      int index, int isConvertable) {
+    return Container(
+      margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(0.0, 0.0))
+      ]),
+      child: ButtonTheme(
+        height: 40,
+        child: RaisedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PaymentsServicePage(index, logo, name,
+                    isConvertable: isConvertable),
+              ),
+            );
+          },
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: 35,
+                  height: 40,
+                  margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
+                  child: Image.network(
+                    '$logo',
+                    width: 30.0,
+                  ),
+                ),
+                Container(width: 10),
+                Expanded(
+                  child: Text(
+                    '$name',
+                    style: TextStyle(fontSize: 14, color: blackPurpleColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          color: whiteColor,
+          textColor: blackPurpleColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              10.0,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

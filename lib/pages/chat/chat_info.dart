@@ -259,12 +259,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                         ),
                       ],
                     )
-                  : CachedNetworkImage(
-                      imageUrl: widget.chatAvatar != null
-                          ? '$avatarUrl${widget.chatAvatar}'
-                          : '${avatarUrl}noAvatar.png',
-                      errorWidget: (context, url, error) => CachedNetworkImage(
-                        imageUrl: "${avatarUrl}noAvatar.png",
+                  : Container(
+                      height: 100,
+                      width: 100,
+                      color: greyColor,
+                      child: CachedNetworkImage(
+                        imageUrl: widget.chatAvatar != null
+                            ? '$avatarUrl${widget.chatAvatar}'
+                            : '${avatarUrl}noAvatar.png',
                       ),
                     ),
             ),

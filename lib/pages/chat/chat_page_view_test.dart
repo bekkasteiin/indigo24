@@ -64,8 +64,10 @@ class AudioMessage extends StatelessWidget {
 class ImageMessage extends StatelessWidget {
   final imageUrl;
   final fullImageUrl;
+  final content;
   final imageCount;
-  ImageMessage(this.imageUrl, this.fullImageUrl, {this.imageCount});
+  ImageMessage(this.imageUrl, this.fullImageUrl,
+      {this.content, this.imageCount});
 
   Widget placeholder(context) {
     return Container(
@@ -100,45 +102,50 @@ class ImageMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: FlatButton(
-        splashColor: Colors.transparent,
-        hoverColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        child: Material(
-          color: Colors.transparent,
-          child: CachedNetworkImage(
-            placeholder: (context, url) => placeholder(context),
-            errorWidget: (context, url, error) => Material(
-              child: Image.asset(
-                'assets/preloader.gif',
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          FlatButton(
+            splashColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            child: Material(
+              color: Colors.transparent,
+              child: CachedNetworkImage(
+                placeholder: (context, url) => placeholder(context),
+                errorWidget: (context, url, error) => Material(
+                  child: Image.asset(
+                    'assets/preloader.gif',
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: MediaQuery.of(context).size.width * 0.7,
+                    fit: BoxFit.contain,
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8.0),
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                ),
+                imageUrl: imageUrl,
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.width * 0.7,
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,
               ),
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
               clipBehavior: Clip.hardEdge,
             ),
-            imageUrl: imageUrl,
-            width: MediaQuery.of(context).size.width * 0.7,
-            height: MediaQuery.of(context).size.width * 0.7,
-            // width: 200.0,
-            // height: 200.0,
-            fit: BoxFit.cover,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FullPhoto(url: fullImageUrl),
+                ),
+              );
+            },
+            padding: EdgeInsets.all(0),
           ),
-          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-          clipBehavior: Clip.hardEdge,
-        ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FullPhoto(url: fullImageUrl),
-            ),
-          );
-        },
-        padding: EdgeInsets.all(0),
+          content.toString() != 'null' ? Text('$content') : Center(),
+        ],
       ),
     );
   }

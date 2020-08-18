@@ -9,6 +9,7 @@ import 'package:vibration/vibration.dart';
 import 'circle.dart';
 import 'keyboard.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/user.dart' as user;
 
 typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();
@@ -118,9 +119,13 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Image(
-          fit: BoxFit.fill,
-          image: chatBackgroundProvider,
-        ),
+            fit: BoxFit.fill,
+            image:
+                // user.chatBackground == 'ligth' // TODO TURN ON THIS
+                // ?
+                AssetImage("assets/images/background_chat.png")
+            // : AssetImage("assets/images/background_chat_2.png"),
+            ),
       );
 
   _buildPortraitPasscodeScreen() => Stack(

@@ -7,6 +7,9 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 
+import 'settings_decor.dart';
+import 'settings_sound.dart';
+
 class SettingsMainPage extends StatefulWidget {
   @override
   _SettingsMainPageState createState() => _SettingsMainPageState();
@@ -73,6 +76,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                   child: Column(
                     children: <Widget>[
                       _buildNotifications(),
+                      _buildDecor(),
                       _buildLanguage(),
                       _buildTermsOfUse(),
 
@@ -178,6 +182,45 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
           print('Default of settings $message');
       }
     });
+  }
+
+  _buildDecor() {
+    return Material(
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SettingsDecorPage()))
+              .whenComplete(() => setState(() {}));
+        },
+        child: Container(
+          padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
+          height: 60,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  '${localization.decor}',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: blackPurpleColor),
+                ),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    margin: EdgeInsets.only(right: 15),
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/forward.png',
+                      ),
+                      width: 15,
+                      height: 15,
+                    ),
+                  ),
+                ])
+              ]),
+        ),
+      ),
+    );
   }
 
   _buildLanguage() {

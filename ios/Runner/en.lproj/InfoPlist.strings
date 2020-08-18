@@ -6,14 +6,14 @@
   
 */
 CFBundleName = "Indigo24";
-NSAppleMusicUsageDescription = "Play using while you are hiking";
-NSCalendarsUsageDescription = "This app need to access your calendar events";
-NSCameraUsageDescription = "This app requires camera to share photos from your library and save photos to your Camera Roll.";
-NSContactsUsageDescription = "This app requires contacts access to display contacts for chat.";
-NSLocationAlwaysUsageDescription = "Your location is required for chat.";
-NSLocationWhenInUseUsageDescription= "Your location is required for chat.";
-NSMicrophoneUsageDescription = "This app requires microphone for voice messages.";
-NSMotionUsageDescription = "This app needs to be able to access your motion use";
-NSPhotoLibraryAddUsageDescription = "This app requires photos to share photos from your library and save photos to your Camera Roll.";
-NSPhotoLibraryUsageDescription = "This app requires photos to share photos from your library and save photos to your Camera Roll.";
-NSSpeechRecognitionUsageDescription = "This app requires recognize speech";
+NSAppleMusicUsageDescription = "This app requires access to play music.";
+NSCalendarsUsageDescription = "This app need to access your calendar events.";
+NSCameraUsageDescription = "This app requires camera to take photos, share to server, and save photos to Camera Roll.";
+NSContactsUsageDescription = "This app requires access to contacts to find friends in a chat room.";
+NSLocationAlwaysUsageDescription = "This app requires location to send in a chat room.";
+NSLocationWhenInUseUsageDescription= "This app requires location to send in a chat room.";
+NSMicrophoneUsageDescription = "This app requires microphone for voice messages in a chat room.";
+NSMotionUsageDescription = "This app needs to be able to access your motion use.";
+NSPhotoLibraryAddUsageDescription = "This app requires photos to share photos to server from your library and save photos from server to your Camera Roll.";
+NSPhotoLibraryUsageDescription = "This app requires photos to share photos to server from your library and save photos from server to your Camera Roll.";
+NSSpeechRecognitionUsageDescription = "This app requires recognize speech.";

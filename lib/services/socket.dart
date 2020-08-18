@@ -254,7 +254,6 @@ class ChatRoom {
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
     message = message.trimLeft();
     message = message.trimRight();
-    if (message.isNotEmpty) {
       String data = json.encode({
         "cmd": 'message:create',
         "data": {
@@ -270,9 +269,6 @@ class ChatRoom {
       print('added message');
       print("$data");
       sendSocketData(data);
-    } else {
-      print('message is empty');
-    }
   }
 
   setUserSettings(int boolean) {
@@ -679,8 +675,7 @@ class ChatRoom {
       },
       onDone: () {
         print("ON DONE IS CALLED");
-        // TODO CHANGE DURATION TO 1 SEC
-        Future.delayed(const Duration(seconds: 60), () {
+        Future.delayed(const Duration(seconds: 1), () {
           connect(context);
           init();
         });

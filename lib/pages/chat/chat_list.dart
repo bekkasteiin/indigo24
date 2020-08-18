@@ -34,9 +34,10 @@ bool globalBoolForForceGetChat = false;
 class _ChatsListPageState extends State<ChatsListPage>
     with AutomaticKeepAliveClientMixin {
   RefreshController _refreshController;
-
+  int _currentDate;
   @override
   void initState() {
+    _currentDate = DateTime.now().toUtc().millisecondsSinceEpoch;
     _refreshController = RefreshController(initialRefresh: false);
     super.initState();
   }
@@ -448,21 +449,27 @@ class _ChatsListPageState extends State<ChatsListPage>
   String _time(timestamp) {
     if (timestamp != null) {
       if (timestamp != '') {
-        var date = DateTime.fromMillisecondsSinceEpoch(
+        var messageUnixDate = DateTime.fromMillisecondsSinceEpoch(
           int.parse("$timestamp") * 1000,
         );
-        TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
+        TimeOfDay messageDate =
+            TimeOfDay.fromDateTime(DateTime.parse('$messageUnixDate'));
         var hours;
         var minutes;
-        // messageMinutes = '${roomBooked.minute}';
-        hours = '${roomBooked.hour}';
-        minutes = '${roomBooked.minute}';
-
-        if (roomBooked.hour.toString().length == 1)
-          hours = '0${roomBooked.hour}';
-        if (roomBooked.minute.toString().length == 1)
-          minutes = '0${roomBooked.minute}';
-        return '$hours:$minutes';
+        hours = '${messageDate.hour}';
+        minutes = '${messageDate.minute}';
+        var diff = DateTime.now().difference(messageUnixDate);
+        if (messageDate.hour.toString().length == 1)
+          hours = '0${messageDate.hour}';
+        if (messageDate.minute.toString().length == 1)
+          minutes = '0${messageDate.minute}';
+        if (diff.inDays == 0) {
+          return '$hours:$minutes';
+        } else if (diff.inDays < 7) {
+          return '${diff.inDays} ${localization.days} ${localization.ago}\n$hours:$minutes';
+        } else {
+          return '$messageUnixDate'.substring(0, 10).replaceAll('-', '.')+'\n$hours:$minutes';
+        }
       }
     }
     return '??:??';

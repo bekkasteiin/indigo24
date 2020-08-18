@@ -22,6 +22,10 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   bool _emptyResponse;
 
   String _logoUrl;
+  String _maskedText;
+  String _text;
+
+  List splittedDates;
 
   Api api;
 
@@ -36,8 +40,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
     _page = 1;
     _logoUrl = "";
+    _maskedText = '';
+    _text = '';
 
     api = Api();
+
+    splittedDates = [];
 
     _refreshController = RefreshController(initialRefresh: false);
 
@@ -87,7 +95,29 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   void _onLoading() async {
     print("_onLoading ");
-    _loadData();
+
+    if (_maskedText.length == 21) {
+      splittedDates = _maskedText.split("/");
+      api
+          .getFilteredHistories(
+        _page,
+        splittedDates[0],
+        splittedDates[1],
+      )
+          .then((histories) {
+        if (histories['message'] == 'Not authenticated' &&
+            histories['success'].toString() == 'false') {
+          logOut(context);
+        } else {
+          setState(() {
+            resultList.addAll(histories['payments'].toList());
+          });
+          _page++;
+        }
+      });
+    } else {
+      _loadData();
+    }
     _refreshController.loadComplete();
   }
 
@@ -353,6 +383,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
               Container(
                 width: size.width * 0.8 - 20,
                 child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'YYYY-MM-DD / YYYY-MM-DD',
+                  ),
                   textAlign: TextAlign.center,
                   inputFormatters: [_filterFormatter],
                 ),
@@ -374,88 +407,95 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                   ),
                 ),
                 onTap: () {
-                  String _maskedText =
+                  _maskedText =
                       _filterFormatter.getMaskedText().replaceAll(' ', '');
-
-                  List splittedDates = _maskedText.split("/");
-                  _page = 1;
-
-                  api
-                      .getHistories(_page,
-                          fromDate: splittedDates[0], toDate: splittedDates[1])
-                      .then((histories) {
-                    print(histories);
-                    if (histories['message'] == 'Not authenticated' &&
-                        histories['success'].toString() == 'false') {
-                      logOut(context);
-                    } else {
-                      setState(() {
-                        _logoUrl = histories['logoURL'];
-                        if (histories['payments'].toList().isEmpty) {
-                          _emptyResponse = true;
+                  if (_maskedText.length == 21) {
+                    splittedDates = _maskedText.split("/");
+                    _page = 1;
+                    api
+                        .getFilteredHistories(
+                            _page, splittedDates[0], splittedDates[1])
+                        .then((histories) {
+                      if (histories['message'] == 'Not authenticated' &&
+                          histories['success'].toString() == 'false') {
+                        logOut(context);
+                      } else {
+                        if (histories['message'] != null) {
+                          setState(() {
+                            _text = histories['message'];
+                          });
+                        } else {
+                          _text = '';
+                          setState(() {
+                            resultList = histories['payments'].toList();
+                          });
+                          _page++;
                         }
-                        if (_page == 1)
-                          resultList = histories['payments'].toList();
-                      });
-                      _page++;
-                    }
-                  });
+                      }
+                    });
+                  }
                 },
               ),
             ],
           ),
         ),
         SizedBox(height: 10),
-        !_emptyResponse
-            ? resultList.isNotEmpty
-                ? Flexible(
-                    child: SafeArea(
-                      child: SmartRefresher(
-                        enablePullDown: false,
-                        enablePullUp: true,
-                        footer: CustomFooter(
-                          builder: (BuildContext context, LoadStatus mode) {
-                            Widget body;
-                            return Container(
-                              height: 55.0,
-                              child: Center(child: body),
-                            );
-                          },
+        _text == ''
+            ? !_emptyResponse
+                ? resultList.isNotEmpty
+                    ? Flexible(
+                        child: SafeArea(
+                          child: SmartRefresher(
+                            enablePullDown: false,
+                            enablePullUp: true,
+                            footer: CustomFooter(
+                              builder: (BuildContext context, LoadStatus mode) {
+                                Widget body;
+                                return Container(
+                                  height: 55.0,
+                                  child: Center(child: body),
+                                );
+                              },
+                            ),
+                            controller: _refreshController,
+                            onLoading: _onLoading,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              itemCount: snapshot != null ? snapshot.length : 0,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Container(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: _historyBuilder(
+                                    context,
+                                    "$_logoUrl${snapshot[index]['logo']}",
+                                    "${snapshot[index]['account']}",
+                                    "${snapshot[index]['amount']}",
+                                    "${snapshot[index]['title']}",
+                                    "${snapshot[index]['data']}",
+                                    "${snapshot[index]['status']}",
+                                    index,
+                                    "${snapshot[index]['pdf']}",
+                                    snapshot[index]['serviceID'],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                         ),
-                        controller: _refreshController,
-                        onLoading: _onLoading,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          itemCount: snapshot != null ? snapshot.length : 0,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: _historyBuilder(
-                                context,
-                                "$_logoUrl${snapshot[index]['logo']}",
-                                "${snapshot[index]['account']}",
-                                "${snapshot[index]['amount']}",
-                                "${snapshot[index]['title']}",
-                                "${snapshot[index]['data']}",
-                                "${snapshot[index]['status']}",
-                                index,
-                                "${snapshot[index]['pdf']}",
-                                snapshot[index]['serviceID'],
-                              ),
-                            );
-                          },
+                      )
+                    : SafeArea(
+                        child: Center(
+                          child: CircularProgressIndicator(),
                         ),
-                      ),
-                    ),
-                  )
+                      )
                 : SafeArea(
-                    child: Center(
-                      child: CircularProgressIndicator(),
+                    child: Container(
+                      child: Center(child: Text('${localization.empty}')),
                     ),
                   )
-            : SafeArea(
-                child: Container(
-                  child: Center(child: Text('${localization.empty}')),
+            : Center(
+                child: Text(
+                  _text,
                 ),
               ),
       ],

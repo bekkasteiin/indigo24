@@ -257,6 +257,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                 return ImageMessage(
                                                     "$mediaUrl$rMedia",
                                                     "$mediaUrl$media",
+                                                    content: content,
                                                     imageCount: imageCount
                                                         .indexOf(test));
                                               }())
@@ -276,15 +277,18 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                 // url: "$mediaUrl$media") // TODO FIX FILES
                                                 : (type == "3")
                                                     ? AudioMessage(
-                                                        "$mediaUrl$media")
+                                                        "$mediaUrl$media",
+                                                      )
                                                     : (type == "4")
                                                         ? VideoPlayerWidget(
                                                             "$mediaUrl$media",
-                                                            "network")
+                                                            "network",
+                                                          )
                                                         : (type == "10")
                                                             ? ReplyMessage(
                                                                 content,
-                                                                replyData)
+                                                                replyData,
+                                                              )
                                                             : type == '11'
                                                                 ? Container(
                                                                     child:

@@ -19,6 +19,8 @@ import 'package:polygon_clipper/polygon_border.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'withdraw/withdraw_list.dart';
+
 class MyBehavior extends ScrollBehavior {
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) =>
@@ -685,7 +687,7 @@ class _WalletTabState extends State<WalletTab> {
               onPressed: () {
                 print('вывести is pressed');
                 Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => WithdrawPage()))
+                        MaterialPageRoute(builder: (context) => WithdrawListPage()))
                     .whenComplete(() async {
                   await api.getBalance();
                   setState(() {
