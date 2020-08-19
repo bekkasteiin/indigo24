@@ -63,7 +63,8 @@ class _ReplyMessageState extends State<ReplyMessage> {
                               width: 40,
                               height: 40,
                               child: Image.network(
-                                  "${widget.replyData['attachments_url']}${widget.replyData['attachments']["r_filename"]}"),
+                                "${widget.replyData['attachments_url']}${widget.replyData['attachments']["r_filename"]}",
+                              ),
                             ),
                   Container(width: 5),
                   Flexible(

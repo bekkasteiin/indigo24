@@ -264,33 +264,32 @@ class _ChatUserProfileStatePage extends State<ChatUserProfilePage> {
   }
 
   Widget _buildPhoneSection(Size screenSize) {
-    if (isInMyPhoneBook)
-      return Column(
-        children: <Widget>[
-          Container(
-            width: screenSize.width / 1.3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("${localization.phoneNumber}"),
-                SizedBox(height: 5),
-                Text(
-                  '${widget.phone}',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
+    return isInMyPhoneBook
+        ? Column(
+            children: <Widget>[
+              Container(
+                width: screenSize.width / 1.3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text("${localization.phoneNumber}"),
+                    SizedBox(height: 5),
+                    Text(
+                      '${widget.phone}',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                  ],
                 ),
-                SizedBox(height: 5),
-              ],
-            ),
-          ),
-          _buildSeparator(screenSize),
-          SizedBox(height: 10),
-        ],
-      );
-    else
-      return Container();
+              ),
+              _buildSeparator(screenSize),
+              SizedBox(height: 10),
+            ],
+          )
+        : Container();
   }
 
   Widget _buildSeparator(Size screenSize) {

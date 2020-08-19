@@ -15,8 +15,6 @@ class PaymentHistoryPage extends StatefulWidget {
   _PaymentHistoryPageState createState() => _PaymentHistoryPageState();
 }
 
-List resultList = [];
-
 class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     with TickerProviderStateMixin {
   bool _emptyResponse;
@@ -25,9 +23,10 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   String _maskedText;
   String _text;
 
-  List splittedDates;
+  List _splittedDates;
+  List _resultList = [];
 
-  Api api;
+  Api _api;
 
   RefreshController _refreshController;
 
@@ -43,9 +42,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     _maskedText = '';
     _text = '';
 
-    api = Api();
+    _api = Api();
 
-    splittedDates = [];
+    _splittedDates = [];
 
     _refreshController = RefreshController(initialRefresh: false);
 
@@ -56,7 +55,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       },
     );
 
-    api.getHistories(_page).then((histories) {
+    _api.getHistories(_page).then((histories) {
       if (histories['message'] == 'Not authenticated' &&
           histories['success'].toString() == 'false') {
         logOut(context);
@@ -68,7 +67,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             _emptyResponse = true;
           }
 
-          if (_page == 1) resultList = histories['payments'].toList();
+          if (_page == 1) _resultList = histories['payments'].toList();
         });
         _page++;
       }
@@ -85,7 +84,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(), body: _paymentHistroyBody(resultList, context));
+        appBar: _buildAppBar(),
+        body: _paymentHistroyBody(_resultList, context));
   }
 
   void _onRefresh() {
@@ -97,12 +97,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     print("_onLoading ");
 
     if (_maskedText.length == 21) {
-      splittedDates = _maskedText.split("/");
-      api
+      _splittedDates = _maskedText.split("/");
+      _api
           .getFilteredHistories(
         _page,
-        splittedDates[0],
-        splittedDates[1],
+        _splittedDates[0],
+        _splittedDates[1],
       )
           .then((histories) {
         if (histories['message'] == 'Not authenticated' &&
@@ -110,7 +110,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
           logOut(context);
         } else {
           setState(() {
-            resultList.addAll(histories['payments'].toList());
+            _resultList.addAll(histories['payments'].toList());
           });
           _page++;
         }
@@ -356,12 +356,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   }
 
   Future _loadData() async {
-    api.getHistories(_page).then((histories) {
+    _api.getHistories(_page).then((histories) {
       print(histories);
       if (histories['payments'].isNotEmpty) {
         List temp = histories['payments'].toList();
         setState(() {
-          resultList.addAll(temp);
+          _resultList.addAll(temp);
         });
         _page++;
         print(_page);
@@ -410,11 +410,11 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                   _maskedText =
                       _filterFormatter.getMaskedText().replaceAll(' ', '');
                   if (_maskedText.length == 21) {
-                    splittedDates = _maskedText.split("/");
+                    _splittedDates = _maskedText.split("/");
                     _page = 1;
-                    api
+                    _api
                         .getFilteredHistories(
-                            _page, splittedDates[0], splittedDates[1])
+                            _page, _splittedDates[0], _splittedDates[1])
                         .then((histories) {
                       if (histories['message'] == 'Not authenticated' &&
                           histories['success'].toString() == 'false') {
@@ -427,7 +427,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                         } else {
                           _text = '';
                           setState(() {
-                            resultList = histories['payments'].toList();
+                            _resultList = histories['payments'].toList();
                           });
                           _page++;
                         }
@@ -442,7 +442,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         SizedBox(height: 10),
         _text == ''
             ? !_emptyResponse
-                ? resultList.isNotEmpty
+                ? _resultList.isNotEmpty
                     ? Flexible(
                         child: SafeArea(
                           child: SmartRefresher(

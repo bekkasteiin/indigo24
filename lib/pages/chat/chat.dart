@@ -45,14 +45,19 @@ class ChatPage extends StatefulWidget {
   final avatarUrl;
   final chatType;
   final phone;
-  ChatPage(this.name, this.chatID,
-      {this.members,
-      this.chatType,
-      this.memberCount,
-      this.userIds,
-      this.avatar,
-      this.avatarUrl,
-      this.phone});
+  final data;
+  ChatPage(
+    this.name,
+    this.chatID, {
+    this.members,
+    this.chatType,
+    this.memberCount,
+    this.userIds,
+    this.avatar,
+    this.avatarUrl,
+    this.phone,
+    this.data,
+  });
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -68,7 +73,6 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController _text = TextEditingController();
   var _online;
   ScrollController _scrollController;
-  bool _isLoaded = false;
   bool _isTyping = false;
   bool _isRecording = false;
   Api _api = Api();
@@ -84,10 +88,9 @@ class _ChatPageState extends State<ChatPage> {
   String _fileName;
   String _path;
   Map<String, String> _paths;
-  String _extension;
   bool _loadingPath = false;
   bool _multiPick = false;
-  FileType _pickingType = FileType.any;
+  FileType _pickingType = FileType.custom;
   bool _isSomeoneTyping = false;
   List _typingMembers = [];
   List _typingName = [];
@@ -113,6 +116,9 @@ class _ChatPageState extends State<ChatPage> {
     ChatRoom.shared.chatMembers(widget.chatID);
 
     ChatRoom.shared.checkUserOnline(widget.userIds);
+    if (widget.data != null) {
+      ChatRoom.shared.forwardMessage(widget.data, 'asd', widget.chatID);
+    }
     _listen();
   }
 
@@ -1228,17 +1234,15 @@ class _ChatPageState extends State<ChatPage> {
       if (_multiPick) {
         _path = null;
         _paths = await FilePicker.getMultiFilePath(
-            type: _pickingType,
-            allowedExtensions: (_extension?.isNotEmpty ?? false)
-                ? _extension?.replaceAll(' ', '')?.split(',')
-                : null);
+          type: _pickingType,
+          allowedExtensions: ['jpg', 'pdf', 'doc'],
+        );
       } else {
         _paths = null;
         _path = await FilePicker.getFilePath(
-            type: _pickingType,
-            allowedExtensions: (_extension?.isNotEmpty ?? false)
-                ? _extension?.replaceAll(' ', '')?.split(',')
-                : null);
+          type: _pickingType,
+          allowedExtensions: ['jpg', 'pdf', 'doc'],
+        );
 
         print(_path);
       }
@@ -1254,24 +1258,25 @@ class _ChatPageState extends State<ChatPage> {
 
       print("path name $_path");
     });
-
-    _api.uploadMedia(_path, 2).then((r) async {
-      print("RRR ${r["message"]}");
-      if (r["status"]) {
-        var a = [
-          {
-            "filename": "${r["file_name"]}",
-          }
-        ];
-        ChatRoom.shared.sendMessage('${widget.chatID}', "file",
-            type: 2,
-            fileId: r["file_id"],
-            attachments: jsonDecode(jsonEncode(a)));
-      } else {
-        _showAlertDialog(context, r["message"]);
-        print("error");
-      }
-    });
+    if ('$_path' != 'null') {
+      _api.uploadMedia(_path, 2).then((r) async {
+        print("RRR ${r["message"]}");
+        if (r["status"]) {
+          var a = [
+            {
+              "filename": "${r["file_name"]}",
+            }
+          ];
+          ChatRoom.shared.sendMessage('${widget.chatID}', "file",
+              type: 2,
+              fileId: r["file_id"],
+              attachments: jsonDecode(jsonEncode(a)));
+        } else {
+          _showAlertDialog(context, r["message"]);
+          print("error");
+        }
+      });
+    }
   }
 
   _galleryActions() {

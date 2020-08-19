@@ -17,7 +17,7 @@ class PaymentsCategoryPage extends StatefulWidget {
 class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   Api _api;
   Map<String, dynamic> _categories;
-  List services;
+  List _services;
   String _logoUrl;
   TextEditingController _searchController;
 
@@ -98,16 +98,16 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                                 padding: EdgeInsets.only(bottom: 20),
                                 shrinkWrap: true,
                                 itemCount:
-                                    services != null ? services.length : 0,
+                                    _services != null ? _services.length : 0,
                                 itemBuilder: (BuildContext context, int index) {
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 10),
                                     child: _servicesList(
                                       context,
-                                      _logoUrl + services[index]['logo'],
-                                      services[index]['title'],
-                                      services[index]['id'],
-                                      services[index]['is_convertable'],
+                                      _logoUrl + _services[index]['logo'],
+                                      _services[index]['title'],
+                                      _services[index]['id'],
+                                      _services[index]['is_convertable'],
                                     ),
                                   );
                                 },
@@ -171,7 +171,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       });
       _api.searchServices(query).then((result) {
         setState(() {
-          services = result;
+          _services = result;
         });
       });
       setState(() {

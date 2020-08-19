@@ -18,25 +18,24 @@ class RestorePasswordPage extends StatefulWidget {
 }
 
 class _RestorePasswordPageState extends State<RestorePasswordPage> {
-  var api = Api();
+  Api _api = Api();
   TextEditingController _loginController;
   TextEditingController _passwordController;
-  var countryId = 0;
-  var country;
-  var countries = List<Country>();
-  var phonePrefix = '77';
-  var smsCode = 0;
-  List<DropdownMenuItem<String>> dropDownMenuItems;
+  var _countryId = 0;
+  var _country;
+  var _countries = List<Country>();
+  var _phonePrefix = '77';
   String _currentCountry = "Казахстан";
+  var _selectedCountry;
 
   CountryDao _countryDao = CountryDao();
-  var length;
+  var _length;
   _getCountries() async {
     var list = await _countryDao.getAll();
     setState(() {
-      countries = list;
-      country = countries[countryId];
-      length = country.length;
+      _countries = list;
+      _country = _countries[_countryId];
+      _length = _country.length;
     });
   }
 
@@ -58,27 +57,28 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0.0),
-          child: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.white,
-            brightness: Brightness.light,
-          ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          brightness: Brightness.light,
         ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: introBackgroundProvider,
-                  fit: BoxFit.cover,
-                ),
+      ),
+      body: Stack(
+        children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: introBackgroundProvider,
+                fit: BoxFit.cover,
               ),
             ),
-            _buildForeground()
-          ],
-        ));
+          ),
+          _buildForeground()
+        ],
+      ),
+    );
   }
 
   Future<void> _showError(BuildContext context, m, type) {
@@ -97,10 +97,11 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                 Navigator.of(context).pop();
                 if (type == 1)
                   Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => LoginPage(),
-                      ),
-                      (r) => false);
+                    MaterialPageRoute(
+                      builder: (context) => LoginPage(),
+                    ),
+                    (r) => false,
+                  );
               },
             ),
           ],
@@ -109,18 +110,16 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
     );
   }
 
-  var _selectedCountry;
-
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Countries(countries)),
+      MaterialPageRoute(builder: (context) => Countries(_countries)),
     );
 
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        phonePrefix = _selectedCountry._phonePrefix;
+        _phonePrefix = _selectedCountry._phonePrefix;
       });
   }
 
@@ -195,7 +194,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
                               Text(
-                                '+$phonePrefix',
+                                '+$_phonePrefix',
                                 style: TextStyle(
                                     color: Colors.black, fontSize: 15),
                               ),
@@ -208,7 +207,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
                                   hoverColor: Colors.black,
-                                  prefixText: '1$phonePrefix ',
+                                  prefixText: '1$_phonePrefix ',
                                   prefixStyle:
                                       TextStyle(color: Colors.transparent),
                                 ),
@@ -231,18 +230,20 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                         borderRadius: 10.0,
                         color: primaryColor,
                         onPressed: () async {
-                          await api
+                          await _api
                               .restorePassword(
-                                  phonePrefix + _loginController.text)
-                              .then((restorePasswordResponse) async {
-                            if (restorePasswordResponse['success'] == true) {
-                              _showError(context,
-                                  restorePasswordResponse['message'], 1);
-                            } else {
-                              _showError(context,
-                                  restorePasswordResponse['message'], 0);
-                            }
-                          });
+                                  _phonePrefix + _loginController.text)
+                              .then(
+                            (restorePasswordResponse) async {
+                              if (restorePasswordResponse['success'] == true) {
+                                _showError(context,
+                                    restorePasswordResponse['message'], 1);
+                              } else {
+                                _showError(context,
+                                    restorePasswordResponse['message'], 0);
+                              }
+                            },
+                          );
                         },
                       ),
                     ),

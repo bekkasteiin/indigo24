@@ -19,29 +19,27 @@ class _LinkMessageState extends State<LinkMessage> {
     super.initState();
     data = extract(widget.url);
     // dataAsMap = data.toMap();
-    data.then((val){
+    data.then((val) {
       setState(() {
         json = val;
       });
     });
-    
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width*0.5,
+      width: MediaQuery.of(context).size.width * 0.5,
       // height: MediaQuery.of(context).size.width*0.3,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-
           Material(
             color: Colors.transparent,
             child: InkWell(
                 onTap: () async {
-                  if (await canLaunch(
-                      '${widget.url}')) {
+                  if (await canLaunch('${widget.url}')) {
                     await launch(
                       '${widget.url}',
                       forceSafariVC: false,
@@ -57,25 +55,25 @@ class _LinkMessageState extends State<LinkMessage> {
                 child: Ink(
                   child: Container(
                     child: Text("${widget.url}",
-                        style: TextStyle(color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                        decoration: TextDecoration.underline,
-                        )
-                    ),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400,
+                          decoration: TextDecoration.underline,
+                        )),
                   ),
                 )),
           ),
-
-          json != null?
-          Text(json.title != null?json.title:"", style: TextStyle(fontWeight: FontWeight.bold))
-          :
-          Container()
-          ,
-          json != null?
-          Text(json.description != null?json.description:"", style: TextStyle(fontWeight: FontWeight.normal), maxLines: 4,)
-          :
-          Container()
-          ,
+          json != null
+              ? Text(json.title != null ? json.title : "",
+                  style: TextStyle(fontWeight: FontWeight.bold))
+              : Container(),
+          json != null
+              ? Text(
+                  json.description != null ? json.description : "",
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                  maxLines: 4,
+                )
+              : Container(),
         ],
       ),
     );

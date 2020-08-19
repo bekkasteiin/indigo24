@@ -188,24 +188,31 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
     return Material(
       child: InkWell(
         onTap: () {
-          Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SettingsDecorPage()))
-              .whenComplete(() => setState(() {}));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SettingsDecorPage(),
+            ),
+          ).whenComplete(
+            () => setState(() {}),
+          );
         },
         child: Container(
           padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
           height: 60,
           child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '${localization.decor}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: blackPurpleColor),
-                ),
-                Row(mainAxisSize: MainAxisSize.min, children: [
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                '${localization.decor}',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: blackPurpleColor),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Container(
                     margin: EdgeInsets.only(right: 15),
                     child: Image(
@@ -216,8 +223,10 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       height: 15,
                     ),
                   ),
-                ])
-              ]),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -228,25 +237,32 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
       child: InkWell(
         onTap: () {
           Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SettingsLanguagePage()))
-              .whenComplete(() => setState(() {}));
+            context,
+            MaterialPageRoute(
+              builder: (context) => SettingsLanguagePage(),
+            ),
+          ).whenComplete(
+            () => setState(
+              () {},
+            ),
+          );
         },
         child: Container(
           padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
           height: 60,
           child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '${localization.language}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: blackPurpleColor),
-                ),
-                Row(mainAxisSize: MainAxisSize.min, children: [
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                '${localization.language}',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: blackPurpleColor),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Text(
                     '${localization.currentLanguage}',
                     style: TextStyle(
@@ -264,8 +280,10 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       height: 15,
                     ),
                   ),
-                ])
-              ]),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -275,24 +293,33 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
     return Material(
       child: InkWell(
         onTap: () {
-          Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SettingsTermsPage()))
-              .whenComplete(() => setState(() {}));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SettingsTermsPage(),
+            ),
+          ).whenComplete(
+            () => setState(
+              () {},
+            ),
+          );
         },
         child: Container(
           padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
           height: 60,
           child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '${localization.terms}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: blackPurpleColor),
-                ),
-                Row(mainAxisSize: MainAxisSize.min, children: [
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                '${localization.terms}',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: blackPurpleColor),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Container(
                     margin: EdgeInsets.only(right: 15),
                     child: Image(
@@ -303,8 +330,10 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       height: 15,
                     ),
                   ),
-                ])
-              ]),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -335,16 +364,18 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
           padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
           height: 60,
           child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '${localization.notifications}',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: blackPurpleColor),
-                ),
-                Row(mainAxisSize: MainAxisSize.min, children: [
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                '${localization.notifications}',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: blackPurpleColor),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Container(
                     margin: EdgeInsets.only(right: 15),
                     child: Image(
@@ -355,8 +386,10 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       height: 15,
                     ),
                   ),
-                ])
-              ]),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

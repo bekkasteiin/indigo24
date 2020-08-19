@@ -12,14 +12,14 @@ class AspectRatioVideo extends StatefulWidget {
 
 class AspectRatioVideoState extends State<AspectRatioVideo> {
   VideoPlayerController get controller => widget.controller;
-  bool initialized = false;
+  bool _initialized = false;
 
   void _onVideoControllerUpdate() {
     if (!mounted) {
       return;
     }
-    if (initialized != controller.value.initialized) {
-      initialized = controller.value.initialized;
+    if (_initialized != controller.value.initialized) {
+      _initialized = controller.value.initialized;
       setState(() {});
     }
   }
@@ -40,7 +40,7 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
 
   @override
   Widget build(BuildContext context) {
-    if (initialized) {
+    if (_initialized) {
       return Center(
         child: AspectRatio(
           aspectRatio: controller.value?.aspectRatio,

@@ -37,17 +37,34 @@ double _amount = double.parse(user.balance);
 class _WalletTabState extends State<WalletTab> {
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
-  bool needToPreloade = false;
+
+  bool _needToPreloade = false;
+  bool _withPin;
+
+  double _blockedAmount = 0;
+  double _realAmount = 0;
+  double _globalCoef = 1;
+  double _tengeCoef = 1;
+  double _euroCoef = 1;
+  double _rubleCoef = 1;
+  double _dollarCoef = 1;
+
+  String _symbol;
+  String _tengeSymbol = '₸';
+  String _tempPasscode = '';
+
+  Api _api = Api();
+
   @override
   void initState() {
-    api.getBalance();
+    _api.getBalance();
     if ('${user.pin}'.toString() == 'false') {
-      withPin = false;
+      _withPin = false;
     }
     Timer.run(() {
-      withPin == false
+      _withPin == false
           ? _showLockScreen(context, '${localization.createPin}',
-              withPin: withPin,
+              withPin: _withPin,
               opaque: false,
               cancelButton: Text('${localization.cancel}',
                   style: const TextStyle(fontSize: 16, color: blackPurpleColor),
@@ -62,7 +79,7 @@ class _WalletTabState extends State<WalletTab> {
     _symbol = '₸';
     _realAmount = double.parse(user.balance);
     _blockedAmount = double.parse(user.balanceInBlock);
-    api.getExchangeRate().then((v) {
+    _api.getExchangeRate().then((v) {
       if (v['message'] == 'Not authenticated' &&
           v['success'].toString() == 'false') {
         logOut(context);
@@ -80,25 +97,11 @@ class _WalletTabState extends State<WalletTab> {
 
   @override
   void dispose() {
-    api.getBalance();
+    _api.getBalance();
     _verificationNotifier.close();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.dispose();
   }
-
-  bool isAuthenticated = false;
-
-  double _blockedAmount = 0;
-  String _symbol;
-  String _tengeSymbol = '₸';
-  static double _realAmount = 0;
-  double _globalCoef = 1;
-  double _tengeCoef = 1;
-  double _euroCoef = 1;
-  double _rubleCoef = 1;
-  double _dollarCoef = 1;
-  var withPin;
-  var api = Api();
 
   _showLockScreen(BuildContext context, String title,
       {bool withPin,
@@ -130,15 +133,14 @@ class _WalletTabState extends State<WalletTab> {
         ));
   }
 
-  String temp = '';
-
   _onPasscodeEntered(String enteredPasscode) {
-    if (user.pin == 'waiting' && temp == enteredPasscode) {
+    if (user.pin == 'waiting' && _tempPasscode == enteredPasscode) {
       print('creating');
-      api.createPin(enteredPasscode);
+      _api.createPin(enteredPasscode);
       Navigator.pop(context);
     }
-    if ('${user.pin}'.toString() == 'waiting' && temp != enteredPasscode) {
+    if ('${user.pin}'.toString() == 'waiting' &&
+        _tempPasscode != enteredPasscode) {
       return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -159,8 +161,8 @@ class _WalletTabState extends State<WalletTab> {
     }
     if ('${user.pin}' == 'false') {
       user.pin = 'waiting';
-      temp = enteredPasscode;
-      print('first set pin $temp');
+      _tempPasscode = enteredPasscode;
+      print('first set pin $_tempPasscode');
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
@@ -168,9 +170,6 @@ class _WalletTabState extends State<WalletTab> {
       Future.delayed(const Duration(milliseconds: 250), () {
         print(' is really valid ');
         _verificationNotifier.add(isValid);
-        setState(() {
-          this.isAuthenticated = isValid;
-        });
         Navigator.pop(context);
       });
     } else {
@@ -250,11 +249,11 @@ class _WalletTabState extends State<WalletTab> {
                                     ),
                                     onTap: () async {
                                       setState(() {
-                                        needToPreloade = true;
+                                        _needToPreloade = true;
                                       });
-                                      await api.getBalance().then((result) {
+                                      await _api.getBalance().then((result) {
                                         setState(() {
-                                          needToPreloade = false;
+                                          _needToPreloade = false;
                                         });
                                       });
                                       setState(() {
@@ -301,7 +300,7 @@ class _WalletTabState extends State<WalletTab> {
                                   SizedBox(height: 20),
                                   _transfer(size),
                                   SizedBox(height: 20),
-                                  historyBalance(size),
+                                  _historyBalance(size),
                                   SizedBox(height: 20),
                                 ],
                               ),
@@ -314,7 +313,7 @@ class _WalletTabState extends State<WalletTab> {
                 ),
               ),
             ),
-            needToPreloade
+            _needToPreloade
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
@@ -352,7 +351,7 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
-  Container historyBalance(Size size) {
+  Container _historyBalance(Size size) {
     return Container(
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(
@@ -367,11 +366,12 @@ class _WalletTabState extends State<WalletTab> {
         child: RaisedButton(
           onPressed: () {
             Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => BalanceHistoryPage()))
-                .whenComplete(() async {
-              await api.getBalance();
+              context,
+              MaterialPageRoute(
+                builder: (context) => BalanceHistoryPage(),
+              ),
+            ).whenComplete(() async {
+              await _api.getBalance();
               setState(() {
                 // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
@@ -425,7 +425,7 @@ class _WalletTabState extends State<WalletTab> {
             Navigator.push(context,
                     MaterialPageRoute(builder: (context) => TransferListPage()))
                 .whenComplete(() async {
-              await api.getBalance();
+              await _api.getBalance();
               setState(() {
                 // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
@@ -475,11 +475,12 @@ class _WalletTabState extends State<WalletTab> {
         child: RaisedButton(
           onPressed: () {
             Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PaymentsCategoryPage()))
-                .whenComplete(() async {
-              await api.getBalance();
+              context,
+              MaterialPageRoute(
+                builder: (context) => PaymentsCategoryPage(),
+              ),
+            ).whenComplete(() async {
+              await _api.getBalance();
               setState(() {
                 // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
@@ -647,7 +648,7 @@ class _WalletTabState extends State<WalletTab> {
                 Navigator.push(context,
                         MaterialPageRoute(builder: (context) => RefillPage()))
                     .whenComplete(() async {
-                  await api.getBalance();
+                  await _api.getBalance();
                   setState(() {
                     // _amount = double.parse(user.balance);
                     _realAmount = double.parse(user.balance);
@@ -686,10 +687,12 @@ class _WalletTabState extends State<WalletTab> {
             child: RaisedButton(
               onPressed: () {
                 print('вывести is pressed');
-                Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => WithdrawListPage()))
+                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => WithdrawListPage()))
                     .whenComplete(() async {
-                  await api.getBalance();
+                  await _api.getBalance();
                   setState(() {
                     // _amount = double.parse(user.balance);
                     _realAmount = double.parse(user.balance);

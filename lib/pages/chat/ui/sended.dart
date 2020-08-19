@@ -21,108 +21,134 @@ class Sended extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var a = (m['attachments'] == false || m['attachments'] == null)
+    var a = (m['attachments'] == false ||
+            m['attachments'] == null ||
+            m['attachments'] == '')
         ? false
         : jsonDecode(m['attachments']);
     var replyData = (m['reply_data'] == false || m['reply_data'] == null)
         ? false
         : m['reply_data'];
+
+    var forwarData =
+        ('${m['forward_data']}' == 'false' || '${m['forward_data']}' == 'null')
+            ? false
+            : jsonDecode(m['forward_data']);
     return Align(
-        alignment: Alignment(1, 0),
-        child: Container(
-          child: CupertinoContextMenu(
-            actions: [
-              CupertinoContextMenuAction(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${localization.delete}',
-                      style: TextStyle(color: redColor, fontSize: 14),
-                    ),
-                    Icon(CupertinoIcons.delete, color: redColor, size: 20)
-                  ],
-                ),
-                onPressed: () {
-                  ChatRoom.shared.deleteFromAll(
-                      chatId, m['id'] == null ? m['message_id'] : m['id']);
-                  Navigator.pop(context);
-                },
-              ),
-              CupertinoContextMenuAction(
-                child: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${localization.edit}',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      Icon(
-                        CupertinoIcons.pen,
-                        size: 20,
-                      )
-                    ],
+      alignment: Alignment(1, 0),
+      child: Container(
+        child: CupertinoContextMenu(
+          actions: [
+            CupertinoContextMenuAction(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '${localization.delete}',
+                    style: TextStyle(color: redColor, fontSize: 14),
                   ),
-                ),
-                onPressed: () {
-                  ChatRoom.shared.editingMessage(m);
-                  Navigator.pop(context);
-                },
+                  Icon(CupertinoIcons.delete, color: redColor, size: 20)
+                ],
               ),
-              CupertinoContextMenuAction(
+              onPressed: () {
+                ChatRoom.shared.deleteFromAll(
+                    chatId, m['id'] == null ? m['message_id'] : m['id']);
+                Navigator.pop(context);
+              },
+            ),
+            CupertinoContextMenuAction(
+              child: Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      '${localization.reply}',
+                      '${localization.edit}',
                       style: TextStyle(fontSize: 14),
                     ),
-                    Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                    Icon(
+                      CupertinoIcons.pen,
+                      size: 20,
+                    )
                   ],
                 ),
-                onPressed: () {
-                  ChatRoom.shared.replyingMessage(m);
-                  Navigator.pop(context);
-                },
               ),
-            ],
-            child: Material(
-              color: Colors.transparent,
-              child: SendedMessageWidget(
-                  content: '${m['text']}',
-                  time: _time('${m['time']}'),
-                  write: '${m['write']}',
-                  type: "${m["type"]}",
-                  media: (a == false || a == null)
-                      ? null
-                      : "${m["type"]}" == '12'
-                          ? a[0]['link']
-                          : a[0]['filename'],
-                  rMedia: (a == false || a == null)
-                      ? null
-                      : a[0]['r_filename'] == null
-                          ? a[0]['filename']
-                          : a[0]['r_filename'],
-                  mediaUrl:
-                      (a == false || a == null) ? null : m['attachment_url'],
-                  edit: "${m["edit"]}",
-                  anotherUser: "${m["type"]}" == '11'
-                      ? jsonDecode(jsonEncode({
+              onPressed: () {
+                ChatRoom.shared.editingMessage(m);
+                Navigator.pop(context);
+              },
+            ),
+            CupertinoContextMenuAction(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('${localization.forward}',
+                      style: TextStyle(fontSize: 14)),
+                  Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                ],
+              ),
+              onPressed: () {
+                // ChatRoom.shared.replyingMessage(m);
+                Navigator.pop(context);
+                Navigator.pop(context, m);
+              },
+            ),
+            CupertinoContextMenuAction(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '${localization.reply}',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                ],
+              ),
+              onPressed: () {
+                ChatRoom.shared.replyingMessage(m);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+          child: Material(
+            color: Colors.transparent,
+            child: SendedMessageWidget(
+              content: '${m['text']}',
+              time: _time('${m['time']}'),
+              write: '${m['write']}',
+              type: "${m["type"]}",
+              media: (a == false || a == null)
+                  ? null
+                  : "${m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
+              rMedia: (a == false || a == null)
+                  ? null
+                  : a[0]['r_filename'] == null
+                      ? a[0]['filename']
+                      : a[0]['r_filename'],
+              mediaUrl: (a == false || a == null) ? null : m['attachment_url'],
+              edit: "${m["edit"]}",
+              anotherUser: "${m["type"]}" == '11'
+                  ? jsonDecode(
+                      jsonEncode(
+                        {
                           "id": "${m["another_user_id"]}",
                           "avatar": "${m["another_user_avatar"]}",
                           "name": "${m["another_user_name"]}"
-                        }))
-                      : null,
-                  replyData: (replyData == false || replyData == null)
-                      ? null
-                      : replyData),
+                        },
+                      ),
+                    )
+                  : null,
+              replyData:
+                  (replyData == false || replyData == null) ? null : replyData,
+              forwardData: forwarData,
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   String _time(timestamp) {
@@ -155,20 +181,22 @@ class SendedMessageWidget extends StatelessWidget {
   final String edit;
   final anotherUser;
   final replyData;
+  final forwardData;
 
-  const SendedMessageWidget(
-      {Key key,
-      this.content,
-      this.time,
-      this.write,
-      this.media,
-      this.mediaUrl,
-      this.rMedia,
-      this.type,
-      this.edit,
-      this.anotherUser,
-      this.replyData})
-      : super(key: key);
+  const SendedMessageWidget({
+    Key key,
+    this.content,
+    this.time,
+    this.write,
+    this.media,
+    this.mediaUrl,
+    this.rMedia,
+    this.type,
+    this.edit,
+    this.anotherUser,
+    this.replyData,
+    this.forwardData,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -204,140 +232,165 @@ class SendedMessageWidget extends StatelessWidget {
                     top: (type == "3") ? 2 : 8.0,
                     bottom: (type == "3") ? 1.0 : 15.0,
                   ),
-                  child: (type == "12")
-                      ? LinkMessage("$media")
-                      : (a[0] == ":" && a[l] == ":" && content.length < 9)
-                          ? Text(content, style: TextStyle(fontSize: 40))
-                          : (a[0] == ":" && a[l] == ":" && content.length > 8)
-                              ? Text(content, style: TextStyle(fontSize: 24))
-                              : (type == "1")
-                                  ? (() {
-                                      listMessages.forEach((element) {
-                                        if (element['type'].toString() == '1') {
-                                          imageCount.add(element);
-                                          test = element;
-                                        }
-                                      });
-                                      return ImageMessage(
-                                        "$mediaUrl$rMedia",
-                                        "$mediaUrl$media",
-                                        content: content,
-                                        imageCount: imageCount.indexOf(test),
-                                      );
-                                    }())
-                                  : (type == "2")
-                                      ? Container(
-                                          color: Colors.pinkAccent
-                                              .withOpacity(0.2),
-                                          padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            '${localization.document} ${localization.error}',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        )
-                                      // TODO FIX FILES
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      '$forwardData' != 'null' && '$forwardData' != 'false'
+                          ? Text(
+                              '${localization.forwardFrom} ${forwardData['chat_name']}')
+                          : SizedBox(
+                              height: 0,
+                              width: 0,
+                            ),
+                      (type == "12")
+                          ? LinkMessage("$media")
+                          : (a[0] == ":" && a[l] == ":" && content.length < 9)
+                              ? Text(content, style: TextStyle(fontSize: 40))
+                              : (a[0] == ":" &&
+                                      a[l] == ":" &&
+                                      content.length > 8)
+                                  ? Text(content,
+                                      style: TextStyle(fontSize: 24))
+                                  : (type == "1")
+                                      ? (() {
+                                          listMessages.forEach((element) {
+                                            if (element['type'].toString() ==
+                                                '1') {
+                                              imageCount.add(element);
+                                              test = element;
+                                            }
+                                          });
+                                          return ImageMessage(
+                                            "$mediaUrl$rMedia",
+                                            "$mediaUrl$media",
+                                            content: content,
+                                            imageCount:
+                                                imageCount.indexOf(test),
+                                          );
+                                        }())
+                                      : (type == "2")
+                                          ? Container(
+                                              color: Colors.pinkAccent
+                                                  .withOpacity(0.2),
+                                              padding: EdgeInsets.all(5),
+                                              child: Text(
+                                                '${localization.document} ${localization.error}',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            )
+                                          // TODO FIX FILES
 
-                                      //  FileMessage(
-                                      //     url: "$mediaUrl/$media",
-                                      //     key: Key("$mediaUrl/$media"),
-                                      //   )
-                                      : (type == "3")
-                                          ? AudioMessage("$mediaUrl$media")
-                                          : (type == "4")
-                                              ? Container(
-                                                  child: VideoPlayerWidget(
-                                                      "$mediaUrl$media",
-                                                      "network"),
-                                                )
-                                              : (type == "10")
-                                                  ? ReplyMessage(
-                                                      content, replyData)
-                                                  : type == '11'
-                                                      ? Container(
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Row(
+                                          //  FileMessage(
+                                          //     url: "$mediaUrl/$media",
+                                          //     key: Key("$mediaUrl/$media"),
+                                          //   )
+                                          : (type == "3")
+                                              ? AudioMessage("$mediaUrl$media")
+                                              : (type == "4")
+                                                  ? Container(
+                                                      child: VideoPlayerWidget(
+                                                          "$mediaUrl$media",
+                                                          "network"),
+                                                    )
+                                                  : (type == "10")
+                                                      ? ReplyMessage(
+                                                          content, replyData)
+                                                      : type == '11'
+                                                          ? Container(
+                                                              child: Column(
                                                                 mainAxisSize:
                                                                     MainAxisSize
                                                                         .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
                                                                         .start,
                                                                 children: [
-                                                                  Container(
-                                                                      width:
-                                                                          30.0,
-                                                                      height:
-                                                                          30.0,
-                                                                      decoration: BoxDecoration(
-                                                                          shape: BoxShape
-                                                                              .circle,
-                                                                          image: DecorationImage(
-                                                                              fit: BoxFit.fill,
-                                                                              image: NetworkImage("$avatarUrl${anotherUser["avatar"].toString().replaceAll('AxB', '200x200')}")))),
+                                                                  Row(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Container(
+                                                                        width:
+                                                                            30.0,
+                                                                        height:
+                                                                            30.0,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          shape:
+                                                                              BoxShape.circle,
+                                                                          image:
+                                                                              DecorationImage(
+                                                                            fit:
+                                                                                BoxFit.fill,
+                                                                            image:
+                                                                                NetworkImage(
+                                                                              "$avatarUrl${anotherUser["avatar"].toString().replaceAll('AxB', '200x200')}",
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                          width:
+                                                                              5),
+                                                                      Flexible(
+                                                                        child:
+                                                                            Text(
+                                                                          "${anotherUser["name"]}",
+                                                                          maxLines:
+                                                                              1,
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                          style: TextStyle(
+                                                                              fontWeight: FontWeight.w600,
+                                                                              color: whiteColor),
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  ),
                                                                   SizedBox(
-                                                                      width: 5),
+                                                                      height:
+                                                                          5),
                                                                   Flexible(
                                                                     child: Text(
-                                                                      "${anotherUser["name"]}",
+                                                                      '-$content KZT',
                                                                       maxLines:
                                                                           1,
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis,
-                                                                      style: TextStyle(
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          color:
-                                                                              whiteColor),
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
                                                                     ),
                                                                   )
                                                                 ],
                                                               ),
-                                                              SizedBox(
-                                                                  height: 5),
-                                                              Flexible(
-                                                                child: Text(
-                                                                  '-$content KZT',
-                                                                  maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                        )
-                                                      : (type == "uploading")
-                                                          ? Container(
-                                                              width: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width *
-                                                                  0.7,
-                                                              height: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width *
-                                                                  0.7,
-                                                              child:
-                                                                  uploadingImage !=
+                                                            )
+                                                          : (type ==
+                                                                  "uploading")
+                                                              ? Container(
+                                                                  width: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.7,
+                                                                  height: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.7,
+                                                                  child: uploadingImage !=
                                                                           null
                                                                       ? Stack(
                                                                           children: [
@@ -358,10 +411,12 @@ class SendedMessageWidget extends StatelessWidget {
                                                                           ],
                                                                         )
                                                                       : Center(),
-                                                            )
-                                                          : SelectableText(
-                                                              content,
-                                                            ),
+                                                                )
+                                                              : SelectableText(
+                                                                  content,
+                                                                ),
+                    ],
+                  ),
                 ),
                 Positioned(
                   bottom: -1,

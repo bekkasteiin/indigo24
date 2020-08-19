@@ -52,7 +52,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
   void dispose() {
     super.dispose();
     ChatRoom.shared.contactController.close();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    _searchController.dispose();
   }
 
   _listen() {

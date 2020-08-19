@@ -27,49 +27,51 @@ class TapesPage extends StatefulWidget {
 class _TapesPageState extends State<TapesPage>
     with AutomaticKeepAliveClientMixin {
   Future<int> _listFuture;
-  bool isLoaded = false;
-  var api = Api();
-  List result;
-  int tapePage = 1;
-  FlickMultiManager flickMultiManager;
+  Api _api = Api();
+  List _result;
+  int _tapePage = 1;
+  FlickMultiManager _flickMultiManager;
 
+  TapeDB _tapeDb = TapeDB();
   VideoPlayerController _videoPlayerController;
   ChewieController _chewieController;
+  var _tapesDatabaseData = [];
 
-  getTapeFromDb() async {
-    tapesDatabaseData = await tapeDb.getAll();
+  var _likeResult;
+
+  _getTapeFromDb() async {
+    _tapesDatabaseData = await _tapeDb.getAll();
   }
 
   @override
   void initState() {
     print("tapes init state");
-    getTapeFromDb();
-    getTapes();
+    _getTapeFromDb();
+    _getTapes();
     super.initState();
   }
 
-  rebuildTape() {
+  _rebuildTape() {
     setState(() {
-      flickMultiManager = FlickMultiManager();
+      _flickMultiManager = FlickMultiManager();
     });
 
-    api.getTapes('1').then((tapes) {
+    _api.getTapes('1').then((tapes) {
       if (tapes['message'] == 'Not authenticated' &&
           tapes['success'].toString() == 'false') {
         logOut(context);
         return true;
       } else {
-        return rebuild(tapes);
+        return _rebuild(tapes);
       }
     });
   }
 
-  var tapesDatabaseData = [];
-  getTapes() {
+  _getTapes() {
     setState(() {
-      flickMultiManager = FlickMultiManager();
+      _flickMultiManager = FlickMultiManager();
     });
-    api.getTapes('$tapePage').then((tapes) async {
+    _api.getTapes('$_tapePage').then((tapes) async {
       if (tapes['message'] == 'Not authenticated' &&
           tapes['success'].toString() == 'false') {
         logOut(context);
@@ -77,25 +79,24 @@ class _TapesPageState extends State<TapesPage>
       } else {
         // print(tapeDb.getAll());
         // print(tapeDb.getAll());
-        return setTapes(tapes);
+        return _setTapes(tapes);
       }
     });
   }
 
-  Future addTapes(tapes) async {
+  Future _addTapes(tapes) async {
     setState(() {
       var r = tapes["result"].toList();
-      result.addAll(r);
-      isLoaded = false;
+      _result.addAll(r);
     });
   }
 
-  Future rebuild(tapes) async {
+  Future _rebuild(tapes) async {
     setState(() {
-      tapePage = 2;
-      result = tapes["result"].toList();
+      _tapePage = 2;
+      _result = tapes["result"].toList();
       _listFuture = Future(foo);
-      result.forEach((el) async {
+      _result.forEach((el) async {
         if (el['myLike'] == true) {
           _saved.add(el['id']);
         }
@@ -103,12 +104,12 @@ class _TapesPageState extends State<TapesPage>
     });
   }
 
-  Future setTapes(tapes) async {
-    if (tapePage == 1)
+  Future _setTapes(tapes) async {
+    if (_tapePage == 1)
       setState(() {
-        result = tapes["result"].toList();
+        _result = tapes["result"].toList();
         _listFuture = Future(foo);
-        result.forEach((el) async {
+        _result.forEach((el) async {
           if (el['myLike'] == true) {
             _saved.add(el['id']);
           }
@@ -116,8 +117,8 @@ class _TapesPageState extends State<TapesPage>
       });
     else
       setState(() {
-        result.addAll(tapes["result"].toList());
-        result.forEach((el) async {
+        _result.addAll(tapes["result"].toList());
+        _result.forEach((el) async {
           if (el['myLike'] == true) {
             _saved.add(el['id']);
           }
@@ -126,19 +127,15 @@ class _TapesPageState extends State<TapesPage>
   }
 
   void _onLoading() async {
-    tapePage++;
-    getTapes();
+    _tapePage++;
+    _getTapes();
     // if(mounted)
     _refreshController.loadComplete();
   }
 
-  TapeDB tapeDb = TapeDB();
   int foo() {
     return 1;
   }
-
-  var likeResult;
-  var commentResult;
 
   @override
   void dispose() {
@@ -147,13 +144,13 @@ class _TapesPageState extends State<TapesPage>
     _videoPlayerController.dispose();
     _chewieController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
-    flickMultiManager.dispose();
+    _flickMultiManager.dispose();
   }
 
   final Set _saved = Set();
 
   void _onRefresh() {
-    rebuildTape();
+    _rebuildTape();
     _refreshController.refreshCompleted();
   }
 
@@ -183,7 +180,7 @@ class _TapesPageState extends State<TapesPage>
     );
   }
 
-  moreActions({dynamic data}) {
+  _moreActions({dynamic data}) {
     final act = CupertinoActionSheet(
         title: Text('${localization.selectOption}'),
         // message: Text('Which option?'),
@@ -204,13 +201,13 @@ class _TapesPageState extends State<TapesPage>
                 id: data['id'],
               );
 
-              await tapeDb.updateOrInsert(tape);
+              await _tapeDb.updateOrInsert(tape);
 
-              tapesDatabaseData = await tapeDb.getAll();
+              _tapesDatabaseData = await _tapeDb.getAll();
               setState(() {
-                tapesDatabaseData = tapesDatabaseData;
+                _tapesDatabaseData = _tapesDatabaseData;
               });
-              print('$data' '$tapesDatabaseData');
+              print('$data' '$_tapesDatabaseData');
               showAlertDialog(context, "${data['title']} ${localization.hide}");
             },
           ),
@@ -224,14 +221,14 @@ class _TapesPageState extends State<TapesPage>
                 isBlocked: true,
               );
 
-              await tapeDb.updateOrInsert(tape);
-              api.blockUser(data[
+              await _tapeDb.updateOrInsert(tape);
+              _api.blockUser(data[
                   'customerId']); // TODO CHECK IT WHEN BACKEND FIXES REQUEST
-              tapesDatabaseData = await tapeDb.getAll();
+              _tapesDatabaseData = await _tapeDb.getAll();
               setState(() {
-                tapesDatabaseData = tapesDatabaseData;
+                _tapesDatabaseData = _tapesDatabaseData;
               });
-              print('$data' '$tapesDatabaseData');
+              print('$data' '$_tapesDatabaseData');
               showAlertDialog(
                   context, "${data['title']} ${localization.block}");
             },
@@ -289,10 +286,10 @@ class _TapesPageState extends State<TapesPage>
                 if (response != null) {
                   print("RESULT $response");
                   setState(() {
-                    result.insert(0, response);
-                    flickMultiManager = new FlickMultiManager();
+                    _result.insert(0, response);
+                    _flickMultiManager = new FlickMultiManager();
                   });
-                  print("Result index 0: ${result[0]}");
+                  print("Result index 0: ${_result[0]}");
                 }
               },
             )
@@ -327,18 +324,18 @@ class _TapesPageState extends State<TapesPage>
                         height: 0,
                       ),
                       reverse: false,
-                      itemCount: result.length,
+                      itemCount: _result.length,
                       itemBuilder: (BuildContext context, int index) {
                         bool needToHide = false;
                         bool needToBlock = false;
-                        tapesDatabaseData.forEach((element) {
+                        _tapesDatabaseData.forEach((element) {
                           // print('${element.toJson()['isBlocked']} ${element.toJson()['id']} ${result[index]['id']}');
                           if ('${element.toJson()['id']}' ==
-                              '${result[index]['id']}') {
+                              '${_result[index]['id']}') {
                             needToHide = true;
                           }
                           if ('${element.toJson()['id']}' ==
-                                  '${result[index]['id']}' &&
+                                  '${_result[index]['id']}' &&
                               '${element.toJson()['isBlocked']}' == 'true') {
                             needToHide = false;
                             needToBlock = true;
@@ -358,12 +355,12 @@ class _TapesPageState extends State<TapesPage>
                         return needToHide
                             ? Container()
                             : VisibilityDetector(
-                                key: ObjectKey(flickMultiManager),
+                                key: ObjectKey(_flickMultiManager),
                                 onVisibilityChanged: (visibility) {
                                   if (visibility.visibleFraction == 0 &&
                                       this.mounted) {
                                     print("Tapes disposed");
-                                    flickMultiManager.pause();
+                                    _flickMultiManager.pause();
                                   }
                                 },
                                 child: Container(
@@ -372,7 +369,7 @@ class _TapesPageState extends State<TapesPage>
                                       Container(
                                         child: Container(
                                           color: milkWhiteColor,
-                                          padding: const EdgeInsets.only(
+                                          padding: EdgeInsets.only(
                                             top: 10,
                                           ),
                                           child: Column(
@@ -380,8 +377,8 @@ class _TapesPageState extends State<TapesPage>
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10.0),
+                                                padding:
+                                                    EdgeInsets.only(left: 10.0),
                                                 child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -406,7 +403,7 @@ class _TapesPageState extends State<TapesPage>
                                                                   ? '${avatarUrl}noAvatar.png'
                                                                   : needToBlock
                                                                       ? '${avatarUrl}noAvatar.png'
-                                                                      : '$avatarUrl${result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                                                                      : '$avatarUrl${_result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
                                                               width: 35,
                                                               height: 35,
                                                             ),
@@ -425,10 +422,10 @@ class _TapesPageState extends State<TapesPage>
                                                                               10.0),
                                                                   child: Text(
                                                                     needToHide
-                                                                        ? 'Hided content by ${result[index]['name']}'
+                                                                        ? 'Hided content by ${_result[index]['name']}'
                                                                         : needToBlock
-                                                                            ? 'Blocked content by ${result[index]['name']}'
-                                                                            : '${result[index]['name']}',
+                                                                            ? 'Blocked content by ${_result[index]['name']}'
+                                                                            : '${_result[index]['name']}',
                                                                     maxLines: 1,
                                                                     overflow:
                                                                         TextOverflow
@@ -447,7 +444,7 @@ class _TapesPageState extends State<TapesPage>
                                                                                 EdgeInsets.only(left: 10.0),
                                                                             child:
                                                                                 Text(
-                                                                              '${result[index]['title']}',
+                                                                              '${_result[index]['title']}',
                                                                               maxLines: 1,
                                                                               overflow: TextOverflow.ellipsis,
                                                                             ),
@@ -466,8 +463,8 @@ class _TapesPageState extends State<TapesPage>
                                                                 icon: Icon(Icons
                                                                     .more_vert),
                                                                 onPressed: () {
-                                                                  moreActions(
-                                                                      data: result[
+                                                                  _moreActions(
+                                                                      data: _result[
                                                                           index]);
                                                                 },
                                                               )
@@ -484,21 +481,21 @@ class _TapesPageState extends State<TapesPage>
                                                       : GestureDetector(
                                                           onDoubleTap:
                                                               () async {
-                                                            await api
+                                                            await _api
                                                                 .likeTape(
-                                                                    '${result[index]['id']}')
+                                                                    '${_result[index]['id']}')
                                                                 .then((value) {
-                                                              likeResult =
+                                                              _likeResult =
                                                                   value;
                                                             });
                                                             setState(() {
-                                                              if (likeResult[
+                                                              if (_likeResult[
                                                                       'result']
                                                                   ['myLike']) {
                                                                 _saved.add(
-                                                                    result[index]
+                                                                    _result[index]
                                                                         ['id']);
-                                                                result[index][
+                                                                _result[index][
                                                                     'likesCount'] += 1;
                                                                 final snackBar =
                                                                     SnackBar(
@@ -509,7 +506,7 @@ class _TapesPageState extends State<TapesPage>
                                                                           seconds:
                                                                               2),
                                                                   content: Text(
-                                                                    'Вы лайнули пост ${result[index]['title']} от ${result[index]['name']}',
+                                                                    'Вы лайнули пост ${_result[index]['title']} от ${_result[index]['name']}',
                                                                     style: TextStyle(
                                                                         color: Colors
                                                                             .white,
@@ -526,9 +523,9 @@ class _TapesPageState extends State<TapesPage>
                                                                         snackBar);
                                                               } else {
                                                                 _saved.remove(
-                                                                    result[index]
+                                                                    _result[index]
                                                                         ['id']);
-                                                                result[index][
+                                                                _result[index][
                                                                     'likesCount'] -= 1;
                                                               }
                                                             });
@@ -540,26 +537,26 @@ class _TapesPageState extends State<TapesPage>
                                                                     .size
                                                                     .width,
                                                             child: Center(
-                                                              child: (result[index]['media'].toString().endsWith("MOV") ||
-                                                                      result[index]
+                                                              child: (_result[index]['media'].toString().endsWith("MOV") ||
+                                                                      _result[index]
                                                                               [
                                                                               'media']
                                                                           .toString()
                                                                           .endsWith(
                                                                               "mov") ||
-                                                                      result[index]
+                                                                      _result[index]
                                                                               [
                                                                               'media']
                                                                           .toString()
                                                                           .endsWith(
                                                                               "mp4") ||
-                                                                      result[index]
+                                                                      _result[index]
                                                                               [
                                                                               'media']
                                                                           .toString()
                                                                           .endsWith(
                                                                               "mpeg") ||
-                                                                      result[index]
+                                                                      _result[index]
                                                                               [
                                                                               'media']
                                                                           .toString()
@@ -567,12 +564,12 @@ class _TapesPageState extends State<TapesPage>
                                                                               "avi"))
                                                                   ? new FlickMultiPlayer(
                                                                       url:
-                                                                          "$uploadTapes${result[index]['media']}",
+                                                                          "$uploadTapes${_result[index]['media']}",
                                                                       flickMultiManager:
-                                                                          flickMultiManager,
-                                                                      image: result[index]['frame'] !=
+                                                                          _flickMultiManager,
+                                                                      image: _result[index]['frame'] !=
                                                                               null
-                                                                          ? result[index]
+                                                                          ? _result[index]
                                                                               [
                                                                               'frame']
                                                                           : 'assets/preloader.gif',
@@ -594,7 +591,7 @@ class _TapesPageState extends State<TapesPage>
                                                                             PhotoView(
                                                                           imageProvider:
                                                                               CachedNetworkImageProvider(
-                                                                            '$uploadTapes${result[index]['media']}',
+                                                                            '$uploadTapes${_result[index]['media']}',
                                                                           ),
                                                                           backgroundDecoration:
                                                                               BoxDecoration(color: Colors.transparent),
@@ -631,7 +628,7 @@ class _TapesPageState extends State<TapesPage>
                                                                 child: Image(
                                                                   image:
                                                                       AssetImage(
-                                                                    _saved.contains(result[index]
+                                                                    _saved.contains(_result[index]
                                                                             [
                                                                             'id'])
                                                                         ? 'assets/images/tapeLiked.png'
@@ -641,35 +638,35 @@ class _TapesPageState extends State<TapesPage>
                                                               ),
                                                               onPressed:
                                                                   () async {
-                                                                await api
+                                                                await _api
                                                                     .likeTape(
-                                                                        '${result[index]['id']}')
+                                                                        '${_result[index]['id']}')
                                                                     .then(
                                                                         (value) {
                                                                   print(value);
                                                                   setState(() {
-                                                                    likeResult =
+                                                                    _likeResult =
                                                                         value;
                                                                   });
                                                                 });
 
                                                                 setState(() {
-                                                                  if (likeResult[
+                                                                  if (_likeResult[
                                                                           'result']
                                                                       [
                                                                       'myLike']) {
-                                                                    _saved.add(result[
+                                                                    _saved.add(_result[
                                                                             index]
                                                                         ['id']);
-                                                                    result[index]
+                                                                    _result[index]
                                                                         [
                                                                         'likesCount'] += 1;
                                                                   } else {
                                                                     _saved.remove(
-                                                                        result[index]
+                                                                        _result[index]
                                                                             [
                                                                             'id']);
-                                                                    result[index]
+                                                                    _result[index]
                                                                         [
                                                                         'likesCount'] -= 1;
                                                                   }
@@ -679,7 +676,7 @@ class _TapesPageState extends State<TapesPage>
                                                             Container(
                                                               width: 30,
                                                               child: Text(
-                                                                '${result[index]['likesCount']}',
+                                                                '${_result[index]['likesCount']}',
                                                               ),
                                                             ),
                                                             IconButton(
@@ -699,7 +696,7 @@ class _TapesPageState extends State<TapesPage>
                                                                   MaterialPageRoute(
                                                                     builder: (context) =>
                                                                         TapePage(
-                                                                            result[index]),
+                                                                            _result[index]),
                                                                   ),
                                                                 ).whenComplete(
                                                                     () {});
@@ -729,13 +726,12 @@ class _TapesPageState extends State<TapesPage>
                                                               child: Text(''),
                                                             ),
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
+                                                              padding: EdgeInsets
+                                                                  .only(
                                                                       right:
                                                                           10.0),
                                                               child: Text(
-                                                                '${result[index]['created'].toString().replaceAll(".2020", "")}',
+                                                                '${_result[index]['created'].toString().replaceAll(".2020", "")}',
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -754,11 +750,10 @@ class _TapesPageState extends State<TapesPage>
                                                       ? Center()
                                                       : Padding(
                                                           padding:
-                                                              const EdgeInsets
-                                                                      .only(
+                                                              EdgeInsets.only(
                                                                   left: 10.0),
                                                           child: Text(
-                                                            '${result[index]['description']}',
+                                                            '${_result[index]['description']}',
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
@@ -768,15 +763,13 @@ class _TapesPageState extends State<TapesPage>
                                                           ),
                                                         ),
                                               Padding(
-                                                padding: const EdgeInsets.only(
+                                                padding: EdgeInsets.only(
                                                     bottom: 10.0),
                                                 child: Row(
                                                   children: <Widget>[
                                                     Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 10.0,
-                                                              top: 10),
+                                                      padding: EdgeInsets.only(
+                                                          left: 10.0, top: 10),
                                                       child: ClipRRect(
                                                         borderRadius:
                                                             BorderRadius
@@ -819,18 +812,18 @@ class ChewieVideo extends StatefulWidget {
 }
 
 class _ChewieVideoState extends State<ChewieVideo> {
-  VideoPlayerController controller;
+  VideoPlayerController _controller;
   ChewieController _chewieController;
 
   Future<void> _future;
 
   Future<void> initVideoPlayer() async {
-    await controller.initialize();
+    await _controller.initialize();
     setState(() {
-      print(controller.value.aspectRatio);
+      print(_controller.value.aspectRatio);
       _chewieController = ChewieController(
-        videoPlayerController: controller,
-        aspectRatio: controller.value.aspectRatio,
+        videoPlayerController: _controller,
+        aspectRatio: _controller.value.aspectRatio,
         deviceOrientationsAfterFullScreen: [
           DeviceOrientation.landscapeRight,
           DeviceOrientation.landscapeLeft,
@@ -840,11 +833,11 @@ class _ChewieVideoState extends State<ChewieVideo> {
         autoInitialize: true,
         autoPlay: false,
         looping: false,
-        placeholder: buildPlaceholderImage(),
+        placeholder: _buildPlaceholderImage(),
         errorBuilder: (context, errorMessage) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Text(
                 errorMessage,
                 style: TextStyle(color: Colors.white),
@@ -859,11 +852,11 @@ class _ChewieVideoState extends State<ChewieVideo> {
   @override
   void initState() {
     super.initState();
-    setControllers();
+    _setControllers();
   }
 
-  setControllers() {
-    controller = widget.controller;
+  _setControllers() {
+    _controller = widget.controller;
     _future = initVideoPlayer();
   }
 
@@ -871,8 +864,8 @@ class _ChewieVideoState extends State<ChewieVideo> {
   void deactivate() {
     super.deactivate();
     print("deactive");
-    if (controller != null && _chewieController != null) {
-      controller.dispose();
+    if (_controller != null && _chewieController != null) {
+      _controller.dispose();
       _chewieController.dispose();
       _future = null;
     }
@@ -887,8 +880,8 @@ class _ChewieVideoState extends State<ChewieVideo> {
   @override
   void dispose() {
     super.dispose();
-    if (controller != null && _chewieController != null) {
-      controller.dispose();
+    if (_controller != null && _chewieController != null) {
+      _controller.dispose();
       _chewieController.dispose();
       _future = null;
     }
@@ -897,7 +890,7 @@ class _ChewieVideoState extends State<ChewieVideo> {
 
   //
 
-  buildPlaceholderImage() {
+  _buildPlaceholderImage() {
     return Center(
       child: CircularProgressIndicator(),
     );
@@ -912,8 +905,8 @@ class _ChewieVideoState extends State<ChewieVideo> {
             future: _future,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting)
-                return buildPlaceholderImage();
-              if (_chewieController == null) return buildPlaceholderImage();
+                return _buildPlaceholderImage();
+              if (_chewieController == null) return _buildPlaceholderImage();
               return Chewie(
                 controller: _chewieController,
               );

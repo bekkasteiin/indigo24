@@ -254,21 +254,21 @@ class ChatRoom {
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
     message = message.trimLeft();
     message = message.trimRight();
-      String data = json.encode({
-        "cmd": 'message:create',
-        "data": {
-          "user_id": "${user.id}",
-          "userToken": "${user.unique}",
-          "chat_id": "$chatID",
-          "text": '$message',
-          "message_type": type == null ? 0 : type,
-          "file_id": fileId == null ? 0 : fileId,
-          "attachments": attachments == null ? null : attachments
-        }
-      });
-      print('added message');
-      print("$data");
-      sendSocketData(data);
+    String data = json.encode({
+      "cmd": 'message:create',
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "chat_id": "$chatID",
+        "text": '$message',
+        "message_type": type == null ? 0 : type,
+        "file_id": fileId == null ? 0 : fileId,
+        "attachments": attachments == null ? null : attachments
+      }
+    });
+    print('added message');
+    print("$data");
+    sendSocketData(data);
   }
 
   setUserSettings(int boolean) {
@@ -432,6 +432,21 @@ class ChatRoom {
 
     if (cabinetController != null)
       cabinetController.add(new MyCabinetEvent(json));
+  }
+
+  forwardMessage(m, String text, String chatIds) {
+    print("FORWARD MESSAGE TO SOCKET $m");
+    String data = json.encode({
+      "cmd": 'message:forward',
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "chat_id": chatIds,
+        "text": text,
+        "forward_messages_id": m['id'],
+      }
+    });
+    sendSocketData(data);
   }
 
   editMessage(message, chatID, type, time, mId) {

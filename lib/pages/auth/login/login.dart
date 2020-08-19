@@ -377,7 +377,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        phonePrefix = _selectedCountry.phonePrefix;
+        phonePrefix = _selectedCountry._phonePrefix;
         length = _selectedCountry.length;
         passwordController.text = '';
         loginController.text = '';

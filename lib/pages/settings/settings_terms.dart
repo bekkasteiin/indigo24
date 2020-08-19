@@ -23,53 +23,61 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          iconTheme: IconThemeData(
-            color: Colors.black,
-          ),
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
+      appBar: AppBar(
+        centerTitle: true,
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        leading: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(10),
+            child: Image(
+              image: AssetImage(
+                'assets/images/back.png',
               ),
             ),
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
           ),
-          title: Text(
-            "${localization.terms}",
-            style:
-                TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          backgroundColor: Colors.white,
-          brightness: Brightness.light,
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
         ),
-        body: SafeArea(
-            child: Column(
+        title: Text(
+          "${localization.terms}",
+          style:
+              TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        backgroundColor: Colors.white,
+        brightness: Brightness.light,
+      ),
+      body: SafeArea(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              padding:
-                  EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                bottom: 10,
+                top: 10,
+              ),
               child: Text(
                 '${localization.terms}',
                 style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: blackPurpleColor),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: blackPurpleColor,
+                ),
               ),
             ),
             Container(
-              padding:
-                  EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                bottom: 10,
+                top: 10,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -84,23 +92,32 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Terms.pdf",
+                      Text(
+                        "Terms.pdf",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: blackPurpleColor),
+                      ),
+                      Flexible(
+                        child: Text(
+                          "381.0 KB",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: blackPurpleColor)),
-                      Flexible(
-                          child: Text("381.0 KB",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: greyColor))),
+                          style: TextStyle(color: greyColor),
+                        ),
+                      ),
                     ],
                   )
                 ],
               ),
             ),
             Container(
-              padding:
-                  EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                bottom: 10,
+                top: 10,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -134,6 +151,8 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
               ),
             )
           ],
-        )));
+        ),
+      ),
+    );
   }
 }

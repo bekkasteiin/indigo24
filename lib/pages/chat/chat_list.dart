@@ -35,8 +35,11 @@ class _ChatsListPageState extends State<ChatsListPage>
     with AutomaticKeepAliveClientMixin {
   RefreshController _refreshController;
   int _currentDate;
+  bool showSelection;
+  dynamic message;
   @override
   void initState() {
+    showSelection = false;
     _currentDate = DateTime.now().toUtc().millisecondsSinceEpoch;
     _refreshController = RefreshController(initialRefresh: false);
     super.initState();
@@ -57,13 +60,27 @@ class _ChatsListPageState extends State<ChatsListPage>
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
-        title: Text(
-          string,
-          style: TextStyle(
-            fontSize: 22.0,
-            color: blackPurpleColor,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Column(
+          children: <Widget>[
+            Text(
+              string,
+              style: TextStyle(
+                fontSize: 22.0,
+                color: blackPurpleColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            showSelection
+                ? Text(
+                    '${localization.selectChat}',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: blackPurpleColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : SizedBox(height: 0, width: 0)
+          ],
         ),
         brightness: Brightness.light,
         actions: <Widget>[
@@ -103,51 +120,58 @@ class _ChatsListPageState extends State<ChatsListPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(left: 10, top: 10),
-            child: InkWell(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      '${localization.createGroup}',
-                      style: TextStyle(color: blackPurpleColor),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      height: 10,
-                      width: 10,
-                      child: Image(
-                        image: AssetImage(
-                          'assets/images/add.png',
+            margin: EdgeInsets.only(left: 10),
+            child: ButtonTheme(
+              height: 0,
+              child: RaisedButton(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        '${localization.createGroup}',
+                        style: TextStyle(color: blackPurpleColor),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        height: 10,
+                        width: 10,
+                        child: Image(
+                          image: AssetImage(
+                            'assets/images/add.png',
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      height: 30,
-                      width: 20,
-                      child: Image(
-                        image: AssetImage(
-                          'assets/images/group.png',
+                      Container(
+                        height: 30,
+                        width: 20,
+                        child: Image(
+                          image: AssetImage(
+                            'assets/images/group.png',
+                          ),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatGroupSelection(),
+                      )
+                    ],
                   ),
-                );
-              },
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                textColor: blackPurpleColor,
+                color: whiteColor,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatGroupSelection(),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           Expanded(
@@ -193,10 +217,11 @@ class _ChatsListPageState extends State<ChatsListPage>
     avatar,
     avatarUrl,
     members,
-  }) {
+    data,
+  }) async {
     ChatRoom.shared.setCabinetStream();
     ChatRoom.shared.checkUserOnline(userIds);
-    Navigator.push(
+    var test = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ChatPage(
@@ -209,6 +234,7 @@ class _ChatsListPageState extends State<ChatsListPage>
           userIds: userIds,
           avatar: avatar,
           avatarUrl: avatarUrl,
+          data: data,
         ),
       ),
     ).whenComplete(
@@ -222,6 +248,16 @@ class _ChatsListPageState extends State<ChatsListPage>
         ChatRoom.shared.closeCabinetStream();
       },
     );
+    if (test != null) {
+      setState(() {
+        message = test;
+        showSelection = true;
+      });
+    } else {
+      setState(() {
+        showSelection = false;
+      });
+    }
   }
 
   _showAlertDialog(BuildContext context, String message, var chat) {
@@ -315,125 +351,46 @@ class _ChatsListPageState extends State<ChatsListPage>
               itemBuilder: (context, i) {
                 return Column(
                   children: <Widget>[
-                    Slidable(
-                      actionPane: SlidableDrawerActionPane(),
-                      actionExtentRatio: 0.25,
-                      secondaryActions: <Widget>[
-                        IconSlideAction(
-                          caption:
-                              '${myList[i]['mute'].toString() == '0' ? localization.mute : localization.unmute}',
-                          color: myList[i]['mute'].toString() == '0'
-                              ? redColor
-                              : Colors.grey,
-                          icon: myList[i]['mute'].toString() == '0'
-                              ? Icons.volume_mute
-                              : Icons.settings_backup_restore,
-                          onTap: () {
-                            myList[i]['mute'].toString() == '0'
-                                ? ChatRoom.shared.muteChat(myList[i]['id'], 1)
-                                : ChatRoom.shared.muteChat(myList[i]['id'], 0);
-                            ChatRoom.shared.forceGetChat();
-                          },
-                        ),
-                        IconSlideAction(
-                          caption: '${localization.delete}',
-                          color: Colors.red,
-                          icon: Icons.delete,
-                          onTap: () {
-                            _showAlertDialog(
-                              context,
-                              '${localization.delete} ${localization.chat} ${myList[i]['name']}?',
-                              myList[i]['id'],
-                            );
-                            ChatRoom.shared.forceGetChat();
-                          },
-                        )
-                      ],
-                      child: ListTile(
-                        onTap: () {
-                          print('get message');
-                          ChatRoom.shared.getMessages(myList[i]['id']);
-                          _goToChat(
-                            myList[i]['name'],
-                            myList[i]['id'],
-                            phone: myList[i]['another_user_phone'],
-                            members: myList[i]['members'],
-                            memberCount: myList[i]['members_count'],
-                            chatType: myList[i]['type'],
-                            userIds: myList[i]['another_user_id'],
-                            avatar: myList[i]['avatar']
-                                .toString()
-                                .replaceAll("AxB", "200x200"),
-                            avatarUrl: myList[i]['avatar_url'],
-                          );
-                        },
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: Container(
-                            height: 50,
-                            width: 50,
-                            color: greyColor,
-                            child: ClipOval(
-                              child: Image.network(
-                                (myList[i]["avatar"] == null ||
-                                        myList[i]["avatar"] == '' ||
-                                        myList[i]["avatar"] == false)
-                                    ? '${avatarUrl}noAvatar.png'
-                                    : '$avatarUrl${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
+                    showSelection
+                        ? _chatListTile(myList, i, data: message)
+                        : Slidable(
+                            actionPane: SlidableDrawerActionPane(),
+                            actionExtentRatio: 0.25,
+                            secondaryActions: <Widget>[
+                              IconSlideAction(
+                                caption:
+                                    '${myList[i]['mute'].toString() == '0' ? localization.mute : localization.unmute}',
+                                color: myList[i]['mute'].toString() == '0'
+                                    ? redColor
+                                    : Colors.grey,
+                                icon: myList[i]['mute'].toString() == '0'
+                                    ? Icons.volume_mute
+                                    : Icons.settings_backup_restore,
+                                onTap: () {
+                                  myList[i]['mute'].toString() == '0'
+                                      ? ChatRoom.shared
+                                          .muteChat(myList[i]['id'], 1)
+                                      : ChatRoom.shared
+                                          .muteChat(myList[i]['id'], 0);
+                                  ChatRoom.shared.forceGetChat();
+                                },
                               ),
-                            ),
+                              IconSlideAction(
+                                caption: '${localization.delete}',
+                                color: Colors.red,
+                                icon: Icons.delete,
+                                onTap: () {
+                                  _showAlertDialog(
+                                    context,
+                                    '${localization.delete} ${localization.chat} ${myList[i]['name']}?',
+                                    myList[i]['id'],
+                                  );
+                                  ChatRoom.shared.forceGetChat();
+                                },
+                              )
+                            ],
+                            child: _chatListTile(myList, i),
                           ),
-                        ),
-                        title: Text(
-                          myList[i]["name"].length != 0
-                              ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
-                              : "",
-                          maxLines: 1,
-                          style: TextStyle(
-                              color: blackPurpleColor,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        subtitle: Text(
-                          myList[i]["last_message"].length != 0
-                              ? myList[i]["last_message"]['text'].length != 0
-                                  ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"
-                                  : myList[i]["last_message"]
-                                              ['message_for_type'] !=
-                                          null
-                                      ? "${myList[i]["last_message"]['message_for_type'][0].toUpperCase() + myList[i]["last_message"]['message_for_type'].substring(1)}"
-                                      : ""
-                              : "",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(color: darkGreyColor2),
-                        ),
-                        trailing: Wrap(
-                          direction: Axis.vertical,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          alignment: WrapAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              myList[i]['last_message']["time"] == null
-                                  ? "null"
-                                  : _time(myList[i]['last_message']["time"]),
-                              style: TextStyle(color: blackPurpleColor),
-                            ),
-                            myList[i]['unread_messages'] == 0
-                                ? Container()
-                                : Container(
-                                    decoration: BoxDecoration(
-                                        color: brightGreyColor4,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Text(
-                                      " ${myList[i]['unread_messages']} ",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  )
-                          ],
-                        ),
-                      ),
-                    ),
                     Container(
                       margin: EdgeInsets.only(left: 80, right: 20),
                       height: 1,
@@ -444,6 +401,101 @@ class _ChatsListPageState extends State<ChatsListPage>
               },
             ),
           );
+  }
+
+  ListTile _chatListTile(myList, int i, {data}) {
+    return ListTile(
+      onTap: () {
+        print('get message');
+        ChatRoom.shared.getMessages(myList[i]['id']);
+        showSelection
+            ? _goToChat(
+                myList[i]['name'],
+                myList[i]['id'],
+                phone: myList[i]['another_user_phone'],
+                members: myList[i]['members'],
+                memberCount: myList[i]['members_count'],
+                chatType: myList[i]['type'],
+                userIds: myList[i]['another_user_id'],
+                avatar:
+                    myList[i]['avatar'].toString().replaceAll("AxB", "200x200"),
+                avatarUrl: myList[i]['avatar_url'],
+                data: data,
+              )
+            : _goToChat(
+                myList[i]['name'],
+                myList[i]['id'],
+                phone: myList[i]['another_user_phone'],
+                members: myList[i]['members'],
+                memberCount: myList[i]['members_count'],
+                chatType: myList[i]['type'],
+                userIds: myList[i]['another_user_id'],
+                avatar:
+                    myList[i]['avatar'].toString().replaceAll("AxB", "200x200"),
+                avatarUrl: myList[i]['avatar_url'],
+              );
+      },
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(25.0),
+        child: Container(
+          height: 50,
+          width: 50,
+          color: greyColor,
+          child: ClipOval(
+            child: Image.network(
+              (myList[i]["avatar"] == null ||
+                      myList[i]["avatar"] == '' ||
+                      myList[i]["avatar"] == false)
+                  ? '${avatarUrl}noAvatar.png'
+                  : '$avatarUrl${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
+            ),
+          ),
+        ),
+      ),
+      title: Text(
+        myList[i]["name"].length != 0
+            ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
+            : "",
+        maxLines: 1,
+        style: TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
+      ),
+      subtitle: Text(
+        myList[i]["last_message"].length != 0
+            ? myList[i]["last_message"]['text'].length != 0
+                ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"
+                : myList[i]["last_message"]['message_for_type'] != null
+                    ? "${myList[i]["last_message"]['message_for_type'][0].toUpperCase() + myList[i]["last_message"]['message_for_type'].substring(1)}"
+                    : ""
+            : "",
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        style: TextStyle(color: darkGreyColor2),
+      ),
+      trailing: Wrap(
+        direction: Axis.vertical,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        alignment: WrapAlignment.center,
+        children: <Widget>[
+          Text(
+            myList[i]['last_message']["time"] == null
+                ? "null"
+                : _time(myList[i]['last_message']["time"]),
+            style: TextStyle(color: blackPurpleColor),
+          ),
+          myList[i]['unread_messages'] == 0
+              ? Container()
+              : Container(
+                  decoration: BoxDecoration(
+                      color: brightGreyColor4,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Text(
+                    " ${myList[i]['unread_messages']} ",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+        ],
+      ),
+    );
   }
 
   String _time(timestamp) {
@@ -468,7 +520,8 @@ class _ChatsListPageState extends State<ChatsListPage>
         } else if (diff.inDays < 7) {
           return '${diff.inDays} ${localization.days} ${localization.ago}\n$hours:$minutes';
         } else {
-          return '$messageUnixDate'.substring(0, 10).replaceAll('-', '.')+'\n$hours:$minutes';
+          return '$messageUnixDate'.substring(0, 10).replaceAll('-', '.') +
+              '\n$hours:$minutes';
         }
       }
     }

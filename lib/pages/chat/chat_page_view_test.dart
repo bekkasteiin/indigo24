@@ -49,14 +49,6 @@ class AudioMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(url);
-    print(url);
-    print(url);
-    print(url);
-    print(url);
-    print(url);
-    print(url);
-    print(url);
     return PlayerWidget(url: url);
   }
 }
@@ -244,7 +236,8 @@ class PDFViewer extends StatefulWidget {
 }
 
 class _PDFViewerState extends State<PDFViewer> {
-  int _actualPageNumber = 1, _allPagesCount = 0;
+  int _actualPageNumber = 1;
+  int _allPagesCount = 0;
   PdfController _pdfController;
 
   @override
@@ -326,21 +319,4 @@ class _PDFViewerState extends State<PDFViewer> {
           ),
         ),
       );
-}
-
-class _TaskInfo {
-  final String name;
-  final String link;
-
-  String taskId;
-  int progress = 0;
-
-  _TaskInfo({this.name, this.link});
-}
-
-class _ItemHolder {
-  final String name;
-  final _TaskInfo task;
-
-  _ItemHolder({this.name, this.task});
 }

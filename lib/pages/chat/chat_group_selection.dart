@@ -17,20 +17,17 @@ class ChatGroupSelection extends StatefulWidget {
 }
 
 class _ChatGroupSelectionState extends State<ChatGroupSelection> {
-  var arrays = [];
-  var _saved = List<dynamic>();
-  var _saved2 = List<dynamic>();
-  var tempIndex = 0;
+  var _selectedsList = List<dynamic>();
   TextEditingController _searchController = TextEditingController();
   TextEditingController _titleController = TextEditingController();
 
-  var actualList = List<dynamic>();
+  var _actualList = List<dynamic>();
   @override
   void initState() {
     super.initState();
-    actualList.addAll(myContacts);
+    _actualList.addAll(myContacts);
     ChatRoom.shared.setContactsStream();
-    _saved2.add({
+    _selectedsList.add({
       "phone": "${user.phone}",
       "user_id": "${user.id}",
       "name": "${user.name}"
@@ -41,8 +38,9 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   @override
   void dispose() {
     super.dispose();
+    _searchController.dispose();
+    _titleController.dispose();
     ChatRoom.shared.contactController.close();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   _listen() {
@@ -55,9 +53,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
           if ("${e.json['data']['chat_id']}" != "null" &&
               "${e.json['data']['status']}" == 'true') {
             setState(() {
-              _saved.add(
-                  {"index": tempIndex, "user_id": e.json['data']['user_id']});
-              _saved2.add({
+              _selectedsList.add({
                 'phone': e.json['data']['phone'],
                 'user_id': e.json['data']['user_id'],
                 'name': e.json['data']['name'],
@@ -136,19 +132,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
     );
   }
 
-  String formatPhone(String phone) {
-    String r = phone.replaceAll(" ", "");
-    r = r.replaceAll("(", "");
-    r = r.replaceAll(")", "");
-    r = r.replaceAll("+", "");
-    r = r.replaceAll("-", "");
-    if (r.startsWith("8")) {
-      r = r.replaceFirst("8", "7");
-    }
-    return r;
-  }
-
-  void search(String query) {
+  void _search(String query) {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
       contacts.forEach((item) {
@@ -158,13 +142,13 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
         }
       });
       setState(() {
-        actualList.clear();
-        actualList.addAll(matches);
+        _actualList.clear();
+        _actualList.addAll(matches);
       });
     } else {
       setState(() {
-        actualList.clear();
-        actualList.addAll(myContacts);
+        _actualList.clear();
+        _actualList.addAll(myContacts);
       });
     }
   }
@@ -203,11 +187,11 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 iconSize: 30,
                 color: blackPurpleColor,
                 onPressed: () {
-                  if (_saved2.length > 2) {
+                  if (_selectedsList.length > 2) {
                     if (_titleController.text.isNotEmpty) {
                       String userIds = '';
-                      _saved2.removeAt(0);
-                      _saved2.forEach((element) {
+                      _selectedsList.removeAt(0);
+                      _selectedsList.forEach((element) {
                         userIds += '${element['user_id']}' + ',';
                         print(element);
                       });
@@ -236,13 +220,15 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                   children: <Widget>[
                     Container(
                         padding: EdgeInsets.only(top: 10, left: 10),
-                        child:
-                            Text('${_saved2.length} ${localization.contacts}')),
+                        child: Text(
+                            '${_selectedsList.length} ${localization.contacts}')),
                     Container(
-                      height: _saved2.length == 0 ? 0 : 82,
+                      height: _selectedsList.length == 0 ? 0 : 82,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: _saved2.length != null ? _saved2.length : 0,
+                        itemCount: _selectedsList.length != null
+                            ? _selectedsList.length
+                            : 0,
                         itemBuilder: (BuildContext context, int index) {
                           return Stack(
                             children: <Widget>[
@@ -260,7 +246,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                         height: 35,
                                         child: Center(
                                           child: Text(
-                                            '${_saved2[index]['name'][0].toUpperCase()}',
+                                            '${_selectedsList[index]['name'][0].toUpperCase()}',
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 16.0,
@@ -275,7 +261,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                     Container(
                                       child: Text(
                                         // '${_saved2[index]['data']['data']['name']} asd',
-                                        '${_saved2[index]['name']}',
+                                        '${_selectedsList[index]['name']}',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                       ),
@@ -284,7 +270,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                   ],
                                 ),
                               ),
-                              _saved2[index]['user_id'] == '${user.id}'
+                              _selectedsList[index]['user_id'] == '${user.id}'
                                   ? Center()
                                   : Positioned(
                                       bottom: 30,
@@ -310,9 +296,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                                 ),
                                                 onTap: () {
                                                   setState(() {
-                                                    _saved2.removeWhere((item) {
+                                                    _selectedsList
+                                                        .removeWhere((item) {
                                                       return '${item['phone']}' ==
-                                                          '${_saved2[index]['phone']}';
+                                                          '${_selectedsList[index]['phone']}';
                                                     });
                                                   });
                                                 },
@@ -327,7 +314,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(
-                          top: 10.0, left: 10.0, right: 10, bottom: 0),
+                          top: 10, left: 10, right: 10, bottom: 0),
                       child: TextField(
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(40),
@@ -342,7 +329,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                     Container(
                       height: 50,
                       padding: EdgeInsets.only(
-                          top: 10.0, left: 10.0, right: 10, bottom: 0),
+                          top: 10, left: 10, right: 10, bottom: 0),
                       child: Center(
                         child: TextField(
                           decoration: InputDecoration(
@@ -354,7 +341,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                             fillColor: blackPurpleColor,
                           ),
                           onChanged: (value) {
-                            search(value);
+                            _search(value);
                           },
                           controller: _searchController,
                         ),
@@ -362,12 +349,12 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                     ),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: actualList.length,
+                        itemCount: _actualList.length,
                         itemBuilder: (BuildContext context, int index) {
-                          if (actualList[index].phone == null &&
-                              actualList[index].name == null)
+                          if (_actualList[index].phone == null &&
+                              _actualList[index].name == null)
                             return Container();
-                          if ('${user.phone}' == '+${actualList[index].phone}')
+                          if ('${user.phone}' == '+${_actualList[index].phone}')
                             return Center();
                           return Padding(
                             padding: const EdgeInsets.only(top: 2),
@@ -376,14 +363,14 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                 title: Wrap(
                                   children: <Widget>[
                                     Text(
-                                      '${actualList[index].name}',
+                                      '${_actualList[index].name}',
                                       style: TextStyle(fontSize: 16.0),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
                                 subtitle: Text(
-                                  '${actualList[index].phone}',
+                                  '${_actualList[index].phone}',
                                   style: TextStyle(fontSize: 14.0),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -391,13 +378,12 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                 onChanged: (value) {
                                   setState(() {
                                     if (value == true) {
-                                      tempIndex = index;
                                       ChatRoom.shared
-                                          .userCheck(actualList[index].phone);
+                                          .userCheck(_actualList[index].phone);
                                     } else {
-                                      _saved2.removeWhere((item) {
+                                      _selectedsList.removeWhere((item) {
                                         return '${item['phone']}' ==
-                                            '${actualList[index].phone}';
+                                            '${_actualList[index].phone}';
                                       });
                                     }
                                   });
@@ -421,8 +407,8 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
 
   _value(index) {
     bool tempo = false;
-    _saved2.forEach((element) {
-      if ('${element['phone']}' == '${actualList[index].phone}') {
+    _selectedsList.forEach((element) {
+      if ('${element['phone']}' == '${_actualList[index].phone}') {
         tempo = true;
       }
     });

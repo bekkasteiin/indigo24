@@ -139,7 +139,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     if (maskedText.length == 21) {
                       splittedDates = maskedText.split("/");
                       _page = 1;
-                      api
+                      _api
                           .getFilteredTransactions(
                               _page, splittedDates[0], splittedDates[1])
                           .then((transactions) {

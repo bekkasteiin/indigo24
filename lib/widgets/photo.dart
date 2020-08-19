@@ -195,29 +195,30 @@ class ExampleButtonNode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.symmetric(
-          vertical: 20.0,
-        ),
-        child: Column(
-          children: <Widget>[
-            Text(
-              title,
-              style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 21.0,
-                  fontWeight: FontWeight.w600),
-            ),
-            Container(
-                margin: const EdgeInsets.only(
-                  top: 10.0,
-                ),
-                child: RaisedButton(
-                  onPressed: onPressed,
-                  child: const Text("Open example"),
-                  color: Colors.amber,
-                ))
-          ],
-        ));
+      margin: const EdgeInsets.symmetric(
+        vertical: 20.0,
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            title,
+            style: const TextStyle(
+                color: Colors.black,
+                fontSize: 21.0,
+                fontWeight: FontWeight.w600),
+          ),
+          Container(
+              margin: const EdgeInsets.only(
+                top: 10.0,
+              ),
+              child: RaisedButton(
+                onPressed: onPressed,
+                child: const Text("Open example"),
+                color: Colors.amber,
+              ))
+        ],
+      ),
+    );
   }
 }
 
@@ -339,42 +340,42 @@ class ExampleAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Container(
-            padding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
-            decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                    bottomLeft: const Radius.circular(10.0),
-                    bottomRight: const Radius.circular(10.0)),
-                boxShadow: <BoxShadow>[
-                  const BoxShadow(
-                      color: Colors.black12,
-                      spreadRadius: 10.0,
-                      blurRadius: 20.0)
-                ]),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  child: showGoBack
-                      ? IconButton(
-                          icon: const Icon(Icons.chevron_left),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          padding: EdgeInsets.zero,
-                        )
-                      : Container(
-                          height: 50.0,
-                        ),
-                ),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                        fontSize: 25.0, fontWeight: FontWeight.w700),
-                  ),
-                )
-              ],
-            )));
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+                bottomLeft: const Radius.circular(10.0),
+                bottomRight: const Radius.circular(10.0)),
+            boxShadow: <BoxShadow>[
+              const BoxShadow(
+                  color: Colors.black12, spreadRadius: 10.0, blurRadius: 20.0)
+            ]),
+        child: Row(
+          children: <Widget>[
+            Container(
+              child: showGoBack
+                  ? IconButton(
+                      icon: const Icon(Icons.chevron_left),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      padding: EdgeInsets.zero,
+                    )
+                  : Container(
+                      height: 50.0,
+                    ),
+            ),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                    fontSize: 25.0, fontWeight: FontWeight.w700),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

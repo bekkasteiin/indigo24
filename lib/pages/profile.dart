@@ -314,7 +314,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
                 borderRadius: BorderRadius.circular(80.0),
                 border: Border.all(
-                  color: blackPurpleColor,
+                  color: whiteColor,
                   width: 5.0,
                 ),
               ),
@@ -328,9 +328,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildFullName() {
     TextStyle _nameTextStyle = TextStyle(
       fontFamily: 'Roboto',
-      color: Colors.white,
+      color: whiteColor,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
+      decoration: TextDecoration.underline,
     );
 
     return GestureDetector(
@@ -349,12 +350,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             style: _nameTextStyle,
             overflow: TextOverflow.ellipsis,
           ),
-          _isEditing
-              ? Center()
-              : Container(
-                  height: 1,
-                  color: whiteColor,
-                ),
         ],
       ),
     );
@@ -362,23 +357,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   TextEditingController emailController =
       TextEditingController(text: '${user.email}');
-
-  Widget _buildIdentifcation(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("${localization.identification}"),
-          SizedBox(height: 5),
-          user.identified
-              ? Text("${localization.identified}")
-              : Text("${localization.notIdentified}"),
-          SizedBox(height: 5)
-        ],
-      ),
-    );
-  }
 
   Widget _buildEmailSection(Size screenSize) {
     return Container(
@@ -388,7 +366,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: <Widget>[
           Text("${localization.email}"),
           SizedBox(height: 5),
-          Text('${user.email}'),
+          Text(
+            '${user.email}',
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 18, color: blackPurpleColor),
+          ),
           SizedBox(height: 5)
         ],
       ),
@@ -406,7 +388,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           Text(
             '${user.phone}',
             textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(fontSize: 18, color: blackPurpleColor),
           ),
           SizedBox(height: 5),
         ],
@@ -443,9 +425,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         _buildSeparator(screenSize),
                         SizedBox(height: 10),
                         _buildEmailSection(screenSize),
-                        _buildSeparator(screenSize),
-                        SizedBox(height: 10),
-                        _buildIdentifcation(screenSize),
                         _buildSeparator(screenSize),
                       ],
                     ),
@@ -487,18 +466,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                     Column(
                       children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.only(bottom: 10),
-                          height: 50,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: RaisedButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    10.0,
-                                  ),
-                                ),
-                                color: whiteColor,
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.42),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 10.0,
+                                    spreadRadius: -2,
+                                    offset: Offset(0.0, 0.0))
+                              ],
+                            ),
+                            child: ButtonTheme(
+                              minWidth:
+                                  MediaQuery.of(context).size.width * 0.42,
+                              height: 50,
+                              child: RaisedButton(
                                 onPressed: () async {
                                   if (await canLaunch(
                                       'https://indigo24.com/contacts.html')) {
@@ -514,66 +500,85 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     throw 'Could not launch https://indigo24.com/contacts.html';
                                   }
                                 },
-                                child: Ink(
-                                  child: Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: Text("${localization.support}",
-                                        style:
-                                            TextStyle(color: Colors.grey[700])),
+                                child: FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Text(
+                                    "${localization.support}",
+                                    style: TextStyle(
+                                      color: Colors.grey[700],
+                                    ),
                                   ),
-                                )),
+                                ),
+                                color: whiteColor,
+                                textColor: whiteColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    10.0,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(
                           height: 10,
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.42),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
                                   color: Colors.black26,
                                   blurRadius: 10.0,
                                   spreadRadius: -2,
-                                  offset: Offset(0.0, 0.0))
-                            ],
-                          ),
-                          child: ButtonTheme(
-                            minWidth: MediaQuery.of(context).size.width * 0.42,
-                            height: 50,
-                            child: RaisedButton(
-                              onPressed: () async {
-                                print('exit is pressed');
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      CustomDialog(
-                                    title: null,
-                                    description: "${localization.wantToExit}?",
-                                    buttonText: "Okay",
-                                    image: CachedNetworkImage(
-                                        imageUrl: '$avatarUrl${user.avatar}'),
+                                  offset: Offset(0.0, 0.0),
+                                )
+                              ],
+                            ),
+                            child: ButtonTheme(
+                              minWidth:
+                                  MediaQuery.of(context).size.width * 0.42,
+                              height: 50,
+                              child: RaisedButton(
+                                onPressed: () async {
+                                  print('exit is pressed');
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        CustomDialog(
+                                      title: null,
+                                      description:
+                                          "${localization.wantToExit}?",
+                                      buttonText: "Okay",
+                                      image: CachedNetworkImage(
+                                          imageUrl: '$avatarUrl${user.avatar}'),
+                                    ),
+                                  );
+                                  // SharedPreferences preferences =
+                                  //       await SharedPreferences.getInstance();
+                                  //   preferences.setString('phone', 'null');
+                                  //   Navigator.of(context).pushAndRemoveUntil(
+                                  //       MaterialPageRoute(
+                                  //           builder: (context) => IntroPage()),
+                                  //       (r) => false);
+                                },
+                                child: FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Text(
+                                    '${localization.exit}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                );
-                                // SharedPreferences preferences =
-                                //       await SharedPreferences.getInstance();
-                                //   preferences.setString('phone', 'null');
-                                //   Navigator.of(context).pushAndRemoveUntil(
-                                //       MaterialPageRoute(
-                                //           builder: (context) => IntroPage()),
-                                //       (r) => false);
-                              },
-                              child: FittedBox(
-                                fit: BoxFit.fitWidth,
-                                child: Text(
-                                  '${localization.exit}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              color: primaryColor,
-                              textColor: whiteColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  10.0,
+                                color: primaryColor,
+                                textColor: whiteColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    10.0,
+                                  ),
                                 ),
                               ),
                             ),
@@ -633,49 +638,79 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SizedBox(width: 10),
                     _buildProfileImage(),
                     SizedBox(width: 10),
                     _isEditing
                         ? Flexible(
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Flexible(
-                                  child: TextField(
-                                    style: TextStyle(color: whiteColor),
-                                    controller: _nameController,
-                                  ),
-                                ),
-                                FlatButton(
-                                  child: Text(
-                                    '${localization.save}',
-                                    style: TextStyle(
-                                      color: whiteColor,
+                                Row(
+                                  children: <Widget>[
+                                    Flexible(
+                                      child: TextField(
+                                        style: TextStyle(color: whiteColor),
+                                        controller: _nameController,
+                                      ),
                                     ),
+                                    FlatButton(
+                                      child: Text(
+                                        '${localization.save}',
+                                        style: TextStyle(
+                                          color: whiteColor,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        if (_nameController.text.isNotEmpty) {
+                                          api
+                                              .settingsSave(
+                                                  _nameController.text)
+                                              .then((result) {
+                                            print(result);
+                                            if (result['success'].toString() ==
+                                                'true') {
+                                              user.name = _nameController.text;
+                                              SharedPreferencesHelper.setString(
+                                                  'name', _nameController.text);
+                                            }
+                                            setState(() {
+                                              _isEditing = false;
+                                            });
+                                          });
+                                        }
+                                      },
+                                    )
+                                  ],
+                                ),
+                                Text(
+                                  "${user.identified ? localization.identified : localization.notIdentified}",
+                                  style: TextStyle(
+                                    color: whiteColor,
                                   ),
-                                  onPressed: () {
-                                    api
-                                        .settingsSave(_nameController.text)
-                                        .then((result) {
-                                      print(result);
-                                      if (result['success'].toString() ==
-                                          'true') {
-                                        user.name = _nameController.text;
-                                        SharedPreferencesHelper.setString(
-                                            'name', _nameController.text);
-                                      }
-                                      setState(() {
-                                        _isEditing = false;
-                                      });
-                                    });
-                                  },
                                 )
                               ],
                             ),
                           )
                         : Flexible(
-                            child: _buildFullName(),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(top: 10),
+                                  child: _buildFullName(),
+                                ),
+                                SizedBox(height: 15),
+                                Text(
+                                  "${user.identified ? localization.identified : localization.notIdentified}",
+                                  style: TextStyle(
+                                    color: whiteColor,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                   ],
                 ),

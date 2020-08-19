@@ -26,15 +26,14 @@ class _AddTapePageState extends State<AddTapePage> {
   File _videoFile;
   File _currentFile;
   dynamic _pickImageError;
-  bool isVideo = false;
+  bool _isVideo = false;
   VideoPlayerController _controller;
   String _retrieveDataError;
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  Api api = Api();
-  ImagePicker picker = ImagePicker();
-  PickedFile myFile;
-  bool isNotPicked = true;
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  Api _api = Api();
+  ImagePicker _picker = ImagePicker();
+  bool _isNotPicked = true;
 
   @override
   void initState() {
@@ -53,6 +52,8 @@ class _AddTapePageState extends State<AddTapePage> {
   @override
   void dispose() {
     _disposeVideoController();
+    _titleController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -118,8 +119,8 @@ class _AddTapePageState extends State<AddTapePage> {
                   //   });
                   // }
                   print("Pressed with $_currentFile");
-                  if (descriptionController.text == '' ||
-                      titleController.text == '') {
+                  if (_descriptionController.text == '' ||
+                      _titleController.text == '') {
                     showAlertDialog(context, "${localization.fillAllFields}");
                   } else if (_currentFile == null) {
                     showAlertDialog(context, "${localization.selectFile}");
@@ -149,7 +150,7 @@ class _AddTapePageState extends State<AddTapePage> {
                     Container(
                       margin: EdgeInsets.all(10),
                       child: TextField(
-                          controller: titleController,
+                          controller: _titleController,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(40),
                           ],
@@ -165,16 +166,16 @@ class _AddTapePageState extends State<AddTapePage> {
                           ],
                           keyboardType: TextInputType.text,
                           maxLines: 4,
-                          controller: descriptionController,
+                          controller: _descriptionController,
                           decoration: InputDecoration(
                               labelText: '${localization.description}')),
                     ),
                   ],
                 ),
 
-                isNotPicked
+                _isNotPicked
                     ? Container()
-                    : isVideo ? _previewVideo() : _previewImage(),
+                    : _isVideo ? _previewVideo() : _previewImage(),
 
                 // Image(
                 //   image: AssetDataImage(
@@ -197,7 +198,7 @@ class _AddTapePageState extends State<AddTapePage> {
                 child: FloatingActionButton(
                   backgroundColor: Colors.white,
                   onPressed: () {
-                    isVideo = false;
+                    _isVideo = false;
                     action();
                     // _settingModalBottomSheet(context);
                     // MY COMMENT
@@ -213,7 +214,7 @@ class _AddTapePageState extends State<AddTapePage> {
                 child: FloatingActionButton(
                   backgroundColor: Colors.white,
                   onPressed: () {
-                    isVideo = true;
+                    _isVideo = true;
                     action();
                     // _onImageButtonPressed(ImageSource.camera);
                   },
@@ -340,8 +341,8 @@ class _AddTapePageState extends State<AddTapePage> {
     if (_controller != null) {
       await _controller.setVolume(0.0);
     }
-    if (isVideo) {
-      final pickedFile = await picker.getVideo(source: source);
+    if (_isVideo) {
+      final pickedFile = await _picker.getVideo(source: source);
       print(File(pickedFile.path).lengthSync());
 
       if (File(pickedFile.path).lengthSync() > 104857600) {
@@ -356,7 +357,7 @@ class _AddTapePageState extends State<AddTapePage> {
         setState(() {
           _videoFile = File(pickedFile.path);
           _currentFile = File(pickedFile.path);
-          isNotPicked = false;
+          _isNotPicked = false;
         });
 
         print("video file from $_videoFile");
@@ -366,12 +367,12 @@ class _AddTapePageState extends State<AddTapePage> {
       try {
         // _imageFile = await ImagePicker.pickImage(source: source);
         // final pickedFile = await picker.getImage(source: source);
-        final pickedFile = await picker.getImage(source: source);
+        final pickedFile = await _picker.getImage(source: source);
         if (pickedFile != null) {
           setState(() {
             _imageFile = File(pickedFile.path);
             _currentFile = File(pickedFile.path);
-            isNotPicked = false;
+            _isNotPicked = false;
           });
           print("image file from $_imageFile");
           setState(() {});
@@ -447,16 +448,16 @@ class _AddTapePageState extends State<AddTapePage> {
   }
 
   Future<void> retrieveLostData() async {
-    final LostData response = await picker.getLostData();
+    final LostData response = await _picker.getLostData();
     if (response.isEmpty) {
       return;
     }
     if (response.file != null) {
       if (response.type == RetrieveType.video) {
-        isVideo = true;
+        _isVideo = true;
         await _playVideo(File(response.file.path));
       } else {
-        isVideo = false;
+        _isVideo = false;
         setState(() {
           _imageFile = File(response.file.path);
         });
@@ -469,9 +470,9 @@ class _AddTapePageState extends State<AddTapePage> {
   Future addTape(context) async {
     print("MY current file ${_currentFile.path}");
     _disposeVideoController();
-    api
-        .addTape(_currentFile.path, titleController.text,
-            descriptionController.text, context)
+    _api
+        .addTape(_currentFile.path, _titleController.text,
+            _descriptionController.text, context)
         .then((r) {
       if (r['message'] == 'Not authenticated' &&
           r['success'].toString() == 'false') {
@@ -479,9 +480,9 @@ class _AddTapePageState extends State<AddTapePage> {
         return r;
       } else {
         if (r["success"]) {
-          titleController.text = "";
-          descriptionController.text = "";
-          isNotPicked = true;
+          _titleController.text = "";
+          _descriptionController.text = "";
+          _isNotPicked = true;
           // Navigator.pop(context, r['result']);
           Navigator.of(context).pop(r['result']);
         } else {

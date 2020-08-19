@@ -63,59 +63,72 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                         padding: EdgeInsets.only(
                             left: 20, right: 20, bottom: 10, top: 20),
                         child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '${localization.showNotifications}',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackPurpleColor),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              '${localization.showNotifications}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: blackPurpleColor,
                               ),
-                            ]),
+                            ),
+                          ],
+                        ),
                       ),
                       Container(
-                          margin: EdgeInsets.only(left: 20),
-                          height: 0.5,
-                          color: greyColor),
+                        margin: EdgeInsets.only(left: 20),
+                        height: 0.5,
+                        color: greyColor,
+                      ),
                       Container(
-                        padding: EdgeInsets.only(
-                            left: 20, right: 20, bottom: 10, top: 10),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '${localization.messagePreview}',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackPurpleColor),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              '${localization.messagePreview}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: blackPurpleColor,
                               ),
-                            ]),
+                            ),
+                          ],
+                        ),
                       ),
                       Container(
-                          margin: EdgeInsets.only(left: 20),
-                          height: 0.5,
-                          color: greyColor),
+                        margin: EdgeInsets.only(left: 20),
+                        height: 0.5,
+                        color: greyColor,
+                      ),
                       Container(
-                        padding: EdgeInsets.only(
-                            left: 20, right: 20, bottom: 10, top: 10),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '${localization.messagePreview}',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackPurpleColor),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              '${localization.messagePreview}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: blackPurpleColor,
                               ),
-                            ]),
+                            ),
+                          ],
+                        ),
                       ),
                       Container(
-                          margin: EdgeInsets.only(left: 20),
-                          height: 0.5,
-                          color: greyColor),
+                        margin: EdgeInsets.only(left: 20),
+                        height: 0.5,
+                        color: greyColor,
+                      ),
                     ],
                   ),
                 ),

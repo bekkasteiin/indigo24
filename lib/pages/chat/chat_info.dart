@@ -221,54 +221,36 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           ),
           child: ClipOval(
             child: Center(
-              child: widget.chatType.toString() == '1'
-                  ? Stack(
-                      children: <Widget>[
-                        Flexible(
-                          child: Container(
-                            color: Colors.white,
-                          ),
-                        ),
-                        GridView.count(
-                          crossAxisCount: 2,
-                          physics: NeverScrollableScrollPhysics(),
-                          children: List.generate(_membersList.length, (index) {
-                            String tempAvatar;
-                            _membersList.length > index
-                                ? tempAvatar =
-                                    '$avatarUrl${_membersList[index]["avatar"].toString().replaceAll("AxB", "200x200")}'
-                                : tempAvatar = '';
-                            return Center(
-                              child: AspectRatio(
-                                aspectRatio: 1,
-                                child: Container(
-                                  decoration: BoxDecoration(),
-                                  child: CachedNetworkImage(
-                                    imageUrl: widget.chatAvatar != null
-                                        ? '$tempAvatar'
-                                        : '',
-                                    errorWidget: (context, url, error) =>
-                                        CachedNetworkImage(
-                                      imageUrl: "${avatarUrl}noAvatar.png",
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      ],
-                    )
-                  : Container(
-                      height: 100,
-                      width: 100,
-                      color: greyColor,
-                      child: CachedNetworkImage(
-                        imageUrl: widget.chatAvatar != null
-                            ? '$avatarUrl${widget.chatAvatar}'
-                            : '${avatarUrl}noAvatar.png',
-                      ),
-                    ),
+              child:
+                  // '${widget.chatType}' == '1'
+                  // ? Stack(
+                  //     children: <Widget>[
+                  //       Flexible(
+                  //         child: Container(
+                  //           color: Colors.white,
+                  //         ),
+                  //       ),
+                  //       GridView.count(
+                  //         crossAxisCount: 2,
+                  //         physics: NeverScrollableScrollPhysics(),
+                  //         children: List.generate(_membersList.length, (index) {
+                  //           return Image.network(
+                  //               '${_membersList[index]['avatar_url']}${_membersList[index]["avatar"].toString().replaceAll("AxB", "200x200")}');
+                  //         }),
+                  //       ),
+                  //     ],
+                  //   )
+                  // :
+                  Container(
+                height: 100,
+                width: 100,
+                color: greyColor,
+                child: CachedNetworkImage(
+                  imageUrl: widget.chatAvatar != null
+                      ? '$avatarUrl${widget.chatAvatar}'
+                      : '${avatarUrl}noAvatar.png',
+                ),
+              ),
             ),
           ),
         ),
@@ -476,7 +458,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                   ? Text('${localization.makeMember}')
                   : Text('${localization.error}'),
           onPressed: () {
-            print('${member['role']} $memberRole $adminRole $ownerRole');
+            // print('${member['role']} $memberRole $adminRole $ownerRole');
             switch (member['role'].toString()) {
               case '$memberRole':
                 print('toAdmin');
@@ -591,13 +573,15 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                       Icon(Icons.edit, color: Colors.white)
                                     ],
                                   )
-                                : Text(
-                                    widget.chatName.length > 2
-                                        ? '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}'
-                                        : '',
-                                    style: fS26(c: 'ffffff'),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                : FittedBox(
+                                    child: Text(
+                                      widget.chatName.length > 2
+                                          ? '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}'
+                                          : '',
+                                      style: fS26(c: 'ffffff'),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                           ),
                         ),
@@ -707,10 +691,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                                           ['user_id']
                                                       .toString() ==
                                                   '${user.id}') {
-                                                print(_actualMembersList[i]
-                                                            ['user_id']
-                                                        .toString() ==
-                                                    '${user.id}');
+                                                // print(_actualMembersList[i]
+                                                // ['user_id']
+                                                // .toString() ==
+                                                // '${user.id}');
                                                 // memberAction(actualMembersList[i]);
                                               } else {
                                                 switch (

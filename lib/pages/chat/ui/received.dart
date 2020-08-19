@@ -24,7 +24,9 @@ class Received extends StatelessWidget {
   Received(this.m, {this.chatId, this.isGroup});
   @override
   Widget build(BuildContext context) {
-    var a = (m['attachments'] == false || m['attachments'] == null)
+    var a = (m['attachments'] == false ||
+            m['attachments'] == null ||
+            m['attachments'] == '')
         ? false
         : jsonDecode(m['attachments']);
     var replyData = (m['reply_data'] == false || m['reply_data'] == null)
@@ -47,6 +49,22 @@ class Received extends StatelessWidget {
               onPressed: () {
                 ChatRoom.shared.replyingMessage(m);
                 Navigator.pop(context);
+              },
+            ),
+            CupertinoContextMenuAction(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('${localization.forward}',
+                      style: TextStyle(fontSize: 14)),
+                  Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                ],
+              ),
+              onPressed: () {
+                // ChatRoom.shared.replyingMessage(m);
+                Navigator.pop(context);
+                Navigator.pop(context, m);
               },
             ),
           ],
@@ -84,7 +102,8 @@ class Received extends StatelessWidget {
                     : null,
                 replyData: (replyData == false || replyData == null)
                     ? null
-                    : replyData),
+                    : replyData,
+                forwardData: m['forward_data']),
           ),
         ),
       ),
@@ -122,23 +141,25 @@ class ReceivedMessageWidget extends StatelessWidget {
   final phone;
   final anotherUser;
   final replyData;
+  final forwardData;
 
-  const ReceivedMessageWidget(
-      {Key key,
-      this.phone,
-      this.content,
-      this.time,
-      this.image,
-      this.name,
-      this.media,
-      this.mediaUrl,
-      this.rMedia,
-      this.type,
-      this.edit,
-      this.isGroup,
-      this.anotherUser,
-      this.replyData})
-      : super(key: key);
+  const ReceivedMessageWidget({
+    Key key,
+    this.phone,
+    this.content,
+    this.time,
+    this.image,
+    this.name,
+    this.media,
+    this.mediaUrl,
+    this.rMedia,
+    this.type,
+    this.edit,
+    this.isGroup,
+    this.anotherUser,
+    this.replyData,
+    this.forwardData,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -232,88 +253,102 @@ class ReceivedMessageWidget extends StatelessWidget {
                                 left: (type == "3") ? 2 : 8.0,
                                 top: 0.0,
                                 bottom: (type == "3") ? 1 : 15.0),
-                            child: (type == "12")
-                                ? LinkMessage("$media")
-                                : (a[0] == ":" &&
-                                        a[l] == ":" &&
-                                        content.length < 9)
-                                    ? Text(content,
-                                        style: TextStyle(fontSize: 40))
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                '$forwardData' != 'null'
+                                    ? Text(
+                                        '${localization.forward} from ${forwardData}')
+                                    : SizedBox(height: 0, width: 0),
+                                (type == "12")
+                                    ? LinkMessage("$media")
                                     : (a[0] == ":" &&
                                             a[l] == ":" &&
-                                            content.length > 8)
+                                            content.length < 9)
                                         ? Text(content,
-                                            style: TextStyle(fontSize: 24))
-                                        : (type == "1")
-                                            ? (() {
-                                                listMessages.forEach((element) {
-                                                  if (element['type']
-                                                          .toString() ==
-                                                      '1') {
-                                                    imageCount.add(element);
-                                                    test = element;
-                                                  }
-                                                });
-                                                return ImageMessage(
-                                                    "$mediaUrl$rMedia",
-                                                    "$mediaUrl$media",
-                                                    content: content,
-                                                    imageCount: imageCount
-                                                        .indexOf(test));
-                                              }())
-                                            : (type == "2")
-                                                ? Container(
-                                                    color: Colors.pinkAccent
-                                                        .withOpacity(0.2),
-                                                    padding: EdgeInsets.all(5),
-                                                    child: Text(
-                                                      '${localization.document} ${localization.error}',
-                                                      style: TextStyle(
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                                  )
-                                                // FileMessage(
-                                                // url: "$mediaUrl$media") // TODO FIX FILES
-                                                : (type == "3")
-                                                    ? AudioMessage(
+                                            style: TextStyle(fontSize: 40))
+                                        : (a[0] == ":" &&
+                                                a[l] == ":" &&
+                                                content.length > 8)
+                                            ? Text(content,
+                                                style: TextStyle(fontSize: 24))
+                                            : (type == "1")
+                                                ? (() {
+                                                    listMessages
+                                                        .forEach((element) {
+                                                      if (element['type']
+                                                              .toString() ==
+                                                          '1') {
+                                                        imageCount.add(element);
+                                                        test = element;
+                                                      }
+                                                    });
+                                                    return ImageMessage(
+                                                        "$mediaUrl$rMedia",
                                                         "$mediaUrl$media",
+                                                        content: content,
+                                                        imageCount: imageCount
+                                                            .indexOf(test));
+                                                  }())
+                                                : (type == "2")
+                                                    ? Container(
+                                                        color: Colors.pinkAccent
+                                                            .withOpacity(0.2),
+                                                        padding:
+                                                            EdgeInsets.all(5),
+                                                        child: Text(
+                                                          '${localization.document} ${localization.error}',
+                                                          style: TextStyle(
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
                                                       )
-                                                    : (type == "4")
-                                                        ? VideoPlayerWidget(
+                                                    // FileMessage(
+                                                    // url: "$mediaUrl$media") // TODO FIX FILES
+                                                    : (type == "3")
+                                                        ? AudioMessage(
                                                             "$mediaUrl$media",
-                                                            "network",
                                                           )
-                                                        : (type == "10")
-                                                            ? ReplyMessage(
-                                                                content,
-                                                                replyData,
+                                                        : (type == "4")
+                                                            ? VideoPlayerWidget(
+                                                                "$mediaUrl$media",
+                                                                "network",
                                                               )
-                                                            : type == '11'
-                                                                ? Container(
-                                                                    child:
-                                                                        Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .min,
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        Row(
+                                                            : (type == "10")
+                                                                ? ReplyMessage(
+                                                                    content,
+                                                                    replyData,
+                                                                  )
+                                                                : type == '11'
+                                                                    ? Container(
+                                                                        child:
+                                                                            Column(
                                                                           mainAxisSize:
                                                                               MainAxisSize.min,
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.start,
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
                                                                           children: [
-                                                                            Container(
-                                                                                width: 30.0,
-                                                                                height: 30.0,
-                                                                                decoration: new BoxDecoration(shape: BoxShape.circle, image: new DecorationImage(fit: BoxFit.fill, image: new NetworkImage("$avatarUrl${anotherUser["avatar"].toString().replaceAll('AxB', '200x200')}")))),
-                                                                            SizedBox(width: 5),
+                                                                            Row(
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                                              children: [
+                                                                                Container(width: 30.0, height: 30.0, decoration: new BoxDecoration(shape: BoxShape.circle, image: new DecorationImage(fit: BoxFit.fill, image: new NetworkImage("$avatarUrl${anotherUser["avatar"].toString().replaceAll('AxB', '200x200')}")))),
+                                                                                SizedBox(width: 5),
+                                                                                Flexible(
+                                                                                  child: Text(
+                                                                                    "${anotherUser["name"]}",
+                                                                                    maxLines: 1,
+                                                                                    overflow: TextOverflow.ellipsis,
+                                                                                    style: TextStyle(fontWeight: FontWeight.w600, color: whiteColor),
+                                                                                  ),
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                            SizedBox(height: 5),
                                                                             Flexible(
                                                                               child: Text(
-                                                                                "${anotherUser["name"]}",
+                                                                                '+$content KZT',
                                                                                 maxLines: 1,
                                                                                 overflow: TextOverflow.ellipsis,
                                                                                 style: TextStyle(fontWeight: FontWeight.w600, color: whiteColor),
@@ -321,27 +356,12 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                                             )
                                                                           ],
                                                                         ),
-                                                                        SizedBox(
-                                                                            height:
-                                                                                5),
-                                                                        Flexible(
-                                                                          child:
-                                                                              Text(
-                                                                            '+$content KZT',
-                                                                            maxLines:
-                                                                                1,
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
-                                                                            style:
-                                                                                TextStyle(fontWeight: FontWeight.w600, color: whiteColor),
-                                                                          ),
-                                                                        )
-                                                                      ],
-                                                                    ),
-                                                                  )
-                                                                : SelectableText(
-                                                                    content,
-                                                                  ),
+                                                                      )
+                                                                    : SelectableText(
+                                                                        content,
+                                                                      ),
+                              ],
+                            ),
                           ),
                         ],
                       ),

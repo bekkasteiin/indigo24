@@ -15,19 +15,22 @@ class BalanceHistoryPage extends StatefulWidget {
 
 class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     with TickerProviderStateMixin {
-  List _historyBalanceList;
-  String _text;
   bool _emptyResponse;
   bool _isProccessing;
+
   int _balanceHistoryPage;
+
+  String _text;
+  String _maskedText;
+
+  List _historyBalanceList;
+  List _splittedDates;
 
   Api _api;
 
   RefreshController _balanceRefreshController;
 
   MaskTextInputFormatter _filterFormatter;
-  String maskedText;
-  var splittedDates;
 
   @override
   void initState() {
@@ -37,7 +40,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     _balanceHistoryPage = 1;
 
     _text = '';
-    maskedText = '';
+    _maskedText = '';
 
     _api = Api();
 
@@ -98,7 +101,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
 
   void _onBalanceLoading() async {
     print("_onBalanceLoading ");
-    if (maskedText.length == 21) {
+    if (_maskedText.length == 21) {
       _loadFilteredBalanceData();
     } else {
       _loadBalanceData();
@@ -108,9 +111,9 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
 
   Future _loadFilteredBalanceData() async {
     _balanceHistoryPage += 1;
-    api
+    _api
         .getFilteredHistoryBalance(
-            _balanceHistoryPage, splittedDates[0], splittedDates[1])
+            _balanceHistoryPage, _splittedDates[0], _splittedDates[1])
         .then((historyBalance) {
       if (historyBalance['message'] == 'Not authenticated' &&
           historyBalance['success'].toString() == 'false') {
@@ -323,9 +326,9 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                     ),
                   ),
                   onTap: () {
-                    maskedText =
+                    _maskedText =
                         _filterFormatter.getMaskedText().replaceAll(' ', '');
-                    if (maskedText.length == 0) {
+                    if (_maskedText.length == 0) {
                       setState(() {
                         _isProccessing = true;
                       });
@@ -350,16 +353,16 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                         }
                       });
                     }
-                    if (maskedText.length == 21) {
+                    if (_maskedText.length == 21) {
                       _balanceHistoryPage = 1;
 
                       setState(() {
                         _isProccessing = true;
                       });
-                      splittedDates = maskedText.split("/");
-                      api
+                      _splittedDates = _maskedText.split("/");
+                      _api
                           .getFilteredHistoryBalance(_balanceHistoryPage,
-                              splittedDates[0], splittedDates[1])
+                              _splittedDates[0], _splittedDates[1])
                           .then((historyBalance) {
                         setState(() {
                           _isProccessing = false;

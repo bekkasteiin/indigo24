@@ -20,25 +20,23 @@ class _TapePageState extends State<TapePage>
   var _saved = List<dynamic>();
 
   TextEditingController _commentController = TextEditingController();
-  var commentResult;
-  var tapeResult;
-  List com = [];
-  int letterCount = 100;
-  var api = Api();
-  String tempCount = " ";
-  var commentCount;
-  int maxLine = 5;
+  var _tapeResult;
+  List _comments = [];
+  int _letterCount = 100;
+  Api _api = Api();
+  String _tempCount = " ";
+  var _commentCount;
 
   @override
   void initState() {
-    api.getTape(widget.tape["id"]).then((result) {
+    _api.getTape(widget.tape["id"]).then((result) {
       if (result['message'] == 'Not authenticated' &&
           result['success'].toString() == 'false') {
         logOut(context);
         return true;
       } else {
         print('Get tape result $result');
-        commentCount = result['result']['comments'].length;
+        _commentCount = result['result']['comments'].length;
         return setTape(result);
       }
     });
@@ -54,9 +52,9 @@ class _TapePageState extends State<TapePage>
   @override
   Widget build(BuildContext context) {
     bool keyboardIsOpened = MediaQuery.of(context).viewInsets.bottom != 0.0;
-    if (_commentController.text.isEmpty) letterCount = 100;
+    if (_commentController.text.isEmpty) _letterCount = 100;
     if (_commentController.text.isNotEmpty)
-      letterCount = 100 - _commentController.text.length;
+      _letterCount = 100 - _commentController.text.length;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -105,7 +103,7 @@ class _TapePageState extends State<TapePage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${localization.comments} : $commentCount',
+                              '${localization.comments} : $_commentCount',
                               style: TextStyle(
                                   color: blackPurpleColor,
                                   fontWeight: FontWeight.w300),
@@ -113,7 +111,7 @@ class _TapePageState extends State<TapePage>
                             ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: com.length,
+                              itemCount: _comments.length,
                               itemBuilder: (context, index) {
                                 _saved.add({'index': index, 'maxLines': 5});
                                 return Column(
@@ -154,7 +152,7 @@ class _TapePageState extends State<TapePage>
                                                 RichText(
                                                   text: TextSpan(
                                                     text:
-                                                        '${com[index]['name']} ',
+                                                        '${_comments[index]['name']} ',
                                                     style: TextStyle(
                                                         color: blackPurpleColor,
                                                         fontWeight:
@@ -162,7 +160,7 @@ class _TapePageState extends State<TapePage>
                                                     children: <TextSpan>[
                                                       TextSpan(
                                                         text:
-                                                            '${com[index]['comment']}',
+                                                            '${_comments[index]['comment']}',
                                                         style: TextStyle(
                                                             color:
                                                                 blackPurpleColor,
@@ -179,7 +177,7 @@ class _TapePageState extends State<TapePage>
                                                   alignment:
                                                       Alignment.centerLeft,
                                                   child: Text(
-                                                    '${com[index]['date']}',
+                                                    '${_comments[index]['date']}',
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: TextStyle(
@@ -256,11 +254,11 @@ class _TapePageState extends State<TapePage>
                         onSubmitted: (value) async {
                           if (_commentController.text.isNotEmpty) {
                             setState(() {
-                              tapeResult.cast<String, dynamic>();
-                              commentCount++;
+                              _tapeResult.cast<String, dynamic>();
+                              _commentCount++;
                             });
-                            letterCount = 100;
-                            await api
+                            _letterCount = 100;
+                            await _api
                                 .addCommentToTape(
                               '${_commentController.text}',
                               '${widget.tape['id']}',
@@ -273,7 +271,7 @@ class _TapePageState extends State<TapePage>
                                 "date": "${v['result']['date']}"
                               };
                               setState(() {
-                                com.add(result);
+                                _comments.add(result);
                               });
                             });
                             _commentController.text = "";
@@ -286,17 +284,17 @@ class _TapePageState extends State<TapePage>
                         ],
                         controller: _commentController,
                         onChanged: (value) {
-                          if (value.length < tempCount.length) {
+                          if (value.length < _tempCount.length) {
                             setState(() {
-                              letterCount = letterCount + 1;
+                              _letterCount = _letterCount + 1;
                             });
                           }
-                          if (value.length > tempCount.length) {
+                          if (value.length > _tempCount.length) {
                             setState(() {
-                              letterCount = letterCount - 1;
+                              _letterCount = _letterCount - 1;
                             });
                           }
-                          tempCount = value;
+                          _tempCount = value;
                         },
                         decoration: InputDecoration(
                           // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -305,11 +303,11 @@ class _TapePageState extends State<TapePage>
                             onPressed: () async {
                               if (_commentController.text.isNotEmpty) {
                                 setState(() {
-                                  tapeResult.cast<String, dynamic>();
-                                  commentCount++;
+                                  _tapeResult.cast<String, dynamic>();
+                                  _commentCount++;
                                 });
-                                letterCount = 100;
-                                await api
+                                _letterCount = 100;
+                                await _api
                                     .addCommentToTape(
                                   '${_commentController.text}',
                                   '${widget.tape['id']}',
@@ -323,7 +321,7 @@ class _TapePageState extends State<TapePage>
                                     "date": "${v['result']['date']}"
                                   };
                                   setState(() {
-                                    com.add(result);
+                                    _comments.add(result);
                                   });
                                 });
                                 _commentController.text = "";
@@ -340,7 +338,7 @@ class _TapePageState extends State<TapePage>
                 Padding(
                   padding: const EdgeInsets.only(
                       top: 10, left: 10, bottom: 10, right: 10),
-                  child: Text('$letterCount'),
+                  child: Text('$_letterCount'),
                 ),
               ],
             ),
@@ -353,8 +351,8 @@ class _TapePageState extends State<TapePage>
   Future setTape(result) async {
     setState(() {
       // print('this is result $result');
-      tapeResult = result["result"];
-      com = result["result"]["comments"].toList();
+      _tapeResult = result["result"];
+      _comments = result["result"]["comments"].toList();
       _future = Future(foo);
     });
   }

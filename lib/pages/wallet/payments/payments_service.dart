@@ -561,7 +561,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   }
                 } else {
                   print('ptinr');
-                  api
+                  _api
                       .calculateSum(
                           widget.serviceID,
                           '${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',

@@ -43,8 +43,8 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'style/colors.dart';
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-bool isInAppPushActive = false;
-String formatPhone(String phone) {
+bool _isInAppPushActive = false;
+String _formatPhone(String phone) {
   String r = phone.replaceAll(" ", "");
   r = r.replaceAll("(", "");
   r = r.replaceAll(")", "");
@@ -99,8 +99,8 @@ getContacts(context) async {
         phonebook.forEach((el) {
           if (el.displayName != null) {
             el.phones.forEach((phone) {
-              if (!contacts.contains(formatPhone(phone.value))) {
-                phone.value = formatPhone(phone.value);
+              if (!contacts.contains(_formatPhone(phone.value))) {
+                phone.value = _formatPhone(phone.value);
                 if (contacts.every((user) => user['phone'] != phone.value)) {
                   contacts.add({
                     'name': el.displayName,
@@ -129,14 +129,13 @@ permissionForPush() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await ContactsService.addContact(Contact(displayName: "Name $i", givenName: 'Givenname $i', middleName: 'Middlename $i', phones: [ Item(label: 'home', value: '${87020000000+i}')])); // To Add Contacts
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  String languageCode = preferences.getString('languageCode');
-  localization.setLanguage(languageCode);
-  var phone = preferences.getString('phone');
-  var unique = preferences.getString('unique');
-  var customerID = preferences.getString('customerID');
-  String domen2 = preferences.getString('domen');
+  SharedPreferences _preferences = await SharedPreferences.getInstance();
+  String _languageCode = _preferences.getString('languageCode');
+  localization.setLanguage(_languageCode);
+  var phone = _preferences.getString('phone');
+  var unique = _preferences.getString('unique');
+  var customerID = _preferences.getString('customerID');
+  String domen2 = _preferences.getString('domen');
   if ('$domen2' == 'null') {
     domen = 'com';
   } else {
@@ -198,11 +197,11 @@ class MyApp extends StatelessWidget {
 inAppPush(m) {
   print('_________________In App Push $m');
 
-  if (!isInAppPushActive) {
+  if (!_isInAppPushActive) {
     // Check if inAppPush is alreadyExist
-    isInAppPushActive = true;
+    _isInAppPushActive = true;
     Future.delayed(Duration(seconds: 4)).then((value) {
-      isInAppPushActive = false;
+      _isInAppPushActive = false;
     });
     if (user.settings['settings']['chat_all_mute'].toString() == '1') {
       // check user muted all of chats or not
@@ -222,7 +221,7 @@ inAppPush(m) {
                       MaterialPageRoute(builder: (context) => Tabs()),
                       (r) => false);
                   ChatRoom.shared.getMessages(m['chat_id']);
-                  goToChat(
+                  _goToChat(
                     "${m['chat_name']}",
                     "${m['chat_id']}",
                     context,
@@ -244,7 +243,7 @@ inAppPush(m) {
                 subtitle: Text(
                   m['attachments'] == null
                       ? "${m["text"]}"
-                      : identifyType(m['type']),
+                      : _identifyType(m['type']),
                 ),
                 trailing: IconButton(
                     icon: Icon(Icons.close),
@@ -260,7 +259,7 @@ inAppPush(m) {
   }
 }
 
-goToChat(name, chatID, context,
+_goToChat(name, chatID, context,
     {chatType, memberCount, userIds, avatar, avatarUrl}) {
   ChatRoom.shared.setCabinetStream();
   ChatRoom.shared.checkUserOnline(userIds);
@@ -284,7 +283,7 @@ goToChat(name, chatID, context,
   });
 }
 
-identifyType(type) {
+_identifyType(type) {
   // const TEXT_MESSAGE_TYPE = 0;
   // const IMAGE_MESSAGE_TYPE = 1;
   // const DOCUMENT_MESSAGE_TYPE = 2;
@@ -348,8 +347,7 @@ class Tabs extends StatefulWidget {
 List<MyContact> myContacts = [];
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
-  bool isAuthenticated = false;
-  TabController tabController;
+  TabController _tabController;
   Api api = Api();
   MyConnectivity _connectivity = MyConnectivity.instance;
   Map _source = {ConnectivityResult.none: false};
@@ -359,14 +357,16 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   StreamSubscription _intentDataStreamSubscription;
   List<SharedMediaFile> _sharedFiles;
   String _sharedText;
-  bool isSharedVideo = false;
+  bool _isSharedVideo = false;
+  ChatsDB _chatsDB = ChatsDB();
 
-  var sharedType;
+  ContactsDB _contactsDB = ContactsDB();
 
-  var contactsDB = ContactsDB();
-
+  final StreamController<bool> _verificationNotifier =
+      StreamController<bool>.broadcast();
+  var _tempPasscode;
   share() async {
-    await contactsDB.getAll().then((value) {
+    await _contactsDB.getAll().then((value) {
       myContacts = value;
     });
 
@@ -376,7 +376,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       setState(() {
         print(
             'path of thumbnail: ${value[0].thumbnail}   ${value[0].type == SharedMediaType.VIDEO} ');
-        if (value[0].type == SharedMediaType.VIDEO) isSharedVideo = true;
+        if (value[0].type == SharedMediaType.VIDEO) _isSharedVideo = true;
         print("Shared:" + (value?.map((f) => f.path)?.join(",") ?? ""));
         _sharedFiles = value;
       });
@@ -415,8 +415,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
   }
 
-  ChatsDB chatsDB = ChatsDB();
-
   setUser() async {
     user.id = await SharedPreferencesHelper.getCustomerID();
     user.phone = await SharedPreferencesHelper.getString('phone');
@@ -448,18 +446,16 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     );
   }
 
-  final StreamController<bool> _verificationNotifier =
-      StreamController<bool>.broadcast();
-  var _temp;
   _onPasscodeEntered(String enteredPasscode) {
-    if (user.pin == 'waiting' && _temp == enteredPasscode) {
+    if (user.pin == 'waiting' && _tempPasscode == enteredPasscode) {
       print('creating');
       api.createPin(enteredPasscode);
       Future.delayed(const Duration(milliseconds: 250), () {
         Navigator.pop(context);
       });
     }
-    if ('${user.pin}'.toString() == 'waiting' && _temp != enteredPasscode) {
+    if ('${user.pin}'.toString() == 'waiting' &&
+        _tempPasscode != enteredPasscode) {
       return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -480,8 +476,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
     if ('${user.pin}'.toString() == 'false') {
       user.pin = 'waiting';
-      _temp = enteredPasscode;
-      print('first set pin $_temp');
+      _tempPasscode = enteredPasscode;
+      print('first set pin $_tempPasscode');
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
@@ -489,9 +485,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       Future.delayed(const Duration(milliseconds: 250), () {
         print(' is really valid ');
         _verificationNotifier.add(isValid);
-        setState(() {
-          this.isAuthenticated = isValid;
-        });
         Navigator.pop(context);
       });
     } else {
@@ -642,7 +635,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       },
     );
 
-    tabController = new TabController(length: 4, vsync: this);
+    _tabController = new TabController(length: 4, vsync: this);
 
     setUser().then((result) async {
       print("result: $result");
@@ -729,7 +722,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               chatId: data['chat_id'],
               online: data['online'],
             );
-            await contactsDB.updateOrInsert(contact);
+            await _contactsDB.updateOrInsert(contact);
           }
           break;
         default:
@@ -741,7 +734,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   updateOrInsertChat(ChatsModel chat) async {
     // await chatsDB.deleteAll();
-    await chatsDB.updateOrInsert(chat);
+    await _chatsDB.updateOrInsert(chat);
   }
 
   goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
@@ -769,7 +762,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   Future _getChats() async {
-    Future<List<ChatsModel>> chats = chatsDB.getAllSortedByTime();
+    Future<List<ChatsModel>> chats = _chatsDB.getAllSortedByTime();
     chats.then((value) {
       setState(() {
         value.forEach((element) {
@@ -795,7 +788,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           TapesPage(),
           WalletTab(),
         ],
-        controller: tabController,
+        controller: _tabController,
       ),
       bottomNavigationBar: SafeArea(
         child: PreferredSize(
@@ -811,7 +804,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               indicatorPadding: EdgeInsets.all(1),
               labelPadding: EdgeInsets.all(0),
               indicatorWeight: 0.0000000000001,
-              controller: tabController,
+              controller: _tabController,
               unselectedLabelColor: blackPurpleColor,
               labelColor: primaryColor,
               tabs: [
@@ -880,7 +873,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                           : _sharedFiles == null || _sharedFiles.isEmpty
                               ? Container()
                               : Image.file(
-                                  File(isSharedVideo
+                                  File(_isSharedVideo
                                       ? _sharedFiles[0].thumbnail
                                       : _sharedFiles[0].path),
                                   fit: BoxFit.cover,
@@ -973,7 +966,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 onPressed: () {
                   Navigator.pop(context);
                   _sharedFiles.clear();
-                  isSharedVideo = false;
+                  _isSharedVideo = false;
                 },
               ),
             );
@@ -982,12 +975,12 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   sendMedia(path, chatId, StateSetter setState) {
-    var type = isSharedVideo ? 4 : 1;
+    var type = _isSharedVideo ? 4 : 1;
     uploadMedia(path, type, setState).then((r) async {
       print("RRR $r");
       if (r["status"]) {
         var a = [
-          isSharedVideo
+          _isSharedVideo
               ? {
                   "filename": "${r["file_name"]}",
                 }
@@ -996,11 +989,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   "r_filename": "${r["resize_file_name"]}"
                 }
         ];
-        var mediaType = isSharedVideo ? "video" : "image";
+        var mediaType = _isSharedVideo ? "video" : "image";
         ChatRoom.shared.sendMessage('$chatId', "$mediaType",
             type: type, attachments: jsonDecode(jsonEncode(a)));
         _sharedFiles.clear();
-        isSharedVideo = false;
+        _isSharedVideo = false;
         Navigator.pop(context);
       } else {
         showAlertDialog(context, r["message"]);
@@ -1091,8 +1084,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     );
   }
 }
-
-var api = Api();
 
 dioError(context) async {
   Widget okButton = CupertinoDialogAction(

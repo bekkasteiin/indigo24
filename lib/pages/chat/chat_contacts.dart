@@ -18,19 +18,19 @@ class ChatContactsPage extends StatefulWidget {
   _ChatContactsPageState createState() => _ChatContactsPageState();
 }
 
-bool firstLoad = true;
-
 class _ChatContactsPageState extends State<ChatContactsPage> {
   TextEditingController _searchController = TextEditingController();
 
-  var actualList = List<dynamic>();
+  List _actualList = List<dynamic>();
 
-  var contactsDB = ContactsDB();
+  ContactsDB _contactsDB = ContactsDB();
+
+  bool _boolForPrevenceUserCheck = true;
 
   @override
   void initState() {
     super.initState();
-    actualList.addAll(myContacts);
+    _actualList.addAll(myContacts);
     ChatRoom.shared.setContactsStream();
     _listen();
     getContacts(context).then((getContactsResult) {
@@ -63,10 +63,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   @override
   void dispose() {
     super.dispose();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    _searchController.dispose();
   }
 
-  bool boolForPrevenceUserCheck = true;
   _listen() {
     ChatRoom.shared.onContactChange.listen((e) {
       print("Contact EVENT");
@@ -75,7 +74,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
       switch (cmd) {
         case "user:check":
-          if (!boolForPrevenceUserCheck) {
+          if (!_boolForPrevenceUserCheck) {
           } else {
             if (e.json['data']['chat_id'].toString() != 'false' &&
                 e.json['data']['status'].toString() == 'true') {
@@ -155,19 +154,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     });
   }
 
-  String formatPhone(String phone) {
-    String r = phone.replaceAll(" ", "");
-    r = r.replaceAll("(", "");
-    r = r.replaceAll(")", "");
-    r = r.replaceAll("+", "");
-    r = r.replaceAll("-", "");
-    if (r.startsWith("8")) {
-      r = r.replaceFirst("8", "7");
-    }
-    return r;
-  }
-
-  search(String query) {
+  _search(String query) {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
       myContacts.forEach((item) {
@@ -187,14 +174,14 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         }
       });
       setState(() {
-        actualList = [];
-        actualList.addAll(matches);
+        _actualList = [];
+        _actualList.addAll(matches);
       });
       return;
     } else {
       setState(() {
-        actualList = [];
-        actualList.addAll(myContacts);
+        _actualList = [];
+        _actualList.addAll(myContacts);
       });
     }
   }
@@ -248,14 +235,14 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               iconSize: 30,
               color: blackPurpleColor,
               onPressed: () async {
-                boolForPrevenceUserCheck = false;
+                _boolForPrevenceUserCheck = false;
                 print('update contacts');
                 await getContactsTemplate(context);
-                await contactsDB.getAll().then((value) {
+                await _contactsDB.getAll().then((value) {
                   myContacts = value;
                   setState(() {
-                    actualList.clear();
-                    actualList.addAll(value);
+                    _actualList.clear();
+                    _actualList.addAll(value);
                   });
                 });
               },
@@ -279,20 +266,20 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                     fillColor: blackPurpleColor,
                   ),
                   onChanged: (value) {
-                    search(value);
+                    _search(value);
                   },
                   controller: _searchController,
                 ),
               ),
               Expanded(
-                child: actualList.isNotEmpty
+                child: _actualList.isNotEmpty
                     ? ListView.builder(
-                        itemCount: actualList != null ? actualList.length : 0,
+                        itemCount: _actualList != null ? _actualList.length : 0,
                         itemBuilder: (BuildContext context, int index) {
-                          if ('${user.phone}' == '+${actualList[index].phone}')
+                          if ('${user.phone}' == '+${_actualList[index].phone}')
                             return Center();
-                          if (actualList[index].phone == null &&
-                              actualList[index].name == null)
+                          if (_actualList[index].phone == null &&
+                              _actualList[index].name == null)
                             return Container();
                           return Padding(
                             padding: const EdgeInsets.only(top: 2),
@@ -315,7 +302,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                 height: 35,
                                                 child: Center(
                                                   child: Text(
-                                                    '${actualList[index].name.toString()[0]}',
+                                                    '${_actualList[index].name.toString()[0]}',
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: TextStyle(
@@ -337,15 +324,15 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                   children: <Widget>[
                                                     Text(
                                                       index != 0
-                                                          ? actualList[index]
+                                                          ? _actualList[index]
                                                                       .name ==
-                                                                  actualList[
+                                                                  _actualList[
                                                                           index -
                                                                               1]
                                                                       .name
-                                                              ? '${actualList[index].name}'
-                                                              : '${actualList[index].name}'
-                                                          : '${actualList[index].name}',
+                                                              ? '${_actualList[index].name}'
+                                                              : '${_actualList[index].name}'
+                                                          : '${_actualList[index].name}',
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: TextStyle(
@@ -353,7 +340,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                       textAlign: TextAlign.left,
                                                     ),
                                                     Text(
-                                                      '${actualList[index].phone}',
+                                                      '${_actualList[index].phone}',
                                                       style: TextStyle(
                                                           fontSize: 10),
                                                       textAlign: TextAlign.left,
@@ -372,9 +359,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                   ],
                                 ),
                                 onPressed: () {
-                                  boolForPrevenceUserCheck = true;
+                                  _boolForPrevenceUserCheck = true;
                                   ChatRoom.shared
-                                      .userCheck(actualList[index].phone);
+                                      .userCheck(_actualList[index].phone);
                                 },
                               ),
                               decoration: BoxDecoration(
