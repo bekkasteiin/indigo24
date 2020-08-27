@@ -9,6 +9,8 @@ var balanceInBlock = "";
 var pin = "false";
 String chatBackground = 'ligth';
 bool identified = false;
+String country = '';
+String city = '';
 
 var avatarUrl = "https://indigo24.com/uploads/avatars/";
 Map<String, dynamic> settings;

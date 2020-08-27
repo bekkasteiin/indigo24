@@ -17,7 +17,7 @@ class SettingsNotificationsMainPage extends StatefulWidget {
 
 class _SettingsNotificationsMainPageState
     extends State<SettingsNotificationsMainPage> {
-  bool _isShowNotificationsSwitched;
+  bool _isHideNotificationsSwitched;
   bool _isPreviewMessageSwitched;
   Map<String, dynamic> settings;
   @override
@@ -27,7 +27,7 @@ class _SettingsNotificationsMainPageState
     print(settings['chat_all_mute'].toString() == '1');
     print(settings['chat_all_mute'].toString() == '1');
 
-    _isShowNotificationsSwitched =
+    _isHideNotificationsSwitched =
         settings['chat_all_mute'].toString() == '1' ? true : false;
     _isPreviewMessageSwitched = false;
   }
@@ -97,7 +97,7 @@ class _SettingsNotificationsMainPageState
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                '${localization.showNotifications}',
+                                '${localization.hideNotifications}',
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
@@ -106,10 +106,10 @@ class _SettingsNotificationsMainPageState
                               CupertinoSwitch(
                                 trackColor: brightGreyColor3,
                                 activeColor: primaryColor,
-                                value: _isShowNotificationsSwitched,
+                                value: _isHideNotificationsSwitched,
                                 onChanged: (value) {
                                   setState(() {
-                                    _isShowNotificationsSwitched = value;
+                                    _isHideNotificationsSwitched = value;
                                     int boolean = value ? 1 : 0;
                                     ChatRoom.shared.setUserSettings(boolean);
                                   });

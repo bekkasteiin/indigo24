@@ -702,6 +702,12 @@ class _TapesPageState extends State<TapesPage>
                                                                     () {});
                                                               },
                                                             ),
+                                                            Container(
+                                                              width: 30,
+                                                              child: Text(
+                                                                '${_result[index]['commentsCount']}',
+                                                              ),
+                                                            ),
                                                             // IconButton(
                                                             //   icon: Container(
                                                             //     width: 35,

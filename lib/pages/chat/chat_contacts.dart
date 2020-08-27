@@ -68,8 +68,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
   _listen() {
     ChatRoom.shared.onContactChange.listen((e) {
-      print("Contact EVENT");
-      print(e.json);
+      print("Contact EVENT ${e.json}");
       var cmd = e.json['cmd'];
 
       switch (cmd) {
@@ -78,10 +77,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
           } else {
             if (e.json['data']['chat_id'].toString() != 'false' &&
                 e.json['data']['status'].toString() == 'true') {
-              ChatRoom.shared.setCabinetStream();
-              ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
+              ChatRoom.shared.setChatStream();
+              ChatRoom.shared.getMessages(e.json['data']['chat_id']);
 
-              print("USER CHECK DATA: ${e.json['data']}");
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -97,14 +95,14 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                 // this is bool for check load more is needed or not
                 globalBoolForForceGetChat = false;
                 ChatRoom.shared.forceGetChat();
-                ChatRoom.shared.closeCabinetStream();
+                ChatRoom.shared.closeChatStream();
               });
             } else if (e.json['data']['status'].toString() == 'true') {
               // print('____________________');
               // print('else if e.jsonDataStatus == true');
               // print({e.json['data']['user_id']});
               // print('____________________');
-              ChatRoom.shared.setCabinetStream();
+              ChatRoom.shared.setChatStream();
               ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
             }
           }
@@ -113,8 +111,8 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         case "chat:create":
           print("CHAT CREATE ${e.json['data']}");
           if (e.json["data"]["status"].toString() == "true") {
-            ChatRoom.shared.setCabinetStream();
-            ChatRoom.shared.getMessages('${e.json['data']['chat_id']}');
+            ChatRoom.shared.setChatStream();
+            ChatRoom.shared.getMessages(e.json['data']['chat_id']);
             Navigator.pop(context);
             // print('_________________________________');
             // print('chat contacts user ids ${e.json['data']['user_id']}');
@@ -132,10 +130,10 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               // this is bool for check load more is needed or not
               globalBoolForForceGetChat = false;
               ChatRoom.shared.forceGetChat();
-              ChatRoom.shared.closeCabinetStream();
+              ChatRoom.shared.closeChatStream();
             });
           } else {
-            ChatRoom.shared.setCabinetStream();
+            ChatRoom.shared.setChatStream();
             var name = e.json["data"]["name"];
             var chatID = e.json["data"]["chat_id"];
             Navigator.pop(context);
@@ -143,8 +141,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               context,
               MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
             ).whenComplete(() {
+              globalBoolForForceGetChat = false;
               ChatRoom.shared.forceGetChat();
-              ChatRoom.shared.closeCabinetStream();
+              ChatRoom.shared.closeChatStream();
             });
           }
           break;

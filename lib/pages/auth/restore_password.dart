@@ -119,7 +119,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        _phonePrefix = _selectedCountry._phonePrefix;
+        _phonePrefix = _selectedCountry.phonePrefix;
       });
   }
 

@@ -62,6 +62,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   double _expectedAmount = 0.0;
   String _expectedCurrency = '';
 
+  String accountExample;
+  String amountExample;
+
   @override
   void initState() {
     super.initState();
@@ -80,18 +83,20 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         }
         if ('${element['name']}' == 'account') {
           _accountPlaceholder = element['placeholder'];
+          accountExample = '${element['mask']}';
+
           _accountRegex = RegExp(r'' + element['regex']);
+          RegExp anyRegExp = RegExp(r'.');
+
           if (element['mask'] == ' ') {
-            _loginFormatter =
-                MaskTextInputFormatter(filter: {"*": _accountRegex});
+            _loginFormatter = MaskTextInputFormatter(filter: {"*": anyRegExp});
           } else {
             print('else else $element');
             if (element['mask'].toString() != 'null') {
-              _accountLength = element['mask'].replaceAll(' ', '').length;
+              _accountLength = element['mask'].length;
             }
-
             _loginFormatter = MaskTextInputFormatter(
-                mask: '${element['mask']}', filter: {"*": _accountRegex});
+                mask: '${element['mask']}', filter: {"*": anyRegExp});
           }
         }
       });
@@ -638,7 +643,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     Container(
                       child: TextFormField(
                         inputFormatters: [
-                          // _loginFormatter,
+                          _loginFormatter,
                           _accountLength != null
                               ? LengthLimitingTextInputFormatter(_accountLength)
                               : LengthLimitingTextInputFormatter(50),
@@ -650,6 +655,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         style: TextStyle(fontSize: 20),
                       ),
                     ),
+                    Text('${localization.example} $accountExample')
                   ],
                 ),
               ),
@@ -666,17 +672,25 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           Row(
             children: <Widget>[
               Expanded(
-                child: Container(
-                  child: TextFormField(
-                    controller: _sumController,
-                    decoration:
-                        InputDecoration.collapsed(hintText: _amountPlaceholder),
-                    style: TextStyle(fontSize: 20),
-                    inputFormatters: [
-                      BlacklistingTextInputFormatter(new RegExp(r"^(?!(0))$")),
-                    ],
-                    onChanged: (value) {},
-                  ),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: TextFormField(
+                        controller: _sumController,
+                        decoration: InputDecoration.collapsed(
+                            hintText: _amountPlaceholder),
+                        style: TextStyle(fontSize: 20),
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(
+                            _service['service']['max'].toString().length,
+                          ),
+                          BlacklistingTextInputFormatter(
+                              new RegExp(r"^(?!(0))$")),
+                        ],
+                        onChanged: (value) {},
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

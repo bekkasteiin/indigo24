@@ -7,6 +7,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 
+import '../../main.dart';
 import 'chat_contacts.dart';
 
 class ChatMembersSelection extends StatefulWidget {
@@ -30,18 +31,9 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     super.initState();
 
     _saved = List<dynamic>();
-    _actualList = List<dynamic>();
-
     _searchController = TextEditingController();
 
-    if (contacts.isNotEmpty) {
-      _actualList.addAll(contacts);
-      widget.currentChatMembers.forEach((value) {
-        _actualList.removeWhere((element) {
-          return '${value['phone']}' == '${element['phone']}';
-        });
-      });
-    }
+    _actualList = myContacts;
 
     ChatRoom.shared.setContactsStream();
 
@@ -51,21 +43,19 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
   @override
   void dispose() {
     super.dispose();
-    ChatRoom.shared.contactController.close();
+    // ChatRoom.shared.contactController.close();
     _searchController.dispose();
   }
 
   _listen() {
     ChatRoom.shared.onContactChange.listen((e) {
-      print("MEMBER SELECTION EVENT");
-      print(e.json);
       var cmd = e.json['cmd'];
+      print("MEMBER SELECTION EVENT $cmd");
+      print(e.json);
       switch (cmd) {
         case "user:check":
           if ("${e.json['data']['chat_id']}" != "null" &&
               "${e.json['data']['status']}" == 'true') {
-            print('________ user check is valid __________');
-            print('________ user check is valid __________');
             setState(() {
               _saved.add({
                 'phone': e.json['data']['phone'],
@@ -73,25 +63,11 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                 'name': e.json['data']['name'],
               });
             });
-
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) => ChatPage(
-            //           e.json['data']['user_id'], e.json['data']['chat_id'])),
-            // ).whenComplete(() {
-            //   ChatRoom.shared.forceGetChat();
-            //   ChatRoom.shared.closeCabinetStream();
-            // });
-          } else if (e.json['data']['status'] == 'true') {
-            // ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
-          } else {
-            _showError(context, '${localization.userNotInSystem}');
           }
           break;
         case "chat:members:add":
           print('______CHAT MEMBERS ADD______');
-          Navigator.pop(context);
+          // Navigator.pop(context);
           break;
         default:
           print('this is default');
@@ -99,32 +75,12 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     });
   }
 
-  Future<void> _showError(BuildContext context, m) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('${localization.error}'),
-          content: Text(m),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _search(String query) {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
-      contacts.forEach((item) {
-        if (item['name'].toLowerCase().contains(query.toLowerCase()) ||
-            item['phone'].toLowerCase().contains(query.toLowerCase())) {
+      myContacts.forEach((item) {
+        if (item.name.toLowerCase().contains(query.toLowerCase()) ||
+            item.phone.toLowerCase().contains(query.toLowerCase())) {
           matches.add(item);
         }
       });
@@ -135,7 +91,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     } else {
       setState(() {
         _actualList.clear();
-        _actualList.addAll(contacts);
+        _actualList.addAll(myContacts);
       });
     }
   }
@@ -185,7 +141,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
         ],
         backgroundColor: Colors.white,
       ),
-      body: contacts.isNotEmpty
+      body: myContacts.isNotEmpty
           ? SafeArea(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -268,8 +224,8 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                             onTap: () {
                                               setState(() {
                                                 _saved.removeWhere((item) {
-                                                  return '${item['phone']}' ==
-                                                      '${_saved[index]['phone']}';
+                                                  return '${item.phone}' ==
+                                                      '${_saved[index].phone}';
                                                 });
                                               });
                                             },
@@ -312,8 +268,8 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                     child: ListView.builder(
                       itemCount: _actualList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        if ('${user.phone}' ==
-                            '+${_actualList[index]['phone']}') return Center();
+                        if ('${user.phone}' == '+${_actualList[index].phone}')
+                          return Center();
                         return Padding(
                           padding: const EdgeInsets.only(top: 2),
                           child: Container(
@@ -321,14 +277,14 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                               title: Wrap(
                                 children: <Widget>[
                                   Text(
-                                    '${_actualList[index]['name']}',
+                                    '${_actualList[index].name}',
                                     style: TextStyle(fontSize: 16.0),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                               subtitle: Text(
-                                '${_actualList[index]['phone']}',
+                                '${_actualList[index].phone}',
                                 style: TextStyle(fontSize: 14.0),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -337,11 +293,11 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                 setState(() {
                                   if (val == true) {
                                     ChatRoom.shared
-                                        .userCheck(_actualList[index]['phone']);
+                                        .userCheck(_actualList[index].phone);
                                   } else {
                                     _saved.removeWhere((item) {
                                       return '${item['phone']}' ==
-                                          '${_actualList[index]['phone']}';
+                                          '${_actualList[index].phone}';
                                     });
                                   }
                                 });
@@ -369,7 +325,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
   _value(index) {
     bool tempo = false;
     _saved.forEach((element) {
-      if ('${element['phone']}' == '${_actualList[index]['phone']}') {
+      if ('${element['phone']}' == '${_actualList[index].phone}') {
         tempo = true;
       }
     });

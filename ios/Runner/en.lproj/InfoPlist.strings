@@ -8,8 +8,9 @@
 CFBundleName = "Indigo24";
 NSAppleMusicUsageDescription = "This app requires access to play music.";
 NSCalendarsUsageDescription = "This app need to access your calendar events.";
-NSCameraUsageDescription = "This app requires camera to take photos, share to server, and save photos to Camera Roll.";
-NSContactsUsageDescription = "This app requires access to contacts to find friends in a chat room.";
+NSCameraUsageDescription = "This app requires camera to take photos, upload pictures to server, change profile image.";
+NSContactsUsageDescription = "This allows Indigo24 to upload your contacts to the server and let you find which friends you want to chat in a chat room.
+You can find Privacy Policy at settings of inside Indigo24.";
 NSLocationAlwaysUsageDescription = "This app requires location to send in a chat room.";
 NSLocationWhenInUseUsageDescription= "This app requires location to send in a chat room.";
 NSMicrophoneUsageDescription = "This app requires microphone for voice messages in a chat room.";

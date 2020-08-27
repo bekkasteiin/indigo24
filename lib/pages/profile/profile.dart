@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/db/chats_db.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/intro.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
@@ -22,30 +23,57 @@ import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:indigo24/services/user.dart' as user;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+
+import 'profile_settings.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> {
-  TextEditingController _nameController;
-  bool _isEditing;
+bool needToAskCity = true;
+
+class _UserProfilePageState extends State<UserProfilePage>
+    with AutomaticKeepAliveClientMixin {
+  Api _api;
   @override
   void dispose() {
     super.dispose();
-    _nameController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   @override
   void initState() {
     super.initState();
-    _isEditing = false;
-    _nameController = TextEditingController();
+    _api = Api();
+    _api.getProfile().then((result) {
+      print('profile result is $result');
+      if (result['success'] == true) {
+        setState(() {
+          user.avatar = result['avatar'];
+          user.email = result['email'];
+          user.identified = result['identified'];
+          user.name = result['name'];
+          user.phone = '+' + result['phone'];
+          if (result['country'] != null) {
+            user.country = result['country'];
+          }
+          if (result['city'] != null) {
+            if (result['city'].contains(';')) {
+              print(result['city']);
+              List cities = result['city'].split(';');
+              if (needToAskCity) _showSelectCity(cities);
+            } else {
+              user.city = result['city'];
+            }
+          }
+        });
+      }
+    });
+
     _initPackageInfo();
   }
 
@@ -62,6 +90,93 @@ class _UserProfilePageState extends State<UserProfilePage> {
         _packageInfo = info;
       });
     }
+  }
+
+  showCustomDialog(BuildContext context, String message) async {
+    Widget okButton = CupertinoDialogAction(
+      child: Text("OK"),
+      onPressed: () async {
+        Navigator.pop(context);
+      },
+    );
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  _showSelectCity(cities) {
+    needToAskCity = false;
+    Size size = MediaQuery.of(context).size;
+    Dialog errorDialog = Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Container(
+        width: size.width * 0.5,
+        height: size.width * 0.8,
+        child: Column(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.all(10),
+              child: Text('${localization.selectOption}'),
+            ),
+            Container(
+              height: 1,
+              width: size.width,
+              color: blackColor,
+            ),
+            Flexible(
+              child: ListView.separated(
+                padding: EdgeInsets.all(0),
+                shrinkWrap: false,
+                itemCount: cities.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return FlatButton(
+                    child: Text('${cities[index]}'),
+                    onPressed: () {
+                      api.settingsSave(city: cities[index]).then((result) {
+                        if (result['success']) {
+                          setState(() {
+                            user.city = cities[index];
+                          });
+                          showCustomDialog(context, '${result['message']}');
+                        }
+                      });
+
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    Container(
+                  height: 1,
+                  width: size.width,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return errorDialog;
+      },
+    );
   }
 
   File _image;
@@ -170,6 +285,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
+        print(e.response);
         print(e.response.statusCode);
       } else {
         print(e.request);
@@ -335,12 +451,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isEditing = true;
-          _nameController.text = user.name;
-        });
-      },
+      onTap: () {},
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         // mainAxisSize: MainAxisSize.min,
@@ -368,6 +479,44 @@ class _UserProfilePageState extends State<UserProfilePage> {
           SizedBox(height: 5),
           Text(
             '${user.email}',
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 18, color: blackPurpleColor),
+          ),
+          SizedBox(height: 5)
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCitySection(Size screenSize) {
+    return Container(
+      width: screenSize.width / 1.3,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text("${localization.city}"),
+          SizedBox(height: 5),
+          Text(
+            '${user.city}',
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 18, color: blackPurpleColor),
+          ),
+          SizedBox(height: 5)
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountrySection(Size screenSize) {
+    return Container(
+      width: screenSize.width / 1.3,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text("${localization.country}"),
+          SizedBox(height: 5),
+          Text(
+            '${user.country}',
             textAlign: TextAlign.left,
             style: TextStyle(fontSize: 18, color: blackPurpleColor),
           ),
@@ -413,191 +562,200 @@ class _UserProfilePageState extends State<UserProfilePage> {
         body: Stack(
           children: <Widget>[
             SingleChildScrollView(
-              child: Container(
-                height: screenSize.height * 0.82,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        SizedBox(height: 160),
-                        _buildPhoneSection(screenSize),
-                        _buildSeparator(screenSize),
-                        SizedBox(height: 10),
-                        _buildEmailSection(screenSize),
-                        _buildSeparator(screenSize),
-                      ],
-                    ),
-
-                    // SizedBox(height: screenSize.height*0.2),
-                    // SizedBox(height: 20),
-
-                    // LANGUAGE
-                    // Container(
-                    //   padding: EdgeInsets.symmetric(horizontal: 10),
-                    //   decoration: BoxDecoration(
-                    //       color: Colors.white,
-                    //       borderRadius: BorderRadius.all(
-                    //         Radius.circular(16.0),
-                    //       )),
-                    //   child: DropdownButtonHideUnderline(
-                    //     child: DropdownButton(
-                    //       hint: Text("${localization.currentLanguage}",
-                    //           style: TextStyle(color:blackPurpleColor)),
-                    //       // value: _valFriends,
-                    //       items: localization.languages.map((value) {
-                    //         return DropdownMenuItem(
-                    //           child: Text('${value['title']}',
-                    //               style: TextStyle(color:blackPurpleColor)),
-                    //           value: value,
-                    //         );
-                    //       }).toList(),
-                    //       onChanged: (value) {
-                    //         // MyApp.tabPageKey.currentState.tabController.animateTo(0);
-                    //         tabPageKey.currentState.setState(() {});
-                    //         print('${value['title']}');
-                    //         setState(() {
-                    //         });
-                    //         localization.setLanguage(value['code']);
-                    //       },
-                    //     ),
-                    //   ),
-                    // ),
-
-                    Column(
-                      children: <Widget>[
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxWidth:
-                                  MediaQuery.of(context).size.width * 0.42),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 10.0,
-                                    spreadRadius: -2,
-                                    offset: Offset(0.0, 0.0))
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          SizedBox(height: 160),
+                          _buildPhoneSection(screenSize),
+                          _buildSeparator(screenSize),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          SizedBox(height: 10),
+                          _buildEmailSection(screenSize),
+                          _buildSeparator(screenSize),
+                        ],
+                      ),
+                      user.country != ''
+                          ? Column(
+                              children: <Widget>[
+                                SizedBox(height: 10),
+                                _buildCountrySection(screenSize),
+                                _buildSeparator(screenSize),
                               ],
+                            )
+                          : Center(),
+                      user.city != ''
+                          ? Column(
+                              children: <Widget>[
+                                SizedBox(height: 10),
+                                _buildCitySection(screenSize),
+                                _buildSeparator(screenSize),
+                              ],
+                            )
+                          : Center(),
+                      SizedBox(height: 10),
+                      FlatButton(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text('${localization.edit}',
+                                style: TextStyle(fontSize: 16)),
+                            SizedBox(
+                              width: 10,
                             ),
-                            child: ButtonTheme(
-                              minWidth:
-                                  MediaQuery.of(context).size.width * 0.42,
-                              height: 50,
-                              child: RaisedButton(
-                                onPressed: () async {
-                                  if (await canLaunch(
-                                      'https://indigo24.com/contacts.html')) {
-                                    await launch(
-                                      'https://indigo24.com/contacts.html',
-                                      forceSafariVC: false,
-                                      forceWebView: false,
-                                      headers: <String, String>{
-                                        'my_header_key': 'my_header_value'
-                                      },
-                                    );
-                                  } else {
-                                    throw 'Could not launch https://indigo24.com/contacts.html';
-                                  }
-                                },
-                                child: FittedBox(
-                                  fit: BoxFit.fitWidth,
-                                  child: Text(
-                                    "${localization.support}",
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ),
-                                color: whiteColor,
-                                textColor: whiteColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    10.0,
-                                  ),
-                                ),
-                              ),
+                            Image.asset(
+                              'assets/images/pencil.png',
+                              width: 20,
+                              height: 20,
                             ),
-                          ),
+                          ],
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxWidth:
-                                  MediaQuery.of(context).size.width * 0.42),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileSettingsPage(),
+                            ),
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.42),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
                                   color: Colors.black26,
                                   blurRadius: 10.0,
                                   spreadRadius: -2,
-                                  offset: Offset(0.0, 0.0),
-                                )
-                              ],
-                            ),
-                            child: ButtonTheme(
-                              minWidth:
-                                  MediaQuery.of(context).size.width * 0.42,
-                              height: 50,
-                              child: RaisedButton(
-                                onPressed: () async {
-                                  print('exit is pressed');
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        CustomDialog(
-                                      title: null,
-                                      description:
-                                          "${localization.wantToExit}?",
-                                      buttonText: "Okay",
-                                      image: CachedNetworkImage(
-                                          imageUrl: '$avatarUrl${user.avatar}'),
-                                    ),
+                                  offset: Offset(0.0, 0.0))
+                            ],
+                          ),
+                          child: ButtonTheme(
+                            minWidth: MediaQuery.of(context).size.width * 0.42,
+                            height: 50,
+                            child: RaisedButton(
+                              onPressed: () async {
+                                if (await canLaunch(
+                                    'https://indigo24.com/contacts.html')) {
+                                  await launch(
+                                    'https://indigo24.com/contacts.html',
+                                    forceSafariVC: false,
+                                    forceWebView: false,
+                                    headers: <String, String>{
+                                      'my_header_key': 'my_header_value'
+                                    },
                                   );
-                                  // SharedPreferences preferences =
-                                  //       await SharedPreferences.getInstance();
-                                  //   preferences.setString('phone', 'null');
-                                  //   Navigator.of(context).pushAndRemoveUntil(
-                                  //       MaterialPageRoute(
-                                  //           builder: (context) => IntroPage()),
-                                  //       (r) => false);
-                                },
-                                child: FittedBox(
-                                  fit: BoxFit.fitWidth,
-                                  child: Text(
-                                    '${localization.exit}',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                } else {
+                                  throw 'Could not launch https://indigo24.com/contacts.html';
+                                }
+                              },
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Text(
+                                  "${localization.support}",
+                                  style: TextStyle(
+                                    color: Colors.grey[700],
                                   ),
                                 ),
-                                color: primaryColor,
-                                textColor: whiteColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    10.0,
-                                  ),
+                              ),
+                              color: whiteColor,
+                              textColor: whiteColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  10.0,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
-                          style: TextStyle(
-                            color: Colors.grey,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.42),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 10.0,
+                                spreadRadius: -2,
+                                offset: Offset(0.0, 0.0),
+                              )
+                            ],
+                          ),
+                          child: ButtonTheme(
+                            minWidth: MediaQuery.of(context).size.width * 0.42,
+                            height: 50,
+                            child: RaisedButton(
+                              onPressed: () async {
+                                print('exit is pressed');
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      CustomDialog(
+                                    title: null,
+                                    description: "${localization.wantToExit}?",
+                                    buttonText: "Okay",
+                                    image: CachedNetworkImage(
+                                      imageUrl: '$avatarUrl${user.avatar}',
+                                    ),
+                                  ),
+                                );
+                                // SharedPreferences preferences =
+                                //       await SharedPreferences.getInstance();
+                                //   preferences.setString('phone', 'null');
+                                //   Navigator.of(context).pushAndRemoveUntil(
+                                //       MaterialPageRoute(
+                                //           builder: (context) => IntroPage()),
+                                //       (r) => false);
+                              },
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Text(
+                                  '${localization.exit}',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              color: primaryColor,
+                              textColor: whiteColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  10.0,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        Container(height: 0)
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Container(height: 0)
+                    ],
+                  ),
+                ],
               ),
             ),
             _buildCoverImage(screenSize),
@@ -643,75 +801,24 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     SizedBox(width: 10),
                     _buildProfileImage(),
                     SizedBox(width: 10),
-                    _isEditing
-                        ? Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    Flexible(
-                                      child: TextField(
-                                        style: TextStyle(color: whiteColor),
-                                        controller: _nameController,
-                                      ),
-                                    ),
-                                    FlatButton(
-                                      child: Text(
-                                        '${localization.save}',
-                                        style: TextStyle(
-                                          color: whiteColor,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        if (_nameController.text.isNotEmpty) {
-                                          api
-                                              .settingsSave(
-                                                  _nameController.text)
-                                              .then((result) {
-                                            print(result);
-                                            if (result['success'].toString() ==
-                                                'true') {
-                                              user.name = _nameController.text;
-                                              SharedPreferencesHelper.setString(
-                                                  'name', _nameController.text);
-                                            }
-                                            setState(() {
-                                              _isEditing = false;
-                                            });
-                                          });
-                                        }
-                                      },
-                                    )
-                                  ],
-                                ),
-                                Text(
-                                  "${user.identified ? localization.identified : localization.notIdentified}",
-                                  style: TextStyle(
-                                    color: whiteColor,
-                                  ),
-                                )
-                              ],
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: _buildFullName(),
+                          ),
+                          SizedBox(height: 15),
+                          Text(
+                            "${user.identified ? localization.identified : localization.notIdentified}",
+                            style: TextStyle(
+                              color: whiteColor,
                             ),
                           )
-                        : Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: _buildFullName(),
-                                ),
-                                SizedBox(height: 15),
-                                Text(
-                                  "${user.identified ? localization.identified : localization.notIdentified}",
-                                  style: TextStyle(
-                                    color: whiteColor,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -753,6 +860,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 var api = Api();
@@ -845,9 +955,13 @@ class CustomDialog extends StatelessWidget {
                           preferences.setString('phone', 'null');
                           ChatRoom.shared.channel = null;
                           Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => IntroPage()),
-                              (r) => false);
+                            MaterialPageRoute(
+                              builder: (context) => IntroPage(),
+                            ),
+                            (r) => false,
+                          );
+                          ChatsDB _chatsDB = ChatsDB();
+                          _chatsDB.deleteAll();
                           await api.logOutHttp().then((result) {
                             print(result);
                             if (result['message'] == 'Not authenticated' &&

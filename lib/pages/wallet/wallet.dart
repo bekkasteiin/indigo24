@@ -645,9 +645,12 @@ class _WalletTabState extends State<WalletTab> {
             child: RaisedButton(
               onPressed: () {
                 print('пополнить is pressed');
-                Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => RefillPage()))
-                    .whenComplete(() async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RefillPage(),
+                  ),
+                ).whenComplete(() async {
                   await _api.getBalance();
                   setState(() {
                     // _amount = double.parse(user.balance);

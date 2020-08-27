@@ -8,6 +8,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../filter.dart';
 import 'payments_service.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
@@ -20,7 +21,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   bool _emptyResponse;
 
   String _logoUrl;
-  String _maskedText;
   String _text;
 
   List _splittedDates;
@@ -30,30 +30,24 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   RefreshController _refreshController;
 
+  TextEditingController _filterController;
+
   int _page;
 
-  MaskTextInputFormatter _filterFormatter;
   @override
   void initState() {
     _emptyResponse = false;
 
     _page = 1;
     _logoUrl = "";
-    _maskedText = '';
     _text = '';
 
     _api = Api();
 
     _splittedDates = [];
 
+    _filterController = TextEditingController();
     _refreshController = RefreshController(initialRefresh: false);
-
-    _filterFormatter = MaskTextInputFormatter(
-      mask: '****-**-** / ****-**-**',
-      filter: {
-        "*": RegExp(r'[0-9]'),
-      },
-    );
 
     _api.getHistories(_page).then((histories) {
       if (histories['message'] == 'Not authenticated' &&
@@ -95,9 +89,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   void _onLoading() async {
     print("_onLoading ");
-
-    if (_maskedText.length == 21) {
-      _splittedDates = _maskedText.split("/");
+    if (_filterController.text.isNotEmpty) {
       _api
           .getFilteredHistories(
         _page,
@@ -383,11 +375,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
               Container(
                 width: size.width * 0.8 - 20,
                 child: TextFormField(
+                  readOnly: true,
                   decoration: InputDecoration(
                     hintText: 'YYYY-MM-DD / YYYY-MM-DD',
                   ),
+                  controller: _filterController,
                   textAlign: TextAlign.center,
-                  inputFormatters: [_filterFormatter],
                 ),
               ),
               InkWell(
@@ -406,34 +399,38 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                     ],
                   ),
                 ),
-                onTap: () {
-                  _maskedText =
-                      _filterFormatter.getMaskedText().replaceAll(' ', '');
-                  if (_maskedText.length == 21) {
-                    _splittedDates = _maskedText.split("/");
-                    _page = 1;
-                    _api
-                        .getFilteredHistories(
-                            _page, _splittedDates[0], _splittedDates[1])
-                        .then((histories) {
-                      if (histories['message'] == 'Not authenticated' &&
-                          histories['success'].toString() == 'false') {
-                        logOut(context);
+                onTap: () async {
+                  List selectedDate = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HistoryFiletPage(),
+                    ),
+                  );
+                  _filterController.text = selectedDate.join(' / ');
+
+                  _splittedDates = selectedDate;
+                  _page = 1;
+                  _api
+                      .getFilteredHistories(
+                          _page, selectedDate[0], selectedDate[1])
+                      .then((histories) {
+                    if (histories['message'] == 'Not authenticated' &&
+                        histories['success'].toString() == 'false') {
+                      logOut(context);
+                    } else {
+                      if (histories['message'] != null) {
+                        setState(() {
+                          _text = histories['message'];
+                        });
                       } else {
-                        if (histories['message'] != null) {
-                          setState(() {
-                            _text = histories['message'];
-                          });
-                        } else {
-                          _text = '';
-                          setState(() {
-                            _resultList = histories['payments'].toList();
-                          });
-                          _page++;
-                        }
+                        _text = '';
+                        setState(() {
+                          _resultList = histories['payments'].toList();
+                        });
+                        _page++;
                       }
-                    });
-                  }
+                    }
+                  });
                 },
               ),
             ],

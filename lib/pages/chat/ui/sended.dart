@@ -13,139 +13,178 @@ import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-class Sended extends StatelessWidget {
+class Sended extends StatefulWidget {
   final m;
   final chatId;
 
   Sended(this.m, {this.chatId});
 
   @override
-  Widget build(BuildContext context) {
-    var a = (m['attachments'] == false ||
-            m['attachments'] == null ||
-            m['attachments'] == '')
-        ? false
-        : jsonDecode(m['attachments']);
-    var replyData = (m['reply_data'] == false || m['reply_data'] == null)
-        ? false
-        : m['reply_data'];
+  _SendedState createState() => _SendedState();
+}
 
-    var forwarData =
-        ('${m['forward_data']}' == 'false' || '${m['forward_data']}' == 'null')
+class _SendedState extends State<Sended> {
+  @override
+  Widget build(BuildContext context) {
+    var a = (widget.m['attachments'] == false ||
+            widget.m['attachments'] == null ||
+            widget.m['attachments'] == '')
+        ? false
+        : jsonDecode(widget.m['attachments']);
+    var replyData =
+        (widget.m['reply_data'] == false || widget.m['reply_data'] == null)
             ? false
-            : jsonDecode(m['forward_data']);
+            : widget.m['reply_data'];
+
+    var forwarData = ('${widget.m['forward_data']}' == 'false' ||
+            '${widget.m['forward_data']}' == 'null')
+        ? false
+        : jsonDecode(widget.m['forward_data']);
     return Align(
       alignment: Alignment(1, 0),
       child: Container(
-        child: CupertinoContextMenu(
-          actions: [
-            CupertinoContextMenuAction(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    '${localization.delete}',
-                    style: TextStyle(color: redColor, fontSize: 14),
-                  ),
-                  Icon(CupertinoIcons.delete, color: redColor, size: 20)
-                ],
-              ),
-              onPressed: () {
-                ChatRoom.shared.deleteFromAll(
-                    chatId, m['id'] == null ? m['message_id'] : m['id']);
-                Navigator.pop(context);
-              },
-            ),
-            CupertinoContextMenuAction(
-              child: Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${localization.edit}',
-                      style: TextStyle(fontSize: 14),
+        child: showForwardingProcess
+            ? buildMaterial(context, a, replyData, forwarData)
+            : CupertinoContextMenu(
+                actions: <Widget>[
+                  CupertinoContextMenuAction(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${localization.delete}',
+                          style: TextStyle(color: redColor, fontSize: 14),
+                        ),
+                        Icon(CupertinoIcons.delete, color: redColor, size: 20)
+                      ],
                     ),
-                    Icon(
-                      CupertinoIcons.pen,
-                      size: 20,
-                    )
-                  ],
-                ),
-              ),
-              onPressed: () {
-                ChatRoom.shared.editingMessage(m);
-                Navigator.pop(context);
-              },
-            ),
-            CupertinoContextMenuAction(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('${localization.forward}',
-                      style: TextStyle(fontSize: 14)),
-                  Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                ],
-              ),
-              onPressed: () {
-                // ChatRoom.shared.replyingMessage(m);
-                Navigator.pop(context);
-                Navigator.pop(context, m);
-              },
-            ),
-            CupertinoContextMenuAction(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    '${localization.reply}',
-                    style: TextStyle(fontSize: 14),
+                    onPressed: () {
+                      ChatRoom.shared.deleteFromAll(
+                          widget.chatId,
+                          widget.m['id'] == null
+                              ? widget.m['message_id']
+                              : widget.m['id']);
+                      Navigator.pop(context);
+                    },
                   ),
-                  Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                ],
-              ),
-              onPressed: () {
-                ChatRoom.shared.replyingMessage(m);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-          child: Material(
-            color: Colors.transparent,
-            child: SendedMessageWidget(
-              content: '${m['text']}',
-              time: _time('${m['time']}'),
-              write: '${m['write']}',
-              type: "${m["type"]}",
-              media: (a == false || a == null)
-                  ? null
-                  : "${m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
-              rMedia: (a == false || a == null)
-                  ? null
-                  : a[0]['r_filename'] == null
-                      ? a[0]['filename']
-                      : a[0]['r_filename'],
-              mediaUrl: (a == false || a == null) ? null : m['attachment_url'],
-              edit: "${m["edit"]}",
-              anotherUser: "${m["type"]}" == '11'
-                  ? jsonDecode(
-                      jsonEncode(
-                        {
-                          "id": "${m["another_user_id"]}",
-                          "avatar": "${m["another_user_avatar"]}",
-                          "name": "${m["another_user_name"]}"
-                        },
+                  CupertinoContextMenuAction(
+                    child: Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${localization.edit}',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          Icon(
+                            CupertinoIcons.pen,
+                            size: 20,
+                          )
+                        ],
                       ),
-                    )
-                  : null,
-              replyData:
-                  (replyData == false || replyData == null) ? null : replyData,
-              forwardData: forwarData,
-            ),
-          ),
+                    ),
+                    onPressed: () {
+                      ChatRoom.shared.editingMessage(widget.m);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  CupertinoContextMenuAction(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${localization.reply}',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                      ],
+                    ),
+                    onPressed: () {
+                      ChatRoom.shared.replyingMessage(widget.m);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  CupertinoContextMenuAction(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${localization.forward}',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        Icon(
+                          CupertinoIcons.reply_all,
+                          size: 20,
+                        )
+                      ],
+                    ),
+                    onPressed: () {
+                      // ChatRoom.shared.replyingMessage(m);
+                      if (widget.m['message_id'] == null)
+                        ChatRoom.shared.localForwardMessage(widget.m['id']);
+                      else
+                        ChatRoom.shared.localForwardMessage(widget.m['message_id']);
+
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+                child: buildMaterial(context, a, replyData, forwarData),
+              ),
+      ),
+    );
+  }
+
+  Material buildMaterial(BuildContext context, a, replyData, forwarData) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        splashColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onTap: showForwardingProcess
+            ? null
+            : () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+              },
+        child: SendedMessageWidget(
+          content: '${widget.m['text']}',
+          time: _time('${widget.m['time']}'),
+          write: '${widget.m['write']}',
+          type: "${widget.m["type"]}",
+          media: (a == false || a == null)
+              ? null
+              : "${widget.m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
+          rMedia: (a == false || a == null)
+              ? null
+              : a[0]['r_filename'] == null
+                  ? a[0]['filename']
+                  : a[0]['r_filename'],
+          mediaUrl:
+              (a == false || a == null) ? null : widget.m['attachment_url'],
+          edit: "${widget.m["edit"]}",
+          anotherUser: "${widget.m["type"]}" == '11'
+              ? jsonDecode(
+                  jsonEncode(
+                    {
+                      "id": "${widget.m["another_user_id"]}",
+                      "avatar": "${widget.m["another_user_avatar"]}",
+                      "name": "${widget.m["another_user_name"]}"
+                    },
+                  ),
+                )
+              : null,
+          replyData:
+              (replyData == false || replyData == null) ? null : replyData,
+          forwardData: forwarData,
         ),
       ),
     );
@@ -412,9 +451,14 @@ class SendedMessageWidget extends StatelessWidget {
                                                                         )
                                                                       : Center(),
                                                                 )
-                                                              : SelectableText(
-                                                                  content,
-                                                                ),
+                                                              : showForwardingProcess !=
+                                                                          null &&
+                                                                      showForwardingProcess
+                                                                  ? Text(
+                                                                      content)
+                                                                  : SelectableText(
+                                                                      content,
+                                                                    ),
                     ],
                   ),
                 ),

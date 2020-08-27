@@ -41,7 +41,10 @@ class _ReplyMessageState extends State<ReplyMessage> {
               // print(widget.replyData);
               // if (i != -1) {
               replyMessage = widget.replyData;
-              ChatRoom.shared.findMessage(widget.replyData);
+              print(
+                  'added to find with deleted value ${widget.replyData['is_deleted']}');
+              if (widget.replyData['is_deleted'] != true)
+                ChatRoom.shared.findMessage(widget.replyData);
               // } else {
               //   // ChatRoom.shared.getMessages(widget.chatID, page: messagesPage);
               // }
@@ -53,7 +56,11 @@ class _ReplyMessageState extends State<ReplyMessage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(width: 2.5, height: 45, color: primaryColor),
+                  Container(
+                    width: 2.5,
+                    height: 45,
+                    color: primaryColor,
+                  ),
                   Container(width: 5),
                   widget.replyData == null
                       ? Container()

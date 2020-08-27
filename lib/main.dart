@@ -34,7 +34,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/chats_db.dart';
-import 'pages/profile.dart';
+import 'pages/chat/ui/new_chat/chats_list.dart';
+import 'pages/profile/profile.dart';
 import 'services/api.dart';
 import 'services/my_connectivity.dart';
 import 'services/socket.dart';
@@ -146,15 +147,16 @@ Future<void> main() async {
   print('unuque: $unique');
   print('customerID: $customerID');
 
+  //   await ContactsService.addContact(Contact(
+  //       displayName: "Name $i",
+  //       givenName: 'Givenname $i',
+  //       middleName: 'Middlename $i',
+  //       phones: [
+  //         Item(label: 'home', value: '${87020000000 + i}')
+  //       ])); // To Add Contacts
+
   runApp(MyApp(phone: phone, domen: domen));
 }
-
-// class TestClass extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return AudioMessage("$mediaUrl$media");
-//   }
-// }
 
 // ignore: must_be_immutable
 class MyApp extends StatelessWidget {
@@ -261,7 +263,7 @@ inAppPush(m) {
 
 _goToChat(name, chatID, context,
     {chatType, memberCount, userIds, avatar, avatarUrl}) {
-  ChatRoom.shared.setCabinetStream();
+  ChatRoom.shared.setChatStream();
   ChatRoom.shared.checkUserOnline(userIds);
   Navigator.push(
     context,
@@ -279,7 +281,7 @@ _goToChat(name, chatID, context,
     // this is bool for check load more is needed or not
     globalBoolForForceGetChat = false;
     ChatRoom.shared.forceGetChat();
-    ChatRoom.shared.closeCabinetStream();
+    ChatRoom.shared.closeChatStream();
   });
 }
 
@@ -436,7 +438,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     _init();
 
     ChatRoom.shared.getMessages(m['chat_id']);
-    goToChat(
+    _goToChat(
       "${m['chat_name']}",
       "${m['chat_id']}",
       memberCount: "${m['type']}" == "0" ? 2 : 3,
@@ -651,7 +653,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           case ConnectivityResult.none:
             print("NO INTERNET");
             ChatRoom.shared.closeConnection();
-            ChatRoom.shared.closeStream();
+            ChatRoom.shared.closeChatsListStream();
             setState(() {
               initIsCalling = 1;
             });
@@ -676,15 +678,16 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   _init() {
     ChatRoom.shared.connect(context);
-    ChatRoom.shared.setStream();
+    ChatRoom.shared.setChatsListStream();
     _connect();
     ChatRoom.shared.init();
     getUserSettings();
   }
 
   _connect() async {
-    ChatRoom.shared.onChange.listen((e) async {
+    ChatRoom.shared.onMainChange.listen((e) async {
       var cmd = e.json["cmd"];
+      print('CHAT LISTS MAIN LISTENER ${e.json}');
       switch (cmd) {
         case 'message:create':
           print(e.json["data"]);
@@ -698,7 +701,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         case 'chats:get':
           setState(() {
             // this is bool for check load more is needed or not
-            if (globalBoolForForceGetChat) {
+            if (globalBoolForForceGetChat == true) {
               e.json['data'].toList().forEach((element) {
                 myList.add(element);
               });
@@ -708,7 +711,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                 updateOrInsertChat(ChatsModel.fromJson(element));
               }).toList();
             }
-            chatsPage += 1;
+            // chatsPage += 1;
           });
           break;
         case 'user:check':
@@ -737,8 +740,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     await _chatsDB.updateOrInsert(chat);
   }
 
-  goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
-    ChatRoom.shared.setCabinetStream();
+  _goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
+    ChatRoom.shared.setChatStream();
     ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
       context,
@@ -757,7 +760,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       // this is bool for check load more is needed or not
       globalBoolForForceGetChat = false;
       ChatRoom.shared.forceGetChat();
-      ChatRoom.shared.closeCabinetStream();
+      ChatRoom.shared.closeChatStream();
     });
   }
 
@@ -787,6 +790,10 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           UserProfilePage(),
           TapesPage(),
           WalletTab(),
+          // TestChatsListPage(),
+          // Text('1'),
+          // Text('1'),
+          // Text('1'),
         ],
         controller: _tabController,
       ),
@@ -1107,6 +1114,8 @@ dioError(context) async {
   );
 }
 
+ChatsDB _chatsDB = ChatsDB();
+
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   ChatRoom.shared.channel = null;
@@ -1115,7 +1124,8 @@ logOut(BuildContext context) async {
   preferences.setString('pin', 'false');
   Widget okButton = CupertinoDialogAction(
     child: Text("OK"),
-    onPressed: () {
+    onPressed: () async {
+      _chatsDB.deleteAll();
       Navigator.pop(context);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(

@@ -16,10 +16,12 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/keyboard_dismisser.dart';
+import 'package:indigo24/widgets/photo.dart';
 import 'package:indigo24/widgets/player.dart';
 import 'package:indigo24/widgets/preview.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:record_mp3/record_mp3.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -33,7 +35,10 @@ import 'package:vibration/vibration.dart';
 import 'chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'ui/chats_list_draggable.dart';
+
 List listMessages = [];
+bool showForwardingProcess;
 
 class ChatPage extends StatefulWidget {
   final members;
@@ -45,7 +50,7 @@ class ChatPage extends StatefulWidget {
   final avatarUrl;
   final chatType;
   final phone;
-  final data;
+  final List data;
   ChatPage(
     this.name,
     this.chatID, {
@@ -66,6 +71,8 @@ class ChatPage extends StatefulWidget {
 int messagesPage;
 
 class _ChatPageState extends State<ChatPage> {
+  List toForwardMessages = [];
+
   Dependencies _dependencies = Dependencies();
   List _myList = [];
   List _temp;
@@ -107,6 +114,8 @@ class _ChatPageState extends State<ChatPage> {
   ImagePicker _picker = ImagePicker();
   @override
   initState() {
+    showForwardingProcess = false;
+    listMessages = [];
     messagesPage = 1;
     _isGroup = widget.chatType.toString() == '1';
     _membersCount = widget.memberCount;
@@ -117,14 +126,14 @@ class _ChatPageState extends State<ChatPage> {
 
     ChatRoom.shared.checkUserOnline(widget.userIds);
     if (widget.data != null) {
-      ChatRoom.shared.forwardMessage(widget.data, 'asd', widget.chatID);
+      ChatRoom.shared.forwardMessage(widget.data.join(','), '', widget.chatID);
     }
     _listen();
   }
 
   @override
   void dispose() {
-    ChatRoom.shared.cabinetController.close();
+    // ChatRoom.shared.chatController.close();
     _scrollController.removeListener(_scrollListener);
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.dispose();
@@ -132,6 +141,49 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   bool isLoading = false;
+  getDateFromUnix(unix) {
+    return DateTime.fromMillisecondsSinceEpoch(
+        int.parse(unix.toString()) * 1000);
+  }
+
+  buildMessage(index) {
+    if (_myList[index]['time'].toString() != '') {
+      if (_myList[index]['time'].toString() == '1') {
+        return SizedBox(height: 0, width: 0);
+      } else {
+        if (index == 0) {
+          _lastMessageTime = int.parse(_myList[0]['time'].toString());
+        }
+        DateTime actualUnixDate = getDateFromUnix(_myList[index]['time']);
+
+        DateTime lastUnixDate = getDateFromUnix(
+          _lastMessageTime == null ? _myList[index]['time'] : _lastMessageTime,
+        );
+
+        int differenceInDays = lastUnixDate.difference(actualUnixDate).inDays;
+        _lastMessageTime = int.parse(_myList[index]['time'].toString());
+        if (differenceInDays != 0) {
+          return Column(
+            children: <Widget>[
+              temp(_myList[index]),
+              lastUnixDate.difference(DateTime.now()).inDays == 0
+                  ? Devider({'text': '${localization.today}'})
+                  : Devider({
+                      'text':
+                          '$lastUnixDate'.substring(0, 10).replaceAll('-', '.')
+                    }),
+            ],
+          );
+        } else {
+          return temp(
+            _myList[index],
+          );
+        }
+      }
+    } else {
+      return SizedBox(height: 0, width: 0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,158 +192,98 @@ class _ChatPageState extends State<ChatPage> {
         GestureType.onTap,
         GestureType.onPanUpdateDownDirection,
       ],
-      // onTap: () {
-      //   SystemChannels.textInput.invokeMethod('TextInput.hide');
-      //   FocusScopeNode currentFocus = FocusScope.of(context);
-      //   if (!currentFocus.hasPrimaryFocus) {
-      //     currentFocus.unfocus();
-      //   }
-      // },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          iconTheme: IconThemeData(
-            color: Colors.black,
-          ),
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
+      child: GestureDetector(
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            iconTheme: IconThemeData(
+              color: Colors.black,
+            ),
+            leading: IconButton(
+              icon: Container(
+                padding: EdgeInsets.all(10),
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/back.png',
+                  ),
                 ),
               ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: InkWell(
-            child: Column(
-              children: <Widget>[
-                Text(
-                  widget.name.length != 0
-                      ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}"
-                      : "",
-                  style: TextStyle(
-                      color: blackPurpleColor, fontWeight: FontWeight.w400),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                _isSomeoneTyping
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          (_membersCount > 2)
-                              ? Text("${_typingName.join(' ')} ",
+            title: InkWell(
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    widget.name.length != 0
+                        ? "${widget.name[0].toUpperCase() + widget.name.substring(1)}"
+                        : "",
+                    style: TextStyle(
+                        color: blackPurpleColor, fontWeight: FontWeight.w400),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  _isSomeoneTyping
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${_typingName.join(' ')} ",
+                              style: TextStyle(
+                                color: blackPurpleColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Image.asset(
+                              "assets/typing.gif",
+                              width: 20,
+                            )
+                          ],
+                        )
+                      : (widget.chatType.toString() == '1')
+                          ? Column(
+                              children: <Widget>[
+                                Text(
+                                  '${localization.members} ${_membersCount}',
                                   style: TextStyle(
                                       color: blackPurpleColor,
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w400))
-                              : Container(),
-                          Image.asset(
-                            "assets/typing.gif",
-                            width: 20,
-                          )
-                        ],
-                      )
-                    : (widget.chatType.toString() == '1')
-                        ? Column(
-                            children: <Widget>[
-                              Text(
-                                '${localization.members} ${_membersCount}',
-                                style: TextStyle(
-                                    color: blackPurpleColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              Text(
-                                '${localization.online} $_onlineCount',
-                                style: TextStyle(
-                                    color: blackPurpleColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          )
-                        : _online == null
-                            ? Container()
-                            : Text(
-                                ('$_online' == 'online' ||
-                                        '$_online' == 'offline')
-                                    ? '$_online'
-                                    : '${localization.lastSeen} $_online',
-                                style: TextStyle(
-                                    color: blackPurpleColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                              ),
-              ],
-            ),
-            onTap: () async {
-              ChatRoom.shared.setChatInfoStream();
-              ChatRoom.shared.cabinetController.close();
-              var chatProfileResult = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatProfileInfo(
-                    chatType: widget.chatType,
-                    chatName: widget.name,
-                    memberCount: _membersCount,
-                    chatAvatar:
-                        widget.avatar == null ? 'noAvatar.png' : widget.avatar,
-                    chatId: widget.chatID,
-                  ),
-                ),
-              ).whenComplete(() {
-                setState(() {
-                  ChatRoom.shared.getMessages('${widget.chatID}');
-                });
-              });
-              if (chatProfileResult != null) {
-                setState(() {
-                  _membersCount = chatProfileResult;
-                });
-              }
-            },
-          ),
-          actions: <Widget>[
-            MaterialButton(
-              elevation: 0,
-              color: Colors.transparent,
-              textColor: Colors.white,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25.0),
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  color: greyColor,
-                  child: ClipOval(
-                      child: Image.network(
-                    '${widget.avatarUrl.toString()}${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                    width: 35,
-                    height: 35,
-                  )
-                      // child: CachedNetworkImage(
-                      //   height: 50,
-                      //   width: 50,
-                      //   imageUrl: '${widget.avatarUrl.toString() + widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                      //   errorWidget: (context, url, error) => CachedNetworkImage(imageUrl: "https://indigo24.com/uploads/avatars/noAvatar.png"),
-                      // ),
-                      ),
-                ),
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                Text(
+                                  '${localization.online} $_onlineCount',
+                                  style: TextStyle(
+                                      color: blackPurpleColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            )
+                          : _online == null
+                              ? Container()
+                              : Text(
+                                  ('$_online' == 'online' ||
+                                          '$_online' == 'offline')
+                                      ? '$_online'
+                                      : '${localization.lastSeen} $_online',
+                                  style: TextStyle(
+                                      color: blackPurpleColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                ],
               ),
-              // padding: EdgeInsets.all(16),
-              shape: CircleBorder(),
-              onPressed: () {
-                ChatRoom.shared.cabinetController.close();
+              onTap: () async {
                 ChatRoom.shared.setChatInfoStream();
-                Navigator.push(
+                var chatProfileResult = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatProfileInfo(
                       chatType: widget.chatType,
                       chatName: widget.name,
                       memberCount: _membersCount,
+                      phone: widget.phone,
                       chatAvatar: widget.avatar == null
                           ? 'noAvatar.png'
                           : widget.avatar,
@@ -299,48 +291,97 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ).whenComplete(() {
-                  ChatRoom.shared.getMessages('${widget.chatID}');
-                  setState(() {});
+                  setState(() {
+                    ChatRoom.shared.setChatStream();
+                    ChatRoom.shared.getMessages(widget.chatID);
+                  });
                 });
+                if (chatProfileResult != null) {
+                  setState(() {
+                    _membersCount = chatProfileResult;
+                  });
+                }
               },
             ),
-          ],
-          backgroundColor: Colors.white,
-          brightness: Brightness.light,
-        ),
-        body: SafeArea(
-            child: Container(
-          child: Stack(
-            fit: StackFit.loose,
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Image(
-                  image: user.chatBackground == 'ligth'
-                      ? AssetImage("assets/images/background_chat.png")
-                      : AssetImage("assets/images/background_chat_2.png"),
-                  fit: BoxFit.fill,
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Divider(
-                    height: 0,
-                    color: Colors.black54,
+            actions: <Widget>[
+              MaterialButton(
+                elevation: 0,
+                color: Colors.transparent,
+                textColor: Colors.white,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25.0),
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    color: greyColor,
+                    child: ClipOval(
+                        child: Image.network(
+                      '${widget.chatType.toString() == '1' ? groupAvatarUrl : widget.avatarUrl}${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
+                      width: 35,
+                      height: 35,
+                    )),
                   ),
-                  Flexible(
-                    fit: FlexFit.tight,
-                    child: Container(
-                      child: Container(
-                        child: _myList.isEmpty
-                            ? Center()
-                            : Column(
-                                children: [
-                                  Expanded(
-                                    child: NotificationListener<
-                                            ScrollNotification>(
+                ),
+                shape: CircleBorder(),
+                onPressed: () {
+                  // ChatRoom.shared.chatController.close();
+                  ChatRoom.shared.setChatInfoStream();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FullScreenWrapper(
+                          imageProvider: CachedNetworkImageProvider(
+                              "${widget.avatarUrl}${widget.avatar.toString().replaceAll('AxB', '200x200')}"),
+                          minScale: PhotoViewComputedScale.contained,
+                          maxScale: PhotoViewComputedScale.contained * 3,
+                          backgroundDecoration:
+                              BoxDecoration(color: Colors.transparent),
+                        ),
+                      )).whenComplete(() {
+                    ChatRoom.shared.setChatStream();
+                    ChatRoom.shared.getMessages(widget.chatID);
+
+                    setState(() {});
+                  });
+                },
+              ),
+            ],
+            backgroundColor: Colors.white,
+            brightness: Brightness.light,
+          ),
+          body: SafeArea(
+            child: Container(
+              child: Stack(
+                fit: StackFit.loose,
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: Image(
+                      image: user.chatBackground == 'ligth'
+                          ? AssetImage("assets/images/background_chat.png")
+                          : AssetImage("assets/images/background_chat_2.png"),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Divider(
+                        height: 0,
+                        color: Colors.black54,
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: Container(
+                          child: Container(
+                            child: _myList.isEmpty
+                                ? Center()
+                                : Column(
+                                    children: [
+                                      Expanded(
+                                          child: NotificationListener<
+                                              ScrollNotification>(
                                         onNotification:
                                             (ScrollNotification scrollInfo) {
                                           if (!isLoading &&
@@ -348,490 +389,522 @@ class _ChatPageState extends State<ChatPage> {
                                                   scrollInfo.metrics
                                                       .maxScrollExtent) {
                                             _loadData();
-                                            // start loading data
                                             setState(() {
                                               isLoading = true;
                                             });
                                           }
                                         },
-                                        child: ScrollablePositionedList.builder(
-                                          itemScrollController:
-                                              _itemScrollController,
-                                          reverse: true,
-                                          itemCount: _myList.length,
-                                          itemBuilder: (context, index) {
-                                            if (_myList[index]['time']
-                                                    .toString() !=
-                                                '') {
-                                              if (_lastMessageTime != null) {
-                                                if (_myList[index]['time']
-                                                        .toString() !=
-                                                    '1') {
-                                                } else {
-                                                  var messageUnixDate = DateTime
-                                                      .fromMillisecondsSinceEpoch(
-                                                    int.parse(_myList[index]
-                                                                ['time']
-                                                            .toString()) *
-                                                        1000,
-                                                  );
-                                                  var lastMessageUnixDate = DateTime
-                                                      .fromMillisecondsSinceEpoch(
-                                                    _lastMessageTime * 1000,
-                                                  );
-                                                  var diff = lastMessageUnixDate
-                                                      .difference(
-                                                          messageUnixDate);
-                                                  int differenceInDays =
-                                                      diff.inDays;
-                                                  if (differenceInDays > 0)
-                                                    return Column(
-                                                      children: <Widget>[
-                                                        Devider({
-                                                          'text':
-                                                              '$messageUnixDate'
-                                                                  .substring(
-                                                                      0, 10)
-                                                                  .replaceAll(
-                                                                      '-', '.')
-                                                        }),
-                                                        _message(
-                                                            _myList[index]),
-                                                      ],
-                                                    );
-                                                }
-                                                _lastMessageTime = int.parse(
-                                                    _myList[index]['time']
-                                                        .toString());
-                                              }
-
-                                              return _message(_myList[index]);
-                                            }
-                                          },
-                                        )
-
-                                        // ListView.builder(
-                                        //   itemCount: _myList.length,
-                                        //   reverse: true,
-                                        //   itemBuilder: (context, index) {
-                                        //     return _message(_myList[index]);
-                                        //   },
-                                        // ),
+                                        child: Column(
+                                          children: <Widget>[
+                                            Flexible(
+                                              child: ScrollablePositionedList
+                                                  .builder(
+                                                itemScrollController:
+                                                    _itemScrollController,
+                                                itemCount: _myList.length,
+                                                reverse: true,
+                                                itemBuilder: (context, index) {
+                                                  return buildMessage(index);
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                          ],
                                         ),
-                                  ),
-                                  // Expanded(
-                                  //   child: SmartRefresher(
-                                  //     enablePullDown: false,
-                                  //     enablePullUp: true,
-                                  //     // header: WaterDropHeader(),
-                                  //     footer: CustomFooter(
-                                  //       builder: (BuildContext context,
-                                  //           LoadStatus mode) {
-                                  //         Widget body;
-                                  //         return Container(
-                                  //           height: 55.0,
-                                  //           child: Center(child: body),
-                                  //         );
-                                  //       },
-                                  //     ),
-                                  //     controller: _refreshController,
-                                  //     onRefresh: _onRefresh,
-                                  //     onLoading: _onLoading,
-                                  //     child: ListView.builder(
-                                  //       controller: _scrollController,
-                                  //       // itemScrollController: itemScrollController,
-                                  //       // itemPositionsListener: itemPositionsListener,
-                                  //       itemCount: _myList.length,
-                                  //       reverse: true,
-                                  //       itemBuilder: (context, i) {
-                                  //         return _message(_myList[i]);
-                                  //       },
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  _isEditing
-                                      ? Container(
-                                          height: 50,
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          color: Colors.white,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Row(
-                                                  children: [
-                                                    IconButton(
-                                                        icon: Icon(Icons.edit,
-                                                            color: Colors
-                                                                .transparent),
-                                                        onPressed: null),
-                                                    Container(
-                                                        width: 2.5,
-                                                        height: 45,
-                                                        color: primaryColor),
-                                                    Container(width: 5),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Flexible(
-                                                              child: Container(
-                                                                  child: Text(
-                                                                      "${localization.edit}",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              primaryColor),
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      maxLines:
-                                                                          1,
-                                                                      softWrap:
-                                                                          false))),
-                                                          Flexible(
-                                                              child: Container(
-                                                                  child: Text(
-                                                                      "${_editMessage["text"]}",
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      maxLines:
-                                                                          1,
-                                                                      softWrap:
-                                                                          false)))
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: IconButton(
-                                                  icon: Icon(Icons.close),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _isEditing = false;
-                                                      _editMessage = null;
-                                                      _text.text = "";
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : Container(),
-                                  _isReplying
-                                      ? Container(
-                                          height: 50,
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          color: Colors.white,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Row(
-                                                  children: [
-                                                    IconButton(
-                                                        icon: Icon(Icons.edit,
-                                                            color: Colors
-                                                                .transparent),
-                                                        onPressed: null),
-                                                    Container(
-                                                        width: 2.5,
-                                                        height: 45,
-                                                        color: primaryColor),
-                                                    Container(width: 5),
-                                                    _replyMessage[
-                                                                "attachment_url"] !=
-                                                            null
-                                                        ? Container(
-                                                            width: 40,
-                                                            height: 40,
-                                                            child:
-                                                                CachedNetworkImage(
-                                                              imageUrl:
-                                                                  "${_replyMessage["attachment_url"]}${json.decode(_replyMessage["attachments"])[0]["r_filename"]}",
-                                                            ),
-                                                          )
-                                                        : Container(),
-                                                    Container(width: 5),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Flexible(
-                                                              child: Container(
-                                                                  child: Text(
-                                                                      "${_replyMessage["user_name"]}",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              primaryColor),
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      maxLines:
-                                                                          1,
-                                                                      softWrap:
-                                                                          false))),
-                                                          Flexible(
-                                                              child: Container(
-                                                                  child: Text(
-                                                                      "${_replyMessage["type"].toString() == '1' ? "Изображение" : _replyMessage["type"].toString() == '4' ? "Видео" : _replyMessage["text"]}",
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      maxLines:
-                                                                          1,
-                                                                      softWrap:
-                                                                          false)))
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: IconButton(
-                                                  icon: Icon(Icons.close),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _isReplying = false;
-                                                      _replyMessage = null;
-                                                      _text.text = "";
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                      ),
-                    ),
-                  ),
-                  Divider(height: 0, color: Colors.black26),
-                  // SizedBox(
-                  //   height: 50,
-                  Container(
-                    color: Colors.white,
-                    width: MediaQuery.of(context).size.width,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 5, right: 5),
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              // isComplete
-                              //     ? GestureDetector(
-                              //         onTap: () {
-                              //           play();
-                              //         },
-                              //         child: Center(
-                              //           child: Icon(
-                              //             Icons.play_arrow,
-                              //             size: 30,
-                              //           ),
-                              //         ),
-                              //       )
-                              //     :
-                              IconButton(
-                                icon: Icon(Icons.attach_file),
-                                onPressed: () {
-                                  print("Прикрепить");
+                                      )
 
-                                  FocusScopeNode currentFocus =
-                                      FocusScope.of(context);
-                                  if (!currentFocus.hasPrimaryFocus) {
-                                    currentFocus.unfocus();
-                                  }
-                                  _showAttachmentBottomSheet(context);
-                                },
-                              ),
-                              !_isRecording
-                                  ? Flexible(
-                                      child: TextField(
-                                        textCapitalization:
-                                            TextCapitalization.sentences,
-                                        maxLines: 6,
-                                        minLines: 1,
-                                        controller: _text,
-                                        onChanged: (value) {
-                                          print("Typing: $value");
-                                          if (value == '') {
+                                          // ListView.builder(
+                                          //   itemCount: _myList.length,
+                                          //   reverse: true,
+                                          //   itemBuilder: (context, index) {
+                                          //     return _message(_myList[index]);
+                                          //   },
+                                          // ),
+                                          ),
+                                      // Expanded(
+                                      //   child: SmartRefresher(
+                                      //     enablePullDown: false,
+                                      //     enablePullUp: true,
+                                      //     // header: WaterDropHeader(),
+                                      //     footer: CustomFooter(
+                                      //       builder: (BuildContext context,
+                                      //           LoadStatus mode) {
+                                      //         Widget body;
+                                      //         return Container(
+                                      //           height: 55.0,
+                                      //           child: Center(child: body),
+                                      //         );
+                                      //       },
+                                      //     ),
+                                      //     controller: _refreshController,
+                                      //     onRefresh: _onRefresh,
+                                      //     onLoading: _onLoading,
+                                      //     child: ListView.builder(
+                                      //       controller: _scrollController,
+                                      //       // itemScrollController: itemScrollController,
+                                      //       // itemPositionsListener: itemPositionsListener,
+                                      //       itemCount: _myList.length,
+                                      //       reverse: true,
+                                      //       itemBuilder: (context, i) {
+                                      //         return _message(_myList[i]);
+                                      //       },
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      _isEditing
+                                          ? Container(
+                                              height: 50,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              color: Colors.white,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Row(
+                                                      children: [
+                                                        IconButton(
+                                                            icon: Icon(
+                                                                Icons.edit,
+                                                                color: Colors
+                                                                    .transparent),
+                                                            onPressed: null),
+                                                        Container(
+                                                            width: 2.5,
+                                                            height: 45,
+                                                            color:
+                                                                primaryColor),
+                                                        Container(width: 5),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Flexible(
+                                                                  child: Container(
+                                                                      child: Text(
+                                                                          "${localization.edit}",
+                                                                          style: TextStyle(
+                                                                              color:
+                                                                                  primaryColor),
+                                                                          overflow: TextOverflow
+                                                                              .ellipsis,
+                                                                          maxLines:
+                                                                              1,
+                                                                          softWrap:
+                                                                              false))),
+                                                              Flexible(
+                                                                  child: Container(
+                                                                      child: Text(
+                                                                          "${_editMessage["text"]}",
+                                                                          overflow: TextOverflow
+                                                                              .ellipsis,
+                                                                          maxLines:
+                                                                              1,
+                                                                          softWrap:
+                                                                              false)))
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.close),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _isEditing = false;
+                                                          _editMessage = null;
+                                                          _text.text = "";
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : Container(),
+                                      _isReplying
+                                          ? Container(
+                                              height: 50,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              color: Colors.white,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Row(
+                                                      children: [
+                                                        IconButton(
+                                                            icon: Icon(
+                                                                Icons.edit,
+                                                                color: Colors
+                                                                    .transparent),
+                                                            onPressed: null),
+                                                        Container(
+                                                            width: 2.5,
+                                                            height: 45,
+                                                            color:
+                                                                primaryColor),
+                                                        Container(width: 5),
+                                                        _replyMessage[
+                                                                    "attachment_url"] !=
+                                                                null
+                                                            ? Container(
+                                                                width: 40,
+                                                                height: 40,
+                                                                child:
+                                                                    CachedNetworkImage(
+                                                                  imageUrl:
+                                                                      "${_replyMessage["attachment_url"]}${json.decode(_replyMessage["attachments"])[0]["r_filename"]}",
+                                                                ),
+                                                              )
+                                                            : Container(),
+                                                        Container(width: 5),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Flexible(
+                                                                  child: Container(
+                                                                      child: Text(
+                                                                          "${_replyMessage["user_name"]}",
+                                                                          style: TextStyle(
+                                                                              color:
+                                                                                  primaryColor),
+                                                                          overflow: TextOverflow
+                                                                              .ellipsis,
+                                                                          maxLines:
+                                                                              1,
+                                                                          softWrap:
+                                                                              false))),
+                                                              Flexible(
+                                                                  child: Container(
+                                                                      child: Text(
+                                                                          "${_replyMessage["type"].toString() == '1' ? "Изображение" : _replyMessage["type"].toString() == '4' ? "Видео" : _replyMessage["text"]}",
+                                                                          overflow: TextOverflow
+                                                                              .ellipsis,
+                                                                          maxLines:
+                                                                              1,
+                                                                          softWrap:
+                                                                              false)))
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.close),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _isReplying = false;
+                                                          _replyMessage = null;
+                                                          _text.text = "";
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : Container()
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      ),
+                      Divider(height: 0, color: Colors.black26),
+                      // SizedBox(
+                      //   height: 50,
+                      Container(
+                        color: Colors.white,
+                        width: MediaQuery.of(context).size.width,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 5, right: 5),
+                          child: Column(
+                            children: <Widget>[
+                              showForwardingProcess
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        IconButton(
+                                          icon: Icon(Icons.cancel),
+                                          onPressed: () {
+                                            print("cancelling forward");
                                             setState(() {
-                                              _isTyping = false;
+                                              showForwardingProcess = false;
+                                              toForwardMessages.clear();
                                             });
-                                          } else {
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.reply_all),
+                                          onPressed: () {
+                                            setState(() {
+                                              showForwardingProcess = false;
+                                            });
+                                            print('going to reply');
                                             ChatRoom.shared
-                                                .typing(widget.chatID);
-                                            setState(() {
-                                              _isTyping = true;
+                                                .setChatsListDialogStream();
+
+                                            Navigator.push(
+                                              context,
+                                              CupertinoPageRoute(
+                                                fullscreenDialog: true,
+                                                builder: (context) =>
+                                                    ChatListDraggablePage(
+                                                        messages:
+                                                            toForwardMessages),
+                                              ),
+                                            ).whenComplete(() {
+                                              ChatRoom.shared
+                                                  .closeChatsListDialogStream();
+                                              ChatRoom.shared.setChatStream();
+                                              ChatRoom.shared
+                                                  .getMessages(widget.chatID);
                                             });
-                                          }
-                                        },
-                                      ),
+                                          },
+                                        ),
+                                      ],
                                     )
                                   : Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
-                                        Image.asset("assets/record.gif",
-                                            width: 10, height: 10),
-                                        Container(width: 5),
-                                        TimerText(dependencies: _dependencies),
-                                      ],
-                                    ),
-                              !_isTyping
-                                  ? ClipOval(
-                                      child: GestureDetector(
-                                        onLongPress: () async {
-                                          print("long press");
-                                          bool p = await _checkPermission();
-                                          if (p) {
-                                            _startRecord();
-                                          }
-                                        },
-                                        onLongPressUp: () {
-                                          print("long press UP");
-                                          _stopRecord();
-                                        },
-                                        // onTap: () {
-                                        //   startRecord();
-                                        // },
-                                        // onDoubleTap: () {
-                                        //   stopRecord();
-                                        // },
-                                        child: Center(
-                                            child: !_isRecording
-                                                ? Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    child: Icon(
-                                                      Icons.mic,
-                                                      size: 50,
-                                                    ),
-                                                  )
-                                                : Container()),
-                                      ),
-                                    )
+                                        // isComplete
+                                        //     ? GestureDetector(
+                                        //         onTap: () {
+                                        //           play();
+                                        //         },
+                                        //         child: Center(
+                                        //           child: Icon(
+                                        //             Icons.play_arrow,
+                                        //             size: 30,
+                                        //           ),
+                                        //         ),
+                                        //       )
+                                        //     :
+                                        IconButton(
+                                          icon: Icon(Icons.attach_file),
+                                          onPressed: () {
+                                            print("Прикрепить");
 
-                                  // IconButton(
-                                  //   icon: Icon(Icons.mic),
-                                  //   onPressed: () {
-                                  //     print("audio pressed");
-                                  //   },
-                                  // )
-                                  : Container(
-                                      height: 50,
-                                      width: 50,
-                                      child: IconButton(
-                                        icon: Icon(Icons.send),
-                                        onPressed: () {
-                                          print(
-                                              "new message or editing? editing: $_isEditing");
-                                          if (_isEditing) {
-                                            print("Edit message is called");
-                                            var mId = _editMessage['id'] == null
-                                                ? _editMessage['message_id']
-                                                : _editMessage['id'];
-                                            var type = _editMessage['type'];
-                                            var time = _editMessage['time'];
-                                            ChatRoom.shared.editMessage(
-                                                _text.text,
-                                                widget.chatID,
-                                                type,
-                                                time,
-                                                mId);
-                                            setState(() {
-                                              _isTyping = false;
-                                              _text.text = '';
-                                              _isEditing = false;
-                                              _editMessage = null;
-                                            });
-                                          } else if (_isReplying) {
-                                            print("Reply message is called");
-                                            var mId = _replyMessage['id'] ==
-                                                    null
-                                                ? _replyMessage['message_id']
-                                                : _replyMessage['id'];
-                                            ChatRoom.shared.replyMessage(
-                                                _text.text,
-                                                widget.chatID,
-                                                10,
-                                                mId);
-                                            setState(() {
-                                              _isTyping = false;
-                                              _text.text = '';
-                                              _isReplying = false;
-                                              _replyMessage = null;
-                                            });
-                                          } else {
-                                            ChatRoom.shared.sendMessage(
-                                                '${widget.chatID}', _text.text);
-                                            setState(() {
-                                              _isTyping = false;
-                                              _text.text = '';
-                                            });
-                                          }
-                                        },
-                                      ),
+                                            FocusScopeNode currentFocus =
+                                                FocusScope.of(context);
+                                            if (!currentFocus.hasPrimaryFocus) {
+                                              currentFocus.unfocus();
+                                            }
+                                            _showAttachmentBottomSheet(context);
+                                          },
+                                        ),
+                                        !_isRecording
+                                            ? Flexible(
+                                                child: TextField(
+                                                  textCapitalization:
+                                                      TextCapitalization
+                                                          .sentences,
+                                                  maxLines: 6,
+                                                  minLines: 1,
+                                                  controller: _text,
+                                                  onChanged: (value) {
+                                                    print("Typing: $value");
+                                                    if (value == '') {
+                                                      setState(() {
+                                                        _isTyping = false;
+                                                      });
+                                                    } else {
+                                                      ChatRoom.shared.typing(
+                                                          widget.chatID);
+                                                      setState(() {
+                                                        _isTyping = true;
+                                                      });
+                                                    }
+                                                  },
+                                                ),
+                                              )
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Image.asset(
+                                                      "assets/record.gif",
+                                                      width: 10,
+                                                      height: 10),
+                                                  Container(width: 5),
+                                                  TimerText(
+                                                      dependencies:
+                                                          _dependencies),
+                                                ],
+                                              ),
+                                        !_isTyping
+                                            ? ClipOval(
+                                                child: GestureDetector(
+                                                  onLongPress: () async {
+                                                    print("long press");
+                                                    bool p =
+                                                        await _checkPermission();
+                                                    if (p) {
+                                                      _startRecord();
+                                                    }
+                                                  },
+                                                  onLongPressUp: () {
+                                                    print("long press UP");
+                                                    _stopRecord();
+                                                  },
+                                                  // onTap: () {
+                                                  //   startRecord();
+                                                  // },
+                                                  // onDoubleTap: () {
+                                                  //   stopRecord();
+                                                  // },
+                                                  child: Center(
+                                                      child: !_isRecording
+                                                          ? Container(
+                                                              height: 50,
+                                                              width: 50,
+                                                              child: Icon(
+                                                                Icons.mic,
+                                                                size: 50,
+                                                              ),
+                                                            )
+                                                          : Container()),
+                                                ),
+                                              )
+
+                                            // IconButton(
+                                            //   icon: Icon(Icons.mic),
+                                            //   onPressed: () {
+                                            //     print("audio pressed");
+                                            //   },
+                                            // )
+                                            : Container(
+                                                height: 50,
+                                                width: 50,
+                                                child: IconButton(
+                                                  icon: Icon(Icons.send),
+                                                  onPressed: () {
+                                                    print(
+                                                        "new message or editing? editing: $_isEditing");
+                                                    if (_isEditing) {
+                                                      print(
+                                                          "Edit message is called");
+                                                      var mId = _editMessage[
+                                                                  'id'] ==
+                                                              null
+                                                          ? _editMessage[
+                                                              'message_id']
+                                                          : _editMessage['id'];
+                                                      var type =
+                                                          _editMessage['type'];
+                                                      var time =
+                                                          _editMessage['time'];
+                                                      ChatRoom.shared
+                                                          .editMessage(
+                                                              _text.text,
+                                                              widget.chatID,
+                                                              type,
+                                                              time,
+                                                              mId);
+                                                      setState(() {
+                                                        _isTyping = false;
+                                                        _text.text = '';
+                                                        _isEditing = false;
+                                                        _editMessage = null;
+                                                      });
+                                                    } else if (_isReplying) {
+                                                      print(
+                                                          "Reply message is called");
+                                                      var mId = _replyMessage[
+                                                                  'id'] ==
+                                                              null
+                                                          ? _replyMessage[
+                                                              'message_id']
+                                                          : _replyMessage['id'];
+                                                      ChatRoom.shared
+                                                          .replyMessage(
+                                                              _text.text,
+                                                              widget.chatID,
+                                                              10,
+                                                              mId);
+                                                      setState(() {
+                                                        _isTyping = false;
+                                                        _text.text = '';
+                                                        _isReplying = false;
+                                                        _replyMessage = null;
+                                                      });
+                                                    } else {
+                                                      ChatRoom.shared
+                                                          .sendMessage(
+                                                              '${widget.chatID}',
+                                                              _text.text);
+                                                      setState(() {
+                                                        _isTyping = false;
+                                                        _text.text = '';
+                                                      });
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                      ],
                                     ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
+                  _isRecording
+                      ? Positioned.fill(
+                          // top: 100,
+                          left: MediaQuery.of(context).size.width * 0.8,
+                          child: Image.asset(
+                            "assets/voice.gif",
+                            // fit: BoxFit.fitWidth,
+                            width: 100,
+                            height: 100,
+                            alignment: Alignment.bottomCenter,
+                          ),
+                        )
+                      : Container(),
+                  // Container(
+                  //   width: 200,
+                  //   height: 200,
+                  //   margin: EdgeInsets.only(
+                  //     left:MediaQuery.of(context).size.width*0.85,
+                  //     top: MediaQuery.of(context).size.height*0.78
+                  //   ),
+                  //   // alignment: Alignment.bottomRight,
+                  //   child: OverflowBox(child: Image.asset("assets/voice.gif", width: 200, height: 200,)),
+                  // ),
                 ],
               ),
-              _isRecording
-                  ? Positioned.fill(
-                      // top: 100,
-                      left: MediaQuery.of(context).size.width * 0.8,
-                      child: Image.asset(
-                        "assets/voice.gif",
-                        // fit: BoxFit.fitWidth,
-                        width: 100,
-                        height: 100,
-                        alignment: Alignment.bottomCenter,
-                      ),
-                    )
-                  : Container(),
-              // Container(
-              //   width: 200,
-              //   height: 200,
-              //   margin: EdgeInsets.only(
-              //     left:MediaQuery.of(context).size.width*0.85,
-              //     top: MediaQuery.of(context).size.height*0.78
-              //   ),
-              //   // alignment: Alignment.bottomRight,
-              //   child: OverflowBox(child: Image.asset("assets/voice.gif", width: 200, height: 200,)),
-              // ),
-            ],
+            ),
           ),
-        )),
+        ),
       ),
     );
   }
@@ -891,7 +964,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   _listen() {
-    ChatRoom.shared.onCabinetChange.listen((e) {
+    ChatRoom.shared.onChatChange.listen((e) {
       print("CABINET EVENT ${e.json['cmd']}");
       var cmd = e.json['cmd'];
       switch (cmd) {
@@ -918,7 +991,6 @@ class _ChatPageState extends State<ChatPage> {
             print('this is before finding');
             if (messageFinding) {
               print('this is founded process');
-              var id = replyMessage['message_id'];
               bool contains = false;
               e.json['data'].forEach((element) {
                 contains = false;
@@ -966,13 +1038,8 @@ class _ChatPageState extends State<ChatPage> {
           break;
         case "message:create":
           var message = e.json['data'];
-          print("Message created with data $message");
-          if (message['type'].toString() == '1') {
-            // setState(() {
-            //   uploadingImage = null;
-            // });
-          }
           if ('${widget.chatID}' == '${e.json['data']['chat_id']}') {
+            _lastMessageTime = message['time'];
             if (_isUploaded) {
               setState(() {
                 _isUploaded = false;
@@ -987,24 +1054,20 @@ class _ChatPageState extends State<ChatPage> {
               });
             }
           }
+          print("Message created with data $message");
           var senderId = e.json["data"]['user_id'].toString();
           var userId = user.id.toString();
           if ('${e.json['data']['chat_id']}' == '${widget.chatID}' &&
               senderId != userId) {
-            ChatRoom.shared.readMessage(widget.chatID, e.json['data']['id']);
-            _myList.forEach((element) {
-              if (element['write'].toString() == '0')
-                setState(() {
-                  element['write'] = '1';
-                });
-            });
           } else {
             _itemScrollController.scrollTo(
                 index: 0, duration: Duration(milliseconds: 500));
           }
           if (senderId != userId &&
               '${widget.chatID}' != '${e.json['data']['chat_id']}') {
-            inAppPush(e.json["data"]);
+            inAppPush(
+              e.json["data"],
+            );
           }
           break;
         case "chat:create":
@@ -1082,8 +1145,10 @@ class _ChatPageState extends State<ChatPage> {
           print("Scrolling to ${e.json['index']['message_id']}");
           // while(_myLis
           var id = e.json['index']['message_id'];
-          int i = _myList.indexWhere(
-              (e) => e['id'] == null ? e['message_id'] : e['id'] == id);
+
+          int i = _myList.indexWhere((e) {
+            return e['id'] == id;
+          });
 
           if (i != -1) {
             messageFinding = false;
@@ -1099,12 +1164,23 @@ class _ChatPageState extends State<ChatPage> {
           break;
         case "message:write":
           print('message read');
-          var mId = e.json['data']['message_id'];
-          var i = _myList.indexWhere((element) =>
-              (element['id'] == null ? element['message_id'] : element['id']) ==
-              mId);
+          var i = _myList.indexWhere((element) {
+            print(_myList[0]['message_id']);
+            return element['message_id'] == e.json['data']['message_id'];
+          });
+
           setState(() {
             _myList[i]['write'] = '1';
+          });
+          break;
+        case "forwardMessage":
+          setState(() {
+            showForwardingProcess = true;
+            print('add to forward is ${e.json}');
+            print('add to forward is ${e.json}');
+            print('add to forward is ${e.json}');
+            print('add to forward is ${e.json}');
+            toForwardMessages.add(e.json['id']);
           });
           break;
         default:
@@ -1752,13 +1828,98 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  bool _value = true;
+  Widget temp(m) {
+    return InkWell(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+        if (m['message_id'] == null) {
+          print('clicking ${m['id']} \n $toForwardMessages');
+
+          if (toForwardMessages.contains(m['id'])) {
+            setState(() {
+              toForwardMessages.remove(m['id']);
+            });
+          } else {
+            setState(() {
+              toForwardMessages.add(m['id']);
+            });
+          }
+        } else {
+          if (toForwardMessages.contains(m['message_id'])) {
+            print('contains ${m['message_id']} \n $toForwardMessages');
+            setState(() {
+              toForwardMessages.remove(m['message_id']);
+            });
+          } else {
+            print('not $toForwardMessages');
+
+            setState(() {
+              toForwardMessages.add(m['message_id']);
+            });
+          }
+        }
+      },
+      child: Row(
+        children: <Widget>[
+          showForwardingProcess
+              ? Container(
+                  margin: EdgeInsets.all(5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.blue),
+                    child: Padding(
+                      padding: EdgeInsets.all(5),
+                      child: m['message_id'] == null ?
+                      toForwardMessages.contains(m['id'])
+                          ? Icon(
+                              Icons.check,
+                              size: 15,
+                              color: Colors.white,
+                            )
+                          : Icon(
+                              Icons.check_box_outline_blank,
+                              size: 15,
+                              color: Colors.blue,
+                            ) :
+                            toForwardMessages.contains(m['id'])
+                          ? Icon(
+                              Icons.check,
+                              size: 15,
+                              color: Colors.white,
+                            )
+                          : Icon(
+                              Icons.check_box_outline_blank,
+                              size: 15,
+                              color: Colors.blue,
+                            ),
+                    ),
+                  ),
+                )
+              : SizedBox(height: 0, width: 0),
+          Flexible(
+            child: _message(m),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _message(m) {
     if ('${m['id']}' == 'chat:message:create' ||
         '${m['type']}' == '7' ||
         '${m['type']}' == '8') return Devider(m);
-    return '${m['user_id']}' == '${user.id}'
-        ? Sended(m, chatId: widget.chatID)
-        : Received(m, chatId: widget.chatID, isGroup: _isGroup);
+    if ('${m['user_id']}' == '${user.id}') {
+      return Sended(m, chatId: widget.chatID);
+    } else {
+      if (m['write'].toString() == '0') {
+        ChatRoom.shared.readMessage(widget.chatID, m['message_id']);
+      }
+      return Received(m, chatId: widget.chatID, isGroup: _isGroup);
+    }
   }
 }
 

@@ -50,104 +50,116 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: _categories != null
-          ? Stack(
-              children: <Widget>[
-                SafeArea(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: 10,
-                          left: 20,
-                          right: 20,
-                          bottom: 0,
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            Flexible(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.search,
-                                    color: blackPurpleColor,
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: _buildAppBar(),
+        body: _categories != null
+            ? Stack(
+                children: <Widget>[
+                  SafeArea(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: 10,
+                            left: 20,
+                            right: 20,
+                            bottom: 0,
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Flexible(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                      color: blackPurpleColor,
+                                    ),
+                                    hintText: "${localization.search}",
+                                    fillColor: blackPurpleColor,
                                   ),
-                                  hintText: "${localization.search}",
-                                  fillColor: blackPurpleColor,
+                                  onChanged: (value) {
+                                    searchOnChanged();
+                                  },
+                                  controller: _searchController,
                                 ),
-                                onChanged: (value) {
-                                  searchOnChanged();
-                                },
-                                controller: _searchController,
                               ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.search),
-                              onPressed: () {
-                                search(_searchController.text);
-                              },
-                            )
-                          ],
+                              IconButton(
+                                icon: Icon(Icons.search),
+                                onPressed: () {
+                                  if (_searchController.text.isNotEmpty)
+                                    search(_searchController.text);
+                                },
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      needToShowServices
-                          ? Flexible(
-                              child: ListView.builder(
-                                padding: EdgeInsets.only(bottom: 20),
-                                shrinkWrap: true,
-                                itemCount:
-                                    _services != null ? _services.length : 0,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    child: _servicesList(
-                                      context,
-                                      _logoUrl + _services[index]['logo'],
-                                      _services[index]['title'],
-                                      _services[index]['id'],
-                                      _services[index]['is_convertable'],
-                                    ),
-                                  );
-                                },
+                        needToShowServices
+                            ? Flexible(
+                                child: ListView.builder(
+                                  padding: EdgeInsets.only(bottom: 20),
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      _services != null ? _services.length : 0,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: _servicesList(
+                                        context,
+                                        _logoUrl + _services[index]['logo'],
+                                        _services[index]['title'],
+                                        _services[index]['id'],
+                                        _services[index]['is_convertable'],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                            : Flexible(
+                                child: ListView.builder(
+                                  padding: EdgeInsets.only(bottom: 20),
+                                  shrinkWrap: true,
+                                  itemCount: _categories["categories"] != null
+                                      ? _categories["categories"].length
+                                      : 0,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: _paymentsList(
+                                        context,
+                                        _categories["logoURL"] +
+                                            _categories["categories"][index]
+                                                ['logo'],
+                                        _categories["categories"][index]
+                                            ['title'],
+                                        _categories["categories"][index]['ID'],
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
-                            )
-                          : Flexible(
-                              child: ListView.builder(
-                                padding: EdgeInsets.only(bottom: 20),
-                                shrinkWrap: true,
-                                itemCount: _categories["categories"] != null
-                                    ? _categories["categories"].length
-                                    : 0,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    child: _paymentsList(
-                                      context,
-                                      _categories["logoURL"] +
-                                          _categories["categories"][index]
-                                              ['logo'],
-                                      _categories["categories"][index]['title'],
-                                      _categories["categories"][index]['ID'],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                isReadyToSend
-                    ? Center()
-                    : Center(
-                        child: CircularProgressIndicator(),
-                      ),
-              ],
-            )
-          : Center(
-              child: CircularProgressIndicator(),
-            ),
+                  isReadyToSend
+                      ? Center()
+                      : Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                ],
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              ),
+      ),
     );
   }
 

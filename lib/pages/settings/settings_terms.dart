@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsTermsPage extends StatefulWidget {
   @override
@@ -55,6 +56,69 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            SizedBox(height: 20,)
+            ,
+Container(
+  alignment: Alignment.topCenter,
+  child:   ConstrainedBox(
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.42),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 10.0,
+                                      spreadRadius: -2,
+                                      offset: Offset(0.0, 0.0))
+                                ],
+                              ),
+                              child: ButtonTheme(
+                                minWidth:
+                                    MediaQuery.of(context).size.width * 0.42,
+                                height: 50,
+                                child: RaisedButton(
+                                  onPressed: () async {
+                                    if (await canLaunch(
+                                        'https://indigo24.com/security.html')) {
+                                      await launch(
+                                        'https://indigo24.com/security.html',
+                                        forceSafariVC: false,
+                                        forceWebView: false,
+                                        headers: <String, String>{
+                                          'my_header_key': 'my_header_value'
+                                        },
+                                      );
+                                    } else {
+                                      throw 'Could not launch https://indigo24.com/security.html';
+                                    }
+                                  },
+                                  child: FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text(
+                                      "${localization.privacyPolicy}",
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ),
+                                  color: whiteColor,
+                                  textColor: whiteColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      10.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+),
+                        SizedBox(
+                          height: 10,
+                        ),
+
             Container(
               padding: EdgeInsets.only(
                 left: 20,

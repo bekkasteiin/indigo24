@@ -114,6 +114,7 @@ class _TapePageState extends State<TapePage>
                               itemCount: _comments.length,
                               itemBuilder: (context, index) {
                                 _saved.add({'index': index, 'maxLines': 5});
+                               // print('${_comments}');
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -135,8 +136,8 @@ class _TapePageState extends State<TapePage>
                                               CircleAvatar(
                                                 radius: 15.0,
                                                 backgroundImage: NetworkImage(
-                                                    '$avatarUrl${user.avatar}'),
-                                                backgroundColor: Colors.red,
+                                                    '$avatarUrl${_comments[index]['avatar']}'),
+                                                backgroundColor: Colors.grey,
                                               ),
                                             ],
                                           ),

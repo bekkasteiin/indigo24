@@ -8,13 +8,13 @@ import 'package:indigo24/widgets/progress_bar.dart';
 import 'helper.dart';
 
 class Api {
-  static BaseOptions _options =  BaseOptions(
+  static BaseOptions _options = BaseOptions(
     baseUrl: '$baseUrl',
     connectTimeout: 15000,
     receiveTimeout: 3000,
   );
 
-  Dio _dio =  Dio(_options);
+  Dio _dio = Dio(_options);
   static const _sendSmsToken = '2MSldk_7!FUh3zB18XoEfIe#nY69@0tcP5Q4';
   static const _registrationToken = 'BGkA2as4#h_J@5txId3fEq6e!F80UMj197ZC';
   static const _checkPhoneToken = 'EG#201wR8Wk6ZbvMFf_e@39h7V!tI5gBTx4a';
@@ -33,7 +33,7 @@ class Api {
     Response response;
     try {
       response = await _dio.post(path, data: data);
-      print('post result $response');
+      // print('post resulе $path $response');
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -133,13 +133,37 @@ class Api {
     return _postRequest('api/v2.1/check/registration', data);
   }
 
-  settingsSave(String name) async {
+  settingsSave({String name, String city}) async {
+    dynamic data;
+    if (name != null) {
+      data = {
+        'customerID': '${user.id}',
+        'unique': '${user.unique}',
+        'name': name,
+      };
+    }
+
+    if (city != null) {
+      data = {
+        'customerID': '${user.id}',
+        'unique': '${user.unique}',
+        'city': city,
+      };
+    }
+    return _postRequest('api/v2.1/settings/save', data);
+  }
+
+  getProfile() async {
     dynamic data = {
       'customerID': '${user.id}',
       'unique': '${user.unique}',
-      'name': name,
     };
-    return _postRequest('api/v2.1/settings/save', data);
+    return _postRequest('api/v2.1/get/profile', data);
+  }
+
+  getNews() async {
+    return _getRequest('https://postman-echo.com/get?foo1=bar1&foo2=bar2',
+        null); // TODO CHANGE URL PATH
   }
 
   getHistoryBalance(page) async {
@@ -275,7 +299,7 @@ class Api {
     return _postRequest('api/v2.1/check/token', data);
   }
 
-  withdraw(String path,amount) async {
+  withdraw(String path, amount) async {
     dynamic data = {
       '_token': '$_token',
       'amount': '$amount',
@@ -287,8 +311,11 @@ class Api {
 
   doTransfer(toID, amount, {transferChat, String comment}) async {
     dynamic data;
+    print('this is $transferChat');
     if (transferChat == null) {
+      print('when if not null $transferChat');
       if (comment != null) {
+        print('when comment != null $transferChat');
         data = {
           'customerID': '${user.id}',
           'unique': '${user.unique}',
@@ -297,6 +324,7 @@ class Api {
           'comment': comment,
         };
       } else {
+        print('when comment == null $transferChat');
         data = {
           'customerID': '${user.id}',
           'unique': '${user.unique}',
@@ -304,9 +332,10 @@ class Api {
           'amount': '$amount',
         };
       }
-      return _dio.post('api/v2.1/check/send/money', data: data);
+      print('data is $data');
+      return _postRequest('api/v2.1/check/send/money', data);
     } else {
-      return _dio.post('api/v2.1/check/send/money', data: {
+      return _postRequest('api/v2.1/check/send/money', {
         'customerID': '${user.id}',
         'unique': '${user.unique}',
         'toID': '$toID',

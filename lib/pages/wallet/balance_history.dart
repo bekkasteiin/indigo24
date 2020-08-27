@@ -8,6 +8,8 @@ import 'package:indigo24/style/colors.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'filter.dart';
+
 class BalanceHistoryPage extends StatefulWidget {
   @override
   _BalanceHistoryPageState createState() => _BalanceHistoryPageState();
@@ -21,7 +23,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
   int _balanceHistoryPage;
 
   String _text;
-  String _maskedText;
 
   List _historyBalanceList;
   List _splittedDates;
@@ -30,7 +31,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
 
   RefreshController _balanceRefreshController;
 
-  MaskTextInputFormatter _filterFormatter;
+  TextEditingController _filterController;
 
   @override
   void initState() {
@@ -39,19 +40,12 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
 
     _balanceHistoryPage = 1;
 
-    _text = '';
-    _maskedText = '';
-
     _api = Api();
 
     _balanceRefreshController = RefreshController(initialRefresh: false);
 
-    _filterFormatter = MaskTextInputFormatter(
-      mask: '****-**-** / ****-**-**',
-      filter: {
-        "*": RegExp(r'[0-9]'),
-      },
-    );
+    _filterController = TextEditingController();
+
     _api.getHistoryBalance(_balanceHistoryPage).then((histories) {
       if (histories['message'] == 'Not authenticated' &&
           histories['success'].toString() == 'false') {
@@ -101,7 +95,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
 
   void _onBalanceLoading() async {
     print("_onBalanceLoading ");
-    if (_maskedText.length == 21) {
+    if (_filterController.text.isNotEmpty) {
       _loadFilteredBalanceData();
     } else {
       _loadBalanceData();
@@ -305,8 +299,9 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                     decoration: InputDecoration(
                       hintText: 'YYYY-MM-DD / YYYY-MM-DD',
                     ),
+                    controller: _filterController,
                     textAlign: TextAlign.center,
-                    inputFormatters: [_filterFormatter],
+                    readOnly: true,
                   ),
                 ),
                 InkWell(
@@ -325,70 +320,49 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                       ],
                     ),
                   ),
-                  onTap: () {
-                    _maskedText =
-                        _filterFormatter.getMaskedText().replaceAll(' ', '');
-                    if (_maskedText.length == 0) {
+                  onTap: () async {
+                    List selectedDate = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HistoryFiletPage(),
+                      ),
+                    );
+                    _filterController.text = selectedDate.join(' / ');
+
+                    _splittedDates = selectedDate;
+                    _balanceHistoryPage = 1;
+
+                    setState(() {
+                      _isProccessing = true;
+                    });
+                    print(selectedDate);
+                    _api
+                        .getFilteredHistoryBalance(_balanceHistoryPage,
+                            selectedDate[0], selectedDate[1])
+                        .then((historyBalance) {
                       setState(() {
-                        _isProccessing = true;
+                        _isProccessing = false;
                       });
-                      _balanceHistoryPage = 1;
-                      _api
-                          .getHistoryBalance(_balanceHistoryPage)
-                          .then((histories) {
-                        setState(() {
-                          _isProccessing = false;
-                        });
-                        if (histories['message'] == 'Not authenticated' &&
-                            histories['success'].toString() == 'false') {
-                          logOut(context);
+                      if (historyBalance['message'] == 'Not authenticated' &&
+                          historyBalance['success'].toString() == 'false') {
+                        logOut(context);
+                        return historyBalance;
+                      } else {
+                        if (historyBalance['succcess'].toString() == 'false') {
+                          _historyBalanceList = null;
+                          _text = historyBalance['message'];
                         } else {
-                          setState(() {
-                            if (histories['result'].isEmpty) {
+                          print('setStates');
+                          _historyBalanceList = historyBalance['result'];
+                          if (historyBalance['result'].isEmpty) {
+                            setState(() {
                               _emptyResponse = true;
-                            }
-                            _historyBalanceList = histories['result'];
-                          });
+                            });
+                          }
                           _balanceHistoryPage++;
                         }
-                      });
-                    }
-                    if (_maskedText.length == 21) {
-                      _balanceHistoryPage = 1;
-
-                      setState(() {
-                        _isProccessing = true;
-                      });
-                      _splittedDates = _maskedText.split("/");
-                      _api
-                          .getFilteredHistoryBalance(_balanceHistoryPage,
-                              _splittedDates[0], _splittedDates[1])
-                          .then((historyBalance) {
-                        setState(() {
-                          _isProccessing = false;
-                        });
-                        if (historyBalance['message'] == 'Not authenticated' &&
-                            historyBalance['success'].toString() == 'false') {
-                          logOut(context);
-                          return historyBalance;
-                        } else {
-                          if (historyBalance['succcess'].toString() ==
-                              'false') {
-                            _historyBalanceList = null;
-                            _text = historyBalance['message'];
-                          } else {
-                            print('setStates');
-                            _historyBalanceList = historyBalance['result'];
-                            if (historyBalance['result'].isEmpty) {
-                              setState(() {
-                                _emptyResponse = true;
-                              });
-                            }
-                            _balanceHistoryPage++;
-                          }
-                        }
-                      });
-                    }
+                      }
+                    });
                   },
                 ),
               ],
@@ -440,9 +414,11 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                       ),
                     )
               : Center(
-                  child: Text(
-                    '$_text',
-                  ),
+                  child: _text != null
+                      ? Text(
+                          '$_text',
+                        )
+                      : CircularProgressIndicator(),
                 ),
         ],
       ),

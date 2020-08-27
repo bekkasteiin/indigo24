@@ -12,6 +12,9 @@ class FlickMultiManager {
     } else {
       flickManager?.flickControlManager?.unmute();
     }
+
+    _flickManagers.forEach((manager) => manager.flickControlManager.mute());
+
     if (_flickManagers.length == 1) {
       play(flickManager);
     }
@@ -51,13 +54,6 @@ class FlickMultiManager {
       _activeManager?.flickControlManager?.pause();
       _activeManager = flickManager;
     }
-
-    if (_isMute) {
-      _activeManager?.flickControlManager?.mute();
-    } else {
-      _activeManager?.flickControlManager?.unmute();
-    }
-
     _activeManager?.flickControlManager?.play();
   }
 

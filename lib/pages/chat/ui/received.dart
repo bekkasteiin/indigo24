@@ -15,6 +15,8 @@ import 'package:indigo24/widgets/linkMessage.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import '../chat_info.dart';
+
 EmojiParser _parser = EmojiParser();
 
 class Received extends StatelessWidget {
@@ -35,77 +37,102 @@ class Received extends StatelessWidget {
     return Align(
       alignment: Alignment(-1, 0),
       child: Container(
-        child: CupertinoContextMenu(
-          actions: [
-            CupertinoContextMenuAction(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('${localization.reply}', style: TextStyle(fontSize: 14)),
-                  Icon(CupertinoIcons.reply_thick_solid, size: 20)
+        child: showForwardingProcess
+            ? buildMaterial(a, replyData, context)
+            : CupertinoContextMenu(
+                actions: [
+                  CupertinoContextMenuAction(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('${localization.reply}',
+                            style: TextStyle(fontSize: 14)),
+                        Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                      ],
+                    ),
+                    onPressed: () {
+                      ChatRoom.shared.replyingMessage(m);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  CupertinoContextMenuAction(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${localization.forward}',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        Icon(CupertinoIcons.reply_all, size: 20)
+                      ],
+                    ),
+                    onPressed: () {
+                      // ChatRoom.shared.replyingMessage(m);
+                      if (m['message_id'] == null)
+                        ChatRoom.shared.localForwardMessage(m['id']);
+                      else
+                        ChatRoom.shared.localForwardMessage(m['message_id']);
+                      Navigator.pop(context);
+                    },
+                  ),
                 ],
+                child: buildMaterial(a, replyData, context),
               ),
-              onPressed: () {
-                ChatRoom.shared.replyingMessage(m);
-                Navigator.pop(context);
+      ),
+    );
+  }
+
+  Material buildMaterial(a, replyData, context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        splashColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onTap: showForwardingProcess
+            ? null
+            : () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
               },
-            ),
-            CupertinoContextMenuAction(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('${localization.forward}',
-                      style: TextStyle(fontSize: 14)),
-                  Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                ],
-              ),
-              onPressed: () {
-                // ChatRoom.shared.replyingMessage(m);
-                Navigator.pop(context);
-                Navigator.pop(context, m);
-              },
-            ),
-          ],
-          child: Material(
-            color: Colors.transparent,
-            child: ReceivedMessageWidget(
-                phone: "${m['phone']}",
-                content: '${m['text']}',
-                time: time('${m['time']}'),
-                name: '${m['user_name']}',
-                image: (m["avatar"] == null || m["avatar"] == "")
-                    ? "${avatarUrl}noAvatar.png"
-                    : m["avatar_url"] == null
-                        ? "$avatarUrl${m["avatar"].toString().replaceAll("AxB", "200x200")}"
-                        : "${m["avatar_url"]}${m["avatar"].toString().replaceAll("AxB", "200x200")}",
-                type: "${m["type"]}",
-                media: (a == false || a == null)
-                    ? null
-                    : "${m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
-                rMedia: (a == false || a == null)
-                    ? null
-                    : a[0]['r_filename'] == null
-                        ? a[0]['filename']
-                        : a[0]['r_filename'],
-                mediaUrl:
-                    (a == false || a == null) ? null : m['attachment_url'],
-                edit: "${m["edit"]}",
-                isGroup: isGroup,
-                anotherUser: "${m["type"]}" == '11'
-                    ? jsonDecode(jsonEncode({
-                        "id": "${m["another_user_id"]}",
-                        "avatar": "${m["another_user_avatar"]}",
-                        "name": "${m["another_user_name"]}"
-                      }))
-                    : null,
-                replyData: (replyData == false || replyData == null)
-                    ? null
-                    : replyData,
-                forwardData: m['forward_data']),
-          ),
-        ),
+        child: ReceivedMessageWidget(
+            phone: "${m['phone']}",
+            content: '${m['text']}',
+            time: time('${m['time']}'),
+            name: '${m['user_name']}',
+            chatId: chatId,
+            image: (m["avatar"] == null || m["avatar"] == "")
+                ? "${avatarUrl}noAvatar.png"
+                : m["avatar_url"] == null
+                    ? "$avatarUrl${m["avatar"].toString().replaceAll("AxB", "200x200")}"
+                    : "${m["avatar_url"]}${m["avatar"].toString().replaceAll("AxB", "200x200")}",
+            type: "${m["type"]}",
+            media: (a == false || a == null)
+                ? null
+                : "${m["type"]}" == '12' ? a[0]['link'] : a[0]['filename'],
+            rMedia: (a == false || a == null)
+                ? null
+                : a[0]['r_filename'] == null
+                    ? a[0]['filename']
+                    : a[0]['r_filename'],
+            mediaUrl: (a == false || a == null) ? null : m['attachment_url'],
+            edit: "${m["edit"]}",
+            isGroup: isGroup,
+            anotherUserPhone: "${m["type"]}" == '11'
+                ? jsonDecode(jsonEncode({
+                    "id": "${m["another_user_id"]}",
+                    "avatar": "${m["another_user_avatar"]}",
+                    "name": "${m["another_user_name"]}"
+                  }))
+                : m,
+            replyData:
+                (replyData == false || replyData == null) ? null : replyData,
+            forwardData: m['forward_data']),
       ),
     );
   }
@@ -137,9 +164,10 @@ class ReceivedMessageWidget extends StatelessWidget {
   final String rMedia;
   final String type;
   final String edit;
+  final chatId;
   final bool isGroup;
   final phone;
-  final anotherUser;
+  final anotherUserPhone;
   final replyData;
   final forwardData;
 
@@ -149,6 +177,7 @@ class ReceivedMessageWidget extends StatelessWidget {
     this.content,
     this.time,
     this.image,
+    this.chatId,
     this.name,
     this.media,
     this.mediaUrl,
@@ -156,7 +185,7 @@ class ReceivedMessageWidget extends StatelessWidget {
     this.type,
     this.edit,
     this.isGroup,
-    this.anotherUser,
+    this.anotherUserPhone,
     this.replyData,
     this.forwardData,
   }) : super(key: key);
@@ -173,21 +202,22 @@ class ReceivedMessageWidget extends StatelessWidget {
         isGroup
             ? InkWell(
                 onTap: () {
-                  ChatRoom.shared.cabinetController.close();
-                  ChatRoom.shared.setCabinetInfoStream();
+                  // ChatRoom.shared.chatController.close();
+                  ChatRoom.shared.setChatInfoStream();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ChatUserProfilePage(
-                        '100',
-                        email: 'email',
-                        image: image,
-                        name: name,
-                        phone: phone,
+                      builder: (context) => ChatProfileInfo(
+                        chatType: isGroup ? '1' : '0',
+                        chatName: name,
+                        memberCount: 2,
+                        chatAvatar: image,
+                        anotherUserPhone: anotherUserPhone,
+                        chatId: chatId,
                       ),
                     ),
                   ).whenComplete(() {
-                    ChatRoom.shared.closeCabinetInfoStream();
+                    // ChatRoom.shared.closeCabinetInfoStream();
                   });
                 },
                 child: CircleAvatar(
@@ -259,7 +289,7 @@ class ReceivedMessageWidget extends StatelessWidget {
                               children: <Widget>[
                                 '$forwardData' != 'null'
                                     ? Text(
-                                        '${localization.forward} from ${forwardData}')
+                                        '${localization.forwardFrom} ${json.decode(forwardData)['user_name']}')
                                     : SizedBox(height: 0, width: 0),
                                 (type == "12")
                                     ? LinkMessage("$media")
@@ -333,11 +363,11 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.start,
                                                                               children: [
-                                                                                Container(width: 30.0, height: 30.0, decoration: new BoxDecoration(shape: BoxShape.circle, image: new DecorationImage(fit: BoxFit.fill, image: new NetworkImage("$avatarUrl${anotherUser["avatar"].toString().replaceAll('AxB', '200x200')}")))),
+                                                                                Container(width: 30.0, height: 30.0, decoration: new BoxDecoration(shape: BoxShape.circle, image: new DecorationImage(fit: BoxFit.fill, image: new NetworkImage("$avatarUrl${anotherUserPhone["avatar"].toString().replaceAll('AxB', '200x200')}")))),
                                                                                 SizedBox(width: 5),
                                                                                 Flexible(
                                                                                   child: Text(
-                                                                                    "${anotherUser["name"]}",
+                                                                                    "${anotherUserPhone["name"]}",
                                                                                     maxLines: 1,
                                                                                     overflow: TextOverflow.ellipsis,
                                                                                     style: TextStyle(fontWeight: FontWeight.w600, color: whiteColor),
@@ -357,9 +387,15 @@ class ReceivedMessageWidget extends StatelessWidget {
                                                                           ],
                                                                         ),
                                                                       )
-                                                                    : SelectableText(
-                                                                        content,
-                                                                      ),
+                                                                    : showForwardingProcess !=
+                                                                                null &&
+                                                                            showForwardingProcess
+                                                                        ? Text(
+                                                                            content,
+                                                                          )
+                                                                        : SelectableText(
+                                                                            content,
+                                                                          ),
                               ],
                             ),
                           ),

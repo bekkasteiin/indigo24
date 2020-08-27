@@ -11,8 +11,37 @@ import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+
+identifyDay(int day) {
+  switch (day) {
+    case 1:
+      return '${localization.monday}';
+      break;
+    case 2:
+      return '${localization.tuesday}';
+      break;
+    case 3:
+      return '${localization.wednesday}';
+      break;
+    case 4:
+      return '${localization.thursday}';
+      break;
+    case 5:
+      return '${localization.friday}';
+      break;
+    case 6:
+      return '${localization.saturday}';
+      break;
+    case 7:
+      return '${localization.sunday}';
+      break;
+    default:
+      return 'dayOfWeek';
+  }
+}
 
 class ChatsListPage extends StatefulWidget {
   ChatsListPage({Key key, this.title}) : super(key: key);
@@ -97,7 +126,7 @@ class _ChatsListPageState extends State<ChatsListPage>
             iconSize: 30,
             color: blackPurpleColor,
             onPressed: () {
-              ChatRoom.shared.setCabinetInfoStream();
+              ChatRoom.shared.setChatUserProfileInfoStream();
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -105,7 +134,7 @@ class _ChatsListPageState extends State<ChatsListPage>
                 ),
               ).whenComplete(
                 () {
-                  ChatRoom.shared.contactController.close();
+                  // ChatRoom.shared.contactController.close();
                   // this is bool for check load more is needed or not
                   globalBoolForForceGetChat = false;
                   ChatRoom.shared.forceGetChat();
@@ -195,16 +224,19 @@ class _ChatsListPageState extends State<ChatsListPage>
   void _onLoading() async {
     await Future.delayed(Duration(milliseconds: 1000));
     print("_onLoading");
-    if (myList.length % 20 == 0) {
-      globalBoolForForceGetChat = true;
-      chatsPage++;
-      if (mounted)
-        setState(() {
-          print("_onLoading CHATS with page $chatsPage");
-          ChatRoom.shared.forceGetChat(page: chatsPage);
-        });
-      _refreshController.loadComplete();
-    }
+    //if (myList.length % 20 == 0) {
+    globalBoolForForceGetChat = true;
+    print("_onLoading CHATS with paasdasdadsdasasdasdasdge $chatsPage");
+    chatsPage++;
+    if (mounted)
+      setState(() {
+        print("_onLoading CHATS with page $chatsPage");
+        ChatRoom.shared.forceGetChat(page: chatsPage);
+      });
+    globalBoolForForceGetChat = false;
+
+    _refreshController.loadComplete();
+    //}
   }
 
   _goToChat(
@@ -219,7 +251,7 @@ class _ChatsListPageState extends State<ChatsListPage>
     members,
     data,
   }) async {
-    ChatRoom.shared.setCabinetStream();
+    ChatRoom.shared.setChatStream();
     ChatRoom.shared.checkUserOnline(userIds);
     var test = await Navigator.push(
       context,
@@ -245,7 +277,7 @@ class _ChatsListPageState extends State<ChatsListPage>
         // this is bool for check load more is needed or not
         globalBoolForForceGetChat = false;
         ChatRoom.shared.forceGetChat();
-        ChatRoom.shared.closeCabinetStream();
+        ChatRoom.shared.closeChatStream();
       },
     );
     if (test != null) {
@@ -260,34 +292,27 @@ class _ChatsListPageState extends State<ChatsListPage>
     }
   }
 
-  _showAlertDialog(BuildContext context, String message, var chat) {
-    Widget okButton = CupertinoDialogAction(
+  _showAlertDialog(BuildContext context, String title, var chat) {
+    void rightButtonCallBack() {
+      Navigator.pop(context);
+      ChatRoom.shared.deleteChat(chat);
+      globalBoolForForceGetChat = false;
+
+      ChatRoom.shared.forceGetChat();
+    }
+
+    void leftButtonCallBacK() {
+      Navigator.pop(context);
+    }
+
+    indigoCupertinoDialogAction(
+      context,
+      title,
+      leftButtonCallBacK: leftButtonCallBacK,
+      rightButtonCallBack: rightButtonCallBack,
       isDestructiveAction: true,
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-        ChatRoom.shared.deleteChat(chat);
-        ChatRoom.shared.forceGetChat();
-      },
-    );
-    Widget noButton = CupertinoDialogAction(
-      child: Text("${localization.no}"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("$message"),
-      actions: [
-        noButton,
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
+      leftButtonText: localization.yes,
+      rightButtonText: localization.no,
     );
   }
 
@@ -303,9 +328,11 @@ class _ChatsListPageState extends State<ChatsListPage>
                       MaterialPageRoute(
                           builder: (context) => ChatContactsPage()))
                   .whenComplete(() {
-                ChatRoom.shared.contactController.close();
+                // ChatRoom.shared.contactController.close();
                 // this is bool for check load more is needed or not
                 ChatRoom.shared.forceGetChat();
+                globalBoolForForceGetChat = false;
+
                 ChatRoom.shared.closeContactsStream();
               });
             },
@@ -349,6 +376,7 @@ class _ChatsListPageState extends State<ChatsListPage>
             child: ListView.builder(
               itemCount: myList.length,
               itemBuilder: (context, i) {
+                // print(myList[i]);
                 return Column(
                   children: <Widget>[
                     showSelection
@@ -372,6 +400,8 @@ class _ChatsListPageState extends State<ChatsListPage>
                                           .muteChat(myList[i]['id'], 1)
                                       : ChatRoom.shared
                                           .muteChat(myList[i]['id'], 0);
+                                  globalBoolForForceGetChat = false;
+
                                   ChatRoom.shared.forceGetChat();
                                 },
                               ),
@@ -408,32 +438,17 @@ class _ChatsListPageState extends State<ChatsListPage>
       onTap: () {
         print('get message');
         ChatRoom.shared.getMessages(myList[i]['id']);
-        showSelection
-            ? _goToChat(
-                myList[i]['name'],
-                myList[i]['id'],
-                phone: myList[i]['another_user_phone'],
-                members: myList[i]['members'],
-                memberCount: myList[i]['members_count'],
-                chatType: myList[i]['type'],
-                userIds: myList[i]['another_user_id'],
-                avatar:
-                    myList[i]['avatar'].toString().replaceAll("AxB", "200x200"),
-                avatarUrl: myList[i]['avatar_url'],
-                data: data,
-              )
-            : _goToChat(
-                myList[i]['name'],
-                myList[i]['id'],
-                phone: myList[i]['another_user_phone'],
-                members: myList[i]['members'],
-                memberCount: myList[i]['members_count'],
-                chatType: myList[i]['type'],
-                userIds: myList[i]['another_user_id'],
-                avatar:
-                    myList[i]['avatar'].toString().replaceAll("AxB", "200x200"),
-                avatarUrl: myList[i]['avatar_url'],
-              );
+        _goToChat(
+          myList[i]['name'],
+          myList[i]['id'],
+          phone: myList[i]['another_user_phone'],
+          members: myList[i]['members'],
+          memberCount: myList[i]['members_count'],
+          chatType: myList[i]['type'],
+          userIds: myList[i]['another_user_id'],
+          avatar: myList[i]['avatar'].toString().replaceAll("AxB", "200x200"),
+          avatarUrl: myList[i]['avatar_url'],
+        );
       },
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(25.0),
@@ -446,23 +461,23 @@ class _ChatsListPageState extends State<ChatsListPage>
               (myList[i]["avatar"] == null ||
                       myList[i]["avatar"] == '' ||
                       myList[i]["avatar"] == false)
-                  ? '${avatarUrl}noAvatar.png'
-                  : '$avatarUrl${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
+                  ? '${myList[i]['type'].toString() == '1' ? groupAvatarUrl : avatarUrl}noAvatar.png'
+                  : '${myList[i]['type'].toString() == '1' ? groupAvatarUrl : avatarUrl}${myList[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
             ),
           ),
         ),
       ),
       title: Text(
-        myList[i]["name"].length != 0
+        myList[i]["name"].toString().length != 0
             ? "${myList[i]["name"][0].toUpperCase() + myList[i]["name"].substring(1)}"
             : "",
         maxLines: 1,
         style: TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
       ),
       subtitle: Text(
-        myList[i]["last_message"].length != 0
-            ? myList[i]["last_message"]['text'].length != 0
-                ? "${myList[i]["last_message"]['text'][0].toUpperCase() + myList[i]["last_message"]['text'].substring(1)}"
+        myList[i]["last_message"].toString().length != 0
+            ? myList[i]["last_message"]['text'].toString().length != 0
+                ? "${myList[i]["last_message"]['text'].toString()[0].toUpperCase() + myList[i]["last_message"]['text'].toString().substring(1)}"
                 : myList[i]["last_message"]['message_for_type'] != null
                     ? "${myList[i]["last_message"]['message_for_type'][0].toUpperCase() + myList[i]["last_message"]['message_for_type'].substring(1)}"
                     : ""
@@ -480,7 +495,10 @@ class _ChatsListPageState extends State<ChatsListPage>
             myList[i]['last_message']["time"] == null
                 ? "null"
                 : _time(myList[i]['last_message']["time"]),
-            style: TextStyle(color: blackPurpleColor),
+            style: TextStyle(
+              color: blackPurpleColor,
+            ),
+            textAlign: TextAlign.right,
           ),
           myList[i]['unread_messages'] == 0
               ? Container()
@@ -516,9 +534,10 @@ class _ChatsListPageState extends State<ChatsListPage>
         if (messageDate.minute.toString().length == 1)
           minutes = '0${messageDate.minute}';
         if (diff.inDays == 0) {
-          return '$hours:$minutes';
+          return '${localization.today}\n$hours:$minutes';
         } else if (diff.inDays < 7) {
-          return '${diff.inDays} ${localization.days} ${localization.ago}\n$hours:$minutes';
+          int weekDay = messageUnixDate.weekday;
+          return identifyDay(weekDay) + '\n$hours:$minutes';
         } else {
           return '$messageUnixDate'.substring(0, 10).replaceAll('-', '.') +
               '\n$hours:$minutes';

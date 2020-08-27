@@ -19,6 +19,10 @@ class ChatsDB {
         .put(await _db, chat.toJson());
   }
 
+  Future deleteChat(int chatId) async {
+    await _chatsFolder.record(chatId).delete(await _db);
+  }
+
   Future insertChats(List<ChatsModel> chats) async {
     chats.forEach((chat) async {
       await _chatsFolder.add(await _db, chat.toJson());

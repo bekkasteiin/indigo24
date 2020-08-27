@@ -58,7 +58,7 @@ class Countries extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '+${countries[index]._phonePrefix}',
+                        '+${countries[index].phonePrefix}',
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           color: blackPurpleColor,

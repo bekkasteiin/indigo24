@@ -121,7 +121,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        _phonePrefix = _selectedCountry._phonePrefix;
+        _phonePrefix = _selectedCountry.phonePrefix;
         _hintText = _selectedCountry.mask;
         loginFormatter = MaskTextInputFormatter(
             mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});

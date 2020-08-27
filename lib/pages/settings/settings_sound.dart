@@ -66,7 +66,7 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              '${localization.showNotifications}',
+                              '${localization.hideNotifications}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,

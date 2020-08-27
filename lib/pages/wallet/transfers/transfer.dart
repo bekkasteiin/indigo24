@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -103,10 +104,10 @@ class TransferContactsDialogPageState
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.only(
+                  padding: EdgeInsets.only(
                       top: 10.0, left: 10.0, right: 10, bottom: 0),
                   child: TextField(
-                    decoration: new InputDecoration(
+                    decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.search,
                         color: blackPurpleColor,
@@ -120,64 +121,72 @@ class TransferContactsDialogPageState
                     controller: _searchController,
                   ),
                 ),
-                ListView.builder(
-                  itemCount: actualList != null ? actualList.length : 0,
-                  shrinkWrap: true,
-                  itemBuilder: (context, i) {
-                    if (actualList[i].phone == null) return Center();
-                    return Center(
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context, actualList[i]);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 20,
-                            horizontal: 40,
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(25.0),
-                                child: Image.network(
-                                  '${actualList[i].avatar}' == ''
-                                      ? '${avatarUrl}noAvatar.png'
-                                      : '$avatarUrl${actualList[i].avatar.replaceAll('AxB', '200x200')}',
-                                  width: 35,
-                                  height: 35,
+                Flexible(
+                  child: ListView.builder(
+                    itemCount: actualList != null ? actualList.length : 0,
+                    shrinkWrap: true,
+                    itemBuilder: (context, i) {
+                      if (actualList[i].phone == null ||
+                          actualList[i].id == user.id)
+                        return SizedBox(
+                          height: 0,
+                          width: 0,
+                        );
+                      return Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context, actualList[i]);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 40,
+                            ),
+                            child: Row(
+                              children: <Widget>[
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(25.0),
+                                  child: Image.network(
+                                    '${actualList[i].avatar}' == ''
+                                        ? '${avatarUrl}noAvatar.png'
+                                        : '$avatarUrl${actualList[i].avatar.replaceAll('AxB', '200x200')}',
+                                    width: 35,
+                                    height: 35,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Flexible(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Container(
-                                      child: Text(
-                                        '${actualList[i].name}',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                    Container(
-                                      child: Text(
-                                        '${actualList[i].phone}',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ],
+                                SizedBox(
+                                  width: 20,
                                 ),
-                              ),
-                            ],
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Container(
+                                        child: Text(
+                                          '${actualList[i].name}',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      Container(
+                                        child: Text(
+                                          '${actualList[i].phone}',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -205,6 +214,7 @@ class _TransferPageState extends State<TransferPage> {
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
+        Navigator.pop(context);
         Navigator.pop(context);
       },
     );
@@ -389,9 +399,12 @@ class _TransferPageState extends State<TransferPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              _commentButton(size, localization.thankYou),
-                              _commentButton(size, localization.returning),
-                              _commentButton(size, localization.withLove),
+                              _commentButton(size, localization.thankYou,
+                                  _commentController),
+                              _commentButton(size, localization.returning,
+                                  _commentController),
+                              _commentButton(size, localization.withLove,
+                                  _commentController),
                             ],
                           ),
                         ),
@@ -403,7 +416,12 @@ class _TransferPageState extends State<TransferPage> {
                     ),
                   ),
                   boolForPreloader
-                      ? Center(child: CircularProgressIndicator())
+                      ? Container(
+                          color: whiteColor.withOpacity(0.5),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        )
                       : Center()
                 ],
               ),
@@ -414,7 +432,8 @@ class _TransferPageState extends State<TransferPage> {
     );
   }
 
-  Container _commentButton(Size size, String comment) {
+  Container _commentButton(
+      Size size, String comment, TextEditingController controller) {
     return Container(
       height: 30,
       width: size.width * 0.25,
@@ -429,9 +448,9 @@ class _TransferPageState extends State<TransferPage> {
       ),
       child: RaisedButton(
         onPressed: () async {
-          _commentController.text = comment;
-          _commentController.selection = TextSelection.fromPosition(
-            TextPosition(offset: _commentController.text.length),
+          controller.text = comment;
+          controller.selection = TextSelection.fromPosition(
+            TextPosition(offset: controller.text.length),
           );
         },
         child: Container(
@@ -524,12 +543,15 @@ class _TransferPageState extends State<TransferPage> {
                   setState(() {
                     boolForPreloader = false;
                   });
+                  print('this is res $res');
                   if (res['success'].toString() == 'false')
                     showAlertDialog(context, '0', res['message']);
                   else {
                     showAlertDialog(context, '1', res['message']);
-                    ChatRoom.shared.sendMoney(
-                        res['transfer_money_chat_token'], widget.transferChat);
+                    if (res['transfer_money_chat_token'].toString() != 'null')
+                      ChatRoom.shared.sendMoney(
+                          res['transfer_money_chat_token'],
+                          widget.transferChat);
                     api.getBalance().then((result) {
                       setState(() {});
                     });
@@ -637,6 +659,7 @@ class _TransferPageState extends State<TransferPage> {
   String toName = '';
   String toAvatar = '';
   Container mainPaymentsDetailMobile() {
+    Size size = MediaQuery.of(context).size;
     return Container(
       height: 170,
       child: Column(
@@ -735,7 +758,9 @@ class _TransferPageState extends State<TransferPage> {
                     },
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.3,
+                    width: size.width * 0.3,
+                    height: 20,
+                    alignment: Alignment.centerRight,
                     child: Text(
                       '$toName',
                       maxLines: 4,
@@ -771,6 +796,16 @@ class _TransferPageState extends State<TransferPage> {
                 ),
               ),
             ],
+          ),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                _commentButton(size, '100', sumController),
+                _commentButton(size, '500', sumController),
+                _commentButton(size, '1000', sumController),
+              ],
+            ),
           ),
         ],
       ),

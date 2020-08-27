@@ -9,27 +9,49 @@ import 'package:indigo24/services/constants.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/user.dart' as user;
 
+class NewChatEvenet {
+  var json;
+
+  NewChatEvenet(var json) {
+    this.json = json;
+  }
+}
+
 class ChatRoom {
   static ChatRoom shared = ChatRoom();
   IOWebSocketChannel channel = new IOWebSocketChannel.connect('$socket');
 
-  var changeController;
-  var cabinetController;
-  var contactController;
-  var chatInfoController;
-  var cabinetInfoController;
-  var notificationSettingsController;
-  var settingsController;
+  StreamController chatsListController;
+  StreamController chatController;
+  StreamController contactController;
+  StreamController chatInfoController;
+  StreamController chatUserProfileController;
+  StreamController notificationSettingsController;
+  StreamController settingsController;
+  StreamController chatsListDialogController;
+  StreamController newChatController;
+  Stream<NewChatEvenet> get onNewChatChange => newChatController.stream;
+  setNewChatStream() {
+    print("Setting StreamController for Events");
+    newChatController = StreamController<NewChatEvenet>();
+  }
 
-  Stream<MyEvent> get onChange => changeController.stream;
+  closeNewChatStream() {
+    // newChatController.close();
+  }
+
+  Stream<ChatsListEvent> get onMainChange => chatsListController.stream;
   Stream<MyContactEvent> get onContactChange => contactController.stream;
-  Stream<MyCabinetEvent> get onCabinetChange => cabinetController.stream;
+  Stream<MyChatEvent> get onChatChange => chatController.stream;
   Stream<MyChatInfoEvent> get onChatInfoChange => chatInfoController.stream;
-  Stream<MyCabinetInfoEvent> get onCabinetInfoChange =>
-      cabinetInfoController.stream;
+  Stream<MyChatUserProfileEvent> get onChatUserProfileChange =>
+      chatUserProfileController.stream;
   Stream<NotificationSettingsEvent> get onNotificationSettingsChange =>
       notificationSettingsController.stream;
   Stream<SettingsEvent> get onSettingsChange => settingsController.stream;
+
+  Stream<ChatListDialog> get onChatsListDialog =>
+      chatsListDialogController.stream;
 
   void outSound() {
     print("msg out sound is called");
@@ -49,86 +71,91 @@ class ChatRoom {
     await player.play("sound/message_in.mp3");
   }
 
-  setStream() {
+  sendSocketData(data) {
+    print('adding to socket $data');
+    channel.sink.add(data);
+  }
+
+  setChatsListStream() {
     print("Setting StreamController for Events");
-    changeController = new StreamController<MyEvent>();
+    chatsListController = StreamController<ChatsListEvent>();
+  }
+
+  closeChatsListStream() {
+    // chatsListController.close();
   }
 
   setChatInfoStream() {
     print("Setting StreamController for Chat Info Events");
-    chatInfoController = new StreamController<MyChatInfoEvent>();
+    chatInfoController = StreamController<MyChatInfoEvent>();
   }
 
-  setCabinetInfoStream() {
-    print("Setting StreamController for Chat Info Events");
-    cabinetInfoController = new StreamController<MyCabinetInfoEvent>();
+  closeChatInfoStream() {
+    // chatInfoController.close();
+  }
+
+  setChatUserProfileInfoStream() {
+    print("Setting StreamController for Chat User Profile Stream");
+    chatUserProfileController = StreamController<MyChatUserProfileEvent>();
+  }
+
+  chatUserProfileStream() {
+    // chatUserProfileController.close();
   }
 
   setContactsStream() {
     print("Setting StreamController for Contact Events");
-    contactController = new StreamController<MyContactEvent>();
+    contactController = StreamController<MyContactEvent>();
   }
 
-  setCabinetStream() {
+  closeContactsStream() {
+    // contactController.close();
+  }
+
+  setChatStream() {
     print("Setting StreamController for Cabinet Events");
-    cabinetController = new StreamController<MyCabinetEvent>();
+    chatController = StreamController<MyChatEvent>();
+  }
+
+  closeChatStream() {
+    // chatController.close();
   }
 
   setSettingsStream() {
     print("Setting StreamController for Settings Event");
-    settingsController = new StreamController<SettingsEvent>();
+    settingsController = StreamController<SettingsEvent>();
+  }
+
+  closeSettingsStream() {
+    // settingsController.close();
   }
 
   setNotificationSettingsStream() {
     print("Setting StreamController for Notifcation Settings Event");
     notificationSettingsController =
-        new StreamController<NotificationSettingsEvent>();
-  }
-
-  csIsClosed() {
-    return cabinetController.isClosed ? true : false;
-  }
-
-  sIsClosed() {
-    return changeController.isClosed ? true : false;
-  }
-
-  closeCabinetStream() {
-    cabinetController.close();
-  }
-
-  closeCabinetInfoStream() {
-    cabinetInfoController.close();
-  }
-
-  closeContactsStream() {
-    contactController.close();
-  }
-
-  closeStream() {
-    changeController.close();
+        StreamController<NotificationSettingsEvent>();
   }
 
   closeNotificationSettingsStream() {
-    notificationSettingsController.close();
+    // notificationSettingsController.close();
   }
 
-  closeSettingsStream() {
-    settingsController.close();
+  setChatsListDialogStream() {
+    print("Setting StreamController for Settings Event");
+    chatsListDialogController = StreamController<ChatListDialog>();
   }
 
-  closeConnection() {
-    channel.sink.close();
-  }
-
-  sendSocketData(data) {
-    print('adding $data');
-    channel.sink.add(data);
+  closeChatsListDialogStream() {
+    // chatsListDialogController.close();
   }
 
   connect(context) {
     channel = new IOWebSocketChannel.connect('$socket');
     listen(context);
+  }
+
+  closeConnection() {
+    // channel.sink.close();
   }
 
   init() {
@@ -220,12 +247,12 @@ class ChatRoom {
     sendSocketData(data);
   }
 
-  getMessages(String chatID, {page}) {
+  getMessages(chatID, {page}) {
     print("getMessages is called");
     String data = json.encode({
       "cmd": 'chat:get',
       "data": {
-        "chat_id": "$chatID",
+        "chat_id": chatID,
         "user_id": "${user.id}",
         "userToken": "${user.unique}",
         "page": page == null ? 1 : page,
@@ -247,8 +274,7 @@ class ChatRoom {
     sendSocketData(data);
   }
 
-  sendMessage(String chatID, String message,
-      {int type, var fileId, attachments}) {
+  sendMessage(chatID, String message, {int type, var fileId, attachments}) {
     outSound();
 
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
@@ -363,7 +389,6 @@ class ChatRoom {
         "userToken": "${user.unique}"
       }
     });
-    print('sending status with $data');
     sendSocketData(data);
   }
 
@@ -405,8 +430,17 @@ class ChatRoom {
     };
     var json = jsonDecode(jsonEncode(object));
 
-    if (cabinetController != null)
-      cabinetController.add(new MyCabinetEvent(json));
+    if (chatController != null) chatController.add(new MyChatEvent(json));
+  }
+
+  localForwardMessage(String id) {
+    var object = {
+      "cmd": "forwardMessage",
+      "id": id,
+    };
+    var json = jsonDecode(jsonEncode(object));
+
+    if (chatController != null) chatController.add(new MyChatEvent(json));
   }
 
   findMessage(i) {
@@ -416,8 +450,7 @@ class ChatRoom {
     };
     var json = jsonDecode(jsonEncode(object));
 
-    if (cabinetController != null)
-      cabinetController.add(new MyCabinetEvent(json));
+    if (chatController != null) chatController.add(new MyChatEvent(json));
   }
 
   replyingMessage(m) {
@@ -430,12 +463,11 @@ class ChatRoom {
     };
     var json = jsonDecode(jsonEncode(object));
 
-    if (cabinetController != null)
-      cabinetController.add(new MyCabinetEvent(json));
+    chatController.add(new MyChatEvent(json));
   }
 
   forwardMessage(m, String text, String chatIds) {
-    print("FORWARD MESSAGE TO SOCKET $m");
+    print("FORWARD MESSAGE TO SOCKET $m $text $chatIds");
     String data = json.encode({
       "cmd": 'message:forward',
       "data": {
@@ -443,7 +475,7 @@ class ChatRoom {
         "userToken": "${user.unique}",
         "chat_id": chatIds,
         "text": text,
-        "forward_messages_id": m['id'],
+        "forward_messages_id": m,
       }
     });
     sendSocketData(data);
@@ -519,6 +551,20 @@ class ChatRoom {
     sendSocketData(data);
   }
 
+  setGroupAvatar(int chatId, String fileName) {
+    String data = json.encode({
+      "cmd": "set:group:avatar",
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        'file_name': fileName,
+        "chat_id": '$chatId',
+      }
+    });
+    print('changing $chatId avatar to $fileName');
+    sendSocketData(data);
+  }
+
   searchChatMembers(search, chatId) {
     String data = json.encode({
       "cmd": "chat:member:search",
@@ -563,12 +609,14 @@ class ChatRoom {
     channel.stream.listen(
       (event) {
         var json = jsonDecode(event);
+
+        print('main listen ${json['cmd']}');
+
         if (json['logout'] != null && json['logout'] == true) {
           logOut(context);
         } else {
           var cmd = json['cmd'];
           var data = json['data'];
-          print(json);
           switch (cmd) {
             case "init":
               print(user.id);
@@ -581,50 +629,65 @@ class ChatRoom {
               }
               break;
             case "chats:get":
-              changeController.add(MyEvent(json));
+              if (chatsListDialogController != null &&
+                  !chatsListDialogController.isClosed) {
+                chatsListDialogController.add(ChatListDialog(json));
+              } else {
+                chatsListController.add(ChatsListEvent(json));
+              }
               break;
             case "chat:get":
-              if (!cabinetController.isClosed) {
-                cabinetController.add(MyCabinetEvent(json));
+              if (newChatController != null && !newChatController.isClosed) {
+                newChatController.add(NewChatEvenet(json));
+              }
+              if (chatController != null && !chatController.isClosed) {
+                chatController.add(MyChatEvent(json));
               }
               break;
             case "message:create":
               // this is bool for check load more is needed or not
               globalBoolForForceGetChat = false;
               forceGetChat();
-              if (cabinetController == null) {
+              if (chatController == null) {
                 // inSound();
-                changeController.add(MyEvent(json));
+                chatsListController.add(ChatsListEvent(json));
                 print("new message in CHATS null page");
               } else {
-                if (!cabinetController.isClosed) {
+                if (!chatController.isClosed) {
                   print("new message in CHAT page");
-                  cabinetController.add(MyCabinetEvent(json));
+                  chatController.add(MyChatEvent(json));
                 } else {
-                  changeController.add(MyEvent(json));
+                  chatsListController.add(ChatsListEvent(json));
                   print("new message in CHATS page");
                 }
               }
+              // newChatController.add(NewChatEvenet(json));
               break;
             case "user:check":
-              if (contactController != null) {
+              if (contactController != null && !contactController.isClosed) {
                 contactController.add(MyContactEvent(json));
               }
-              if (cabinetInfoController != null) {
-                if (!cabinetInfoController.isClosed) {
+              if (chatInfoController != null) {
+                print('added to chatInfoController');
+                if (!chatInfoController.isClosed)
+                  chatInfoController.add(MyChatInfoEvent(json));
+                print('contoller');
+              }
+              if (chatUserProfileController != null) {
+                if (!chatUserProfileController.isClosed) {
                   print('added to cabinet info');
-                  cabinetInfoController.add(MyCabinetInfoEvent(json));
+                  chatUserProfileController.add(MyChatUserProfileEvent(json));
                 }
               }
-              if (changeController != null) {
-                changeController.add(MyEvent(json));
+              if (chatsListController != null) {
+                chatsListController.add(ChatsListEvent(json));
               }
               break;
             case "chat:members:add":
               contactController.add(MyContactEvent(json));
               break;
             case "user:check:online":
-              cabinetController.add(MyCabinetEvent(json));
+              chatController.add(MyChatEvent(json));
               break;
             case "chat:create":
               // this is bool for check load more is needed or not
@@ -637,11 +700,15 @@ class ChatRoom {
               if (chatInfoController != null) {
                 chatInfoController.add(MyChatInfoEvent(json));
               }
-              if (cabinetController != null && !cabinetController.isClosed) {
-                cabinetController.add(MyCabinetEvent(json));
+              if (chatController != null && !chatController.isClosed) {
+                chatController.add(MyChatEvent(json));
               }
               break;
             case "chat:member:search":
+              print('added to chatInfoController');
+              chatInfoController.add(MyChatInfoEvent(json));
+              break;
+            case "set:group:avatar":
               print('added to chatInfoController');
               chatInfoController.add(MyChatInfoEvent(json));
               break;
@@ -650,16 +717,16 @@ class ChatRoom {
               chatInfoController.add(MyChatInfoEvent(json));
               break;
             case "user:writing":
-              if (cabinetController != null && !cabinetController.isClosed)
-                cabinetController.add(MyCabinetEvent(json));
+              if (chatController != null && !chatController.isClosed)
+                chatController.add(MyChatEvent(json));
               break;
             case "message:deleted:all":
-              if (cabinetController != null)
-                cabinetController.add(MyCabinetEvent(json));
+              if (chatsListController != null) forceGetChat();
+              if (chatController != null) chatController.add(MyChatEvent(json));
+
               break;
             case "message:edit":
-              if (cabinetController != null)
-                cabinetController.add(MyCabinetEvent(json));
+              if (chatController != null) chatController.add(MyChatEvent(json));
               break;
             case "chat:members:delete":
               print('added to chatInfoController');
@@ -670,7 +737,7 @@ class ChatRoom {
               chatInfoController.add(MyChatInfoEvent(json));
               break;
             case "message:write":
-              changeController.add(MyEvent(json));
+              chatController.add(MyChatEvent(json));
               print("adding message write to chat");
               break;
             case 'user:settings:get':
@@ -689,7 +756,7 @@ class ChatRoom {
         }
       },
       onDone: () {
-        print("ON DONE IS CALLED");
+        print("ON DONE IS CALLED"); // TODO
         Future.delayed(const Duration(seconds: 1), () {
           connect(context);
           init();
@@ -699,10 +766,10 @@ class ChatRoom {
   }
 }
 
-class MyEvent {
+class ChatsListEvent {
   var json;
 
-  MyEvent(var json) {
+  ChatsListEvent(var json) {
     this.json = json;
   }
 }
@@ -715,10 +782,10 @@ class MyContactEvent {
   }
 }
 
-class MyCabinetEvent {
+class MyChatEvent {
   var json;
 
-  MyCabinetEvent(var json) {
+  MyChatEvent(var json) {
     this.json = json;
   }
 }
@@ -731,10 +798,10 @@ class MyChatInfoEvent {
   }
 }
 
-class MyCabinetInfoEvent {
+class MyChatUserProfileEvent {
   var json;
 
-  MyCabinetInfoEvent(var json) {
+  MyChatUserProfileEvent(var json) {
     this.json = json;
   }
 }
@@ -751,6 +818,14 @@ class SettingsEvent {
   var json;
 
   SettingsEvent(var json) {
+    this.json = json;
+  }
+}
+
+class ChatListDialog {
+  var json;
+
+  ChatListDialog(var json) {
     this.json = json;
   }
 }

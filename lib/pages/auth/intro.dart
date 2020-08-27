@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/db/country_dao.dart';
@@ -19,16 +21,166 @@ class IntroPage extends StatefulWidget {
   _IntroPageState createState() => _IntroPageState();
 }
 
+bool isLanguageSelected = false;
+
 class _IntroPageState extends State<IntroPage> {
   Api _api;
   CountryDao _countryDao;
   int _tempCounter = 0; // TODO FIX REMOVE
+
+  _showLanguages() {
+    Size size = MediaQuery.of(context).size;
+    Dialog errorDialog = Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Container(
+        width: size.width * 0.5,
+        height: size.width * 0.8,
+        child: Column(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.all(10),
+              child: Text('${localization.selectOption}'),
+            ),
+            Container(
+              height: 1,
+              width: size.width,
+              color: blackColor,
+            ),
+            Flexible(
+              child: ListView.separated(
+                padding: EdgeInsets.all(0),
+                shrinkWrap: false,
+                itemCount: localization.languages.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return FlatButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('${localization.languages[index]['title']}'),
+                        Text('${localization.languages[index]['code']}'),
+                      ],
+                    ),
+                    onPressed: () {
+                      print(localization.languages[index]['title']);
+                      isLanguageSelected = true;
+                      setState(() {
+                        localization
+                            .setLanguage(localization.languages[index]['code']);
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    Container(
+                  height: 1,
+                  width: size.width,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return errorDialog;
+      },
+    );
+  }
+
+  _showNews(dynamic result) {
+    Size size = MediaQuery.of(context).size;
+    Dialog errorDialog = Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Container(
+        width: size.width * 0.5,
+        height: size.width * 0.8,
+        child: Column(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.all(10),
+              child: Text('${localization.selectOption}'),
+            ),
+            Container(
+              height: 1,
+              width: size.width,
+              color: blackColor,
+            ),
+            Flexible(
+              child: ListView.separated(
+                padding: EdgeInsets.all(0),
+                shrinkWrap: false,
+                itemCount: localization.languages.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return FlatButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('${result['args']}'),
+                      ],
+                    ),
+                    onPressed: () async {
+                      print('ture');
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    Container(
+                  height: 1,
+                  width: size.width,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return errorDialog;
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _api = Api();
     _countryDao = CountryDao();
     _getCountries();
+
+    Future.delayed(Duration.zero, () {
+      if (!isLanguageSelected) _showLanguages();
+    });
+    // _api.getNews().then((result) async { // TODO TURN ON THIS
+    //   print('result of main $result');
+    //   SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    //   int showedCount = preferences.getInt('newsShowedCount');
+    //   if (showedCount == null) {
+    //     showedCount = 1;
+    //     preferences.setInt('newsShowedCount', showedCount);
+    //   }
+    //   if (showedCount < 3) {
+    //     showedCount++;
+    //     preferences.setInt('newsShowedCount', showedCount);
+    //     _showNews(result);
+    //   }
+    // });
   }
 
   @override
@@ -69,7 +221,7 @@ class _IntroPageState extends State<IntroPage> {
                     Container(
                       child: InkWell(
                         child: Container(
-                          height: 20,
+                          height: 100,
                           width: 100,
                         ),
                         onTap: () async {

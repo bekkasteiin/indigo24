@@ -7,6 +7,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import '../filter.dart';
 import 'transfer.dart';
 
 class TransferHistoryPage extends StatefulWidget {
@@ -22,11 +23,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   String _text;
   bool _emptyResponse;
   RefreshController _refreshController;
-  String maskedText;
   int _page;
   var splittedDates;
-
-  MaskTextInputFormatter _filterFormatter;
+  TextEditingController _filterController;
 
   @override
   void initState() {
@@ -36,17 +35,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     _emptyResponse = false;
     _api = Api();
     _avatarUrl = "";
-    _text = "";
-    maskedText = '';
-
+    _filterController = TextEditingController();
     _refreshController = RefreshController(initialRefresh: false);
-
-    _filterFormatter = MaskTextInputFormatter(
-      mask: '****-**-** / ****-**-**',
-      filter: {
-        "*": RegExp(r'[0-9]'),
-      },
-    );
 
     _api.getTransactions(_page).then((transactions) {
       if (transactions['message'] == 'Not authenticated' &&
@@ -88,11 +78,12 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                 Container(
                   width: size.width * 0.8 - 20,
                   child: TextFormField(
+                    controller: _filterController,
                     decoration: InputDecoration(
                       hintText: 'YYYY-MM-DD / YYYY-MM-DD',
                     ),
                     textAlign: TextAlign.center,
-                    inputFormatters: [_filterFormatter],
+                    readOnly: true,
                   ),
                 ),
                 InkWell(
@@ -111,19 +102,32 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                       ],
                     ),
                   ),
-                  onTap: () {
-                    maskedText =
-                        _filterFormatter.getMaskedText().replaceAll(' ', '');
-                    if (maskedText.length == 0) {
-                      _page = 1;
-                      _api.getTransactions(_page).then((transactions) {
-                        if (transactions['message'] == 'Not authenticated' &&
-                            transactions['success'].toString() == 'false') {
-                          logOut(context);
-                        } else {
+                  onTap: () async {
+                    List selectedDate = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HistoryFiletPage(),
+                      ),
+                    );
+                    _filterController.text = selectedDate.join(' / ');
+
+                    splittedDates = selectedDate;
+                    _page = 1;
+                    _api
+                        .getFilteredTransactions(
+                            _page, selectedDate[0], selectedDate[1])
+                        .then((transactions) {
+                      print(transactions);
+                      if (transactions['message'] == 'Not authenticated' &&
+                          transactions['success'].toString() == 'false') {
+                        logOut(context);
+                        return transactions;
+                      } else {
+                        if (transactions['success'].toString() == 'true') {
                           setState(() {
-                            _avatarUrl = transactions['avatarURL'];
                             if (_page == 1) {
+                              print('setStates');
+
                               _transferHistories =
                                   transactions['transactions'].toList();
                               if (transactions['transactions'].isEmpty) {
@@ -132,46 +136,15 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                               _page++;
                             }
                           });
-                        }
-                      });
-                    }
-
-                    if (maskedText.length == 21) {
-                      splittedDates = maskedText.split("/");
-                      _page = 1;
-                      _api
-                          .getFilteredTransactions(
-                              _page, splittedDates[0], splittedDates[1])
-                          .then((transactions) {
-                        print(transactions);
-                        if (transactions['message'] == 'Not authenticated' &&
-                            transactions['success'].toString() == 'false') {
-                          logOut(context);
-                          return transactions;
                         } else {
-                          if (transactions['success'].toString() == 'true') {
-                            setState(() {
-                              if (_page == 1) {
-                                print('setStates');
+                          setState(() {
+                            _transferHistories = null;
 
-                                _transferHistories =
-                                    transactions['transactions'].toList();
-                                if (transactions['transactions'].isEmpty) {
-                                  _emptyResponse = true;
-                                }
-                                _page++;
-                              }
-                            });
-                          } else {
-                            setState(() {
-                              _transferHistories = null;
-
-                              _text = transactions['message'];
-                            });
-                          }
+                            _text = transactions['message'];
+                          });
                         }
-                      });
-                    }
+                      }
+                    });
                   },
                 ),
               ],
@@ -182,7 +155,13 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               ? _transferHistories != null
                   ? Flexible(
                       child: _transferHistoryBody(_transferHistories, context))
-                  : Center(child: Text('$_text'))
+                  : Center(
+                      child: _text != null
+                          ? Text(
+                              '$_text',
+                            )
+                          : CircularProgressIndicator(),
+                    )
               : SafeArea(
                   child: Container(
                     child: Center(child: Text('${localization.empty}')),
@@ -248,16 +227,16 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               children: <Widget>[
                 Container(
                   child: Image.asset(
-                    type == 'in'
-                        ? 'assets/images/repeat.png'
-                        : 'assets/images/replyTransfer.png',
+                    '$type' == 'in'
+                        ? 'assets/images/replyTransfer.png'
+                        : 'assets/images/repeat.png',
                     width: 20,
                     height: 20,
                   ),
                 ),
                 FittedBox(
                   child: Text(
-                    '${type == 'in' ? localization.repeat : localization.reply}',
+                    '${type == 'in' ? localization.reply : localization.repeat}',
                     style: TextStyle(
                       color: Color(0xFF0543B8),
                     ),
@@ -371,7 +350,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   }
 
   void _onLoading() async {
-    if (maskedText.length == 21) {
+    if (_filterController.text.isNotEmpty) {
       _loadFilteredData();
     } else {
       _loadData();
