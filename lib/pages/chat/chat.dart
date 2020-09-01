@@ -125,9 +125,7 @@ class _ChatPageState extends State<ChatPage> {
     ChatRoom.shared.chatMembers(widget.chatID);
 
     ChatRoom.shared.checkUserOnline(widget.userIds);
-    if (widget.data != null) {
-      ChatRoom.shared.forwardMessage(widget.data.join(','), '', widget.chatID);
-    }
+
     _listen();
   }
 
@@ -146,7 +144,7 @@ class _ChatPageState extends State<ChatPage> {
         int.parse(unix.toString()) * 1000);
   }
 
-  buildMessage(index) {
+  _buildMessage(index) {
     if (_myList[index]['time'].toString() != '') {
       if (_myList[index]['time'].toString() == '1') {
         return SizedBox(height: 0, width: 0);
@@ -404,7 +402,7 @@ class _ChatPageState extends State<ChatPage> {
                                                 itemCount: _myList.length,
                                                 reverse: true,
                                                 itemBuilder: (context, index) {
-                                                  return buildMessage(index);
+                                                  return _buildMessage(index);
                                                 },
                                               ),
                                             ),
@@ -1873,29 +1871,29 @@ class _ChatPageState extends State<ChatPage> {
                         shape: BoxShape.circle, color: Colors.blue),
                     child: Padding(
                       padding: EdgeInsets.all(5),
-                      child: m['message_id'] == null ?
-                      toForwardMessages.contains(m['id'])
-                          ? Icon(
-                              Icons.check,
-                              size: 15,
-                              color: Colors.white,
-                            )
-                          : Icon(
-                              Icons.check_box_outline_blank,
-                              size: 15,
-                              color: Colors.blue,
-                            ) :
-                            toForwardMessages.contains(m['id'])
-                          ? Icon(
-                              Icons.check,
-                              size: 15,
-                              color: Colors.white,
-                            )
-                          : Icon(
-                              Icons.check_box_outline_blank,
-                              size: 15,
-                              color: Colors.blue,
-                            ),
+                      child: m['message_id'] == null
+                          ? toForwardMessages.contains(m['id'])
+                              ? Icon(
+                                  Icons.check,
+                                  size: 15,
+                                  color: Colors.white,
+                                )
+                              : Icon(
+                                  Icons.check_box_outline_blank,
+                                  size: 15,
+                                  color: Colors.blue,
+                                )
+                          : toForwardMessages.contains(m['id'])
+                              ? Icon(
+                                  Icons.check,
+                                  size: 15,
+                                  color: Colors.white,
+                                )
+                              : Icon(
+                                  Icons.check_box_outline_blank,
+                                  size: 15,
+                                  color: Colors.blue,
+                                ),
                     ),
                   ),
                 )

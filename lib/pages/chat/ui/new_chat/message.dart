@@ -37,7 +37,7 @@ class MessageWidget extends StatelessWidget {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('asd'),
+              Text(message['user_name']),
               child,
             ],
           )
@@ -65,9 +65,11 @@ class MessageWidget extends StatelessWidget {
         break;
       case 1:
         return ImageMessageWidget(
-          text: message['text'],
+          text: '${message['text']}',
           url: 'https://indigo24.com/uploads/avatars/',
           media: '116222.20200710224458_200x200.jpeg',
+          // url: message['avatar_url'],
+          // media: message['avatar'],
         );
         break;
       case 2:
@@ -117,11 +119,18 @@ class MessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: MessageCategoryWidget(
+        message: message,
         messageCategory: messageCategory,
         avatar: message['avatar_url'] + message['avatar'],
+        chatType: chatType,
+        messageId:
+            message['id'] != null ? message['id'] : message['message_id'],
+        read: '${message['write'].toString()}' == '1' ? true : false,
+        chatId: int.parse(message['chat_id'].toString()),
         child: MessageFrameWidget(
           messageCategory: messageCategory,
-          messageId: message['id'],
+          messageId:
+              message['id'] != null ? message['id'] : message['message_id'],
           chatId: int.parse(message['chat_id'].toString()),
           time: time(int.parse(message['time'].toString())),
           read: '${message['write'].toString()}' == '1' ? true : false,

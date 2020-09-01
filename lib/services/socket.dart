@@ -9,10 +9,26 @@ import 'package:indigo24/services/constants.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/user.dart' as user;
 
-class NewChatEvenet {
+class NewChatEvent {
   var json;
 
-  NewChatEvenet(var json) {
+  NewChatEvent(var json) {
+    this.json = json;
+  }
+}
+
+class NewChatsEvent {
+  var json;
+
+  NewChatsEvent(var json) {
+    this.json = json;
+  }
+}
+
+class UsersListEvent {
+  var json;
+
+  UsersListEvent(var json) {
     this.json = json;
   }
 }
@@ -29,11 +45,26 @@ class ChatRoom {
   StreamController notificationSettingsController;
   StreamController settingsController;
   StreamController chatsListDialogController;
+  StreamController newUsersListDialogController;
   StreamController newChatController;
-  Stream<NewChatEvenet> get onNewChatChange => newChatController.stream;
+  StreamController newChatsController;
+  Stream<NewChatEvent> get onNewChatChange => newChatController.stream;
+  Stream<NewChatsEvent> get onNewChatsChange => newChatsController.stream;
+  Stream<UsersListEvent> get onUsersListDialogChange =>
+      newUsersListDialogController.stream;
+  setNewUsersListStream() {
+    print("Setting StreamControllers for Events");
+    newUsersListDialogController = StreamController<UsersListEvent>();
+  }
+
+  setNewChatsStream() {
+    print("Setting StreamControllers for Events");
+    newChatsController = StreamController<NewChatsEvent>();
+  }
+
   setNewChatStream() {
     print("Setting StreamController for Events");
-    newChatController = StreamController<NewChatEvenet>();
+    newChatController = StreamController<NewChatEvent>();
   }
 
   closeNewChatStream() {
@@ -276,7 +307,6 @@ class ChatRoom {
 
   sendMessage(chatID, String message, {int type, var fileId, attachments}) {
     outSound();
-
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
     message = message.trimLeft();
     message = message.trimRight();
@@ -431,6 +461,7 @@ class ChatRoom {
     var json = jsonDecode(jsonEncode(object));
 
     if (chatController != null) chatController.add(new MyChatEvent(json));
+    if (newChatController != null) newChatController.add(NewChatEvent(json));
   }
 
   localForwardMessage(String id) {
@@ -441,6 +472,7 @@ class ChatRoom {
     var json = jsonDecode(jsonEncode(object));
 
     if (chatController != null) chatController.add(new MyChatEvent(json));
+    newChatController.add(NewChatEvent(json));
   }
 
   findMessage(i) {
@@ -462,8 +494,7 @@ class ChatRoom {
       "message": m
     };
     var json = jsonDecode(jsonEncode(object));
-
-    chatController.add(new MyChatEvent(json));
+    if (newChatController != null) newChatController.add(NewChatEvent(json));
   }
 
   forwardMessage(m, String text, String chatIds) {
@@ -624,11 +655,11 @@ class ChatRoom {
               if (data['status'].toString() == 'true') {
                 print("INIT status is ${data['status']}");
                 // this is bool for check load more is needed or not
-                globalBoolForForceGetChat = false;
                 forceGetChat();
               }
               break;
             case "chats:get":
+              newChatsController.add(NewChatsEvent(json));
               if (chatsListDialogController != null &&
                   !chatsListDialogController.isClosed) {
                 chatsListDialogController.add(ChatListDialog(json));
@@ -638,7 +669,7 @@ class ChatRoom {
               break;
             case "chat:get":
               if (newChatController != null && !newChatController.isClosed) {
-                newChatController.add(NewChatEvenet(json));
+                newChatController.add(NewChatEvent(json));
               }
               if (chatController != null && !chatController.isClosed) {
                 chatController.add(MyChatEvent(json));
@@ -646,7 +677,6 @@ class ChatRoom {
               break;
             case "message:create":
               // this is bool for check load more is needed or not
-              globalBoolForForceGetChat = false;
               forceGetChat();
               if (chatController == null) {
                 // inSound();
@@ -661,7 +691,8 @@ class ChatRoom {
                   print("new message in CHATS page");
                 }
               }
-              // newChatController.add(NewChatEvenet(json));
+              if (newChatController != null)
+                newChatController.add(NewChatEvent(json));
               break;
             case "user:check":
               if (contactController != null && !contactController.isClosed) {
@@ -687,16 +718,20 @@ class ChatRoom {
               contactController.add(MyContactEvent(json));
               break;
             case "user:check:online":
-              chatController.add(MyChatEvent(json));
+              if (chatController != null) chatController.add(MyChatEvent(json));
+              if (newChatController != null)
+                newChatController.add(NewChatEvent(json));
               break;
             case "chat:create":
               // this is bool for check load more is needed or not
-              globalBoolForForceGetChat = false;
               forceGetChat();
               contactController.add(MyContactEvent(json));
               break;
             case "chat:members":
               print('added to chatInfoController');
+              if (newUsersListDialogController != null) {
+                newUsersListDialogController.add(UsersListEvent(json));
+              }
               if (chatInfoController != null) {
                 chatInfoController.add(MyChatInfoEvent(json));
               }
@@ -717,6 +752,10 @@ class ChatRoom {
               chatInfoController.add(MyChatInfoEvent(json));
               break;
             case "user:writing":
+              if (newChatController != null)
+                newChatController.add(NewChatEvent(json));
+              if (newChatsController != null)
+                newChatsController.add(NewChatsEvent(json));
               if (chatController != null && !chatController.isClosed)
                 chatController.add(MyChatEvent(json));
               break;
@@ -737,7 +776,8 @@ class ChatRoom {
               chatInfoController.add(MyChatInfoEvent(json));
               break;
             case "message:write":
-              chatController.add(MyChatEvent(json));
+              newChatController.add(NewChatEvent(json));
+              // chatController.add(MyChatEvent(json));
               print("adding message write to chat");
               break;
             case 'user:settings:get':
@@ -749,7 +789,12 @@ class ChatRoom {
               user.settings = data;
               print("adding settings get to settings");
               break;
-
+            case 'chat:delete':
+              newChatsController.add(NewChatsEvent(json));
+              break;
+            case 'chat:mute':
+              newChatsController.add(NewChatsEvent(json));
+              break;
             default:
               print('default print cmd: $cmd json: $json');
           }

@@ -93,7 +93,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                         avatarUrl: '${e.json['data']['avatar_url']}')),
               ).whenComplete(() {
                 // this is bool for check load more is needed or not
-                globalBoolForForceGetChat = false;
                 ChatRoom.shared.forceGetChat();
                 ChatRoom.shared.closeChatStream();
               });
@@ -128,7 +127,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                       userIds: e.json['data']['user_id'])),
             ).whenComplete(() {
               // this is bool for check load more is needed or not
-              globalBoolForForceGetChat = false;
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeChatStream();
             });
@@ -141,7 +139,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               context,
               MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
             ).whenComplete(() {
-              globalBoolForForceGetChat = false;
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeChatStream();
             });

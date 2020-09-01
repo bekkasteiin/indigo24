@@ -21,8 +21,6 @@ class _AudioMessageWidgetState extends State<AudioMessageWidget> {
   @override
   Widget build(BuildContext context) {
     print("${widget.mediaUrl}l${widget.media}"); // TODO change it
-    return Container(
-        child: AudioMessage(
-            "https://media.chat.indigo24.xyz/media/voice/UBevVgSRkaSfRNttpngpNkuuRftbfo2oR.mp3"));
+    return Container(child: AudioMessage("${widget.mediaUrl}l${widget.media}"));
   }
 }

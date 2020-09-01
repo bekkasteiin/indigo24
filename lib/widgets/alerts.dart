@@ -1,33 +1,36 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 
 indigoCupertinoDialogAction(
   BuildContext context,
   String title, {
   rightButtonCallBack(),
-  leftButtonCallBacK(),
+  leftButtonCallBack(),
   String content,
   bool isDestructiveAction,
   String rightButtonText,
   String leftButtonText,
 }) {
+  List<Widget> actions = [];
+
   CupertinoDialogAction rightButton = CupertinoDialogAction(
-    child: Text(leftButtonText),
+    child: Text('$rightButtonText'),
     isDestructiveAction: isDestructiveAction,
     onPressed: () {
       rightButtonCallBack();
     },
   );
   CupertinoDialogAction leftButton = CupertinoDialogAction(
-    child: Text(rightButtonText),
+    child: Text(
+      '${leftButtonText == null ? localization.cancel : leftButtonText}',
+    ),
     onPressed: () {
-      leftButtonCallBacK();
+      leftButtonText == null ? Navigator.pop(context) : leftButtonCallBack();
     },
   );
-  List<Widget> actions = [];
-
-  rightButtonText != null ? actions.add(leftButton) : Center();
-  leftButtonText != null ? actions.add(rightButton) : Center();
+  actions.add(leftButton);
+  rightButtonText != null ? actions.add(rightButton) : Center();
 
   CupertinoAlertDialog alert = CupertinoAlertDialog(
     title: Text(title),

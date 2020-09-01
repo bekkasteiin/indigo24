@@ -41,7 +41,7 @@ class _ReplyMessageWidgetState extends State<ReplyMessageWidget> {
                             '${widget.text['user_name']}',
                           ),
                           Text(
-                            '${widget.text['reply_data']['text'].toString()}',
+                            '${widget.text['reply_data'] != null ? widget.text['reply_data']['text'].toString() : ''}',
                           ),
                         ],
                       ),

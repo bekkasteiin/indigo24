@@ -2,8 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/widgets/full_photo.dart';
 
-import '../../../chat_page_view_test.dart';
-
 class ImageMessageWidget extends StatefulWidget {
   final String text;
   final String url;
@@ -22,23 +20,11 @@ class ImageMessageWidget extends StatefulWidget {
 class _ImageMessageWidgetState extends State<ImageMessageWidget> {
   Widget placeholder(context) {
     return Container(
-      child: uploadingImage != null
-          ? Stack(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  height: MediaQuery.of(context).size.width * 0.7,
-                  child: Image.file(uploadingImage, fit: BoxFit.cover),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  height: MediaQuery.of(context).size.width * 0.7,
-                  color: Colors.grey.withOpacity(0.5),
-                ),
-                Center(),
-              ],
-            )
-          : Center(),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.7,
+        height: MediaQuery.of(context).size.width * 0.7,
+        color: Colors.grey.withOpacity(0.5),
+      ),
       width: MediaQuery.of(context).size.width * 0.7,
       height: MediaQuery.of(context).size.width * 0.7,
       decoration: BoxDecoration(

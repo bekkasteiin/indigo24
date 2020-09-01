@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
 import '../chat.dart';
-import '../chat_list.dart';
 
 class ChatListDraggablePage extends StatefulWidget {
   final List messages;
@@ -222,7 +222,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
 
   _listen() {
     ChatRoom.shared.onChatsListDialog.listen((e) {
-      print("CABINET EVENT ${e.json['cmd']}");
+      print("CABINET LIST DRAGABLE EVENT ${e.json['cmd']}");
       var cmd = e.json['cmd'];
       var data = e.json['data'];
       switch (cmd) {
@@ -234,7 +234,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
           break;
 
         default:
-          print('CABINET EVENT DEFasdasdAULT');
+          print('CABINET LIST DRAGABLE DEFasdasdAULT');
       }
     });
   }
@@ -260,7 +260,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
           return '${localization.today}\n$hours:$minutes';
         } else if (diff.inDays < 7) {
           int weekDay = messageUnixDate.weekday;
-          return identifyDay(weekDay) + '\n$hours:$minutes';
+          return newIdentifyDay(weekDay) + '\n$hours:$minutes';
         } else {
           return '$messageUnixDate'.substring(0, 10).replaceAll('-', '.') +
               '\n$hours:$minutes';

@@ -44,7 +44,8 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'style/colors.dart';
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-bool _isInAppPushActive = false;
+bool isInAppPushActive = false;
+bool closeMainChat = false;
 String _formatPhone(String phone) {
   String r = phone.replaceAll(" ", "");
   r = r.replaceAll("(", "");
@@ -198,64 +199,66 @@ class MyApp extends StatelessWidget {
 
 inAppPush(m) {
   print('_________________In App Push $m');
-
-  if (!_isInAppPushActive) {
-    // Check if inAppPush is alreadyExist
-    _isInAppPushActive = true;
-    Future.delayed(Duration(seconds: 4)).then((value) {
-      _isInAppPushActive = false;
-    });
-    if (user.settings['settings']['chat_all_mute'].toString() == '1') {
-      // check user muted all of chats or not
-    } else {
-      print(m['mute'].toString() == '1');
-      if (m['mute'].toString() == '1') {
+  if (closeMainChat) {
+  } else {
+    if (!isInAppPushActive) {
+      // Check if inAppPush is alreadyExist
+      isInAppPushActive = true;
+      Future.delayed(Duration(seconds: 4)).then((value) {
+        isInAppPushActive = false;
+      });
+      if (user.settings['settings']['chat_all_mute'].toString() == '1') {
+        // check user muted all of chats or not
       } else {
-        ChatRoom.shared.inSound();
-        showOverlayNotification((context) {
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            child: SafeArea(
-              child: ListTile(
-                onTap: () {
-                  OverlaySupportEntry.of(context).dismiss();
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => Tabs()),
-                      (r) => false);
-                  ChatRoom.shared.getMessages(m['chat_id']);
-                  _goToChat(
-                    "${m['chat_name']}",
-                    "${m['chat_id']}",
-                    context,
-                    memberCount: "${m['type']}" == "0" ? 2 : 3,
-                    chatType: "${m['chat_type']}",
-                    avatar: "${m['avatar']}",
-                    userIds: "${m['user_id']}",
-                  );
-                },
-                leading: SizedBox.fromSize(
-                  size: Size(40, 40),
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: "${avatarUrl}noAvatar.png",
+        print(m['mute'].toString() == '1');
+        if (m['mute'].toString() == '1') {
+        } else {
+          ChatRoom.shared.inSound();
+          showOverlayNotification((context) {
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 5),
+              child: SafeArea(
+                child: ListTile(
+                  onTap: () {
+                    OverlaySupportEntry.of(context).dismiss();
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => Tabs()),
+                        (r) => false);
+                    ChatRoom.shared.getMessages(m['chat_id']);
+                    _goToChat(
+                      "${m['chat_name']}",
+                      "${m['chat_id']}",
+                      context,
+                      memberCount: "${m['type']}" == "0" ? 2 : 3,
+                      chatType: "${m['chat_type']}",
+                      avatar: "${m['avatar']}",
+                      userIds: "${m['user_id']}",
+                    );
+                  },
+                  leading: SizedBox.fromSize(
+                    size: Size(40, 40),
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: "${avatarUrl}noAvatar.png",
+                      ),
                     ),
                   ),
+                  title: Text("${m['chat_name']}"),
+                  subtitle: Text(
+                    m['attachments'] == null
+                        ? "${m["text"]}"
+                        : _identifyType(m['type']),
+                  ),
+                  trailing: IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: () {
+                        OverlaySupportEntry.of(context).dismiss();
+                      }),
                 ),
-                title: Text("${m['chat_name']}"),
-                subtitle: Text(
-                  m['attachments'] == null
-                      ? "${m["text"]}"
-                      : _identifyType(m['type']),
-                ),
-                trailing: IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () {
-                      OverlaySupportEntry.of(context).dismiss();
-                    }),
               ),
-            ),
-          );
-        }, duration: Duration(seconds: 4));
+            );
+          }, duration: Duration(seconds: 4));
+        }
       }
     }
   }
@@ -279,7 +282,6 @@ _goToChat(name, chatID, context,
             )),
   ).whenComplete(() {
     // this is bool for check load more is needed or not
-    globalBoolForForceGetChat = false;
     ChatRoom.shared.forceGetChat();
     ChatRoom.shared.closeChatStream();
   });
@@ -583,7 +585,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     api.getConfig();
-    _getChats();
     permissions();
     pushPermission();
     share();
@@ -698,22 +699,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             inAppPush(e.json["data"]);
           }
           break;
-        case 'chats:get':
-          setState(() {
-            // this is bool for check load more is needed or not
-            if (globalBoolForForceGetChat == true) {
-              e.json['data'].toList().forEach((element) {
-                myList.add(element);
-              });
-            } else {
-              myList = e.json['data'].toList();
-              myList.map((element) {
-                updateOrInsertChat(ChatsModel.fromJson(element));
-              }).toList();
-            }
-            // chatsPage += 1;
-          });
-          break;
         case 'user:check':
           var data = e.json["data"];
           if (data['status'].toString() == 'true') {
@@ -757,21 +742,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         ),
       ),
     ).whenComplete(() {
-      // this is bool for check load more is needed or not
-      globalBoolForForceGetChat = false;
       ChatRoom.shared.forceGetChat();
       ChatRoom.shared.closeChatStream();
-    });
-  }
-
-  Future _getChats() async {
-    Future<List<ChatsModel>> chats = _chatsDB.getAllSortedByTime();
-    chats.then((value) {
-      setState(() {
-        value.forEach((element) {
-          chatList.add(element.toJson());
-        });
-      });
     });
   }
 
@@ -786,14 +758,10 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       body: TabBarView(
         physics: NeverScrollableScrollPhysics(),
         children: [
-          ChatsListPage(),
+          TestChatsListPage(),
           UserProfilePage(),
           TapesPage(),
           WalletTab(),
-          // TestChatsListPage(),
-          // Text('1'),
-          // Text('1'),
-          // Text('1'),
         ],
         controller: _tabController,
       ),
