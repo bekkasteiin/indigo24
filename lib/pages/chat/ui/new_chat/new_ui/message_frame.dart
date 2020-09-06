@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 
 class MessageFrameWidget extends StatefulWidget {
@@ -9,12 +10,14 @@ class MessageFrameWidget extends StatefulWidget {
   final bool read;
   final String messageId;
   final int chatId;
+  final dynamic message;
   const MessageFrameWidget({
     Key key,
     this.child,
     this.messageCategory,
     this.time,
     this.read,
+    this.message,
     @required this.chatId,
     @required this.messageId,
   }) : super(key: key);
@@ -39,6 +42,18 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
+              widget.message['edit'].toString() == '1'
+                  ? Text(
+                      '${localization.editedMessage} ',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: blackColor.withOpacity(0.6),
+                      ),
+                    )
+                  : SizedBox(
+                      height: 0,
+                      width: 0,
+                    ),
               Text(
                 widget.time,
                 style: TextStyle(
@@ -90,9 +105,6 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
         ],
       );
     } else {
-      if (!read) {
-        ChatRoom.shared.readMessage(widget.chatId, widget.messageId);
-      }
       return SizedBox(height: 0, width: 0);
     }
   }

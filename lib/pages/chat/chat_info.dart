@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat_members_selection.dart';
 import 'package:indigo24/pages/chat/chat_user_profile.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -121,89 +122,88 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       print("CHAT INFO EVENT ${e.json}");
       var cmd = e.json['cmd'];
       var message = e.json['data'];
-
-      switch (cmd) {
-        case "chat:members":
-          setState(() {
-            _onlineCount = 0;
-            if (_chatMembersPage.toString() == '1') {
-              _membersList = message;
-              _actualMembersList = message;
-            } else {
-              _membersList.addAll(message);
-              _actualMembersList.addAll(message);
-            }
-            if (_membersList.isNotEmpty) {
-              _membersList.forEach((member) {
-                if (member['user_id'].toString() == '${user.id}') {
-                  print(
-                      'setting member user id == user.id to ${member['role']}');
-                  _myPrivilege = member['role'].toString();
-                }
-                if (member['online'] == 'online') {
-                  _onlineCount++;
-                }
-              });
-            }
-          });
-          break;
-        case "chat:members:privileges":
-          ChatRoom.shared.chatMembers(widget.chatId);
-          break;
-        case "chat:member:search":
-          setState(() {
-            _actualMembersList = [];
-            if (message.isNotEmpty) {
-              _actualMembersList.addAll(message);
-            }
-            if (_searchController.text.isEmpty) {
-              _actualMembersList.addAll(_membersList);
-            }
-          });
-          break;
-        case "chat:members:delete":
-          ChatRoom.shared.chatMembers(widget.chatId);
-          break;
-        case "set:group:avatar":
-          setState(() {
-            chatAvatar = message['avatar'].replaceAll('AxB', '200x200');
-          });
-          break;
-        case "chat:member:leave":
-          print('isLeaved is true');
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
-          break;
-        case "user:check":
-          if (e.json['data']['chat_id'].toString() != 'false' &&
-              e.json['data']['status'].toString() == 'true') {
-            ChatRoom.shared.setChatStream();
-            ChatRoom.shared.getMessages(e.json['data']['chat_id']);
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatPage(
-                  '${e.json['data']['name']}',
-                  e.json['data']['chat_id'],
-                  memberCount: 2,
-                  userIds: e.json['data']['user_id'],
-                  avatar: '${e.json['data']['avatar']}',
-                  avatarUrl: '${e.json['data']['avatar_url']}',
+      if (ModalRoute.of(context).isCurrent) {
+        switch (cmd) {
+          case "chat:members":
+            setState(() {
+              _onlineCount = 0;
+              if (_chatMembersPage.toString() == '1') {
+                _membersList = message;
+                _actualMembersList = message;
+              } else {
+                _membersList.addAll(message);
+                _actualMembersList.addAll(message);
+              }
+              if (_membersList.isNotEmpty) {
+                _membersList.forEach((member) {
+                  if (member['user_id'].toString() == '${user.id}') {
+                    print(
+                        'setting member user id == user.id to ${member['role']}');
+                    _myPrivilege = member['role'].toString();
+                  }
+                  if (member['online'] == 'online') {
+                    _onlineCount++;
+                  }
+                });
+              }
+            });
+            break;
+          case "chat:members:privileges":
+            ChatRoom.shared.chatMembers(widget.chatId);
+            break;
+          case "chat:member:search":
+            setState(() {
+              _actualMembersList = [];
+              if (message.isNotEmpty) {
+                _actualMembersList.addAll(message);
+              }
+              if (_searchController.text.isEmpty) {
+                _actualMembersList.addAll(_membersList);
+              }
+            });
+            break;
+          case "chat:members:delete":
+            ChatRoom.shared.chatMembers(widget.chatId);
+            break;
+          case "set:group:avatar":
+            setState(() {
+              chatAvatar = message['avatar'].replaceAll('AxB', '200x200');
+            });
+            break;
+          case "chat:member:leave":
+            print('isLeaved is true');
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => Tabs()), (r) => false);
+            break;
+          case "user:check":
+            if (e.json['data']['chat_id'].toString() != 'false' &&
+                e.json['data']['status'].toString() == 'true') {
+              // ChatRoom.shared.setChatStream();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatPage(
+                    chatName: '${e.json['data']['name']}',
+                    chatId: int.parse(e.json['data']['chat_id'].toString()),
+                    userIds: e.json['data']['user_id'].toString(),
+                    chatType: 0,
+                    avatar: '${e.json['data']['avatar']}',
+                    avatarUrl: '${e.json['data']['avatar_url']}',
+                  ),
                 ),
-              ),
-            ).whenComplete(() {});
-          } else if (e.json['data']['status'].toString() == 'true') {
-            print('____________________');
-            print('else if e.jsonDataStatus == true');
-            print({e.json['data']['user_id']});
-            print('____________________');
-            ChatRoom.shared.setChatStream();
-            ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
-          }
-          break;
-        default:
-          print('Default of chat info $message');
+              ).whenComplete(() {});
+            } else if (e.json['data']['status'].toString() == 'true') {
+              print('____________________');
+              print('else if e.jsonDataStatus == true');
+              print({e.json['data']['user_id']});
+              print('____________________');
+              // ChatRoom.shared.setChatStream();
+              ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
+            }
+            break;
+          default:
+            print('Default of chat info $message');
+        }
       }
     });
   }
@@ -263,7 +263,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         "file": await MultipartFile.fromFile(_path),
         'group': 1,
       });
-
       print("Uploading avatar with data ${formData.fields}");
 
       // _sendingMsgProgressBar.show(context, "");
@@ -429,22 +428,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
           if (_myPrivilege == '$ownerRole' || _myPrivilege == '$adminRole')
             buildProfileImageAction();
         } else {
-          _actualMembersList.forEach((member) {
-            if (member['user_id'].toString() != '${user.id}') {
-              if (widget.anotherUserPhone != null) {
-                if (widget.anotherUserPhone['user_id'] == member['user_id']) {
-                  print(member);
-                  _memberAction(member);
-                }
-              } else {
-                print('adsasd ${widget.phone}');
-
-                if (widget.phone != null) {
-                  _memberAction(member, phone: widget.phone);
-                }
-              }
-            }
-          });
+          dynamic newMember = {'phone': widget.phone};
+          _memberAction(newMember);
         }
       },
       child: Center(
@@ -492,7 +477,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       )
                     : CachedNetworkImage(
                         imageUrl: chatAvatar != null
-                            ? '$avatarUrl$chatAvatar'
+                            ? '$chatAvatar'
                             : '${avatarUrl}noAvatar.png',
                       ),
               ),
@@ -507,6 +492,25 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     final act = CupertinoActionSheet(
       title: Text('${localization.selectOption}'),
       actions: <Widget>[
+        CupertinoActionSheetAction(
+          child: Text('${localization.watch}'),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FullScreenWrapper(
+                  imageProvider: CachedNetworkImageProvider(
+                      "${widget.chatType.toString() == '1' ? groupAvatarUrl : avatarUrl}${chatAvatar.toString().replaceAll('AxB', '200x200')}"),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.contained * 3,
+                  backgroundDecoration:
+                      BoxDecoration(color: Colors.transparent),
+                ),
+              ),
+            );
+          },
+        ),
         CupertinoActionSheetAction(
           child: Text('${localization.goToChat}'),
           onPressed: () {
@@ -565,10 +569,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     );
   }
 
-  _memberAction(member, {phone}) {
-    print(phone);
-    print(phone);
-
+  _memberAction(member) {
     final act = CupertinoActionSheet(
       title: Text('${localization.selectOption}'),
       actions: <Widget>[
@@ -594,16 +595,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
         CupertinoActionSheetAction(
           child: Text('${localization.goToChat}'),
           onPressed: () {
-            if (phone != null) {
-              print(phone);
-              print(phone);
-              print(phone);
-              print(phone);
-              print(phone);
-              ChatRoom.shared.userCheck(phone);
-            } else {
-              ChatRoom.shared.userCheck(member['phone']);
-            }
+            ChatRoom.shared.userCheck(member['phone']);
             Navigator.pop(context);
           },
         ),
@@ -663,7 +655,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                       ),
                     ).whenComplete(() {
                       ChatRoom.shared.closeContactsStream();
-                      ChatRoom.shared.setChatInfoStream();
                       ChatRoom.shared.chatMembers(widget.chatId);
                     });
                   },
@@ -719,6 +710,36 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     final act = CupertinoActionSheet(
       title: Text('${localization.selectOption}'),
       actions: <Widget>[
+        CupertinoActionSheetAction(
+          child: Text('${localization.watch}'),
+          onPressed: () {
+            Navigator.pop(context);
+            print('$avatarUrl$chatAvatar');
+            print('$avatarUrl$chatAvatar');
+            print('$avatarUrl$chatAvatar');
+            print('$avatarUrl$chatAvatar');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FullScreenWrapper(
+                  imageProvider: CachedNetworkImageProvider(
+                      "$avatarUrl${chatAvatar.toString().replaceAll('AxB', '200x200')}"),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.contained * 3,
+                  backgroundDecoration:
+                      BoxDecoration(color: Colors.transparent),
+                ),
+              ),
+            );
+          },
+        ),
+        CupertinoActionSheetAction(
+          child: Text('${localization.goToChat}'),
+          onPressed: () {
+            ChatRoom.shared.userCheck(member['phone']);
+            Navigator.pop(context);
+          },
+        ),
         // CupertinoActionSheetAction(
         //   child: Text('${localization.watch}'),
         //   onPressed: () {
@@ -813,279 +834,308 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                 Column(
                   children: <Widget>[
                     SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Container(
-                            padding: EdgeInsets.all(5),
-                            child: Image(
-                              image: AssetImage(
-                                'assets/images/backWhite.png',
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            IconButton(
+                              icon: Container(
+                                padding: EdgeInsets.all(5),
+                                child: Image(
+                                  image: AssetImage(
+                                    'assets/images/backWhite.png',
+                                  ),
+                                ),
                               ),
+                              color: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, _membersCount);
+                              },
                             ),
-                          ),
-                          color: Colors.white,
-                          onPressed: () {
-                            Navigator.pop(context, _membersCount);
-                          },
-                        ),
-                        Flexible(
-                          child: InkWell(
-                            onTap: () {
-                              if (_myPrivilege.toString() == '$ownerRole' &&
-                                  widget.chatType != 0) {
-                                setState(() {
-                                  _isEditing = !_isEditing;
-                                });
-                              }
-                            },
-                            child: _isEditing
-                                ? Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextField(
-                                          textAlign: TextAlign.center,
-                                          controller: _chatTitleController,
-                                          style: fS26(c: 'ffffff'),
-                                          onSubmitted: (value) {
-                                            ChatRoom.shared.changeChatName(
-                                                widget.chatId, value);
-                                          },
-                                          decoration: InputDecoration(
-                                            border: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                            enabledBorder: InputBorder.none,
-                                            errorBorder: InputBorder.none,
-                                            disabledBorder: InputBorder.none,
-                                            contentPadding: EdgeInsets.all(0),
+                            Flexible(
+                              child: InkWell(
+                                onTap: () {
+                                  if (_myPrivilege.toString() == '$ownerRole' &&
+                                      widget.chatType != 0) {
+                                    setState(() {
+                                      _isEditing = !_isEditing;
+                                    });
+                                  }
+                                },
+                                child: _isEditing
+                                    ? Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: TextField(
+                                              textAlign: TextAlign.center,
+                                              controller: _chatTitleController,
+                                              style: fS26(c: 'ffffff'),
+                                              onSubmitted: (value) {
+                                                ChatRoom.shared.changeChatName(
+                                                    widget.chatId, value);
+                                              },
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                focusedBorder: InputBorder.none,
+                                                enabledBorder: InputBorder.none,
+                                                errorBorder: InputBorder.none,
+                                                disabledBorder:
+                                                    InputBorder.none,
+                                                contentPadding:
+                                                    EdgeInsets.all(0),
+                                              ),
+                                            ),
                                           ),
+                                          Icon(Icons.edit, color: Colors.white)
+                                        ],
+                                      )
+                                    : FittedBox(
+                                        child: Text(
+                                          widget.chatName.length > 2
+                                              ? '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}'
+                                              : '',
+                                          style: fS26(c: 'ffffff'),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
-                                      Icon(Icons.edit, color: Colors.white)
-                                    ],
-                                  )
-                                : FittedBox(
-                                    child: Text(
-                                      widget.chatName.length > 2
-                                          ? '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}'
-                                          : '',
-                                      style: fS26(c: 'ffffff'),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.more_vert),
-                          color: widget.chatType == 1
-                              ? Colors.white
-                              : Colors.transparent,
-                          onPressed: () {
-                            widget.chatType == 1
-                                ? _addMembers(widget.chatId)
-                                : print(
-                                    'Change this action to private functions');
-                          },
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.more_vert),
+                              color: widget.chatType == 1
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              onPressed: () {
+                                widget.chatType == 1
+                                    ? _addMembers(widget.chatId)
+                                    : print(
+                                        'Change this action to private functions');
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        _buildProfileImage(),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    widget.chatType == 1
-                        ? Padding(
-                            padding: const EdgeInsets.only(
-                              top: 10.0,
-                              left: 10.0,
-                              right: 10,
-                              bottom: 0,
-                            ),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(
-                                  Icons.search,
-                                  color: blackPurpleColor,
-                                ),
-                                hintText: "${localization.search}",
-                                fillColor: blackPurpleColor,
-                              ),
-                              onChanged: (value) {
-                                ChatRoom.shared.searchChatMembers(
-                                    value, '${widget.chatId}');
-                              },
-                              controller: _searchController,
-                            ),
-                          )
-                        : Container(),
-                    widget.chatType == 1
-                        ? Container(
-                            alignment: Alignment.centerLeft,
-                            margin: EdgeInsets.only(left: 20),
-                            child: Text(
-                              '${localization.members} $_membersCount',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          )
-                        : Container(),
-                    widget.chatType == 1
-                        ? Container(
-                            alignment: Alignment.centerLeft,
-                            margin: EdgeInsets.only(left: 20),
-                            child: Text(
-                              '$_onlineCount ${localization.online}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          )
-                        : Center(),
-                    SizedBox(height: 10),
-                    _actualMembersList.isEmpty
-                        ? Center(child: Text('${localization.emptyContacts}'))
-                        : widget.chatType == 1
-                            ? Flexible(
-                                child: ScrollConfiguration(
-                                  behavior: MyBehavior(),
-                                  child: SmartRefresher(
-                                    enablePullDown: false,
-                                    enablePullUp: true,
-                                    // header: WaterDropHeader(),
-                                    footer: CustomFooter(
-                                      builder: (BuildContext context,
-                                          LoadStatus mode) {
-                                        Widget body;
-                                        return Container(
-                                          height: 55.0,
-                                          child: Center(child: body),
-                                        );
-                                      },
+                    Flexible(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              _buildProfileImage(),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          widget.chatType == 1
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 10.0,
+                                    left: 10.0,
+                                    right: 10,
+                                    bottom: 0,
+                                  ),
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      prefixIcon: Icon(
+                                        Icons.search,
+                                        color: blackPurpleColor,
+                                      ),
+                                      hintText: "${localization.search}",
+                                      fillColor: blackPurpleColor,
                                     ),
-                                    controller: _refreshController,
-                                    onRefresh: _onRefresh,
-                                    onLoading: _onLoading,
-                                    child: ListView.builder(
-                                      itemCount: _actualMembersList.length,
-                                      itemBuilder: (context, i) {
-                                        return ListTile(
-                                          onTap: () {
-                                            if (_actualMembersList[i]['user_id']
-                                                    .toString() ==
-                                                '${user.id}') {
-                                              // print(_actualMembersList[i]
-                                              // ['user_id']
-                                              // .toString() ==
-                                              // '${user.id}');
-                                              // memberAction(actualMembersList[i]);
-                                            } else {
-                                              switch (_myPrivilege.toString()) {
-                                                case '$ownerRole':
-                                                  print('ownerAction');
-                                                  _action(widget.chatId,
-                                                      _actualMembersList[i]);
-                                                  break;
-                                                case '$adminRole':
-                                                  print('adminAction');
-                                                  _adminAction(widget.chatId,
-                                                      _actualMembersList[i]);
-                                                  break;
-                                                case '$memberRole':
-                                                  print('memberAction');
-                                                  _memberAction(
-                                                      _actualMembersList[i]);
-                                                  break;
-                                                default:
-                                              }
-                                            }
-                                            // ChatRoom.shared.checkUserOnline(ids);
-                                            // ChatRoom.shared
-                                            //     .getMessages(actualMembersList[i]['id']);
-                                          },
-                                          leading: Container(
-                                            height: 42,
-                                            width: 42,
-                                            child: Stack(
-                                              children: <Widget>[
-                                                CircleAvatar(
-                                                  backgroundImage: (_actualMembersList[
-                                                                      i]
-                                                                  ["avatar"] ==
-                                                              null ||
-                                                          _actualMembersList[i]
-                                                                  ["avatar"] ==
-                                                              '' ||
-                                                          _actualMembersList[i]
-                                                                  ["avatar"] ==
-                                                              false)
-                                                      ? CachedNetworkImageProvider(
-                                                          "${_actualMembersList[i]["avatar_url"]}noAvatar.png")
-                                                      : CachedNetworkImageProvider(
-                                                          '${_actualMembersList[i]["avatar_url"]}${_actualMembersList[i]["avatar"]}'),
-                                                ),
-                                                Align(
-                                                  alignment:
-                                                      Alignment.bottomRight,
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(2),
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: _actualMembersList[
-                                                                        i][
-                                                                    'online'] ==
-                                                                'online'
-                                                            ? Colors.white
-                                                            : Colors
-                                                                .transparent),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          color: _actualMembersList[
-                                                                          i][
-                                                                      'online'] ==
-                                                                  'online'
-                                                              ? greenColor
-                                                              : Colors
-                                                                  .transparent),
-                                                      height: 15,
-                                                      width: 15,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          title: Text(
-                                              "${_actualMembersList[i]["user_name"]}"),
-                                          subtitle: memberName(
-                                            _actualMembersList[i],
-                                          ),
-                                        );
-                                      },
+                                    onChanged: (value) {
+                                      ChatRoom.shared.searchChatMembers(
+                                          value, '${widget.chatId}');
+                                    },
+                                    controller: _searchController,
+                                  ),
+                                )
+                              : Container(),
+                          widget.chatType == 1
+                              ? Container(
+                                  alignment: Alignment.centerLeft,
+                                  margin: EdgeInsets.only(left: 20),
+                                  child: Text(
+                                    '${localization.members} $_membersCount',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                ),
-                              )
-                            : Center(
-                                child: Text("${localization.status}",
+                                )
+                              : Container(),
+                          widget.chatType == 1
+                              ? Container(
+                                  alignment: Alignment.centerLeft,
+                                  margin: EdgeInsets.only(left: 20),
+                                  child: Text(
+                                    '$_onlineCount ${localization.online}',
                                     style: TextStyle(
-                                      fontSize: 24,
-                                      // fontFamily: ""
-                                    )),
-                              ),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                )
+                              : Center(),
+                          SizedBox(height: 10),
+                          _actualMembersList.isEmpty
+                              ? Center(
+                                  child: Text('${localization.emptyContacts}'))
+                              : widget.chatType == 1
+                                  ? Flexible(
+                                      child: ScrollConfiguration(
+                                        behavior: MyBehavior(),
+                                        child: SmartRefresher(
+                                          enablePullDown: false,
+                                          enablePullUp: true,
+                                          // header: WaterDropHeader(),
+                                          footer: CustomFooter(
+                                            builder: (BuildContext context,
+                                                LoadStatus mode) {
+                                              Widget body;
+                                              return Container(
+                                                height: 55.0,
+                                                child: Center(child: body),
+                                              );
+                                            },
+                                          ),
+                                          controller: _refreshController,
+                                          onRefresh: _onRefresh,
+                                          onLoading: _onLoading,
+                                          child: ListView.builder(
+                                            itemCount:
+                                                _actualMembersList.length,
+                                            itemBuilder: (context, i) {
+                                              return ListTile(
+                                                onTap: () {
+                                                  if (_actualMembersList[i]
+                                                              ['user_id']
+                                                          .toString() ==
+                                                      '${user.id}') {
+                                                    // print(_actualMembersList[i]
+                                                    // ['user_id']
+                                                    // .toString() ==
+                                                    // '${user.id}');
+                                                    // memberAction(actualMembersList[i]);
+                                                  } else {
+                                                    switch (_myPrivilege
+                                                        .toString()) {
+                                                      case '$ownerRole':
+                                                        print('ownerAction');
+                                                        _action(
+                                                            widget.chatId,
+                                                            _actualMembersList[
+                                                                i]);
+                                                        break;
+                                                      case '$adminRole':
+                                                        print('adminAction');
+                                                        _adminAction(
+                                                            widget.chatId,
+                                                            _actualMembersList[
+                                                                i]);
+                                                        break;
+                                                      case '$memberRole':
+                                                        print('memberAction');
+                                                        _memberAction(
+                                                            _actualMembersList[
+                                                                i]);
+                                                        break;
+                                                      default:
+                                                    }
+                                                  }
+                                                  // ChatRoom.shared.checkUserOnline(ids);
+                                                  // ChatRoom.shared
+                                                  //     .getMessages(actualMembersList[i]['id']);
+                                                },
+                                                leading: Container(
+                                                  height: 42,
+                                                  width: 42,
+                                                  child: Stack(
+                                                    children: <Widget>[
+                                                      CircleAvatar(
+                                                        backgroundImage: (_actualMembersList[
+                                                                            i][
+                                                                        "avatar"] ==
+                                                                    null ||
+                                                                _actualMembersList[
+                                                                            i][
+                                                                        "avatar"] ==
+                                                                    '' ||
+                                                                _actualMembersList[
+                                                                            i][
+                                                                        "avatar"] ==
+                                                                    false)
+                                                            ? CachedNetworkImageProvider(
+                                                                "${_actualMembersList[i]["avatar_url"]}noAvatar.png")
+                                                            : CachedNetworkImageProvider(
+                                                                '${_actualMembersList[i]["avatar_url"]}${_actualMembersList[i]["avatar"]}'),
+                                                      ),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .bottomRight,
+                                                        child: Container(
+                                                          padding:
+                                                              EdgeInsets.all(2),
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              color: _actualMembersList[
+                                                                              i]
+                                                                          [
+                                                                          'online'] ==
+                                                                      'online'
+                                                                  ? Colors.white
+                                                                  : Colors
+                                                                      .transparent),
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10),
+                                                                color: _actualMembersList[i]
+                                                                            [
+                                                                            'online'] ==
+                                                                        'online'
+                                                                    ? greenColor
+                                                                    : Colors
+                                                                        .transparent),
+                                                            height: 15,
+                                                            width: 15,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                title: Text(
+                                                    "${_actualMembersList[i]["user_name"]}"),
+                                                subtitle: memberName(
+                                                  _actualMembersList[i],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        "${localization.status}",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          // fontFamily: ""
+                                        ),
+                                      ),
+                                    ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ],

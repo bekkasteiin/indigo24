@@ -83,6 +83,9 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
 
   @override
   void initState() {
+    print('new url $url');
+    print('new url $url');
+    print('new url $url');
     super.initState();
     _controller = new SwiperController();
   }
@@ -91,13 +94,14 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
 
   itemCounter() {
     int c = 0;
-    for (int i = 0; i < listMessages.length; i++) {
-      if (listMessages[i]['type'].toString() == '1') {
-        c = c + 1;
-        tempList.add(listMessages[i]);
-      }
-    }
-    print("ITEM counter ${tempList[0]}");
+    // TODO FIX II
+    // for (int i = 0; i < listMessages.length; i++) {
+    //   if (listMessages[i]['type'].toString() == '1') {
+    //     c = c + 1;
+    //     tempList.add(listMessages[i]);
+    //   }
+    // }
+    // print("ITEM counter ${tempList[0]}");
     return c;
   }
 
@@ -139,7 +143,8 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                       ],
                     ),
                     onPressed: () {
-                      _saveNetworkImage(currentIndex == null ? url : url1);
+                      _saveNetworkImage(url);
+                      // _saveNetworkImage(currentIndex == null ? url : url1);
                     },
                   ),
                   FlatButton(
@@ -159,8 +164,9 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                       ],
                     ),
                     onPressed: () {
-                      Share.share(currentIndex == null ? url : url1,
-                          subject: '${localization.photo}');
+                      Share.share(url, subject: '${localization.photo}');
+                      // Share.share(currentIndex == null ? url : url1,
+                      //                       subject: '${localization.photo}');
                     },
                   ),
                 ],
@@ -170,19 +176,16 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
           flex: 10,
           child: Swiper(
             loop: false,
-            itemCount: itemCounter(),
+            itemCount: 1,
+            // itemCount: itemCounter(),
             itemBuilder: (BuildContext context, int index) {
-              var a = jsonDecode(tempList[index]['attachments']);
-              url1 = '${tempList[index]['attachment_url']}${a[0]['filename']}';
-
               return Container(
                 child: Stack(
                   children: <Widget>[
                     RotatedBox(
                       quarterTurns: inter,
                       child: PhotoView(
-                        imageProvider: CachedNetworkImageProvider(
-                            currentIndex == null ? url : url1),
+                        imageProvider: CachedNetworkImageProvider(url),
                         minScale: PhotoViewComputedScale.contained,
                         maxScale: PhotoViewComputedScale.contained * 3,
                         backgroundDecoration:

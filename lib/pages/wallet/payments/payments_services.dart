@@ -56,6 +56,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                       ? _services["services"].length
                       : 0,
                   itemBuilder: (BuildContext context, int index) {
+                    print(_services['services'][index]);
                     return Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: _paymentsList(
@@ -64,6 +65,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
                         "${_services["services"][index]['title']}",
                         _services["services"][index]['id'],
                         _services["services"][index]['is_convertable'],
+                        _services["services"][index]['provider_id'],
                       ),
                     );
                   },
@@ -107,7 +109,7 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
   }
 
   Container _paymentsList(BuildContext context, String _serviceLogo,
-      String _serviceTitle, int index, isConvertable) {
+      String _serviceTitle, int index, isConvertable, int providerId) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
       decoration: BoxDecoration(
@@ -128,8 +130,12 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
               context,
               MaterialPageRoute(
                 builder: (context) => PaymentsServicePage(
-                    index, _serviceLogo, _serviceTitle,
-                    isConvertable: isConvertable),
+                  index,
+                  _serviceLogo,
+                  _serviceTitle,
+                  isConvertable: isConvertable,
+                  providerId: providerId,
+                ),
               ),
             );
           },

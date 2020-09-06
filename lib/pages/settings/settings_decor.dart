@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/new_ui/message_category.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/new_ui/message_frame.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/new_ui/text_message.dart';
 import 'package:indigo24/pages/chat/ui/received.dart';
 import 'package:indigo24/pages/chat/ui/sended.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -82,24 +85,42 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                   margin: EdgeInsets.symmetric(vertical: 20),
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: ReceivedMessageWidget(
-                          content: '${localization.hello}',
-                          isGroup: false,
-                          time: '13:40',
-                          type: "0",
+                      MessageCategoryWidget(
+                        messageCategory: 0,
+                        chatType: 0,
+                        read: true,
+                        chatId: 1000,
+                        child: MessageFrameWidget(
+                          messageCategory: 0,
+                          chatId: -1000,
+                          time: '11:00',
+                          read: true,
+                          child:
+                              TextMessageWidget(text: '${localization.hello}'),
                         ),
                       ),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: SendedMessageWidget(
-                          content: '${localization.hi}',
-                          time: '13:45',
-                          write: '1',
-                          type: "0",
+                      MessageCategoryWidget(
+                        messageCategory: 2,
+                        chatType: 0,
+                        read: false,
+                        chatId: 1000,
+                        child: MessageFrameWidget(
+                          messageCategory: 1,
+                          chatId: -1000,
+                          time: '11:02',
+                          read: true,
+                          child: TextMessageWidget(text: '${localization.hi}'),
                         ),
                       ),
+                      // Container(
+                      //   alignment: Alignment.centerRight,
+                      //   child: SendedMessageWidget(
+                      //     content: '${localization.hi}',
+                      //     time: '13:45',
+                      //     write: '1',
+                      //     type: "0",
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

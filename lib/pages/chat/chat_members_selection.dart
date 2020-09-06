@@ -52,25 +52,29 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
       var cmd = e.json['cmd'];
       print("MEMBER SELECTION EVENT $cmd");
       print(e.json);
-      switch (cmd) {
-        case "user:check":
-          if ("${e.json['data']['chat_id']}" != "null" &&
-              "${e.json['data']['status']}" == 'true') {
-            setState(() {
-              _saved.add({
-                'phone': e.json['data']['phone'],
-                'user_id': e.json['data']['user_id'],
-                'name': e.json['data']['name'],
+      if (ModalRoute.of(context).isCurrent) {
+        switch (cmd) {
+          case "user:check":
+            if ("${e.json['data']['chat_id']}" != "null" &&
+                "${e.json['data']['status']}" == 'true') {
+              setState(() {
+                _saved.add({
+                  'phone': e.json['data']['phone'],
+                  'user_id': e.json['data']['user_id'],
+                  'name': e.json['data']['name'],
+                });
               });
-            });
-          }
-          break;
-        case "chat:members:add":
-          print('______CHAT MEMBERS ADD______');
-          // Navigator.pop(context);
-          break;
-        default:
-          print('this is default');
+            }
+            break;
+          case "chat:members:add":
+            print('______CHAT MEMBERS ADD______');
+            // Navigator.pop(context);
+            Navigator.pop(context);
+            ChatRoom.shared.getMessages(widget.chatId);
+            break;
+          default:
+            print('this is default');
+        }
       }
     });
   }

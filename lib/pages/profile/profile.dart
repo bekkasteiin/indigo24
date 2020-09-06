@@ -52,25 +52,27 @@ class _UserProfilePageState extends State<UserProfilePage>
     _api.getProfile().then((result) {
       print('profile result is $result');
       if (result['success'] == true) {
-        setState(() {
-          user.avatar = result['avatar'];
-          user.email = result['email'];
-          user.identified = result['identified'];
-          user.name = result['name'];
-          user.phone = '+' + result['phone'];
-          if (result['country'] != null) {
-            user.country = result['country'];
-          }
-          if (result['city'] != null) {
-            if (result['city'].contains(';')) {
-              print(result['city']);
-              List cities = result['city'].split(';');
-              if (needToAskCity) _showSelectCity(cities);
-            } else {
-              user.city = result['city'];
+        if (mounted) {
+          setState(() {
+            user.avatar = result['avatar'];
+            user.email = result['email'];
+            user.identified = result['identified'];
+            user.name = result['name'];
+            user.phone = '+' + result['phone'];
+            if (result['country'] != null) {
+              user.country = result['country'];
             }
-          }
-        });
+            if (result['city'] != null) {
+              if (result['city'].contains(';')) {
+                print(result['city']);
+                List cities = result['city'].split(';');
+                if (needToAskCity) _showSelectCity(cities);
+              } else {
+                user.city = result['city'];
+              }
+            }
+          });
+        }
       }
     });
 
@@ -172,7 +174,6 @@ class _UserProfilePageState extends State<UserProfilePage>
 
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return errorDialog;
       },

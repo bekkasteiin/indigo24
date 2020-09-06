@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/socket.dart';
@@ -18,9 +21,12 @@ class ChatListDraggablePage extends StatefulWidget {
 class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
   List _chats;
   List _selectedChats;
+  List _selectedChatsId;
+
   @override
   void initState() {
     _selectedChats = [];
+    _selectedChatsId = [];
     _listen();
     ChatRoom.shared.forceGetChat();
     super.initState();
@@ -29,6 +35,8 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
   @override
   void dispose() {
     super.dispose();
+    _selectedChats = [];
+    _selectedChatsId = [];
   }
 
   @override
@@ -70,8 +78,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                 print(_selectedChats[0]);
                 Navigator.pop(context);
                 if (_selectedChats.length > 1) {
-                  print('listing is 1');
-                  List _selectedChatsId = [];
+                  print('listing is 1 ${_selectedChats.length}');
                   _selectedChats.forEach((element) {
                     _selectedChatsId.add(element['id']);
                   });
@@ -80,23 +87,25 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                       'asd', _selectedChatsId.join(','));
                   ChatRoom.shared.forceGetChat();
                   Navigator.pop(context);
-                } else {
-                  print('listing is else');
-
+                } else if (_selectedChats.length == 1) {
+                  print('listing is else if');
+                  var jsonChat = _selectedChats[0];
+                  ChatRoom.shared.forwardMessage(
+                      widget.messages.join(','), 'asd', jsonChat['id']);
+                  ChatRoom.shared.forceGetChat();
                   _goToChat(
-                    _selectedChats[0]['name'],
-                    _selectedChats[0]['id'],
-                    phone: _selectedChats[0]['another_user_phone'],
-                    members: _selectedChats[0]['members'],
-                    memberCount: _selectedChats[0]['members_count'],
-                    chatType: _selectedChats[0]['type'],
-                    userIds: _selectedChats[0]['another_user_id'],
-                    avatar: _selectedChats[0]['avatar']
+                    jsonChat['name'],
+                    int.parse(jsonChat['id'].toString()),
+                    phone: jsonChat['another_user_phone'],
+                    chatType: int.parse(jsonChat['type'].toString()),
+                    userIds: jsonChat['another_user_id'],
+                    avatar: jsonChat['avatar']
                         .toString()
                         .replaceAll("AxB", "200x200"),
-                    avatarUrl: _selectedChats[0]['avatar_url'],
-                    data: widget.messages,
+                    avatarUrl: jsonChat['avatar_url'],
                   );
+                } else {
+                  print('no actions yes');
                 }
               }
             },
@@ -225,17 +234,18 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
       print("CABINET LIST DRAGABLE EVENT ${e.json['cmd']}");
       var cmd = e.json['cmd'];
       var data = e.json['data'];
-      switch (cmd) {
-        case "chats:get":
-          print('$data');
-          setState(() {
-            _chats = data.toList();
-          });
-          break;
+      if (mounted)
+        switch (cmd) {
+          case "chats:get":
+            print('$data');
+            setState(() {
+              _chats = data.toList();
+            });
+            break;
 
-        default:
-          print('CABINET LIST DRAGABLE DEFasdasdAULT');
-      }
+          default:
+            print('CABINET LIST DRAGABLE DEFasdasdAULT');
+        }
     });
   }
 
@@ -271,33 +281,30 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
   }
 
   _goToChat(
-    name,
-    chatID, {
+    String name,
+    int chatID, {
     phone,
-    chatType,
-    memberCount,
-    userIds,
-    avatar,
-    avatarUrl,
-    members,
-    data,
+    int chatType,
+    String userIds,
+    String avatar,
+    String avatarUrl,
   }) async {
-    ChatRoom.shared.setChatStream();
+    // ChatRoom.shared.setChatStream();
     ChatRoom.shared.checkUserOnline(userIds);
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ChatPage(
-          name,
-          chatID,
-          phone: phone,
-          members: members,
+          chatName: name,
+          chatId: chatID,
+          // phone: phone,
+          // members: members,
           chatType: chatType,
-          memberCount: memberCount,
           userIds: userIds,
           avatar: avatar,
           avatarUrl: avatarUrl,
-          data: data,
+          // data: data,
         ),
       ),
     ).whenComplete(

@@ -21,6 +21,6 @@ class _AudioMessageWidgetState extends State<AudioMessageWidget> {
   @override
   Widget build(BuildContext context) {
     print("${widget.mediaUrl}l${widget.media}"); // TODO change it
-    return Container(child: AudioMessage("${widget.mediaUrl}l${widget.media}"));
+    return Container(child: AudioMessage("${widget.mediaUrl}${widget.media}"));
   }
 }

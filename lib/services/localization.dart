@@ -332,6 +332,9 @@ String today = 'Сегодня';
 String city = 'Город';
 String name = 'Имя'; // TODO;
 String example = 'Пример'; // TODO;
+String more = 'Еще'; // TODO;
+String less = 'Меньше'; // TODO;
+
 List filters = [
   {'text': 'За неделю', 'code': 'week'},
   {'text': 'За месяц', 'code': 'month'},
@@ -524,6 +527,10 @@ setLanguage(code) {
       sunday = 'Sunday';
       today = 'Today ';
       city = 'City';
+      name = 'Name';
+      example = 'Example';
+      more = 'More';
+      less = 'Less';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -696,6 +703,10 @@ setLanguage(code) {
       sunday = 'Воскресенье';
       today = 'Сегодня';
       city = 'Город';
+      name = 'Имя';
+      example = 'Пример';
+      more = 'Еще';
+      less = 'Меньше';
       print('ru');
       break;
     case 'kz':
@@ -852,23 +863,27 @@ setLanguage(code) {
       days = 'Күн';
       privacyPolicy = 'Политика безопасности';
       day = 'Күн';
-      success = 'Сәтті ';
+      success = 'Сәтті';
       selectChat = 'Чат таңдаңыз';
-      report = ' Шағым ';
+      report = 'Шағым';
       forward = 'Жіберу';
       forwardFrom = 'Жіберілген хабарлама';
-      filter = '  Сүзгі  ';
-      showOperations = '  Операцияларды көрсету ';
-      accept = ' Қолдану';
-      monday = '  Дүйсенбі ';
-      tuesday = ' Сейсенбі ';
-      wednesday = '  Сәрсенбі';
-      thursday = ' Бейсенбі ';
+      filter = 'Сүзгі';
+      showOperations = 'Операцияларды көрсету';
+      accept = 'Қолдану';
+      monday = 'Дүйсенбі ';
+      tuesday = 'Сейсенбі ';
+      wednesday = 'Сәрсенбі';
+      thursday = 'Бейсенбі ';
       friday = ' Жұма';
-      saturday = '   Сенбі ';
+      saturday = 'Сенбі ';
       sunday = ' Жексенбі';
-      today = 'Бүгін ';
-      city = 'Қала  ';
+      today = 'Бүгін';
+      city = 'Қала';
+      name = 'Аты';
+      example = 'Мысал';
+      more = 'Тағы';
+      less = 'Аз';
       print('kz');
       break;
     case 'uz':
@@ -1040,6 +1055,10 @@ setLanguage(code) {
       sunday = 'Якшанбалик';
       today = 'Бугун-ниг';
       city = 'Шаҳар';
+      name = 'Шикаят.ном';
+      example = 'бр Мисол';
+      more = 'Кўпроқ';
+      less = 'Камроқ';
       print('uz');
       break;
     case 'uzb':
@@ -1195,25 +1214,27 @@ setLanguage(code) {
       ago = 'Ilgari';
       days = 'Kun';
       day = 'Kun';
-
-      success = 'Muvaffaqiyatli'; //
-      selectChat = ' Guruh chat tanlang'; //
-      report = 'Shikoyat'; //
-      forward = 'Yuborish'; //
-      forwardFrom = 'Dan yuboriladi xabar'; //
-      filter = ' Filtr'; //
-      showOperations = 'Операцияларни кўрсатиш'; //
-      accept = 'Qo\'llash'; //
-      monday = 'Dushanba'; // '
-      tuesday = 'Seshanba'; //
-      wednesday = 'Chorshanba'; //
-      thursday = 'Payshanba'; //
-      friday = 'Juma'; //
-      saturday = 'Shanba'; //
-      sunday = 'Yakshanba'; //
-      today = 'Bugungi kunda'; //
-      city = 'Shahar'; //
-
+      success = 'Muvaffaqiyatli';
+      selectChat = ' Guruh chat tanlang';
+      report = 'Shikoyat';
+      forward = 'Yuborish';
+      forwardFrom = 'Dan yuboriladi xabar';
+      filter = ' Filtr';
+      showOperations = 'Операцияларни кўрсатиш';
+      accept = 'Qo\'llash';
+      monday = 'Dushanba';
+      tuesday = 'Seshanba';
+      wednesday = 'Chorshanba';
+      thursday = 'Payshanba';
+      friday = 'Juma';
+      saturday = 'Shanba';
+      sunday = 'Yakshanba';
+      today = 'Bugungi kunda';
+      city = 'Shahar';
+      name = 'Ismi';
+      example = 'Misol';
+      more = 'Ko\'proq';
+      less = 'Kamroq';
       print('uzb');
       break;
     default:

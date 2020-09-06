@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -55,15 +57,16 @@ class Api {
 
   _getRequest(String path, queryParameters) async {
     Response response;
-    print('this is get request');
+    print('this is get request $queryParameters');
     try {
       response = await _dio.get(path, queryParameters: queryParameters);
-      return response.data;
+      return json.decode(response.data);
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
-        print(e.response.headers);
-        print(e.response.request);
+        print(e.response.request.path);
+        print(e.response.request.data);
+        print(e.response.statusCode);
         return e.response.data;
       } else {
         print(e.request.baseUrl);
@@ -386,15 +389,39 @@ class Api {
     return _postRequest('api/v2.1/check/send/money/phone', data);
   }
 
-  calculateSum(serviceID, account, amount) async {
-    dynamic queryParameters = {
-      'customerID': '${user.id}',
-      'unique': '${user.unique}',
-      'serviceID': '$serviceID',
-      'amount': '$amount',
-      'account': '$account',
-    };
-    return _getRequest('api/v2.1/hermes/sum/calculate', queryParameters);
+  calculateSum(serviceID, account, amount, int providerId) async {
+    switch (providerId) {
+      case 6:
+        dynamic queryParameters = {
+          'customerID': '${user.id}',
+          'unique': '${user.unique}',
+          'serviceID': '$serviceID',
+          'amount': '$amount',
+          'account': '$account',
+        };
+        return _getRequest('api/v2.1/hermes/sum/calculate', queryParameters);
+        break;
+      case 1:
+        dynamic queryParameters = {
+          'customerID': '${user.id}',
+          'unique': '${user.unique}',
+          'serviceID': '$serviceID',
+          'amount': '$amount',
+          'account': '$account',
+        };
+        return _postRequest('api/v2/ultra-pay/conversion', queryParameters);
+        break;
+      default:
+        dynamic queryParameters = {
+          'customerID': '${user.id}',
+          'unique': '${user.unique}',
+          'serviceID': '$serviceID',
+          'amount': '$amount',
+          'account': '$account',
+        };
+        return _getRequest('api/v2.1/hermes/sum/calculate', queryParameters);
+        break;
+    }
   }
 
   payService(serviceID, account, amount) async {

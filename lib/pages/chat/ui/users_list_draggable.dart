@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helpers/day_helper.dart';
@@ -64,63 +65,67 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
       ),
       body: SafeArea(
         child: Container(
-          child: ScrollablePositionedList.builder(
-            itemCount: _users.length,
-            itemBuilder: (context, i) {
-              return ListTile(
-                leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(25.0),
-                  child: Image.network(
-                    '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
-                    width: 35,
-                    height: 35,
-                  ),
-                ),
-                title: Text(
-                  '${_users[i]['user_name']}',
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TransferPage(
-                        phone: _users[i]['phone'],
-                        transferChat: '${widget.chatId}',
-                      ),
-                    ),
-                  );
-                },
-              );
-              Center(
-                child: InkWell(
-                  onTap: () {},
-                  child: Container(
-                    width: 80,
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 10,
+          child: _users.isNotEmpty
+              ? ScrollablePositionedList.builder(
+                  itemCount: _users.length,
+                  itemBuilder: (context, i) {
+                    return ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(25.0),
+                        child: Image.network(
+                          '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                          width: 35,
+                          height: 35,
                         ),
-                        Container(
-                          child: Text(
-                            '${_users[i]['user_name']}',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                      ),
+                      title: Text(
+                        '${_users[i]['user_name']}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransferPage(
+                              phone: _users[i]['phone'],
+                              transferChat: '${widget.chatId}',
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                    Center(
+                      child: InkWell(
+                        onTap: () {},
+                        child: Container(
+                          width: 80,
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                child: Text(
+                                  '${_users[i]['user_name']}',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
+                )
+              : Center(
+                  child: CircularProgressIndicator(),
                 ),
-              );
-            },
-          ),
         ),
       ),
     );
@@ -174,42 +179,5 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
       }
     }
     return '??:??';
-  }
-
-  _goToChat(
-    name,
-    chatID, {
-    phone,
-    chatType,
-    memberCount,
-    userIds,
-    avatar,
-    avatarUrl,
-    members,
-    data,
-  }) async {
-    ChatRoom.shared.setChatStream();
-    ChatRoom.shared.checkUserOnline(userIds);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChatPage(
-          name,
-          chatID,
-          phone: phone,
-          members: members,
-          chatType: chatType,
-          memberCount: memberCount,
-          userIds: userIds,
-          avatar: avatar,
-          avatarUrl: avatarUrl,
-          data: data,
-        ),
-      ),
-    ).whenComplete(
-      () {
-        ChatRoom.shared.closeChatStream();
-      },
-    );
   }
 }

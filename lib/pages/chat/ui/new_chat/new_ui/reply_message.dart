@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 
 class ReplyMessageWidget extends StatefulWidget {
   final text;
@@ -17,46 +19,61 @@ class _ReplyMessageWidgetState extends State<ReplyMessageWidget> {
         minWidth: MediaQuery.of(context).size.width * 0.2,
         maxWidth: MediaQuery.of(context).size.width * 0.8,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            color: Colors.blue,
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Container(
-                      color: whiteColor,
-                      margin: EdgeInsets.only(left: 3),
-                      padding: EdgeInsets.only(left: 5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            '${widget.text['user_name']}',
-                          ),
-                          Text(
-                            '${widget.text['reply_data'] != null ? widget.text['reply_data']['text'].toString() : ''}',
-                          ),
-                        ],
+      child: GestureDetector(
+        onTap: () {
+          print(
+              'added to find with deleted value ${widget.text['reply_data']}');
+          replyMessage = widget.text['reply_data'];
+          if (replyMessage != null) {
+            print('going to ${(widget.text['reply_data']['is_deleted'])}');
+
+            if (widget.text['reply_data']['is_deleted'] != true) {
+              print('going to if');
+              ChatRoom.shared.findMessage(widget.text['reply_data']);
+            }
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              color: Colors.blue,
+              child: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Container(
+                        color: whiteColor,
+                        margin: EdgeInsets.only(left: 3),
+                        padding: EdgeInsets.only(left: 5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              '${widget.text['user_name']}',
+                            ),
+                            Text(
+                              '${widget.text['reply_data'] != null ? widget.text['reply_data']['text'].toString() : ''}',
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 5),
-          Text(
-            '${widget.text['text'].toString()}',
-            maxLines: 35,
-          ),
-        ],
+            SizedBox(height: 5),
+            Text(
+              '${widget.text['text'].toString()}',
+              maxLines: 35,
+            ),
+          ],
+        ),
       ),
     );
   }

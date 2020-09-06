@@ -84,19 +84,13 @@ class _TapesPageState extends State<TapesPage>
     });
   }
 
-  Future _addTapes(tapes) async {
-    setState(() {
-      var r = tapes["result"].toList();
-      _result.addAll(r);
-    });
-  }
-
   Future _rebuild(tapes) async {
     setState(() {
       _tapePage = 2;
       _result = tapes["result"].toList();
       _listFuture = Future(foo);
       _result.forEach((el) async {
+        el['maxLines'] = 3;
         if (el['myLike'] == true) {
           _saved.add(el['id']);
         }
@@ -110,6 +104,7 @@ class _TapesPageState extends State<TapesPage>
         _result = tapes["result"].toList();
         _listFuture = Future(foo);
         _result.forEach((el) async {
+          el['maxLines'] = 3;
           if (el['myLike'] == true) {
             _saved.add(el['id']);
           }
@@ -119,6 +114,7 @@ class _TapesPageState extends State<TapesPage>
       setState(() {
         _result.addAll(tapes["result"].toList());
         _result.forEach((el) async {
+          el['maxLines'] = 3;
           if (el['myLike'] == true) {
             _saved.add(el['id']);
           }
@@ -754,19 +750,40 @@ class _TapesPageState extends State<TapesPage>
                                                   ? Center()
                                                   : needToBlock
                                                       ? Center()
-                                                      : Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 10.0),
-                                                          child: Text(
-                                                            '${_result[index]['description']}',
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: TextStyle(
-                                                                fontSize: 16),
-                                                            maxLines: 3,
-                                                          ),
+                                                      : Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left:
+                                                                          10.0,
+                                                                      right:
+                                                                          10),
+                                                              child: Container(
+                                                                width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width,
+                                                                child: Text(
+                                                                  '${_result[index]['description']}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                  ),
+                                                                  maxLines: _result[
+                                                                          index]
+                                                                      [
+                                                                      'maxLines'],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            moreLessAction(
+                                                                index)
+                                                          ],
                                                         ),
                                               Padding(
                                                 padding: EdgeInsets.only(
@@ -802,6 +819,49 @@ class _TapesPageState extends State<TapesPage>
             ),
           ),
         ));
+  }
+
+  Widget moreLessAction(int index) {
+    return LayoutBuilder(builder: (context, size) {
+      final span = TextSpan(
+        text: _result[index]['description'],
+        style: TextStyle(
+          fontSize: 16,
+        ),
+      );
+      final tp = TextPainter(
+          text: span, maxLines: 3, textDirection: TextDirection.ltr);
+      tp.layout(maxWidth: size.maxWidth);
+      if (tp.didExceedMaxLines) {
+        return Padding(
+          padding: EdgeInsets.only(left: 10.0, right: 10),
+          child: GestureDetector(
+            child: Text(
+              _result[index]['maxLines'] == null
+                  ? '${localization.less}'
+                  : '${localization.more}',
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            onTap: () {
+              setState(() {
+                if (_result[index]['maxLines'] == null) {
+                  _result[index]['maxLines'] = 3;
+                } else {
+                  _result[index]['maxLines'] = null;
+                }
+              });
+            },
+          ),
+        );
+      } else {
+        return SizedBox(
+          height: 0,
+          width: 0,
+        );
+      }
+    });
   }
 
   @override

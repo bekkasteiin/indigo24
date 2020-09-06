@@ -19,6 +19,7 @@ import 'package:indigo24/pages/auth/intro.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_contacts.dart';
 import 'package:indigo24/pages/chat/chat_list.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/helper.dart';
@@ -266,16 +267,15 @@ inAppPush(m) {
 
 _goToChat(name, chatID, context,
     {chatType, memberCount, userIds, avatar, avatarUrl}) {
-  ChatRoom.shared.setChatStream();
+  // ChatRoom.shared.setChatStream();
   ChatRoom.shared.checkUserOnline(userIds);
   Navigator.push(
     context,
     MaterialPageRoute(
         builder: (context) => ChatPage(
-              name,
-              chatID,
+              chatName: name,
+              chatId: chatID,
               chatType: chatType,
-              memberCount: memberCount,
               userIds: userIds,
               avatar: avatar,
               avatarUrl: avatarUrl,
@@ -688,7 +688,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   _connect() async {
     ChatRoom.shared.onMainChange.listen((e) async {
       var cmd = e.json["cmd"];
-      print('CHAT LISTS MAIN LISTENER ${e.json}');
+      // print('CHAT LISTS MAIN LISTENER ${e.json}');
       switch (cmd) {
         case 'message:create':
           print(e.json["data"]);
@@ -701,13 +701,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           break;
         case 'user:check':
           var data = e.json["data"];
+          print('data is $data');
           if (data['status'].toString() == 'true') {
             MyContact contact = MyContact(
               phone: data['phone'],
-              id: data['user_id'],
+              id: int.parse(data['user_id'].toString()),
               avatar: data['avatar'],
               name: data['name'],
-              chatId: data['chat_id'],
+              chatId: int.parse(data['chat_id'].toString()),
               online: data['online'],
             );
             await _contactsDB.updateOrInsert(contact);
@@ -726,16 +727,15 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   _goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
-    ChatRoom.shared.setChatStream();
+    // ChatRoom.shared.setChatStream();
     ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ChatPage(
-          name,
-          chatID,
+          chatName: name,
+          chatId: chatID,
           chatType: chatType,
-          memberCount: memberCount,
           userIds: userIds,
           avatar: avatar,
           avatarUrl: avatarUrl,

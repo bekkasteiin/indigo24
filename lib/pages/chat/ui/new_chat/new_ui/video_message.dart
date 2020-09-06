@@ -21,7 +21,14 @@ class _VideoMessageWidgetState extends State<VideoMessageWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: VideoPlayerWidget("${widget.mediaUrl}${widget.media}", "network"),
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          VideoPlayerWidget("${widget.mediaUrl}${widget.media}", "network"),
+          widget.text != 'null' ? Text('${widget.text}') : Center(),
+        ],
+      ),
     );
   }
 }

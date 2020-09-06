@@ -23,12 +23,14 @@ class PaymentsServicePage extends StatefulWidget {
   final String title;
   final String account;
   final String amount;
+  final int providerId;
   final isConvertable;
 
   PaymentsServicePage(
     this.serviceID,
     this._logo,
     this.title, {
+    @required this.providerId,
     this.account,
     this.amount,
     this.isConvertable,
@@ -570,9 +572,10 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                       .calculateSum(
                           widget.serviceID,
                           '${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-                          _sumController.text)
+                          _sumController.text,
+                          widget.providerId)
                       .then((result) {
-                    result = json.decode(result);
+                    print(result);
                     if (result['message'] == 'Not authenticated' &&
                         result['success'].toString() == 'false') {
                       logOut(context);
@@ -580,9 +583,11 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                       print('this is $result');
                       setState(() {
                         isCalculated = true;
-                        _amount = result['Amount'];
-                        _exchangeRate = result['ExchangeRate'];
-                        _expectedAmount = result['ExpectedAmount'];
+                        _amount = double.parse(result['Amount'].toString());
+                        _exchangeRate =
+                            double.parse(result['ExchangeRate'].toString());
+                        _expectedAmount =
+                            double.parse(result['ExpectedAmount'].toString());
                         _expectedCurrency = result['ExpectedCurrency'];
                       });
                     }

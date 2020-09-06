@@ -6,6 +6,7 @@ import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_list.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
@@ -77,19 +78,18 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
           } else {
             if (e.json['data']['chat_id'].toString() != 'false' &&
                 e.json['data']['status'].toString() == 'true') {
-              ChatRoom.shared.setChatStream();
-              ChatRoom.shared.getMessages(e.json['data']['chat_id']);
+              // ChatRoom.shared.setChatStream();
 
               Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => ChatPage(
-                        '${e.json['data']['name']}', e.json['data']['chat_id'],
-                        memberCount: 2,
-                        userIds: e.json['data']['user_id'],
-                        avatar: '${e.json['data']['avatar']}',
+                        chatName: '${e.json['data']['name']}',
+                        chatId: int.parse(e.json['data']['chat_id'].toString()),
                         chatType: 0,
+                        userIds: e.json['data']['user_id'].toString(),
+                        avatar: '${e.json['data']['avatar']}',
                         avatarUrl: '${e.json['data']['avatar_url']}')),
               ).whenComplete(() {
                 // this is bool for check load more is needed or not
@@ -101,7 +101,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               // print('else if e.jsonDataStatus == true');
               // print({e.json['data']['user_id']});
               // print('____________________');
-              ChatRoom.shared.setChatStream();
+              // ChatRoom.shared.setChatStream();
               ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
             }
           }
@@ -110,8 +110,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         case "chat:create":
           print("CHAT CREATE ${e.json['data']}");
           if (e.json["data"]["status"].toString() == "true") {
-            ChatRoom.shared.setChatStream();
-            ChatRoom.shared.getMessages(e.json['data']['chat_id']);
+            // ChatRoom.shared.setChatStream();
             Navigator.pop(context);
             // print('_________________________________');
             // print('chat contacts user ids ${e.json['data']['user_id']}');
@@ -119,25 +118,33 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                      '${e.json['data']['chat_name']}',
-                      e.json['data']['chat_id'],
-                      memberCount: 2,
-                      chatType: 0,
-                      userIds: e.json['data']['user_id'])),
+                builder: (context) => ChatPage(
+                  chatName: '${e.json['data']['chat_name']}',
+                  chatId: int.parse(e.json['data']['chat_id'].toString()),
+                  chatType: 0,
+                  userIds: e.json['data']['user_id'],
+                ),
+              ),
             ).whenComplete(() {
               // this is bool for check load more is needed or not
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeChatStream();
             });
           } else {
-            ChatRoom.shared.setChatStream();
+            // ChatRoom.shared.setChatStream();
             var name = e.json["data"]["name"];
             var chatID = e.json["data"]["chat_id"];
             Navigator.pop(context);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ChatPage(name, chatID)),
+              MaterialPageRoute(
+                builder: (context) => ChatPage(
+                  chatName: name,
+                  chatId: int.parse(
+                    chatID.toString(),
+                  ),
+                ),
+              ),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
               ChatRoom.shared.closeChatStream();

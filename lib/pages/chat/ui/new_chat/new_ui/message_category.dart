@@ -5,6 +5,7 @@ import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 
+import '../../../chat_info.dart';
 import '../divider_message.dart';
 import '../received_message.dart';
 import '../sended_message.dart';
@@ -47,88 +48,111 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
         if (widget.read == false) {
           ChatRoom.shared.readMessage(widget.chatId, widget.messageId);
         }
-        return GestureDetector(
-          onLongPress: () {
-            _showMessageAction(context, actions: [
-              widget.child,
-              Container(
-                height: 50,
-                child: Theme(
-                  data: ThemeData(),
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          '${localization.reply}',
-                          style: TextStyle(fontSize: 14),
+        return ReceivedMessageWidget(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              widget.chatType == 1
+                  ? Container(
+                      padding: EdgeInsets.only(right: 5),
+                      child: GestureDetector(
+                        onTap: () {
+                          ChatRoom.shared.setChatInfoStream();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatProfileInfo(
+                                chatType: 0,
+                                chatName: '${widget.message['user_name']}',
+                                chatAvatar: widget.avatar,
+                                chatId: widget.chatId,
+                                phone: widget.message['phone'],
+                              ),
+                            ),
+                          ).whenComplete(() {
+                            // ChatRoom.shared.closeCabinetInfoStream();
+                          });
+                        },
+                        child: ClipOval(
+                          child: Image.network(
+                            widget.avatar.replaceAll('AxB', '200x200'),
+                            width: 30,
+                            height: 30,
+                          ),
                         ),
-                        Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                      ],
-                    ),
-                    onPressed: () {
-                      ChatRoom.shared.replyingMessage(widget.message);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                child: Theme(
-                  data: ThemeData(),
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          '${localization.forward}',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Icon(CupertinoIcons.reply_all, size: 20)
-                      ],
-                    ),
-                    onPressed: () {
-                      print('Файлы');
-                      if (widget.message['message_id'] == null) {
-                        ChatRoom.shared.localForwardMessage(
-                          widget.message['id'],
-                        );
-                      } else {
-                        ChatRoom.shared.localForwardMessage(
-                          widget.message['message_id'],
-                        );
-                      }
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
-            ]);
-          },
-          child: ReceivedMessageWidget(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                widget.chatType == 1
-                    ? Container(
-                        padding: EdgeInsets.only(right: 5),
-                        child: CircleAvatar(
-                          child: Image.network(widget.avatar),
-                        ),
-                      )
-                    : SizedBox(
-                        height: 0,
-                        width: 0,
                       ),
-                widget.child,
-              ],
-            ),
+                    )
+                  : SizedBox(
+                      height: 0,
+                      width: 0,
+                    ),
+              GestureDetector(
+                child: widget.child,
+                onLongPress: () {
+                  _showMessageAction(context, actions: [
+                    widget.child,
+                    Container(
+                      height: 50,
+                      child: Theme(
+                        data: ThemeData(),
+                        child: FlatButton(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                '${localization.reply}',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                            ],
+                          ),
+                          onPressed: () {
+                            ChatRoom.shared.replyingMessage(widget.message);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 50,
+                      child: Theme(
+                        data: ThemeData(),
+                        child: FlatButton(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                '${localization.forward}',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              Icon(CupertinoIcons.reply_all, size: 20)
+                            ],
+                          ),
+                          onPressed: () {
+                            print('Файлы');
+                            if (widget.message['message_id'] == null) {
+                              ChatRoom.shared.localForwardMessage(
+                                widget.message['id'],
+                              );
+                            } else {
+                              ChatRoom.shared.localForwardMessage(
+                                widget.message['message_id'],
+                              );
+                            }
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ),
+                  ]);
+                },
+              ),
+            ],
           ),
         );
         break;

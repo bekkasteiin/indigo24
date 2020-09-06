@@ -63,7 +63,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                   ),
                   clipBehavior: Clip.hardEdge,
                 ),
-                imageUrl: widget.url + widget.media,
+                imageUrl: '${widget.url}' + '${widget.media}',
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.width * 0.7,
                 fit: BoxFit.cover,
@@ -75,13 +75,14 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => FullPhoto(url: widget.url),
+                  builder: (context) =>
+                      FullPhoto(url: widget.url + widget.media),
                 ),
               );
             },
             padding: EdgeInsets.all(0),
           ),
-          widget.text != null ? Text('${widget.text}') : Center(),
+          widget.text != 'null' ? Text('${widget.text}') : Center(),
         ],
       ),
     );

@@ -37,7 +37,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     listen();
     _isChatsLoading = false;
     _chatsList = [];
-    _chatsPage = 1;
+    _chatsPage = 2;
   }
 
   @override
@@ -49,25 +49,30 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     setState(() {
       _isChatsLoading = true;
     });
-    ChatRoom.shared.forceGetChat();
+    ChatRoom.shared.forceGetChat(page: _chatsPage);
   }
 
   ListTile _chatListTile(chat) {
     return ListTile(
       onTap: () {
-        print('get message');
-        ChatRoom.shared.getMessages(chat['id']);
+        print('get message $chat');
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatPage(
               chatId: int.parse(chat['id'].toString()),
               chatName: chat['name'],
+              memberCount: chat['members_count'],
               chatType: int.parse(chat['type'].toString()),
+              avatar: chat['avatar'],
+              avatarUrl: chat['avatar_url'],
+              phone: chat['another_user_phone'],
               userIds: chat['another_user_id'].toString(),
             ),
           ),
-        );
+        ).whenComplete(() {
+          ChatRoom.shared.forceGetChat();
+        });
       },
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(25.0),
@@ -372,14 +377,23 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     ChatRoom.shared.onNewChatsChange.listen((e) async {
       var cmd = e.json["cmd"];
       var data = e.json["data"];
-      print('C12312312HAT L123123ISTS M3123123AIN 12312312 ${e.json}');
-
+      print('C12312312HAT L12 $_chatsPage ${e.json}');
       switch (cmd) {
         case "chats:get":
-          setState(() {
-            _chatsList = data;
-          });
-          _chatsPage++;
+          if (_isChatsLoading) {
+            if (data.isNotEmpty) {
+              setState(() {
+                _chatsList.addAll(data);
+              });
+              _chatsPage++;
+            }
+          } else {
+            setState(() {
+              _chatsList = data;
+              _chatsPage = 2;
+            });
+          }
+
           _isChatsLoading = false;
 
           break;
@@ -429,7 +443,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           ChatRoom.shared.forceGetChat();
           break;
         default:
-          print("default in main ${e.json}");
+          print("default in chats list ${e.json}");
           break;
       }
     });
