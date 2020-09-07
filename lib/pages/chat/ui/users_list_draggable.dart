@@ -7,6 +7,7 @@ import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/user.dart' as user;
 
 import '../chat.dart';
 
@@ -20,10 +21,14 @@ class UsersListDraggableWidget extends StatefulWidget {
 }
 
 class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
+  bool _isMembersLoading;
   List _users;
+  int _membersPage;
   @override
   void initState() {
+    _isMembersLoading = false;
     _users = [];
+    _membersPage = 1;
     ChatRoom.shared.setNewUsersListStream();
     _listen();
     ChatRoom.shared.chatMembers(widget.chatId);
@@ -66,62 +71,51 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
       body: SafeArea(
         child: Container(
           child: _users.isNotEmpty
-              ? ScrollablePositionedList.builder(
-                  itemCount: _users.length,
-                  itemBuilder: (context, i) {
-                    return ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: Image.network(
-                          '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
-                          width: 35,
-                          height: 35,
-                        ),
-                      ),
-                      title: Text(
-                        '${_users[i]['user_name']}',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TransferPage(
-                              phone: _users[i]['phone'],
-                              transferChat: '${widget.chatId}',
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                    Center(
-                      child: InkWell(
-                        onTap: () {},
-                        child: Container(
-                          width: 80,
-                          padding: EdgeInsets.all(10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                child: Text(
-                                  '${_users[i]['user_name']}',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
+              ? NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    if (!_isMembersLoading &&
+                        scrollInfo.metrics.pixels ==
+                            scrollInfo.metrics.maxScrollExtent) {
+                      _loadMore();
+                    }
                   },
+                  child: ScrollablePositionedList.builder(
+                    itemCount: _users.length,
+                    itemBuilder: (context, i) {
+                      if ('${_users[i]['user_id']}' == '${user.id}')
+                        return SizedBox(
+                          height: 0,
+                          width: 0,
+                        );
+                      return ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: Image.network(
+                            '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                            width: 35,
+                            height: 35,
+                          ),
+                        ),
+                        title: Text(
+                          '${_users[i]['user_name']}',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TransferPage(
+                                phone: _users[i]['phone'],
+                                transferChat: '${widget.chatId}',
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 )
               : Center(
                   child: CircularProgressIndicator(),
@@ -131,6 +125,14 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
     );
   }
 
+  _loadMore() {
+    setState(() {
+      _isMembersLoading = true;
+    });
+
+    ChatRoom.shared.chatMembers(widget.chatId, page: _membersPage);
+  }
+
   _listen() {
     ChatRoom.shared.onUsersListDialogChange.listen((e) {
       print("USERS DRAGABLE EVENT ${e.json['cmd']}");
@@ -138,10 +140,15 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
       var data = e.json['data'];
       switch (cmd) {
         case "chat:members":
+          _isMembersLoading = false;
           print('$data');
-          setState(() {
-            _users = data.toList();
-          });
+          if (data.isNotEmpty) {
+            _membersPage++;
+            setState(() {
+              _users.addAll(data.toList());
+            });
+          }
+
           break;
 
         default:

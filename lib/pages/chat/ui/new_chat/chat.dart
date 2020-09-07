@@ -64,14 +64,17 @@ class _NewChatPageState extends State<ChatPage> {
   bool _sendingTyping;
   bool _isSomeoneTyping;
   bool _isRecording;
+  bool _stickersIsActive;
   int _messagesPage;
   int _lastMessageTime;
   List _messagesList;
   List _typingUsers;
+  dynamic _stickersList;
   bool _isMessagesLoading;
   TextEditingController _messageController;
   Dependencies _dependencies = Dependencies();
   String _recordFilePath;
+  String stickersUrl;
   Api _api;
   File _image;
   ImagePicker _picker = ImagePicker();
@@ -169,6 +172,7 @@ class _NewChatPageState extends State<ChatPage> {
     }
   }
 
+  FocusNode myFocusNode;
   @override
   void initState() {
     super.initState();
@@ -177,15 +181,19 @@ class _NewChatPageState extends State<ChatPage> {
     _isSomeoneTyping = false;
     _isRecording = false;
     showForwardingProcess = false;
+    _stickersIsActive = false;
     _messagesPage = 1;
     _messagesList = [];
     _typingUsers = [];
     toForwardMessages = [];
+    _stickersList = [];
+    stickersUrl = '';
     _messageController = TextEditingController();
+    myFocusNode = FocusNode();
     _api = Api();
     ChatRoom.shared.setNewChatStream();
     ChatRoom.shared.checkUserOnline(widget.userIds);
-
+    ChatRoom.shared.getStickers();
     listen();
     ChatRoom.shared.getMessages(widget.chatId, page: _messagesPage);
   }
@@ -194,6 +202,9 @@ class _NewChatPageState extends State<ChatPage> {
   void dispose() {
     ChatRoom.shared.closeNewChatStream();
     _messageController.dispose();
+    myFocusNode.dispose();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+
     super.dispose();
   }
 
@@ -724,148 +735,242 @@ class _NewChatPageState extends State<ChatPage> {
                               ),
                             ],
                           )
-                        : Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                        : Column(
                             children: <Widget>[
-                              IconButton(
-                                icon: Icon(Icons.attach_file),
-                                onPressed: () {
-                                  print("Прикрепить");
-                                  FocusScopeNode currentFocus =
-                                      FocusScope.of(context);
-                                  if (!currentFocus.hasPrimaryFocus) {
-                                    currentFocus.unfocus();
-                                  }
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(Icons.attach_file),
+                                    onPressed: () {
+                                      print("Прикрепить");
+                                      FocusScopeNode currentFocus =
+                                          FocusScope.of(context);
+                                      if (!currentFocus.hasPrimaryFocus) {
+                                        currentFocus.unfocus();
+                                      }
 
-                                  _showAttachmentBottomSheet(context);
-                                },
-                              ),
-                              !_isRecording
-                                  ? Flexible(
-                                      child: TextField(
-                                        textCapitalization:
-                                            TextCapitalization.sentences,
-                                        maxLines: 6,
-                                        minLines: 1,
-                                        controller: _messageController,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          errorBorder: InputBorder.none,
-                                          disabledBorder: InputBorder.none,
-                                          contentPadding: EdgeInsets.all(0),
-                                        ),
-                                        onChanged: (value) {
-                                          setState(() {});
-                                          if (!_sendingTyping) {
-                                            ChatRoom.shared
-                                                .typing(widget.chatId);
-                                            _sendingTyping = true;
-                                            Future.delayed(Duration(seconds: 3),
-                                                () {
-                                              _sendingTyping = false;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    )
-                                  : Expanded(
-                                      child: Container(
-                                        height: 45,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Image.asset(
-                                              "assets/record.gif",
-                                              width: 10,
-                                              height: 10,
+                                      _showAttachmentBottomSheet(context);
+                                    },
+                                  ),
+                                  !_isRecording
+                                      ? Flexible(
+                                          child: Row(
+                                            children: <Widget>[
+                                              Flexible(
+                                                child: TextField(
+                                                  textCapitalization:
+                                                      TextCapitalization
+                                                          .sentences,
+                                                  maxLines: 6,
+                                                  minLines: 1,
+                                                  controller:
+                                                      _messageController,
+                                                  focusNode: myFocusNode,
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    focusedBorder:
+                                                        InputBorder.none,
+                                                    enabledBorder:
+                                                        InputBorder.none,
+                                                    errorBorder:
+                                                        InputBorder.none,
+                                                    disabledBorder:
+                                                        InputBorder.none,
+                                                    contentPadding:
+                                                        EdgeInsets.all(0),
+                                                  ),
+                                                  onChanged: (value) {
+                                                    setState(() {});
+                                                    if (!_sendingTyping) {
+                                                      ChatRoom.shared.typing(
+                                                          widget.chatId);
+                                                      _sendingTyping = true;
+                                                      Future.delayed(
+                                                          Duration(seconds: 3),
+                                                          () {
+                                                        _sendingTyping = false;
+                                                      });
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                              IconButton(
+                                                padding: EdgeInsets.all(0),
+                                                icon: Icon(
+                                                    _stickersIsActive
+                                                        ? Icons.keyboard
+                                                        : Icons.sms_failed,
+                                                    size: 30),
+                                                onPressed: () {
+                                                  if (!_stickersIsActive) {
+                                                    SystemChannels.textInput
+                                                        .invokeMethod(
+                                                            'TextInput.hide');
+                                                  } else {
+                                                    SystemChannels.textInput
+                                                        .invokeMethod(
+                                                            'TextInput.show');
+                                                    myFocusNode.requestFocus();
+                                                  }
+                                                  setState(() {
+                                                    _stickersIsActive =
+                                                        !_stickersIsActive;
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Expanded(
+                                          child: Container(
+                                            height: 45,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                Image.asset(
+                                                  "assets/record.gif",
+                                                  width: 10,
+                                                  height: 10,
+                                                ),
+                                                Container(width: 5),
+                                                TimerText(
+                                                    dependencies:
+                                                        _dependencies),
+                                              ],
                                             ),
-                                            Container(width: 5),
-                                            TimerText(
-                                                dependencies: _dependencies),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                              _messageController.text.isNotEmpty
-                                  ? IconButton(
-                                      padding: EdgeInsets.all(0),
-                                      icon: Icon(Icons.send, size: 30),
-                                      onPressed: () {
-                                        if (_messageController
-                                            .text.isNotEmpty) {
-                                          if (_editMessage != null) {
-                                            print("Edit message is called");
-                                            var mId = _editMessage['id'] == null
-                                                ? _editMessage['message_id']
-                                                : _editMessage['id'];
-                                            var type = _editMessage['type'];
-                                            var time = _editMessage['time'];
-                                            ChatRoom.shared.editMessage(
-                                              _messageController.text,
-                                              widget.chatId,
-                                              type,
-                                              time,
-                                              mId,
-                                            );
-                                            setState(() {
-                                              _messageController.clear();
-                                              _editMessage = null;
-                                            });
-                                          } else {
-                                            if (_replyMessage != null) {
-                                              var mId = _replyMessage['id'] ==
-                                                      null
-                                                  ? _replyMessage['message_id']
-                                                  : _replyMessage['id'];
-                                              ChatRoom.shared.replyMessage(
-                                                _messageController.text,
-                                                widget.chatId,
-                                                10,
-                                                mId,
-                                              );
-                                              setState(() {
-                                                _replyMessage = null;
-                                              });
-                                            } else {
-                                              ChatRoom.shared.sendMessage(
-                                                widget.chatId,
-                                                _messageController.text,
-                                              );
-                                            }
-                                          }
+                                  _messageController.text.isNotEmpty
+                                      ? IconButton(
+                                          padding: EdgeInsets.all(0),
+                                          icon: Icon(Icons.send, size: 30),
+                                          onPressed: () {
+                                            if (_messageController
+                                                .text.isNotEmpty) {
+                                              if (_editMessage != null) {
+                                                print("Edit message is called");
+                                                var mId = _editMessage['id'] ==
+                                                        null
+                                                    ? _editMessage['message_id']
+                                                    : _editMessage['id'];
+                                                var type = _editMessage['type'];
+                                                var time = _editMessage['time'];
+                                                ChatRoom.shared.editMessage(
+                                                  _messageController.text,
+                                                  widget.chatId,
+                                                  type,
+                                                  time,
+                                                  mId,
+                                                );
+                                                setState(() {
+                                                  _messageController.clear();
+                                                  _editMessage = null;
+                                                });
+                                              } else {
+                                                if (_replyMessage != null) {
+                                                  var mId =
+                                                      _replyMessage['id'] ==
+                                                              null
+                                                          ? _replyMessage[
+                                                              'message_id']
+                                                          : _replyMessage['id'];
+                                                  ChatRoom.shared.replyMessage(
+                                                    _messageController.text,
+                                                    widget.chatId,
+                                                    10,
+                                                    mId,
+                                                  );
+                                                  setState(() {
+                                                    _replyMessage = null;
+                                                  });
+                                                } else {
+                                                  ChatRoom.shared.sendMessage(
+                                                    widget.chatId,
+                                                    _messageController.text,
+                                                  );
+                                                }
+                                              }
 
-                                          setState(() {
-                                            _messageController.clear();
-                                          });
-                                        }
-                                      },
-                                    )
-                                  : GestureDetector(
-                                      onLongPressUp: () {
-                                        print("long press UP");
-                                        _stopRecord();
-                                      },
-                                      onLongPress: () async {
-                                        bool p = await _checkPermission();
-                                        if (p) {
-                                          _startRecord();
-                                        }
-                                      },
-                                      child: Container(
-                                        height: 45,
-                                        width: 45,
-                                        child: Icon(
-                                          Icons.mic,
-                                          size: 45,
-                                        ),
+                                              setState(() {
+                                                _messageController.clear();
+                                              });
+                                            }
+                                          },
+                                        )
+                                      : GestureDetector(
+                                          onLongPressUp: () {
+                                            print("long press UP");
+                                            _stopRecord();
+                                          },
+                                          onLongPress: () async {
+                                            bool p = await _checkPermission();
+                                            if (p) {
+                                              _startRecord();
+                                            }
+                                          },
+                                          child: Container(
+                                            height: 45,
+                                            width: 45,
+                                            child: Icon(
+                                              Icons.mic,
+                                              size: 45,
+                                            ),
+                                          ),
+                                        )
+                                ],
+                              ),
+                              Container(
+                                color: blackColor,
+                                height: 1,
+                              ),
+                              MediaQuery.of(context).viewInsets.bottom == 0 &&
+                                      _stickersIsActive &&
+                                      _stickersList.isNotEmpty
+                                  ? Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: GridView.count(
+                                        crossAxisCount: 5,
+                                        children: List.generate(
+                                            _stickersList.length, (index) {
+                                          return InkWell(
+                                            onTap: () {
+                                              print('adding $index');
+                                              ChatRoom.shared.sendMessage(
+                                                  widget.chatId, '',
+                                                  type: 14,
+                                                  attachments: {
+                                                    'stick_id':
+                                                        _stickersList[index]
+                                                            ['id']
+                                                  });
+                                            },
+                                            child: Image.network(
+                                              '$stickersUrl${_stickersList[index]['path']}',
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.15,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.15,
+                                            ),
+                                          );
+                                        }),
                                       ),
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.42,
                                     )
+                                  : SizedBox(
+                                      height: 0,
+                                      width: 0,
+                                    ),
                             ],
                           ),
                   ],
@@ -970,10 +1075,12 @@ class _NewChatPageState extends State<ChatPage> {
           });
 
           if (i != -1) {
-            setState(() {
-              _itemScrollController.scrollTo(
-                  index: i, duration: Duration(milliseconds: 500));
-            });
+            if (_messagesList.length > 10) {
+              setState(() {
+                _itemScrollController.scrollTo(
+                    index: i, duration: Duration(milliseconds: 500));
+              });
+            }
           } else {
             _loadMore();
           }
@@ -989,12 +1096,12 @@ class _NewChatPageState extends State<ChatPage> {
           if ('${e.json['data']['chat_id']}' == '${widget.chatId}' &&
               senderId != userId) {
           } else {
-            if (_messagesList.length > 5) {
-              _itemScrollController.scrollTo(
-                index: 0,
-                duration: Duration(milliseconds: 500),
-              );
-            }
+            // if (_messagesList.length > 10) {
+            // _itemScrollController.scrollTo(
+            // index: 0,
+            // duration: Duration(milliseconds: 500),
+            // );
+            // }
           }
           break;
         case "user:writing":
@@ -1054,6 +1161,17 @@ class _NewChatPageState extends State<ChatPage> {
               }
             });
           });
+          break;
+        case "chat:stickers":
+          setState(() {
+            stickersUrl = data['media_url'];
+            data['packs'].forEach((stickerPack) {
+              print(stickerPack);
+              print(data['packs']);
+              _stickersList.addAll(stickerPack['stickers']);
+            });
+          });
+          break;
       }
     });
   }

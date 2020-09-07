@@ -131,7 +131,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                 _membersList = message;
                 _actualMembersList = message;
               } else {
-                _membersList.addAll(message);
                 _actualMembersList.addAll(message);
               }
               if (_membersList.isNotEmpty) {
@@ -1124,14 +1123,18 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                         ),
                                       ),
                                     )
-                                  : Center(
-                                      child: Text(
-                                        "${localization.status}",
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          // fontFamily: ""
+                                  : Column(
+                                      children: <Widget>[
+                                        Center(
+                                          child: Text(
+                                            "${localization.status}",
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              // fontFamily: ""
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
                         ],
                       ),

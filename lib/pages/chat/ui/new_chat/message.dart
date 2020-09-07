@@ -20,6 +20,7 @@ import 'new_ui/link_message.dart';
 import 'new_ui/message_frame.dart';
 import 'new_ui/money_message.dart';
 import 'new_ui/reply_message.dart';
+import 'new_ui/sticker_message.dart';
 
 class MessageWidget extends StatelessWidget {
   final int messageCategory;
@@ -76,6 +77,7 @@ class MessageWidget extends StatelessWidget {
     //       text: '$message');
     //   return ForwardMessageWidget(text: 'forward: ${message}');
     // }
+    // return Text('$message');
     switch (messageType) {
       case 0:
         return TextMessageWidget(text: message);
@@ -121,9 +123,9 @@ class MessageWidget extends StatelessWidget {
       case 11:
         return MoneyMessageWidget(
           amount: message['text'],
-          username: message['user_name'],
+          username: message['another_user_name'],
           category: messageCategory,
-          userAvatar: message['avatar'],
+          userAvatar: message['another_user_avatar'],
         );
         break;
       case 12:
@@ -133,7 +135,12 @@ class MessageWidget extends StatelessWidget {
       case 13:
         return ForwardMessageWidget(text: 'forward: ${message['text']}');
         break;
-
+      case 14:
+        return StickerMessage(
+            stickerUrl: '${message['attachment_url']}',
+            // stickerUrl: 'https://media.chat.indigo24.xyz/media/stickers/',
+            sticker: '${message['attachments']['path']}');
+        break;
       default:
         return Text('default type');
     }

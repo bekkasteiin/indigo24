@@ -103,7 +103,7 @@ class ChatRoom {
   }
 
   sendSocketData(data) {
-    print('adding to socket $data');
+    print('adding to socket $channel $data');
     channel.sink.add(data);
   }
 
@@ -305,26 +305,59 @@ class ChatRoom {
     sendSocketData(data);
   }
 
-  sendMessage(chatID, String message, {int type, var fileId, attachments}) {
+  sendMessage(chatID, String message,
+      {int stickerId, int type, var fileId, attachments}) {
     outSound();
     message = message.replaceAll(new RegExp(r"\s{2,}"), " ");
     message = message.trimLeft();
     message = message.trimRight();
-    String data = json.encode({
-      "cmd": 'message:create',
-      "data": {
-        "user_id": "${user.id}",
-        "userToken": "${user.unique}",
-        "chat_id": "$chatID",
-        "text": '$message',
-        "message_type": type == null ? 0 : type,
-        "file_id": fileId == null ? 0 : fileId,
-        "attachments": attachments == null ? null : attachments
+    List wordsList = message.split(' ');
+    int maxWordCount = 200;
+    String text;
+    String data;
+    if (wordsList.length > maxWordCount) {
+      int repeatCount = wordsList.length ~/ maxWordCount;
+      
+      for (int i = 1; i < repeatCount + 1; i++) {
+        text = wordsList.sublist(0, maxWordCount * i).join(' ');
+        print(
+          wordsList.length - maxWordCount * i,
+        );
+
+        data = json.encode({
+          "cmd": 'message:create',
+          "data": {
+            "user_id": "${user.id}",
+            "userToken": "${user.unique}",
+            "chat_id": "$chatID",
+            "text": '$text',
+            "message_type": type == null ? 0 : type,
+            "file_id": fileId == null ? 0 : fileId,
+            "attachments": attachments == null ? null : attachments
+          }
+        });
+        print('added message');
+        print("$data");
+        sendSocketData(data);
       }
-    });
-    print('added message');
-    print("$data");
-    sendSocketData(data);
+    } else {
+      text = message;
+      data = json.encode({
+        "cmd": 'message:create',
+        "data": {
+          "user_id": "${user.id}",
+          "userToken": "${user.unique}",
+          "chat_id": "$chatID",
+          "text": '$text',
+          "message_type": type == null ? 0 : type,
+          "file_id": fileId == null ? 0 : fileId,
+          "attachments": attachments == null ? null : attachments
+        }
+      });
+      print('added message');
+      print("$data");
+      sendSocketData(data);
+    }
   }
 
   setUserSettings(int boolean) {
@@ -353,6 +386,18 @@ class ChatRoom {
       }
     });
     print('chat members');
+    sendSocketData(data);
+  }
+
+  getStickers() {
+    String data = json.encode({
+      "cmd": "chat:stickers",
+      "data": {
+        "userToken": "${user.unique}",
+        "user_id": '${user.id}',
+      }
+    });
+    print('get stickers');
     sendSocketData(data);
   }
 
@@ -801,6 +846,10 @@ class ChatRoom {
               break;
             case 'chat:mute':
               newChatsController.add(NewChatsEvent(json));
+              break;
+            case 'chat:stickers':
+              if (newChatController != null)
+                newChatController.add(NewChatEvent(json));
               break;
             default:
               print('default print cmd: $cmd json: $json');

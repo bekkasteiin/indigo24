@@ -58,6 +58,8 @@ class _ReplyMessageWidgetState extends State<ReplyMessageWidget> {
                             ),
                             Text(
                               '${widget.text['reply_data'] != null ? widget.text['reply_data']['text'].toString() : ''}',
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),

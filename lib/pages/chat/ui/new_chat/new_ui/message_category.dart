@@ -163,7 +163,10 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
         return GestureDetector(
           onLongPress: () {
             _showMessageAction(context, actions: [
-              widget.child,
+              Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: FittedBox(child: widget.child),
+              ),
               Container(
                 height: 50,
                 child: Theme(

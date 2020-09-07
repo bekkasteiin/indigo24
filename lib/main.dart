@@ -588,6 +588,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     permissions();
     pushPermission();
     share();
+  
     // initDownloader();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
@@ -645,7 +646,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       print('user id: ${user.id}');
       print('user name: ${user.name}');
       print('user balance: ${user.balance}');
-
+_init();
       _connectivity.initialise();
       _connectivity.myStream.listen((source) {
         setState(() => _source = source);

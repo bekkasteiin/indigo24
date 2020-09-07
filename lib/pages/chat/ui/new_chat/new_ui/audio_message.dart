@@ -20,7 +20,7 @@ class AudioMessageWidget extends StatefulWidget {
 class _AudioMessageWidgetState extends State<AudioMessageWidget> {
   @override
   Widget build(BuildContext context) {
-    print("${widget.mediaUrl}l${widget.media}"); // TODO change it
+    print("audio url is : ${widget.mediaUrl}${widget.media}"); // TODO change it
     return Container(child: AudioMessage("${widget.mediaUrl}${widget.media}"));
   }
 }

@@ -12,6 +12,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/custom_dropdown.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../main.dart';
@@ -162,6 +163,7 @@ class _IntroPageState extends State<IntroPage> {
     _api = Api();
     _countryDao = CountryDao();
     _getCountries();
+    _initPackageInfo();
 
     Future.delayed(Duration.zero, () {
       if (!isLanguageSelected) _showLanguages();
@@ -188,6 +190,20 @@ class _IntroPageState extends State<IntroPage> {
     super.dispose();
   }
 
+  PackageInfo _packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: 'Unknown',
+    buildNumber: 'Unknown',
+  );
+  Future<void> _initPackageInfo() async {
+    final PackageInfo info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _packageInfo = info;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -195,6 +211,12 @@ class _IntroPageState extends State<IntroPage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
+            title:  Text(
+                        '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
             centerTitle: true,
             backgroundColor: Colors.white,
             brightness: Brightness.light,

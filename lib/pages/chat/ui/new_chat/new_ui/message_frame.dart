@@ -31,7 +31,7 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: whiteColor,
+        color: int.parse(widget.message['type'].toString()) == 14 ? Colors.transparent : whiteColor,
         borderRadius: identifyBorderRadius(widget.messageCategory),
       ),
       child: Column(
