@@ -14,9 +14,11 @@ class ProfileSettingsPage extends StatefulWidget {
 
 class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   TextEditingController _nameController;
+  TextEditingController _cityController;
   Api _api;
   @override
   void initState() {
+    _cityController = TextEditingController(text: user.city);
     _nameController = TextEditingController(text: user.name);
     _api = Api();
     super.initState();
@@ -93,12 +95,20 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             // ),
             onPressed: () async {
               if (_nameController.text.isNotEmpty) {
-                _api.settingsSave(name: _nameController.text).then((result) {
+                _api
+                    .settingsSave(
+                        name: _nameController.text, city: _cityController.text)
+                    .then((result) {
                   if (result['success'].toString() == 'true') {
                     user.name = _nameController.text;
+                    user.city = _cityController.text;
                     SharedPreferencesHelper.setString(
                       'name',
                       _nameController.text,
+                    );
+                    SharedPreferencesHelper.setString(
+                      'city',
+                      _cityController.text,
                     );
                     showCustomDialog(context, result['message']);
                   }
@@ -120,6 +130,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 size,
                 '${localization.name}',
                 '${user.name}',
+                _nameController,
+                readyOnly: false,
+              ),
+              _buildEditor(
+                size,
+                '${localization.city}',
+                '${user.city}',
+                _cityController,
                 readyOnly: false,
               ),
             ],
@@ -132,7 +150,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   Widget _buildEditor(
     Size screenSize,
     String text,
-    String initialValue, {
+    String initialValue,
+    TextEditingController controller, {
     bool readyOnly = false,
   }) {
     return Center(
@@ -145,7 +164,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             SizedBox(height: 5),
             TextFormField(
               readOnly: readyOnly,
-              controller: _nameController,
+              controller: controller,
               inputFormatters: [
                 LengthLimitingTextInputFormatter(100),
               ],

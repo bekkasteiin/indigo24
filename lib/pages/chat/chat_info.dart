@@ -51,7 +51,8 @@ class ChatProfileInfo extends StatefulWidget {
   _ChatProfileInfoState createState() => _ChatProfileInfoState();
 }
 
-class _ChatProfileInfoState extends State<ChatProfileInfo> {
+class _ChatProfileInfoState extends State<ChatProfileInfo>
+    with SingleTickerProviderStateMixin {
   bool _isEditing;
 
   int _onlineCount;
@@ -70,6 +71,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
   File _image;
   ImagePicker _picker;
   Api _api;
+  TabController _tabController;
 
   RefreshController _refreshController;
   String chatAvatar;
@@ -92,6 +94,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
     _actualMembersList = [];
 
     _picker = ImagePicker();
+    _tabController = TabController(length: 4, vsync: this);
 
     _api = Api();
 
@@ -1123,19 +1126,57 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
                                         ),
                                       ),
                                     )
-                                  : Column(
-                                      children: <Widget>[
-                                        Center(
-                                          child: Text(
-                                            "${localization.status}",
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              // fontFamily: ""
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  : Text('status')
+                          // : Flexible(
+                          //     child: Stack(
+                          //       children: [
+                          //         TabBar(
+                          //           controller: _tabController,
+                          //           tabs: [
+                          //             Tab(
+                          //               text: 'media',
+                          //             ),
+                          //             Tab(
+                          //               text: 'file',
+                          //             ),
+                          //             Tab(
+                          //               text: 'link',
+                          //             ),
+                          //             Tab(
+                          //               text: 'audio',
+                          //             ),
+                          //           ],
+                          //         ),
+                          //         Container(
+                          //           margin: EdgeInsets.only(top: 45),
+                          //           child: Container(
+                          //             color: greenColor,
+                          //             child: Flexible(
+                          //               child: Column(
+                          //                 children: <Widget>[
+                          //                   Expanded(
+                          //                     child: TabBarView(
+                          //                       controller:
+                          //                           _tabController,
+                          //                       children: [
+                          //                         MediaTab(),
+                          //                         FileTab(
+                          //                           chatId:
+                          //                               widget.chatId,
+                          //                         ),
+                          //                         LinkTab(),
+                          //                         AudioTab()
+                          //                       ],
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
                         ],
                       ),
                     ),
@@ -1163,5 +1204,94 @@ class _ChatProfileInfoState extends State<ChatProfileInfo> {
       default:
         return Text('');
     }
+  }
+}
+
+class MediaTab extends StatefulWidget {
+  @override
+  _MediaTabState createState() => _MediaTabState();
+}
+
+class _MediaTabState extends State<MediaTab> {
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 3,
+      children: List.generate(10, (index) {
+        return Center(
+          child: Text(
+            'Item $index',
+            style: Theme.of(context).textTheme.headline5,
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class FileTab extends StatefulWidget {
+  final int chatId;
+
+  const FileTab({Key key, this.chatId}) : super(key: key);
+  @override
+  _FileTabState createState() => _FileTabState();
+}
+
+class _FileTabState extends State<FileTab> {
+  String type = 'files';
+  @override
+  void initState() {
+    ChatRoom.shared.getMessagesByType(widget.chatId, type);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: 20,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text('${[index]}'),
+        );
+      },
+    );
+  }
+}
+
+class LinkTab extends StatefulWidget {
+  @override
+  _LinkTabState createState() => _LinkTabState();
+}
+
+class _LinkTabState extends State<LinkTab> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: 20,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text('${[index]}'),
+        );
+      },
+    );
+  }
+}
+
+class AudioTab extends StatefulWidget {
+  @override
+  _AudioTabState createState() => _AudioTabState();
+}
+
+class _AudioTabState extends State<AudioTab> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: 20,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text('${[index]}'),
+        );
+      },
+    );
   }
 }

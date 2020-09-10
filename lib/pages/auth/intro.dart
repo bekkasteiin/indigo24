@@ -160,6 +160,11 @@ class _IntroPageState extends State<IntroPage> {
   @override
   void initState() {
     super.initState();
+    getDomen().then((result) {
+      setState(() {
+        _domen3 = '$result';
+      });
+    });
     _api = Api();
     _countryDao = CountryDao();
     _getCountries();
@@ -204,6 +209,15 @@ class _IntroPageState extends State<IntroPage> {
       });
     }
   }
+
+  String _domen3;
+
+  getDomen() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String domen = preferences.getString('domen');
+    return domen;
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -211,12 +225,12 @@ class _IntroPageState extends State<IntroPage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
-            title:  Text(
-                        '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
+            title: Text(
+              '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
             centerTitle: true,
             backgroundColor: Colors.white,
             brightness: Brightness.light,
@@ -243,15 +257,17 @@ class _IntroPageState extends State<IntroPage> {
                     Container(
                       child: InkWell(
                         child: Container(
-                          height: 100,
-                          width: 100,
-                        ),
+                            height: 100,
+                            width: 100,
+                            color: _domen3 == 'xyz'
+                                ? redColor
+                                : Colors.transparent),
                         onTap: () async {
                           _tempCounter++;
+                          SharedPreferences preferences =
+                              await SharedPreferences.getInstance();
+
                           if (_tempCounter == 9) {
-                            SharedPreferences preferences =
-                                await SharedPreferences.getInstance();
-                            String _domen3 = preferences.getString('domen');
                             print(_tempCounter);
                             print('$_domen3');
                             if ('$_domen3' == null) {

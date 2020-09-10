@@ -624,7 +624,9 @@ class _UserProfilePageState extends State<UserProfilePage>
                             MaterialPageRoute(
                               builder: (context) => ProfileSettingsPage(),
                             ),
-                          );
+                          ).whenComplete(() {
+                            setState(() {});
+                          });
                         },
                       )
                     ],

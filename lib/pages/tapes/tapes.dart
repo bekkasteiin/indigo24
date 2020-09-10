@@ -698,12 +698,17 @@ class _TapesPageState extends State<TapesPage>
                                                                     () {});
                                                               },
                                                             ),
-                                                            Container(
-                                                              width: 30,
-                                                              child: Text(
-                                                                '${_result[index]['commentsCount']}',
-                                                              ),
-                                                            ),
+                                                            '${_result[index]['commentsCount']}' ==
+                                                                    '0'
+                                                                ? SizedBox(
+                                                                    height: 0,
+                                                                    width: 0)
+                                                                : Container(
+                                                                    width: 30,
+                                                                    child: Text(
+                                                                      '${_result[index]['commentsCount']}',
+                                                                    ),
+                                                                  ),
                                                             // IconButton(
                                                             //   icon: Container(
                                                             //     width: 35,

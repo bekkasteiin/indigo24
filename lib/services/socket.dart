@@ -317,7 +317,7 @@ class ChatRoom {
     String data;
     if (wordsList.length > maxWordCount) {
       int repeatCount = wordsList.length ~/ maxWordCount;
-      
+
       for (int i = 1; i < repeatCount + 1; i++) {
         text = wordsList.sublist(0, maxWordCount * i).join(' ');
         print(
@@ -642,6 +642,21 @@ class ChatRoom {
     sendSocketData(data);
   }
 
+  getMessagesByType(int chatId, String type, {int page = 1}) {
+    String data = json.encode({
+      "cmd": "chat:message:by:type",
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "page": '$page',
+        'chat_id': '$chatId',
+        "type": '$type',
+      }
+    });
+    print('message by type $chatId to $type');
+    sendSocketData(data);
+  }
+
   searchChatMembers(search, chatId) {
     String data = json.encode({
       "cmd": "chat:member:search",
@@ -739,6 +754,13 @@ class ChatRoom {
               // }
               if (newChatController != null)
                 newChatController.add(NewChatEvent(json));
+              break;
+
+            case "chat:message:by:type":
+              if (chatInfoController != null) {
+                print('added to chatInfoController');
+                chatInfoController.add(MyChatInfoEvent(json));
+              }
               break;
             case "user:check":
               if (contactController != null && !contactController.isClosed) {
