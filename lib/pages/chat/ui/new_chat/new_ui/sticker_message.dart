@@ -16,13 +16,14 @@ class StickerMessage extends StatefulWidget {
 }
 
 class _StickerMessageState extends State<StickerMessage> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.3,
       height: MediaQuery.of(context).size.width * 0.3,
-      child: Image.network('${widget.stickerUrl}${widget.sticker}')
+      child: CachedNetworkImage(
+        imageUrl: '${widget.stickerUrl}${widget.sticker}',
+      ),
     );
   }
 }

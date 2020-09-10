@@ -4,19 +4,23 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'payments_service.dart';
 import 'package:indigo24/services/constants.dart';
 
-class PaymentsGroupPage extends StatefulWidget {
+class PaymentsServices extends StatefulWidget {
   final int categoryID;
   final String title;
-  PaymentsGroupPage(this.categoryID, this.title);
+  final int locationId;
+  final String locationType;
+  PaymentsServices(this.categoryID, this.title,
+      {this.locationId, this.locationType});
 
   @override
-  _PaymentsGroupPageState createState() => _PaymentsGroupPageState();
+  _PaymentsServicesState createState() => _PaymentsServicesState();
 }
 
-class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
+class _PaymentsServicesState extends State<PaymentsServices> {
   Api _api;
 
   Map<String, dynamic> _services;
@@ -25,16 +29,37 @@ class _PaymentsGroupPageState extends State<PaymentsGroupPage> {
   void initState() {
     super.initState();
     _api = Api();
-    _api.getServices(widget.categoryID).then((services) {
-      if (services['message'] == 'Not authenticated' &&
-          services['success'].toString() == 'false') {
-        logOut(context);
-      } else {
-        setState(() {
-          _services = services;
-        });
-      }
-    });
+    if (widget.locationId != null && widget.locationType != null) {
+      print('getting with location');
+      _api
+          .getServices(widget.categoryID,
+              locationId: widget.locationId, locationType: widget.locationType)
+          .then((services) {
+        if (services['message'] == 'Not authenticated' &&
+            services['success'].toString() == 'false') {
+          logOut(context);
+        } else if (services['success'].toString() == 'false') {
+          indigoCupertinoDialogAction(context, services['message'], isDestructiveAction: false, leftButtonCallBack: () { Navigator.pop(context);});
+        } else {
+          setState(() {
+            _services = services;
+            print('services is $_services');
+          });
+        }
+      });
+    } else {
+      print('getting without location');
+      _api.getServices(widget.categoryID).then((services) {
+        if (services['message'] == 'Not authenticated' &&
+            services['success'].toString() == 'false') {
+          logOut(context);
+        } else {
+          setState(() {
+            _services = services;
+          });
+        }
+      });
+    }
   }
 
   @override

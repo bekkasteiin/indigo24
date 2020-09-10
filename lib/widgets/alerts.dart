@@ -26,7 +26,7 @@ indigoCupertinoDialogAction(
       '${leftButtonText == null ? localization.cancel : leftButtonText}',
     ),
     onPressed: () {
-      leftButtonText == null ? Navigator.pop(context) : leftButtonCallBack();
+      leftButtonCallBack() == null ? Navigator.pop(context) : leftButtonCallBack();
     },
   );
   actions.add(leftButton);

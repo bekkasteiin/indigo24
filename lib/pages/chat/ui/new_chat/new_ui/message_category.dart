@@ -75,10 +75,13 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                           });
                         },
                         child: ClipOval(
-                          child: Image.network(
-                            widget.avatar.replaceAll('AxB', '200x200'),
-                            width: 30,
-                            height: 30,
+                          child: Container(
+                            color: greyColor,
+                            child: Image.network(
+                              widget.avatar.replaceAll('AxB', '200x200'),
+                              width: 30,
+                              height: 30,
+                            ),
                           ),
                         ),
                       ),
@@ -164,8 +167,7 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
           onLongPress: () {
             _showMessageAction(context, actions: [
               Container(
-                height: MediaQuery.of(context).size.height * 0.4,
-                child: FittedBox(child: widget.child),
+                child: widget.child,
               ),
               Container(
                 height: 50,
@@ -300,10 +302,12 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
               child: Center(
                 child: Container(
                   color: Colors.white.withOpacity(0.9),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: actions,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: actions,
+                    ),
                   ),
                 ),
               ),

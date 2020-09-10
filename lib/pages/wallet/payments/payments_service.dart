@@ -79,6 +79,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     _api = Api();
 
     _api.getService(widget.serviceID).then((getServiceResult) {
+      print('get servies is $getServiceResult');
       getServiceResult['result'].forEach((element) {
         if ('${element['name']}' == 'amount') {
           _amountPlaceholder = element['placeholder'];
@@ -288,7 +289,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             ),
                                           ),
                                           Text(
-                                            '${_amount.toStringAsFixed(3)}',
+                                            '${_amount.toStringAsFixed(2)}',
                                             style: TextStyle(
                                               fontSize: 20,
                                               color: blackPurpleColor,
@@ -308,7 +309,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             ),
                                           ),
                                           Text(
-                                            '${_expectedAmount.toStringAsFixed(3)}',
+                                            '${_expectedAmount.toStringAsFixed(2)}',
                                             style: TextStyle(
                                               fontSize: 20,
                                               color: blackPurpleColor,
@@ -326,18 +327,37 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           isCalculated
                               ? Center(
                                   child: Text(
-                                      '1 $_expectedCurrency = $_exchangeRate KZT',
+                                      '1 $_expectedCurrency = ${_exchangeRate.toStringAsFixed(2)} KZT',
                                       style:
                                           TextStyle(color: Color(0xFF001D52))))
                               : Center(),
+                          SizedBox(
+                            height: 10,
+                          ),
                           Center(
                               child: Text(
                                   '${localization.minAmount} ${_service['service']['min']} KZT',
                                   style: TextStyle(color: Color(0xFF001D52)))),
+                          SizedBox(
+                            height: 10,
+                          ),
                           Center(
                               child: Text(
                                   '${localization.maxAmount} ${_service['service']['max']} KZT',
                                   style: TextStyle(color: Color(0xFF001D52)))),
+                          _service['service']['commission'].toString() != '0'
+                              ? Center(
+                                  child: Text(
+                                      '${localization.commission} ${_service['service']['commission'] * _amount} KZT',
+                                      style:
+                                          TextStyle(color: Color(0xFF001D52))))
+                              : SizedBox(
+                                  height: 0,
+                                  width: 0,
+                                ),
+                          SizedBox(
+                            height: 10,
+                          ),
                           Center(
                               child: Text(
                                   '${localization.commission} ${_service['service']['commission']}%',
@@ -579,7 +599,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     if (result['message'] == 'Not authenticated' &&
                         result['success'].toString() == 'false') {
                       logOut(context);
-                    } else {
+                    } else if (result['success'].toString() == 'true') {
                       print('this is $result');
                       setState(() {
                         isCalculated = true;

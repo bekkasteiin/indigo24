@@ -35,6 +35,7 @@ class _MoneyMessageWidgetState extends State<MoneyMessageWidget> {
                 height: 30.0,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  color: greyColor,
                   image: DecorationImage(
                     fit: BoxFit.fill,
                     image: NetworkImage('$avatarUrl${widget.userAvatar}'),

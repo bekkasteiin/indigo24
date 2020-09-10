@@ -5,6 +5,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 
 import 'payments_history.dart';
+import 'payments_region.dart';
 import 'payments_service.dart';
 import 'payments_services.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -34,6 +35,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
           categories['success'].toString() == 'false') {
         logOut(context);
       } else {
+        print(categories);
         setState(() {
           _categories = categories;
           _logoUrl = _categories["logoURL"];
@@ -117,6 +119,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                                         _services[index]['title'],
                                         _services[index]['id'],
                                         _services[index]['is_convertable'],
+                                        _services[index]['location_type'],
                                       ),
                                     );
                                   },
@@ -134,14 +137,16 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                                     return Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: _paymentsList(
-                                        context,
-                                        _categories["logoURL"] +
-                                            _categories["categories"][index]
-                                                ['logo'],
-                                        _categories["categories"][index]
-                                            ['title'],
-                                        _categories["categories"][index]['ID'],
-                                      ),
+                                          context,
+                                          _categories["logoURL"] +
+                                              _categories["categories"][index]
+                                                  ['logo'],
+                                          _categories["categories"][index]
+                                              ['title'],
+                                          _categories["categories"][index]
+                                              ['ID'],
+                                          _categories['categories'][index]
+                                              ['location_type']),
                                     );
                                   },
                                 ),
@@ -243,7 +248,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   }
 
   Container _servicesList(BuildContext context, String logo, String name,
-      int index, int isConvertable) {
+      int index, int isConvertable, locationType) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
       decoration: BoxDecoration(boxShadow: [
@@ -302,7 +307,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   }
 
   Container _paymentsList(
-      BuildContext context, String logo, String name, int index) {
+      BuildContext context, String logo, String name, int index, locationType) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
       decoration: BoxDecoration(boxShadow: [
@@ -316,15 +321,27 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         height: 40,
         child: RaisedButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentsGroupPage(
-                  index,
-                  name,
+            if (locationType != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentsRegion(
+                    categoryId: index,
+                    locationType: locationType,
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentsServices(
+                    index,
+                    name,
+                  ),
+                ),
+              );
+            }
           },
           child: Container(
             child: Row(

@@ -139,10 +139,10 @@ class MessageWidget extends StatelessWidget {
         return StickerMessage(
             stickerUrl: '${message['attachment_url']}',
             // stickerUrl: 'https://media.chat.indigo24.xyz/media/stickers/',
-            sticker: '${message['attachments']['path']}');
+            sticker: '${json.decode(message['attachments'])[0]['path']}');
         break;
       default:
-        return Text('default type');
+        return Text('default type $messageType');
     }
   }
 

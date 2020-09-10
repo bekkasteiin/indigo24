@@ -390,6 +390,9 @@ class Api {
   }
 
   calculateSum(serviceID, account, amount, int providerId) async {
+    print('provider id id $providerId');
+    print('provider id id $providerId');
+    print('provider id id $providerId');
     switch (providerId) {
       case 6:
         dynamic queryParameters = {
@@ -444,12 +447,27 @@ class Api {
     return _postRequest('api/v2.1/service/search', data);
   }
 
-  getServices(categoryID) async {
-    dynamic data = {
-      'customerID': '${user.id}',
-      'unique': '${user.unique}',
-      'categoryID': '$categoryID'
-    };
+  getServices(categoryID, {locationId, locationType}) async {
+    dynamic data;
+    if (locationId != null && locationType != null) {
+      print('with');
+      data = {
+        'customerID': '${user.id}',
+        'unique': '${user.unique}',
+        'categoryID': '$categoryID',
+        'location_type': locationType,
+        'location_id': locationId
+      };
+    } else {
+      print('with else');
+
+      data = {
+        'customerID': '${user.id}',
+        'unique': '${user.unique}',
+        'categoryID': '$categoryID'
+      };
+    }
+    print('$data is data');
     return _postRequest('api/v2.1/get/services', data);
   }
 
@@ -501,6 +519,17 @@ class Api {
     };
 
     return _postRequest('api/v2.1/get/categories', data);
+  }
+
+  getCategory(int categoryId, String locationType) async {
+    dynamic data = {
+      'customerID': '${user.id}',
+      'unique': '${user.unique}',
+      'categoryID': categoryId,
+      'location_type': locationType,
+    };
+
+    return _postRequest('api/v2.1/get/category/locations', data);
   }
 
   getCountries() async {

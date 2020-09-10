@@ -751,7 +751,7 @@ class _WalletTabState extends State<WalletTab> {
           onTap: () {
             setState(() {
               _amount = _realAmount / _tengeCoef;
-              _amount = num.parse(_amount.toStringAsFixed(3));
+              _amount = num.parse(_amount.toStringAsFixed(2));
               _symbol = '${String.fromCharCodes(Runes('\u20B8'))}';
               _globalCoef = _tengeCoef;
             });
@@ -780,7 +780,7 @@ class _WalletTabState extends State<WalletTab> {
           onTap: () {
             setState(() {
               _amount = _realAmount / _rubleCoef;
-              _amount = num.parse(_amount.toStringAsFixed(3));
+              _amount = num.parse(_amount.toStringAsFixed(2));
               _symbol = '${String.fromCharCodes(Runes('\u20BD'))}';
               _globalCoef = _rubleCoef;
             });
@@ -809,7 +809,7 @@ class _WalletTabState extends State<WalletTab> {
           onTap: () {
             setState(() {
               _amount = _realAmount / _dollarCoef;
-              _amount = num.parse(_amount.toStringAsFixed(3));
+              _amount = num.parse(_amount.toStringAsFixed(2));
               _symbol = '${String.fromCharCodes(Runes('\u0024'))}';
               _globalCoef = _dollarCoef;
             });
@@ -838,7 +838,7 @@ class _WalletTabState extends State<WalletTab> {
           onTap: () {
             setState(() {
               _amount = _realAmount / _euroCoef;
-              _amount = num.parse(_amount.toStringAsFixed(3));
+              _amount = num.parse(_amount.toStringAsFixed(2));
               _symbol = '${String.fromCharCodes(Runes('\u20AC'))}';
               _globalCoef = _euroCoef;
             });

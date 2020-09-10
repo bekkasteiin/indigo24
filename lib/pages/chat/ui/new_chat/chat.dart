@@ -182,6 +182,7 @@ class _NewChatPageState extends State<ChatPage> {
     _isRecording = false;
     showForwardingProcess = false;
     _stickersIsActive = false;
+    closeMainChat = true;
     _messagesPage = 1;
     _messagesList = [];
     _typingUsers = [];
@@ -200,6 +201,7 @@ class _NewChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    closeMainChat = false;
     ChatRoom.shared.closeNewChatStream();
     _messageController.dispose();
     myFocusNode.dispose();
@@ -280,10 +282,6 @@ class _NewChatPageState extends State<ChatPage> {
             ),
             shape: CircleBorder(),
             onPressed: () {
-              print("${widget.avatarUrl}${widget.avatar.toString()}");
-              print("${widget.avatarUrl}${widget.avatar.toString()}");
-              print("${widget.avatarUrl}${widget.avatar.toString()}");
-              print("${widget.avatarUrl}${widget.avatar.toString()}");
               Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -579,7 +577,7 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  "${_replyMessage["type"].toString() == '1' ? "Изображение" : _replyMessage["type"].toString() == '4' ? "Видео" : _replyMessage["text"]}",
+                                                  "${_replyMessage['message_text_for_type']}",
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   maxLines: 1,
@@ -934,23 +932,29 @@ class _NewChatPageState extends State<ChatPage> {
                                   ? Container(
                                       width: MediaQuery.of(context).size.width,
                                       child: GridView.count(
-                                        crossAxisCount: 5,
+                                        scrollDirection: Axis.horizontal,
+                                        crossAxisCount: 3,
                                         children: List.generate(
                                             _stickersList.length, (index) {
                                           return InkWell(
                                             onTap: () {
                                               print('adding $index');
                                               ChatRoom.shared.sendMessage(
-                                                  widget.chatId, '',
-                                                  type: 14,
-                                                  attachments: {
+                                                widget.chatId,
+                                                '',
+                                                type: 14,
+                                                attachments: [
+                                                  {
                                                     'stick_id':
                                                         _stickersList[index]
                                                             ['id']
-                                                  });
+                                                  }
+                                                ],
+                                              );
                                             },
-                                            child: Image.network(
-                                              '$stickersUrl${_stickersList[index]['path']}',
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  '$stickersUrl${_stickersList[index]['path']}',
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *
@@ -1155,7 +1159,6 @@ class _NewChatPageState extends State<ChatPage> {
         case "user:check:online":
           setState(() {
             data.forEach((element) {
-              print('${element['user_id']} == ${widget.userIds}');
               if (element['user_id'] == widget.userIds) {
                 _onlineString = element['online'];
               }
@@ -1166,8 +1169,6 @@ class _NewChatPageState extends State<ChatPage> {
           setState(() {
             stickersUrl = data['media_url'];
             data['packs'].forEach((stickerPack) {
-              print(stickerPack);
-              print(data['packs']);
               _stickersList.addAll(stickerPack['stickers']);
             });
           });

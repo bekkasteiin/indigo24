@@ -397,6 +397,48 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           _isChatsLoading = false;
 
           break;
+
+        case "user:writing":
+          print('writing $data');
+          var indexes = _chatsList.indexWhere((element) =>
+              element['id'].toString() == data[0]['chat_id'].toString());
+          var temp =
+              _chatsList[indexes]['last_message']['message_for_type'] == null
+                  ? _chatsList[indexes]['last_message']['text']
+                  : _chatsList[indexes]['last_message']['message_for_type'];
+          setState(() {
+            _chatsList[indexes]['last_message']['message_for_type'] = 'typing...';
+            _chatsList[indexes]['last_message']['text'] = 'typing...';
+          });
+          Future.delayed(Duration(seconds: 3), () {
+            setState(() {
+              _chatsList[indexes]['last_message']['message_for_type'] = temp;
+              _chatsList[indexes]['last_message']['text'] = temp;
+            });
+          });
+
+          // if (data[0]['chat_id'] == widget.chatId) {
+          //   typingProcessing = true;
+          //   setState(() {
+          //     _isSomeoneTyping = true;
+          //     data.toList().forEach((element) {
+          //       if (user.id != '${element['user_id']}')
+          //         setState(() {
+          //           _typingUsers.add(element['name']);
+          //         });
+          //       Future.delayed(Duration(seconds: 3), () {
+          //         if (typingProcessing) {
+          //           setState(() {
+          //             _typingUsers = [];
+          //           });
+          //         } else {
+          //           typingProcessing = false;
+          //         }
+          //       });
+          //     });
+          //   });
+          // }
+          break;
         // case 'message:create':
         // print(e.json["data"]);
         // var senderId = e.json["data"]['user_id'].toString();
