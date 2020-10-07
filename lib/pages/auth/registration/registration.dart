@@ -31,8 +31,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var countryId = 0;
   var country;
   var countries = new List<Country>();
-  var _countries = [];
-  var _phonePrefix = '77';
   var smsCode = 0;
   List<DropdownMenuItem<String>> dropDownMenuItems;
   String _currentCountry = "Казахстан";
@@ -121,7 +119,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_selectedCountry != null)
       setState(() {
         _currentCountry = _selectedCountry.title;
-        _phonePrefix = _selectedCountry.phonePrefix;
         _hintText = _selectedCountry.mask;
         loginFormatter = MaskTextInputFormatter(
             mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});

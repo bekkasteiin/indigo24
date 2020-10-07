@@ -8,7 +8,6 @@ import 'package:indigo24/pages/wallet/balance_history.dart';
 import 'package:indigo24/pages/wallet/payments/payments_category.dart';
 import 'package:indigo24/pages/wallet/refill/refill.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer_list.dart';
-import 'package:indigo24/pages/wallet/withdraw/withdraw.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
@@ -63,17 +62,27 @@ class _WalletTabState extends State<WalletTab> {
     }
     Timer.run(() {
       _withPin == false
-          ? _showLockScreen(context, '${localization.createPin}',
+          ? _showLockScreen(
+              context,
+              '${localization.createPin}',
               withPin: _withPin,
               opaque: false,
-              cancelButton: Text('${localization.cancel}',
-                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-                  semanticsLabel: '${localization.cancel}'))
-          : _showLockScreen(context, '${localization.enterPin}',
+              cancelButton: Text(
+                '${localization.cancel}',
+                style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+                semanticsLabel: '${localization.cancel}',
+              ),
+            )
+          : _showLockScreen(
+              context,
+              '${localization.enterPin}',
               opaque: false,
-              cancelButton: Text('${localization.cancel}',
-                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-                  semanticsLabel: '${localization.cancel}'));
+              cancelButton: Text(
+                '${localization.cancel}',
+                style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+                semanticsLabel: '${localization.cancel}',
+              ),
+            );
     });
 
     _symbol = '₸';
@@ -111,26 +120,26 @@ class _WalletTabState extends State<WalletTab> {
       Widget cancelButton,
       List<String> digits}) {
     Navigator.push(
-        context,
-        PageRouteBuilder(
-          opaque: opaque,
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              PasscodeScreen(
-            title: title,
-            withPin: withPin,
-            passwordEnteredCallback: _onPasscodeEntered,
-            cancelButton: cancelButton,
-            deleteButton: Text(
-              '${localization.delete}',
-              style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-              semanticsLabel: '${localization.delete}',
-            ),
-            shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: milkWhiteColor,
-            cancelCallback: _onPasscodeCancelled,
-            digits: digits,
+      context,
+      PageRouteBuilder(
+        opaque: opaque,
+        pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+          title: title,
+          withPin: withPin,
+          passwordEnteredCallback: _onPasscodeEntered,
+          cancelButton: cancelButton,
+          deleteButton: Text(
+            '${localization.delete}',
+            style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+            semanticsLabel: '${localization.delete}',
           ),
-        ));
+          shouldTriggerVerification: _verificationNotifier.stream,
+          backgroundColor: milkWhiteColor,
+          cancelCallback: _onPasscodeCancelled,
+          digits: digits,
+        ),
+      ),
+    );
   }
 
   _onPasscodeEntered(String enteredPasscode) {
@@ -166,6 +175,7 @@ class _WalletTabState extends State<WalletTab> {
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
+
     if (isValid) {
       Future.delayed(const Duration(milliseconds: 250), () {
         print(' is really valid ');
@@ -353,13 +363,16 @@ class _WalletTabState extends State<WalletTab> {
 
   Container _historyBalance(Size size) {
     return Container(
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
             color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+            offset: Offset(0.0, 0.0),
+          )
+        ],
+      ),
       child: ButtonTheme(
         minWidth: size.width * 0.8,
         height: 70,
@@ -410,13 +423,16 @@ class _WalletTabState extends State<WalletTab> {
 
   Container _transfer(Size size) {
     return Container(
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
             color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+            offset: Offset(0.0, 0.0),
+          )
+        ],
+      ),
       child: ButtonTheme(
         minWidth: size.width * 0.8,
         height: 70,
@@ -463,13 +479,16 @@ class _WalletTabState extends State<WalletTab> {
 
   Container _payments(Size size) {
     return Container(
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
             color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+            offset: Offset(0.0, 0.0),
+          )
+        ],
+      ),
       child: ButtonTheme(
         height: 70,
         child: RaisedButton(
@@ -608,13 +627,18 @@ class _WalletTabState extends State<WalletTab> {
       width: size.width,
       child: Column(
         children: <Widget>[
-          Text('${localization.balanceInBlock}', style: fS18w200(c: 'ffffff')),
+          Text(
+            '${localization.balanceInBlock}',
+            style: fS18w200(c: 'ffffff'),
+          ),
           Container(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text('${_blockedAmount.toStringAsFixed(2)}',
-                  style: fS26w200(c: 'ffffff')),
+              Text(
+                '${_blockedAmount.toStringAsFixed(2)}',
+                style: fS26w200(c: 'ffffff'),
+              ),
               Image(
                 image: AssetImage("assets/images/tenge.png"),
                 height: 24,
@@ -632,13 +656,16 @@ class _WalletTabState extends State<WalletTab> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Container(
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
                 color: Colors.black26,
                 blurRadius: 10.0,
                 spreadRadius: -2,
-                offset: Offset(0.0, 0.0))
-          ]),
+                offset: Offset(0.0, 0.0),
+              )
+            ],
+          ),
           child: ButtonTheme(
             minWidth: size.width * 0.42,
             height: 50,
@@ -677,13 +704,16 @@ class _WalletTabState extends State<WalletTab> {
           ),
         ),
         Container(
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
                 color: Colors.black26,
                 blurRadius: 10.0,
                 spreadRadius: -2,
-                offset: Offset(0.0, 0.0))
-          ]),
+                offset: Offset(0.0, 0.0),
+              )
+            ],
+          ),
           child: ButtonTheme(
             minWidth: size.width * 0.42,
             height: 50,
@@ -691,10 +721,11 @@ class _WalletTabState extends State<WalletTab> {
               onPressed: () {
                 print('вывести is pressed');
                 Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => WithdrawListPage()))
-                    .whenComplete(() async {
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WithdrawListPage(),
+                  ),
+                ).whenComplete(() async {
                   await _api.getBalance();
                   setState(() {
                     // _amount = double.parse(user.balance);

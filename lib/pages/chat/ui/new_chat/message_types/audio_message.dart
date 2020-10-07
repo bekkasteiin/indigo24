@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-
-import '../../../chat_page_view_test.dart';
+import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/widgets/player.dart';
 
 class AudioMessageWidget extends StatefulWidget {
   final String text;
-  final String mediaUrl; // TODO fix
   final String media;
 
   const AudioMessageWidget({
     Key key,
     this.text,
     @required this.media,
-    @required this.mediaUrl,
   }) : super(key: key);
   @override
   _AudioMessageWidgetState createState() => _AudioMessageWidgetState();
@@ -20,7 +18,6 @@ class AudioMessageWidget extends StatefulWidget {
 class _AudioMessageWidgetState extends State<AudioMessageWidget> {
   @override
   Widget build(BuildContext context) {
-    print("audio url is : ${widget.mediaUrl}${widget.media}"); // TODO change it
-    return Container(child: AudioMessage("${widget.mediaUrl}${widget.media}"));
+    return Container(child: PlayerWidget(url: "$voiceUrl${widget.media}"));
   }
 }

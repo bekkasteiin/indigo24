@@ -12,7 +12,7 @@ class _DocumentMessageWidgetState extends State<DocumentMessageWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text('${widget.text}'),
+      child: Text('document ${widget.text}'),
     );
   }
 }

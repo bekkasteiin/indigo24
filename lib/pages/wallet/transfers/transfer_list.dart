@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'transfer.dart';
 import 'transfer_history.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -24,58 +25,38 @@ class _TransferListPageState extends State<TransferListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: IndigoAppBarWidget(
+        title: Text(
+          localization.transfers,
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(5),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/history.png',
+                ),
+              ),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TransferHistoryPage(),
+                ),
+              );
+            },
+          )
+        ],
+      ),
       body: _mainScreen(context),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        "${localization.transfers}",
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      actions: <Widget>[
-        IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(5),
-            child: Image(
-              image: AssetImage(
-                'assets/images/history.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TransferHistoryPage(),
-              ),
-            );
-          },
-        )
-      ],
-      backgroundColor: whiteColor,
     );
   }
 

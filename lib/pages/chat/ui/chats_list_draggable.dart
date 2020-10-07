@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/services/constants.dart';
@@ -7,8 +5,6 @@ import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-
-import '../chat.dart';
 
 class ChatListDraggablePage extends StatefulWidget {
   final List messages;
@@ -98,11 +94,9 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                     int.parse(jsonChat['id'].toString()),
                     phone: jsonChat['another_user_phone'],
                     chatType: int.parse(jsonChat['type'].toString()),
-                    userIds: jsonChat['another_user_id'],
                     avatar: jsonChat['avatar']
                         .toString()
                         .replaceAll("AxB", "200x200"),
-                    avatarUrl: jsonChat['avatar_url'],
                   );
                 } else {
                   print('no actions yes');
@@ -119,7 +113,6 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
             itemBuilder: (BuildContext context, int i) {
               return ListTile(
                 onTap: () {
-                  print('get message');
                   if (_selectedChats.contains(_chats[i])) {
                     setState(() {
                       _selectedChats.remove(_chats[i]);
@@ -165,8 +158,8 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                             (_chats[i]["avatar"] == null ||
                                     _chats[i]["avatar"] == '' ||
                                     _chats[i]["avatar"] == false)
-                                ? '${_chats[i]['type'].toString() == '1' ? groupAvatarUrl : avatarUrl}noAvatar.png'
-                                : '${_chats[i]['type'].toString() == '1' ? groupAvatarUrl : avatarUrl}${_chats[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
+                                ? '${avatarUrl}noAvatar.png'
+                                : '${avatarUrl}${_chats[i]["avatar"].toString().replaceAll("AxB", "200x200")}',
                           ),
                         ),
                       ),
@@ -285,13 +278,9 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
     int chatID, {
     phone,
     int chatType,
-    String userIds,
     String avatar,
-    String avatarUrl,
   }) async {
     // ChatRoom.shared.setChatStream();
-    ChatRoom.shared.checkUserOnline(userIds);
-
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -301,9 +290,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
           // phone: phone,
           // members: members,
           chatType: chatType,
-          userIds: userIds,
           avatar: avatar,
-          avatarUrl: avatarUrl,
           // data: data,
         ),
       ),

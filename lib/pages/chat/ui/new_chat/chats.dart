@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
-import 'package:indigo24/db/chats_db.dart';
-import 'package:indigo24/db/chats_model.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/pages/chat/ui/new_widgets/new_widgets.dart';
 import 'package:indigo24/services/constants.dart';
@@ -12,10 +14,12 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/pages/chat/ui/new_extensions.dart';
 import 'package:indigo24/widgets/alerts.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 import '../../chat_contacts.dart';
 import '../../chat_group_selection.dart';
-// import '../../chat_list.dart';
+import 'chat_models/hive_names.dart';
+import 'chat_models/chat_model.dart';
 
 class TestChatsListPage extends StatefulWidget {
   @override
@@ -28,7 +32,6 @@ class _TestChatsListPageState extends State<TestChatsListPage>
   bool get wantKeepAlive => true;
   bool _isChatsLoading;
   int _chatsPage;
-  List _chatsList;
 
   @override
   void initState() {
@@ -36,7 +39,6 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     ChatRoom.shared.setNewChatsStream();
     listen();
     _isChatsLoading = false;
-    _chatsList = [];
     _chatsPage = 2;
   }
 
@@ -52,22 +54,17 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     ChatRoom.shared.forceGetChat(page: _chatsPage);
   }
 
-  ListTile _chatListTile(chat) {
+  ListTile _chatListTile(ChatModel chat) {
     return ListTile(
       onTap: () {
-        print('get message $chat');
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatPage(
-              chatId: int.parse(chat['id'].toString()),
-              chatName: chat['name'],
-              memberCount: chat['members_count'],
-              chatType: int.parse(chat['type'].toString()),
-              avatar: chat['avatar'],
-              avatarUrl: chat['avatar_url'],
-              phone: chat['another_user_phone'],
-              userIds: chat['another_user_id'].toString(),
+              chatId: int.parse(chat.chatId.toString()),
+              chatName: chat.name,
+              chatType: int.parse(chat.chatType.toString()),
+              avatar: chat.avatar,
             ),
           ),
         ).whenComplete(() {
@@ -77,33 +74,32 @@ class _TestChatsListPageState extends State<TestChatsListPage>
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(25.0),
         child: Container(
-          height: 50,
-          width: 50,
+          height: 40,
+          width: 40,
           color: greyColor,
-          child: ClipOval(
-            child: Image.network(
-              (chat["avatar"] == null ||
-                      chat["avatar"] == '' ||
-                      chat["avatar"] == false)
-                  ? '${chat['type'].toString() == '1' ? groupAvatarUrl : avatarUrl}noAvatar.png'
-                  : '${chat['type'].toString() == '1' ? groupAvatarUrl : avatarUrl}${chat["avatar"].toString().replaceAll("AxB", "200x200")}',
+          child: CachedNetworkImage(
+            errorWidget: (context, url, error) => Material(
+              child: Image.asset(
+                'assets/preloader.gif',
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.of(context).size.width * 0.7,
+              ),
             ),
+            imageUrl: (chat.avatar == null || chat.avatar == '')
+                ? '${avatarUrl}noAvatar.png'
+                : '$avatarUrl${chat.avatar.toString().replaceAll("AxB", "200x200")}',
+            width: MediaQuery.of(context).size.width * 0.7,
+            height: MediaQuery.of(context).size.width * 0.7,
           ),
         ),
       ),
       title: Text(
-        chat["name"].toString().capitalize(),
+        chat.name.toString().capitalize(),
         maxLines: 1,
         style: TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
       ),
       subtitle: Text(
-        chat["last_message"].toString().length != 0
-            ? chat["last_message"]['text'].toString().length != 0
-                ? "${chat["last_message"]['text'].toString()[0].toUpperCase() + chat["last_message"]['text'].toString().substring(1)}"
-                : chat["last_message"]['message_for_type'] != null
-                    ? "${chat["last_message"]['message_for_type'][0].toUpperCase() + chat["last_message"]['message_for_type'].substring(1)}"
-                    : ""
-            : "",
+        chat.messagePreview == null ? chat.message : chat.messagePreview,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
         style: TextStyle(color: darkGreyColor2),
@@ -114,22 +110,20 @@ class _TestChatsListPageState extends State<TestChatsListPage>
         alignment: WrapAlignment.center,
         children: <Widget>[
           Text(
-            chat['last_message']["time"] == null
-                ? "null"
-                : _time(chat['last_message']["time"]),
+            _time(chat.messageTime),
             style: TextStyle(
               color: blackPurpleColor,
             ),
             textAlign: TextAlign.right,
           ),
-          chat['unread_messages'] == 0
+          chat.unreadCount == 0
               ? Container()
               : Container(
                   decoration: BoxDecoration(
                       color: brightGreyColor4,
                       borderRadius: BorderRadius.circular(10)),
                   child: Text(
-                    " ${chat['unread_messages']} ",
+                    "${chat.unreadCount}",
                     style: TextStyle(color: Colors.white),
                   ),
                 )
@@ -172,9 +166,12 @@ class _TestChatsListPageState extends State<TestChatsListPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: indigoAppBar(
-        context,
+      appBar: IndigoAppBarWidget(
         elevation: 0.5,
+        leading: SizedBox(
+          height: 0,
+          width: 0,
+        ),
         title: Text(
           localization.chats,
           style: TextStyle(
@@ -271,75 +268,47 @@ class _TestChatsListPageState extends State<TestChatsListPage>
               ),
             ),
           ),
-          _chatsList.isEmpty
-              ? InkWell(
-                  onTap: () {
-                    print("чат");
-                    Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ChatContactsPage()))
-                        .whenComplete(() {
-                      // ChatRoom.shared.contactController.close();
-                      // this is bool for check load more is needed or not
-                      ChatRoom.shared.forceGetChat();
-
-                      ChatRoom.shared.closeContactsStream();
+          NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification scrollInfo) {
+              if (!_isChatsLoading &&
+                  scrollInfo.metrics.pixels ==
+                      scrollInfo.metrics.maxScrollExtent) {
+                _loadMore();
+              }
+            },
+            child: Flexible(
+              child: ValueListenableBuilder(
+                  valueListenable:
+                      Hive.box<ChatModel>(HiveBoxes.chats).listenable(),
+                  builder: (context, Box box, widget) {
+                    List numbers = box.values.toList();
+                    numbers.sort((a, b) {
+                      return b.messageTime.compareTo(a.messageTime);
                     });
-                  },
-                  child: Container(
-                    color: Colors.white,
-                    child: Center(
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: <Widget>[
-                          Image.asset("assets/chat_animation.gif"),
-                          Container(
-                            child: Text(
-                              "${localization.noChats} \n${localization.clickToStart}",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              : NotificationListener<ScrollNotification>(
-                  onNotification: (ScrollNotification scrollInfo) {
-                    if (!_isChatsLoading &&
-                        scrollInfo.metrics.pixels ==
-                            scrollInfo.metrics.maxScrollExtent) {
-                      _loadMore();
-                    }
-                  },
-                  child: Flexible(
-                    child: ScrollablePositionedList.builder(
-                      itemCount: _chatsList.length,
+                    return ScrollablePositionedList.builder(
+                      itemCount: numbers.length,
                       itemBuilder: (BuildContext context, int i) {
+                        if (numbers.length == 0)
+                          return SizedBox(height: 0, width: 0);
                         return Slidable(
                           actionPane: SlidableDrawerActionPane(),
                           actionExtentRatio: 0.25,
                           secondaryActions: <Widget>[
                             IconSlideAction(
                               caption:
-                                  '${_chatsList[i]['mute'].toString() == '0' ? localization.mute : localization.unmute}',
-                              color: _chatsList[i]['mute'].toString() == '0'
-                                  ? redColor
-                                  : Colors.grey,
-                              icon: _chatsList[i]['mute'].toString() == '0'
-                                  ? Icons.volume_mute
-                                  : Icons.settings_backup_restore,
+                                  '${numbers.elementAt(i).isMuted == true ? localization.unmute : localization.mute}',
+                              color: numbers.elementAt(i).isMuted == true
+                                  ? Colors.grey
+                                  : redColor,
+                              icon: numbers.elementAt(i).isMuted == true
+                                  ? Icons.settings_backup_restore
+                                  : Icons.volume_mute,
                               onTap: () {
-                                _chatsList[i]['mute'].toString() == '0'
-                                    ? ChatRoom.shared
-                                        .muteChat(_chatsList[i]['id'], 1)
-                                    : ChatRoom.shared
-                                        .muteChat(_chatsList[i]['id'], 0);
-
-                                ChatRoom.shared.forceGetChat();
+                                numbers.elementAt(i).isMuted == true
+                                    ? ChatRoom.shared.muteChat(
+                                        numbers.elementAt(i).chatId, 1)
+                                    : ChatRoom.shared.muteChat(
+                                        numbers.elementAt(i).chatId, 0);
                               },
                             ),
                             IconSlideAction(
@@ -349,25 +318,25 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                               onTap: () {
                                 indigoCupertinoDialogAction(
                                   context,
-                                  '${localization.delete} ${localization.chat} ${_chatsList[i]['name']}?',
+                                  '${localization.delete} ${localization.chat} ${numbers.elementAt(i).name}?',
                                   isDestructiveAction: true,
                                   rightButtonText: localization.delete,
                                   rightButtonCallBack: () {
-                                    ChatRoom.shared
-                                        .deleteChat(_chatsList[i]['id']);
+                                    ChatRoom.shared.deleteChat(
+                                        numbers.elementAt(i).chatId);
                                     Navigator.pop(context);
                                   },
                                 );
-                                ChatRoom.shared.forceGetChat();
                               },
                             )
                           ],
-                          child: _chatListTile(_chatsList[i]),
+                          child: _chatListTile(numbers.elementAt(i)),
                         );
                       },
-                    ),
-                  ),
-                ),
+                    );
+                  }),
+            ),
+          ),
         ],
       ),
     );
@@ -377,19 +346,63 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     ChatRoom.shared.onNewChatsChange.listen((e) async {
       var cmd = e.json["cmd"];
       var data = e.json["data"];
-      print('C12312312HAT L12 $_chatsPage ${e.json}');
+      print('Chats list listen $_chatsPage ${e.json}');
       switch (cmd) {
         case "chats:get":
           if (_isChatsLoading) {
             if (data.isNotEmpty) {
               setState(() {
-                _chatsList.addAll(data);
+                data.forEach((chat) {
+                  Box<ChatModel> contactsBox =
+                      Hive.box<ChatModel>(HiveBoxes.chats);
+                  contactsBox.put(
+                    int.parse(chat['id'].toString()),
+                    ChatModel(
+                      name: chat['name'] as String,
+                      chatId: int.parse(chat['id'].toString()),
+                      chatType: chat['type'] as int,
+                      avatar: chat['avatar'] as String,
+                      isMuted: chat['mute'] == 0 ? false : true,
+                      unreadCount: chat['unread_messages'],
+                      messageTime:
+                          int.parse(chat['last_message']['time'].toString()),
+                      messageId: chat['last_message']['message_id'],
+                      messageAvatar: chat['last_message']['avatar'] as String,
+                      messagePreview:
+                          chat['last_message']['message_for_type'] as String,
+                      messageUsername: '${chat['last_message']['user_name']}',
+                      message: chat['last_message']['text'] as String,
+                    ),
+                  );
+                });
               });
               _chatsPage++;
             }
           } else {
             setState(() {
-              _chatsList = data;
+              data.forEach((chat) {
+                Box<ChatModel> contactsBox =
+                    Hive.box<ChatModel>(HiveBoxes.chats);
+                contactsBox.put(
+                  int.parse(chat['id'].toString()),
+                  ChatModel(
+                    name: chat['name'] as String,
+                    chatId: int.parse(chat['id'].toString()),
+                    chatType: chat['type'] as int,
+                    avatar: chat['avatar'] as String,
+                    isMuted: chat['mute'] == 0 ? false : true,
+                    unreadCount: chat['unread_messages'],
+                    messageTime:
+                        int.parse(chat['last_message']['time'].toString()),
+                    messageId: chat['last_message']['message_id'],
+                    messageAvatar: chat['last_message']['avatar'] as String,
+                    messagePreview:
+                        chat['last_message']['message_for_type'] as String,
+                    messageUsername: '${chat['last_message']['user_name']}',
+                    message: chat['last_message']['text'] as String,
+                  ),
+                );
+              });
               _chatsPage = 2;
             });
           }
@@ -397,110 +410,52 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           _isChatsLoading = false;
 
           break;
-
         case "user:writing":
-          print('writing $data');
-          var indexes = _chatsList.indexWhere((element) =>
-              element['id'].toString() == data[0]['chat_id'].toString());
-          var temp =
-              _chatsList[indexes]['last_message']['message_for_type'] == null
-                  ? _chatsList[indexes]['last_message']['text']
-                  : _chatsList[indexes]['last_message']['message_for_type'];
-          setState(() {
-            _chatsList[indexes]['last_message']['message_for_type'] = 'typing...';
-            _chatsList[indexes]['last_message']['text'] = 'typing...';
-          });
-          Future.delayed(Duration(seconds: 3), () {
-            setState(() {
-              _chatsList[indexes]['last_message']['message_for_type'] = temp;
-              _chatsList[indexes]['last_message']['text'] = temp;
-            });
+          Box<ChatModel> contactsBox = Hive.box<ChatModel>(HiveBoxes.chats);
+          ChatModel updatedChatValue;
+          int chatId;
+          List<String> typers = [];
+          data.forEach((element) {
+            updatedChatValue =
+                contactsBox.get(int.parse(element['chat_id'].toString()));
+            typers.add(element['name']);
+            chatId = element['chat_id'];
           });
 
-          // if (data[0]['chat_id'] == widget.chatId) {
-          //   typingProcessing = true;
-          //   setState(() {
-          //     _isSomeoneTyping = true;
-          //     data.toList().forEach((element) {
-          //       if (user.id != '${element['user_id']}')
-          //         setState(() {
-          //           _typingUsers.add(element['name']);
-          //         });
-          //       Future.delayed(Duration(seconds: 3), () {
-          //         if (typingProcessing) {
-          //           setState(() {
-          //             _typingUsers = [];
-          //           });
-          //         } else {
-          //           typingProcessing = false;
-          //         }
-          //       });
-          //     });
-          //   });
-          // }
+          String messagePreview = updatedChatValue.messagePreview;
+
+          updatedChatValue.messagePreview = 'Печатает ${typers.join(', ')}';
+
+          Future.delayed(Duration(seconds: 3), () {
+            updatedChatValue.messagePreview = messagePreview;
+            contactsBox.put(chatId, updatedChatValue);
+          });
+
+          contactsBox.put(chatId, updatedChatValue);
           break;
-        // case 'message:create':
-        // print(e.json["data"]);
-        // var senderId = e.json["data"]['user_id'].toString();
-        // var userId = user.id.toString();
-        // print('message create');
-        // if (senderId != userId) {
-        //   inAppPush(e.json["data"]);
-        // }
-        // break;
-        // case 'chats:get':
-        // setState(() {
-        // this is bool for check load more is needed or not
-        // if (globalBoolForForceGetChat == true) {
-        // e.json['data'].toList().forEach((element) {
-        // myList.add(element);
-        // });
-        // } else {
-        // myList = e.json['data'].toList();
-        // myList.map((element) {
-        //   updateOrInsertChat(ChatsModel.fromJson(element));
-        // }).toList();
-        // }
-        // chatsPage += 1;
-        // });
-        // break;
-        // case 'user:check':
-        // var data = e.json["data"];
-        // if (data['status'].toString() == 'true') {
-        //   // MyContact contact = MyContact(
-        //   //   phone: data['phone'],
-        //   //   id: data['user_id'],
-        //   //   avatar: data['avatar'],
-        //   //   name: data['name'],
-        //   //   chatId: data['chat_id'],
-        //   //   online: data['online'],
-        //   // );
-        //   // await _contactsDB.updateOrInsert(contact);
-        // }
-        // break;
+
         case "chat:delete":
-          ChatRoom.shared.forceGetChat();
+          Box<ChatModel> contactsBox = Hive.box<ChatModel>(HiveBoxes.chats);
+          contactsBox.delete(int.parse(data['chat_id'].toString()));
           break;
+
         case "chat:mute":
-          ChatRoom.shared.forceGetChat();
+          Box<ChatModel> contactsBox = Hive.box<ChatModel>(HiveBoxes.chats);
+          ChatModel updatedChatValue =
+              contactsBox.get(int.parse(data['chat_id'].toString()));
+          print('updates chat is ${data['chat_id']} $updatedChatValue');
+          updatedChatValue.isMuted = '${data['mute']}' == '0' ? true : false;
+          contactsBox.put(
+              int.parse(data['chat_id'].toString()), updatedChatValue);
+          ChatModel updatedChatValue2 =
+              contactsBox.get(int.parse(data['chat_id'].toString()));
+          print('updates chat is ${data['chat_id']} $updatedChatValue2');
           break;
+
         default:
           print("default in chats list ${e.json}");
           break;
       }
-    });
-  }
-
-  ChatsDB _chatsDB = ChatsDB();
-
-  Future _getChats() async {
-    Future<List<ChatsModel>> chats = _chatsDB.getAllSortedByTime();
-    chats.then((value) {
-      setState(() {
-        value.forEach((element) {
-          _chatsList.add(element.toJson());
-        });
-      });
     });
   }
 }

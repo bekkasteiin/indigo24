@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,25 +8,19 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/chat/chat_members_selection.dart';
-import 'package:indigo24/pages/chat/chat_user_profile.dart';
 import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/api.dart';
-import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/widgets/photo.dart';
+import 'package:indigo24/widgets/full_photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
-import 'chat.dart';
-import 'chat_list.dart';
 
 class ChatProfileInfo extends StatefulWidget {
   final chatName;
@@ -36,16 +28,16 @@ class ChatProfileInfo extends StatefulWidget {
   final chatId;
   final chatType;
   final memberCount;
-  final anotherUserPhone;
   final phone;
+  final userId;
   ChatProfileInfo({
     this.chatType,
-    this.anotherUserPhone,
     this.phone,
     this.chatId,
     this.chatName,
     this.chatAvatar,
     this.memberCount,
+    this.userId,
   });
   @override
   _ChatProfileInfoState createState() => _ChatProfileInfoState();
@@ -82,7 +74,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     // print('chatId ${widget.chatId}');
     // print('chatType ${widget.chatType}');
     // print('memberCount ${widget.memberCount}');
-    if (widget.chatAvatar != null) chatAvatar = widget.chatAvatar;
+    if (widget.chatAvatar != null && '${widget.chatAvatar}' != '')
+      chatAvatar = widget.chatAvatar;
     _isEditing = false;
 
     _chatMembersPage = 1;
@@ -101,12 +94,16 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     _chatTitleController = TextEditingController();
     _searchController = TextEditingController();
     _refreshController = RefreshController(initialRefresh: false);
-
-    _membersCount = widget.memberCount;
+    _membersCount = 0;
+    // _membersCount = widget.memberCount;
 
     _chatTitle = '${widget.chatName}';
     _listen();
-    ChatRoom.shared.chatMembers(widget.chatId, page: _chatMembersPage);
+    if (widget.chatId != null) {
+      ChatRoom.shared.chatMembers(widget.chatId, page: _chatMembersPage);
+    } else {
+      ChatRoom.shared.userCheckById(widget.userId);
+    }
     if (widget.chatName.length > 2) {
       _chatTitleController.text =
           '${_chatTitle[0].toUpperCase()}${_chatTitle.substring(1)}';
@@ -153,6 +150,11 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
           case "chat:members:privileges":
             ChatRoom.shared.chatMembers(widget.chatId);
             break;
+          case "check:user:id":
+            print('check user id');
+            // ChatRoom.shared.chatMembers(widget.chatId, page: _chatMembersPage);
+
+            break;
           case "chat:member:search":
             setState(() {
               _actualMembersList = [];
@@ -187,10 +189,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                   builder: (context) => ChatPage(
                     chatName: '${e.json['data']['name']}',
                     chatId: int.parse(e.json['data']['chat_id'].toString()),
-                    userIds: e.json['data']['user_id'].toString(),
                     chatType: 0,
                     avatar: '${e.json['data']['avatar']}',
-                    avatarUrl: '${e.json['data']['avatar_url']}',
                   ),
                 ),
               ).whenComplete(() {});
@@ -377,22 +377,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
           child: Text('${localization.watch}'),
           onPressed: () async {
             Navigator.pop(context);
-            var result = await Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider(
-                      "${widget.chatType.toString() == '1' ? groupAvatarUrl : avatarUrl}${chatAvatar.toString().replaceAll('AxB', '200x200')}"),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained * 3,
-                  backgroundDecoration:
-                      BoxDecoration(color: Colors.transparent),
-                ),
+                builder: (context) => FullPhoto(
+                    url:
+                        "$avatarUrl${chatAvatar.toString().replaceAll('AxB', '200x200')}"),
               ),
             );
-            setState(() {
-              chatAvatar = result;
-            });
           },
         ),
         CupertinoActionSheetAction(
@@ -431,7 +423,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
             buildProfileImageAction();
         } else {
           dynamic newMember = {'phone': widget.phone};
-          _memberAction(newMember);
+          newAction();
         }
       },
       child: Center(
@@ -471,171 +463,16 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                 height: 100,
                 width: 100,
                 color: greyColor,
-                child: widget.chatType.toString() == '1'
-                    ? CachedNetworkImage(
-                        imageUrl: chatAvatar != null
-                            ? '$groupAvatarUrl${chatAvatar}'
-                            : '${avatarUrl}noAvatar.png',
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: chatAvatar != null
-                            ? '$chatAvatar'
-                            : '${avatarUrl}noAvatar.png',
-                      ),
+                child: CachedNetworkImage(
+                  imageUrl: chatAvatar != null
+                      ? '$avatarUrl${widget.chatAvatar.replaceAll('AxB', '200x200')}'
+                      : '${avatarUrl}noAvatar.png',
+                ),
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  _adminAction(chatId, member) {
-    final act = CupertinoActionSheet(
-      title: Text('${localization.selectOption}'),
-      actions: <Widget>[
-        CupertinoActionSheetAction(
-          child: Text('${localization.watch}'),
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider(
-                      "${widget.chatType.toString() == '1' ? groupAvatarUrl : avatarUrl}${chatAvatar.toString().replaceAll('AxB', '200x200')}"),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained * 3,
-                  backgroundDecoration:
-                      BoxDecoration(color: Colors.transparent),
-                ),
-              ),
-            );
-          },
-        ),
-        CupertinoActionSheetAction(
-          child: Text('${localization.goToChat}'),
-          onPressed: () {
-            ChatRoom.shared.userCheck(member['phone']);
-            Navigator.pop(context);
-          },
-        ),
-        // CupertinoActionSheetAction(
-        //   child: Text('${localization.profile}'),
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //     ChatRoom.shared.chatController.close();
-        //     ChatRoom.shared.setChatUserProfileInfoStream();
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) => ChatUserProfilePage(
-        //           member,
-        //           name: member['user_name'],
-        //           phone: member['phone'],
-        //           email: member['email'],
-        //           image: member['avatar_url'] + member['avatar'],
-        //         ),
-        //       ),
-        //     ).whenComplete(
-        //       () {
-        //         ChatRoom.shared.closeCabinetInfoStream();
-        //       },
-        //     );
-        //   },
-        // ),
-        member['role'] == '$memberRole'
-            ? CupertinoActionSheetAction(
-                isDestructiveAction: true,
-                child: Text('${localization.delete}'),
-                onPressed: () {
-                  setState(() {
-                    _membersCount -= 1;
-                  });
-                  ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
-                  Navigator.pop(context);
-                },
-              )
-            : Center()
-      ],
-      cancelButton: CupertinoActionSheetAction(
-        child: Text('${localization.back}'),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act,
-    );
-  }
-
-  _memberAction(member) {
-    final act = CupertinoActionSheet(
-      title: Text('${localization.selectOption}'),
-      actions: <Widget>[
-        CupertinoActionSheetAction(
-          child: Text('${localization.watch}'),
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider(
-                      "${widget.chatType.toString() == '1' ? groupAvatarUrl : avatarUrl}${chatAvatar.toString().replaceAll('AxB', '200x200')}"),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained * 3,
-                  backgroundDecoration:
-                      BoxDecoration(color: Colors.transparent),
-                ),
-              ),
-            );
-          },
-        ),
-        CupertinoActionSheetAction(
-          child: Text('${localization.goToChat}'),
-          onPressed: () {
-            ChatRoom.shared.userCheck(member['phone']);
-            Navigator.pop(context);
-          },
-        ),
-        // CupertinoActionSheetAction(
-        //   child: Text('${localization.profile}'),
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //     ChatRoom.shared.chatController.close();
-        //     ChatRoom.shared.setChatUserProfileInfoStream();
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) => ChatUserProfilePage(
-        //           member,
-        //           name: member['user_name'],
-        //           phone: member['phone'],
-        //           email: member['email'],
-        //           image: member['avatar_url'] + member['avatar'],
-        //         ),
-        //       ),
-        //     ).whenComplete(
-        //       () {
-        //         ChatRoom.shared.closeCabinetInfoStream();
-        //       },
-        //     );
-        //   },
-        // ),
-      ],
-      cancelButton: CupertinoActionSheetAction(
-        child: Text('${localization.back}'),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act,
     );
   }
 
@@ -706,114 +543,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
         ));
     showCupertinoModalPopup(
         context: context, builder: (BuildContext context) => act);
-  }
-
-  _action(chatId, member) {
-    final act = CupertinoActionSheet(
-      title: Text('${localization.selectOption}'),
-      actions: <Widget>[
-        CupertinoActionSheetAction(
-          child: Text('${localization.watch}'),
-          onPressed: () {
-            Navigator.pop(context);
-            print('$avatarUrl$chatAvatar');
-            print('$avatarUrl$chatAvatar');
-            print('$avatarUrl$chatAvatar');
-            print('$avatarUrl$chatAvatar');
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FullScreenWrapper(
-                  imageProvider: CachedNetworkImageProvider(
-                      "$avatarUrl${chatAvatar.toString().replaceAll('AxB', '200x200')}"),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.contained * 3,
-                  backgroundDecoration:
-                      BoxDecoration(color: Colors.transparent),
-                ),
-              ),
-            );
-          },
-        ),
-        CupertinoActionSheetAction(
-          child: Text('${localization.goToChat}'),
-          onPressed: () {
-            ChatRoom.shared.userCheck(member['phone']);
-            Navigator.pop(context);
-          },
-        ),
-        // CupertinoActionSheetAction(
-        //   child: Text('${localization.watch}'),
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //     ChatRoom.shared.chatController.close();
-        //     ChatRoom.shared.setChatUserProfileInfoStream();
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) => ChatUserProfilePage(
-        //           member,
-        //           name: member['user_name'],
-        //           phone: member['phone'],
-        //           email: member['email'],
-        //           image: member['avatar_url'] + member['avatar'],
-        //         ),
-        //       ),
-        //     ).whenComplete(
-        //       () {
-        //         ChatRoom.shared.closeCabinetInfoStream();
-        //       },
-        //     );
-        //   },
-        // ),
-        CupertinoActionSheetAction(
-          child: member['role'] == '$memberRole'
-              ? Text('${localization.setAdmin}')
-              : member['role'] == '$adminRole'
-                  ? Text('${localization.makeMember}')
-                  : Text('${localization.error}'),
-          onPressed: () {
-            // print('${member['role']} $memberRole $adminRole $ownerRole');
-            switch (member['role'].toString()) {
-              case '$memberRole':
-                print('toAdmin');
-                ChatRoom.shared
-                    .changePrivileges(chatId, member['user_id'], '$adminRole');
-                break;
-              case '$adminRole':
-                print('toMember');
-                ChatRoom.shared
-                    .changePrivileges(chatId, member['user_id'], '$memberRole');
-                break;
-              default:
-            }
-            ChatRoom.shared.chatMembers(widget.chatId);
-            Navigator.pop(context);
-          },
-        ),
-        CupertinoActionSheetAction(
-          isDestructiveAction: true,
-          child: Text('${localization.delete}'),
-          onPressed: () {
-            setState(() {
-              _membersCount -= 1;
-            });
-            ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
-            Navigator.pop(context);
-          },
-        )
-      ],
-      cancelButton: CupertinoActionSheetAction(
-        child: Text('${localization.back}'),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act,
-    );
   }
 
   @override
@@ -1023,30 +752,12 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                                     // '${user.id}');
                                                     // memberAction(actualMembersList[i]);
                                                   } else {
-                                                    switch (_myPrivilege
-                                                        .toString()) {
-                                                      case '$ownerRole':
-                                                        print('ownerAction');
-                                                        _action(
-                                                            widget.chatId,
-                                                            _actualMembersList[
-                                                                i]);
-                                                        break;
-                                                      case '$adminRole':
-                                                        print('adminAction');
-                                                        _adminAction(
-                                                            widget.chatId,
-                                                            _actualMembersList[
-                                                                i]);
-                                                        break;
-                                                      case '$memberRole':
-                                                        print('memberAction');
-                                                        _memberAction(
-                                                            _actualMembersList[
-                                                                i]);
-                                                        break;
-                                                      default:
-                                                    }
+                                                    newAction(
+                                                      myPrivilege: _myPrivilege,
+                                                      member:
+                                                          _actualMembersList[i],
+                                                      chatId: widget.chatId,
+                                                    );
                                                   }
                                                   // ChatRoom.shared.checkUserOnline(ids);
                                                   // ChatRoom.shared
@@ -1187,6 +898,115 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
           ),
         ),
       ),
+    );
+  }
+
+  newAction({String myPrivilege, dynamic member, dynamic chatId}) {
+    List<Widget> actions = [
+      CupertinoActionSheetAction(
+        child: Text('${localization.watch}'),
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FullPhoto(
+                url:
+                    "$avatarUrl${member['avatar'].toString().replaceAll('AxB', '200x200')}",
+              ),
+            ),
+          );
+        },
+      ),
+      CupertinoActionSheetAction(
+        child: Text('${localization.goToChat}'),
+        onPressed: () {
+          ChatRoom.shared.userCheckById(member);
+          Navigator.pop(context);
+        },
+      ),
+    ];
+
+    List<Widget> ownerActions = [
+      CupertinoActionSheetAction(
+        child: member['role'] == '$memberRole'
+            ? Text('${localization.setAdmin}')
+            : member['role'] == '$adminRole'
+                ? Text('${localization.makeMember}')
+                : Text('${localization.error}'),
+        onPressed: () {
+          switch (member['role'].toString()) {
+            case '$memberRole':
+              ChatRoom.shared
+                  .changePrivileges(chatId, member['user_id'], '$adminRole');
+              break;
+            case '$adminRole':
+              ChatRoom.shared
+                  .changePrivileges(chatId, member['user_id'], '$memberRole');
+              break;
+            default:
+          }
+          ChatRoom.shared.chatMembers(widget.chatId);
+          Navigator.pop(context);
+        },
+      ),
+      CupertinoActionSheetAction(
+        isDestructiveAction: true,
+        child: Text('${localization.delete}'),
+        onPressed: () {
+          setState(() {
+            _membersCount -= 1;
+          });
+          ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
+          ChatRoom.shared.chatMembers(widget.chatId);
+          Navigator.pop(context);
+        },
+      )
+    ];
+
+    List<Widget> adminActions = [
+      member['role'] == '$memberRole'
+          ? CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              child: Text('${localization.delete}'),
+              onPressed: () {
+                setState(() {
+                  _membersCount -= 1;
+                });
+                ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
+                Navigator.pop(context);
+              },
+            )
+          : Center()
+    ];
+
+    switch (myPrivilege) {
+      case '$ownerRole':
+        print('ownerAction');
+        actions.addAll(ownerActions);
+        break;
+      case '$adminRole':
+        print('adminAction');
+        actions.addAll(adminActions);
+        break;
+      case '$memberRole':
+        print('memberAction');
+        break;
+      default:
+    }
+    final act = CupertinoActionSheet(
+      title: Text('${localization.selectOption}'),
+      actions: actions,
+      cancelButton: CupertinoActionSheetAction(
+        child: Text('${localization.back}'),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => act,
     );
   }
 

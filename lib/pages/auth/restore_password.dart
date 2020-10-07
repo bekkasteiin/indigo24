@@ -21,21 +21,16 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   Api _api = Api();
   TextEditingController _loginController;
   TextEditingController _passwordController;
-  var _countryId = 0;
-  var _country;
   var _countries = List<Country>();
   var _phonePrefix = '77';
   String _currentCountry = "Казахстан";
   var _selectedCountry;
 
   CountryDao _countryDao = CountryDao();
-  var _length;
   _getCountries() async {
     var list = await _countryDao.getAll();
     setState(() {
       _countries = list;
-      _country = _countries[_countryId];
-      _length = _country.length;
     });
   }
 

@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:gallery_saver/gallery_saver.dart';
-import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:photo_view/photo_view.dart';
@@ -83,9 +82,6 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
 
   @override
   void initState() {
-    print('new url $url');
-    print('new url $url');
-    print('new url $url');
     super.initState();
     _controller = new SwiperController();
   }
@@ -262,6 +258,9 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
 
   void _saveNetworkImage(url) async {
     GallerySaver.saveImage(url).then((bool success) {
+      setState(() {
+        print('Image is saved');
+      });
       if (success)
         setState(() {
           showAlertDialog(

@@ -6,6 +6,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class RefillPage extends StatefulWidget {
   @override
@@ -86,11 +87,14 @@ class _RefillPageState extends State<RefillPage> {
                     padding: EdgeInsets.symmetric(vertical: 10),
                   ),
                   Center(
-                    child:
-                        Text('${localization.commission} $refillCommission%'),
+                    child: Text(
+                      '${localization.commission} $refillCommission%',
+                    ),
                   ),
                   Center(
-                    child: Text('${localization.minAmount} $refillMin KZT'),
+                    child: Text(
+                      '${localization.minAmount} $refillMin KZT',
+                    ),
                   ),
                   Center(
                     child: Text(
@@ -98,7 +102,9 @@ class _RefillPageState extends State<RefillPage> {
                     ),
                   ),
                   Center(
-                    child: Text('${localization.maxAmount} $refillMax KZT'),
+                    child: Text(
+                      '${localization.maxAmount} $refillMax KZT',
+                    ),
                   ),
                   Container(
                     color: Colors.white,
@@ -257,32 +263,16 @@ class _RefillPageState extends State<RefillPage> {
         return false;
       },
       child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          brightness: Brightness.light,
+        appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.refill}",
+            localization.refill,
             style: TextStyle(
-              color: Colors.black,
+              color: blackPurpleColor,
               fontSize: 22,
               fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
           ),
-          backgroundColor: Colors.white,
         ),
         body: SafeArea(
           child: WebviewScaffold(

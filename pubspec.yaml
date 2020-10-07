@@ -64,12 +64,17 @@ dependencies:
   package_info: ^0.4.1
   flutter_cache_manager: any
   http: ^0.12.2
+  hive: ^1.4.4
+  hive_flutter: ^0.3.0+2
+  flutter_audio_recorder: ^0.5.5
 
-  
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  hive_generator: ^0.7.0+2
+  build_runner: ^1.8.0 
+    
+  
 flutter:
 
   uses-material-design: true

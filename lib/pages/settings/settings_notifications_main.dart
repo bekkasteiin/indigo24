@@ -18,18 +18,13 @@ class SettingsNotificationsMainPage extends StatefulWidget {
 class _SettingsNotificationsMainPageState
     extends State<SettingsNotificationsMainPage> {
   bool _isHideNotificationsSwitched;
-  bool _isPreviewMessageSwitched;
   Map<String, dynamic> settings;
   @override
   void initState() {
     super.initState();
     settings = widget.settings['settings'];
-    print(settings['chat_all_mute'].toString() == '1');
-    print(settings['chat_all_mute'].toString() == '1');
-
     _isHideNotificationsSwitched =
         settings['chat_all_mute'].toString() == '1' ? true : false;
-    _isPreviewMessageSwitched = false;
   }
 
   @override

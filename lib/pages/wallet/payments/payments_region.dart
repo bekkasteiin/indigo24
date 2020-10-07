@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
-
-import 'payments_history.dart';
-import 'payments_service.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/service_widget.dart';
 import 'payments_services.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -28,7 +26,6 @@ class _PaymentsRegionState extends State<PaymentsRegion> {
     super.initState();
 
     _api = Api();
-    print('location type is ${widget.locationType}');
     _api.getCategory(widget.categoryId, widget.locationType).then((categories) {
       if (categories['message'] == 'Not authenticated' &&
           categories['success'].toString() == 'false') {
@@ -57,7 +54,16 @@ class _PaymentsRegionState extends State<PaymentsRegion> {
         }
       },
       child: Scaffold(
-        appBar: _buildAppBar(),
+        appBar: IndigoAppBarWidget(
+          title: Text(
+            localization.payments,
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
         body: _categories != null
             ? SafeArea(
                 child: Column(
@@ -66,17 +72,29 @@ class _PaymentsRegionState extends State<PaymentsRegion> {
                       child: ListView.builder(
                         padding: EdgeInsets.only(bottom: 20),
                         shrinkWrap: true,
-                        itemCount: _categories["items"] != null
-                            ? _categories["items"].length
+                        itemCount: _categories['items'] != null
+                            ? _categories['items'].length
                             : 0,
                         itemBuilder: (BuildContext context, int index) {
+                          dynamic category = _categories['items'][index];
+                          String categoryTitle = category['location_name'];
                           return Padding(
                             padding: const EdgeInsets.only(top: 10),
-                            child: _paymentsList(
-                              context,
-                              _categories["items"][index]['location_name'],
-                              _categories['items'][index]['categoryID'],
-                              _categories["items"][index]['location_id'],
+                            child: ServiceWidget(
+                              title: categoryTitle,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentsServices(
+                                      category['categoryID'],
+                                      categoryTitle,
+                                      locationId: category['location_id'],
+                                      locationType: widget.locationType,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           );
                         },
@@ -88,95 +106,6 @@ class _PaymentsRegionState extends State<PaymentsRegion> {
             : Center(
                 child: CircularProgressIndicator(),
               ),
-      ),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        "${localization.payments}",
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      backgroundColor: Colors.white,
-    );
-  }
-
-  Container _paymentsList(
-      BuildContext context, String name, int index, locationId) {
-    return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, top: 10),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
-      child: ButtonTheme(
-        height: 40,
-        child: RaisedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentsServices(
-                  index,
-                  name,
-                  locationId: locationId,
-                  locationType: widget.locationType,
-                ),
-              ),
-            );
-          },
-          child: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 35,
-                  height: 40,
-                  margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
-                ),
-                Container(width: 10),
-                Expanded(
-                  child: Text(
-                    '$name',
-                    style: TextStyle(fontSize: 14, color: blackPurpleColor),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          color: whiteColor,
-          textColor: blackPurpleColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              10.0,
-            ),
-          ),
-        ),
       ),
     );
   }

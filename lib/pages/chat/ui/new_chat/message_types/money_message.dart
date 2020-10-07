@@ -4,16 +4,11 @@ import 'package:indigo24/style/colors.dart';
 
 class MoneyMessageWidget extends StatefulWidget {
   final String amount;
-  final String username;
-  final String userAvatar;
+  final moneyData;
   final int category;
-  const MoneyMessageWidget({
-    Key key,
-    @required this.amount,
-    @required this.username,
-    @required this.category,
-    @required this.userAvatar,
-  }) : super(key: key);
+  const MoneyMessageWidget(
+      {Key key, @required this.amount, @required this.category, this.moneyData})
+      : super(key: key);
   @override
   _MoneyMessageWidgetState createState() => _MoneyMessageWidgetState();
 }
@@ -38,14 +33,15 @@ class _MoneyMessageWidgetState extends State<MoneyMessageWidget> {
                   color: greyColor,
                   image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: NetworkImage('$avatarUrl${widget.userAvatar}'),
+                    image:
+                        NetworkImage('$avatarUrl${widget.moneyData['avatar']}'),
                   ),
                 ),
               ),
               SizedBox(width: 5),
               Flexible(
                 child: Text(
-                  "${widget.username}",
+                  "${widget.moneyData['name']}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -59,7 +55,7 @@ class _MoneyMessageWidgetState extends State<MoneyMessageWidget> {
           SizedBox(height: 5),
           Flexible(
             child: Text(
-              (widget.category == 0 ? '-' : '+') + '${widget.amount} KZT',
+              '${widget.amount} KZT',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(

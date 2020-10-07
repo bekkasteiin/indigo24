@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +11,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/circle.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -43,21 +44,13 @@ class PaymentsServicePage extends StatefulWidget {
 class _PaymentsServicePageState extends State<PaymentsServicePage> {
   bool isCalculated;
 
-  int _accountLength;
-
   Api _api;
 
   StreamController<bool> _verificationNotifier;
 
   RegExp _accountRegex;
-  String _amountPlaceholder = '';
-  String _accountPlaceholder = '';
 
-  MaskTextInputFormatter _loginFormatter;
   Map<String, dynamic> _service;
-
-  TextEditingController _receiverController;
-  TextEditingController _sumController;
 
   double _amount = 0.0;
   double _exchangeRate = 0.0;
@@ -67,41 +60,27 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   String accountExample;
   String amountExample;
 
+  RegExp anyRegExp = RegExp(r'.');
+
+  List<Map<String, dynamic>> controllers = [];
+  String account = '';
+  String sum = '';
   @override
   void initState() {
     super.initState();
     isCalculated = false;
     _verificationNotifier = StreamController<bool>.broadcast();
 
-    _receiverController = TextEditingController();
-    _sumController = TextEditingController();
-
     _api = Api();
 
     _api.getService(widget.serviceID).then((getServiceResult) {
-      print('get servies is $getServiceResult');
       getServiceResult['result'].forEach((element) {
-        if ('${element['name']}' == 'amount') {
-          _amountPlaceholder = element['placeholder'];
-        }
-        if ('${element['name']}' == 'account') {
-          _accountPlaceholder = element['placeholder'];
-          accountExample = '${element['mask']}';
-
-          _accountRegex = RegExp(r'' + element['regex']);
-          RegExp anyRegExp = RegExp(r'.');
-
-          if (element['mask'] == ' ') {
-            _loginFormatter = MaskTextInputFormatter(filter: {"*": anyRegExp});
-          } else {
-            print('else else $element');
-            if (element['mask'].toString() != 'null') {
-              _accountLength = element['mask'].length;
-            }
-            _loginFormatter = MaskTextInputFormatter(
-                mask: '${element['mask']}', filter: {"*": anyRegExp});
-          }
-        }
+        TextEditingController elementController = TextEditingController(
+            text: element['mask'].toString() != 'null'
+                ? element['mask'].replaceAll('*', '').replaceAll(' ', '')
+                : '');
+        controllers
+            .add({'name': element['name'], 'controller': elementController});
       });
       setState(() {
         _service = getServiceResult;
@@ -109,18 +88,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     });
 
     if (widget.account != null) {
-      setState(() {
-        _receiverController.text = widget.account;
-        _sumController.text = widget.amount;
-      });
+      setState(() {});
     }
   }
 
   @override
   void dispose() {
     super.dispose();
-    _receiverController.dispose();
-    _sumController.dispose();
     _verificationNotifier.close();
   }
 
@@ -148,9 +122,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                               ),
                               Column(
                                 children: <Widget>[
-                                  AppBar(
+                                  IndigoAppBarWidget(
                                     centerTitle: true,
-                                    title: Text("${localization.payments}"),
+                                    title: Text(localization.payments),
                                     leading: IconButton(
                                       icon: Container(
                                         padding: EdgeInsets.all(10),
@@ -238,13 +212,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                               color: darkGreyColor2,
                                             ),
                                           ),
-                                          Text(
-                                            '${_receiverController.text}',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              color: blackPurpleColor,
-                                            ),
-                                          )
                                         ],
                                       ),
                                       Row(
@@ -268,11 +235,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                                 ),
                                               ),
                                               SizedBox(width: 5),
-                                              Image.network(
-                                                '${widget._logo}',
+                                              Container(
                                                 width: 30,
                                                 height: 30,
-                                              )
+                                                child: CachedNetworkImage(
+                                                  imageUrl: '${widget._logo}',
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -421,31 +390,30 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       Widget cancelButton,
       List<String> digits}) {
     Navigator.push(
-        context,
-        PageRouteBuilder(
-          opaque: opaque,
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              PasscodeScreen(
-            withPin: withPin,
-            title: '$title',
-            passwordEnteredCallback: _onPasscodeEntered,
-            cancelButton: cancelButton,
-            deleteButton: Text(
-              'Delete',
-              style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
-              semanticsLabel: 'Delete',
-            ),
-            shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: Color(0xFFF7F7F7),
-            cancelCallback: _onPasscodeCancelled,
-            digits: digits,
+      context,
+      PageRouteBuilder(
+        opaque: opaque,
+        pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+          withPin: withPin,
+          title: '$title',
+          passwordEnteredCallback: _onPasscodeEntered,
+          cancelButton: cancelButton,
+          deleteButton: Text(
+            'Delete',
+            style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
+            semanticsLabel: 'Delete',
           ),
-        ));
+          shouldTriggerVerification: _verificationNotifier.stream,
+          backgroundColor: Color(0xFFF7F7F7),
+          cancelCallback: _onPasscodeCancelled,
+          digits: digits,
+        ),
+      ),
+    );
   }
 
   _onPasscodeEntered(String enteredPasscode) {
     if ('${user.pin}'.toString() == 'false') {
-      print('set pin');
       _api.createPin(enteredPasscode);
     }
 
@@ -456,22 +424,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     Future.delayed(const Duration(milliseconds: 250), () {
       if (isValid) {
         _onPasscodeCancelled();
-        // api
-        //     .paymentProceed(
-        //         widget.serviceID,
-        //         '${receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-        //         expectedAmount)
-        //     .then((result) {
-        //   showAlertDialog(context, '1', '${result['message']}');
-        //   api.getBalance().then((result) {
-        //     setState(() {});
-        //   });
-        // });
         _api
-            .payService(
-                widget.serviceID,
-                '${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-                _sumController.text)
+            .payService(widget.serviceID, '${account.replaceAll('+', '')}', sum)
             .then((services) {
           if (services['message'] == 'Not authenticated' &&
               services['success'].toString() == 'false') {
@@ -511,109 +465,78 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
-            if (_receiverController.text.isNotEmpty &
-                _sumController.text.isNotEmpty) {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus) {
-                currentFocus.unfocus();
-              }
+            int amountControllerIndex = controllers
+                .indexWhere((element) => element['name'] == 'account');
+            account = controllers[amountControllerIndex]['controller']
+                .text
+                .toString()
+                .replaceAll(' ', '');
 
-              if (_receiverController.text.isNotEmpty &
-                  _sumController.text.isNotEmpty) {
-                // String str =
-                //     "${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
-                // bool matches = _accountRegex.hasMatch(str);
-                // if (int.parse(_sumController.text) >=
-                //     _service['service']['min']) {
-                //   if (int.parse(_sumController.text) <=
-                //       _service['service']['max']) {
-                //     if (matches) {
-                //       await _showLockScreen(
-                //         context,
-                //         '${localization.enterPin}',
-                //         opaque: false,
-                //         cancelButton: Text(
-                //           'Cancel',
-                //           style: TextStyle(
-                //             fontSize: 16,
-                //             color: Color(0xFF001D52),
-                //           ),
-                //           semanticsLabel: 'Cancel',
-                //         ),
-                //       );
-                //     } else {
-                //       showAlertDialog(
-                //           context, '0', '${localization.enterValidAccount}');
-                //     }
-                //   } else {
-                //     showAlertDialog(
-                //         context, '0', '${localization.enterBelowMax}');
-                //   }
-                // } else {
-                //   showAlertDialog(
-                //       context, '0', '${localization.enterAboveMin}');
-                // }
-                if (widget.isConvertable == 0 || isCalculated == true) {
-                  String str =
-                      "${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}";
-                  bool matches = _accountRegex.hasMatch(str);
-                  if (int.parse(_sumController.text) >=
-                      _service['service']['min']) {
-                    if (int.parse(_sumController.text) <=
-                        _service['service']['max']) {
-                      if (matches) {
-                        await _showLockScreen(
-                          context,
-                          '${localization.enterPin}',
-                          opaque: false,
-                          cancelButton: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF001D52),
-                            ),
-                          ),
-                        );
-                      } else {
-                        showAlertDialog(
-                            context, '0', '${localization.enterValidAccount}');
-                      }
-                    } else {
-                      showAlertDialog(
-                          context, '0', '${localization.enterBelowMax}');
-                    }
+            int sumControllerIndex = controllers
+                .indexWhere((element) => element['name'] == 'amount');
+            sum = controllers[sumControllerIndex]['controller']
+                .text
+                .replaceAll(' ', '');
+
+            if (widget.isConvertable == 0 || isCalculated == true) {
+              String str =
+                  "${controllers[amountControllerIndex]['controller'].text.replaceAll(' ', '').replaceAll('+', '')}";
+              bool matches = _accountRegex.hasMatch(str);
+              if (int.parse(account) >= _service['service']['min']) {
+                if (int.parse(sum) >= _service['service']['max']) {
+                  if (matches) {
+                    await _showLockScreen(
+                      context,
+                      '${localization.enterPin}',
+                      opaque: false,
+                      cancelButton: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF001D52),
+                        ),
+                      ),
+                    );
                   } else {
                     showAlertDialog(
-                        context, '0', '${localization.enterAboveMin}');
+                        context, '0', '${localization.enterValidAccount}');
                   }
                 } else {
-                  print('ptinr');
-                  _api
-                      .calculateSum(
-                          widget.serviceID,
-                          '${_receiverController.text.replaceAll(' ', '').replaceAll('+', '')}',
-                          _sumController.text,
-                          widget.providerId)
-                      .then((result) {
-                    print(result);
-                    if (result['message'] == 'Not authenticated' &&
-                        result['success'].toString() == 'false') {
-                      logOut(context);
-                    } else if (result['success'].toString() == 'true') {
-                      print('this is $result');
-                      setState(() {
-                        isCalculated = true;
-                        _amount = double.parse(result['Amount'].toString());
-                        _exchangeRate =
-                            double.parse(result['ExchangeRate'].toString());
-                        _expectedAmount =
-                            double.parse(result['ExpectedAmount'].toString());
-                        _expectedCurrency = result['ExpectedCurrency'];
-                      });
-                    }
-                  });
+                  showAlertDialog(context, '0',
+                      '${localization.enterBelowMax} ${int.parse(controllers[1]['controller'].text.replaceAll(' ', '')) < _service['service']['max']} ${_service['service']['max']}');
                 }
+              } else {
+                showAlertDialog(context, '0', '${localization.enterAboveMin}');
               }
+            } else {
+              print('ptinr $sum ${controllers[1]['controller'].text}');
+              _api
+                  .calculateSum(
+                      widget.serviceID,
+                      '${account.replaceAll(' ', '').replaceAll('+', '')}',
+                      int.parse(sum),
+                      widget.providerId)
+                  .then((result) {
+                print(' calculated is $result');
+                if (result['message'] == 'Not authenticated' &&
+                    result['success'].toString() == 'false') {
+                  logOut(context);
+                } else if (result['success'].toString() == 'true') {
+                  print('this is $result');
+                  setState(() {
+                    isCalculated = true;
+                    _amount = double.parse(result['Amount'].toString());
+                    _exchangeRate =
+                        double.parse(result['ExchangeRate'].toString());
+                    _expectedAmount =
+                        double.parse(result['ExpectedAmount'].toString());
+                    _expectedCurrency = result['ExpectedCurrency'];
+                  });
+                } else {
+                  showAlertDialog(
+                      context, '${localization.error}', '${result['message']}');
+                }
+              });
             }
           },
           child: Container(
@@ -646,79 +569,83 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            width: MediaQuery.of(context).size.width,
-            color: Colors.white,
-            padding: EdgeInsets.only(top: 20),
-            child: Text(
-              '${widget.title}',
-              maxLines: 3,
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFF001D52),
-              ),
-            ),
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      child: TextFormField(
-                        inputFormatters: [
-                          _loginFormatter,
-                          _accountLength != null
-                              ? LengthLimitingTextInputFormatter(_accountLength)
-                              : LengthLimitingTextInputFormatter(50),
-                        ],
-                        decoration: InputDecoration.collapsed(
-                          hintText: _accountPlaceholder,
-                        ),
-                        controller: _receiverController,
-                        style: TextStyle(fontSize: 20),
+            padding: EdgeInsets.only(top: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Container(
+                    color: Colors.white,
+                    child: Text(
+                      '${widget.title}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF001D52),
                       ),
                     ),
-                    Text('${localization.example} $accountExample')
-                  ],
+                  ),
                 ),
-              ),
-              Container(
-                width: 40,
-                child: Image.network('${widget._logo}', width: 40.0),
-              ),
-            ],
+                Container(
+                  width: 30,
+                  child: CachedNetworkImage(imageUrl: '${widget._logo}'),
+                ),
+              ],
+            ),
+          ),
+          ListView.separated(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              MaskTextInputFormatter elementFormatter;
+              if ('${snapshot['result'][index]['mask']}' != 'null') {
+                elementFormatter = MaskTextInputFormatter(
+                  mask: '${snapshot['result'][index]['mask']}',
+                  filter: {"*": anyRegExp},
+                );
+              } else {
+                elementFormatter = MaskTextInputFormatter(
+                  filter: {"*": anyRegExp},
+                  mask: '***************************************',
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          child: TextFormField(
+                            inputFormatters: [
+                              elementFormatter,
+                              LengthLimitingTextInputFormatter(50),
+                            ],
+                            decoration: InputDecoration.collapsed(
+                              hintText:
+                                  '${snapshot['result'][index]['placeholder']}',
+                            ),
+                            controller: controllers[index]['controller'],
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                        Text(
+                            '${snapshot['result'][index]['mask'].toString() != 'null' ? localization.example + ' ' + snapshot['result'][index]['mask'] : ' '}')
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+            separatorBuilder: (context, index) {
+              return Text('');
+            },
+            itemCount: snapshot['result'].length,
           ),
           Container(
             height: 1.0,
             color: Colors.grey,
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: TextFormField(
-                        controller: _sumController,
-                        decoration: InputDecoration.collapsed(
-                            hintText: _amountPlaceholder),
-                        style: TextStyle(fontSize: 20),
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(
-                            _service['service']['max'].toString().length,
-                          ),
-                          BlacklistingTextInputFormatter(
-                              new RegExp(r"^(?!(0))$")),
-                        ],
-                        onChanged: (value) {},
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         ],
       ),

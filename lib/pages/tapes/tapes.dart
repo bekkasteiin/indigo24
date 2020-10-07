@@ -9,6 +9,7 @@ import 'package:indigo24/pages/tapes/add_tape.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/video/flick_multi_manager.dart';
 import 'package:indigo24/widgets/video/flick_multi_player.dart';
 import 'package:photo_view/photo_view.dart';
@@ -45,7 +46,6 @@ class _TapesPageState extends State<TapesPage>
 
   @override
   void initState() {
-    print("tapes init state");
     _getTapeFromDb();
     _getTapes();
     super.initState();
@@ -77,8 +77,6 @@ class _TapesPageState extends State<TapesPage>
         logOut(context);
         return true;
       } else {
-        // print(tapeDb.getAll());
-        // print(tapeDb.getAll());
         return _setTapes(tapes);
       }
     });
@@ -244,11 +242,13 @@ class _TapesPageState extends State<TapesPage>
   // ignore: must_call_super
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          brightness: Brightness.light,
+        appBar: IndigoAppBarWidget(
+          leading: SizedBox(
+            height: 0,
+            width: 0,
+          ),
           title: Text(
-            "${localization.tape}",
+            localization.tape,
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,
@@ -274,23 +274,15 @@ class _TapesPageState extends State<TapesPage>
                     builder: (context) => AddTapePage(),
                   ),
                 );
-                // .whenComplete(() {
-                //   print("GET TAPES AFTER ADDING");
-                //   flickMultiManager.removeAll();
-                //   rebuildTape();
-                // });
                 if (response != null) {
-                  print("RESULT $response");
                   setState(() {
                     _result.insert(0, response);
                     _flickMultiManager = new FlickMultiManager();
                   });
-                  print("Result index 0: ${_result[0]}");
                 }
               },
             )
           ],
-          backgroundColor: Colors.white,
         ),
         body: Container(
           color: Colors.white,

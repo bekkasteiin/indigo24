@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
@@ -165,8 +164,8 @@ class Api {
   }
 
   getNews() async {
-    return _getRequest('https://postman-echo.com/get?foo1=bar1&foo2=bar2',
-        null); // TODO CHANGE URL PATH
+    // return _getRequest('https://postman-echo.com/get?foo1=bar1&foo2=bar2',
+    // null); // TODO CHANGE URL PATH
   }
 
   getHistoryBalance(page) async {

@@ -18,7 +18,7 @@ class _DividerMessageWidgetState extends State<DividerMessageWidget> {
         padding: EdgeInsets.all(5),
         width: MediaQuery.of(context).size.width / 2,
         decoration: BoxDecoration(
-          color: whiteColor.withOpacity(0.9),
+          color: whiteColor,
           borderRadius: BorderRadius.all(
             Radius.circular(15),
           ),

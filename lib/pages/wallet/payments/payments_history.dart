@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,7 +6,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../filter.dart';
@@ -72,13 +73,23 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   @override
   void dispose() {
+    _filterController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(),
+        appBar: IndigoAppBarWidget(
+          title: Text(
+            localization.payments,
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
         body: _paymentHistroyBody(_resultList, context));
   }
 
@@ -226,15 +237,13 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   Container _paymentLogo(String logo) {
     return Container(
+      height: 40,
+      width: 40,
       margin: EdgeInsets.only(right: 10),
       alignment: Alignment.topCenter,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
-        child: Image.network(
-          '${logo.replaceAll("AxB", "200x200")}',
-          width: 50.0,
-          height: 50,
-        ),
+        child: CachedNetworkImage(imageUrl: '$logo'),
       ),
     );
   }
@@ -317,36 +326,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     );
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        localization.payments,
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      backgroundColor: Colors.white,
-    );
-  }
-
   Future _loadData() async {
     _api.getHistories(_page).then((histories) {
       print(histories);
@@ -367,7 +346,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          // width: MediaQuery.of(context).size.width / 1.5,
           margin: EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,

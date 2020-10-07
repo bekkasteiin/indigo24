@@ -1,31 +1,26 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/divider_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/audio_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/image_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/message_category.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/service_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/text_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/video_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/received_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/sended_message.dart';
-import 'package:indigo24/style/colors.dart';
+import '../new_chat/message_types/audio_message.dart';
+import '../new_chat/message_types/image_message.dart';
+import 'message_category.dart';
+import '../new_chat/message_types/service_message.dart';
+import '../new_chat/message_types/text_message.dart';
+import '../new_chat/message_types/video_message.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-import 'new_ui/document_message.dart';
-import 'new_ui/forward_message.dart';
-import 'new_ui/link_message.dart';
-import 'new_ui/message_frame.dart';
-import 'new_ui/money_message.dart';
-import 'new_ui/reply_message.dart';
-import 'new_ui/sticker_message.dart';
+import '../new_chat/message_types/document_message.dart';
+import '../new_chat/message_types/forward_message.dart';
+import '../new_chat/message_types/link_message.dart';
+import 'message_frame.dart';
+import '../new_chat/message_types/money_message.dart';
+import '../new_chat/message_types/reply_message.dart';
+import '../new_chat/message_types/sticker_message.dart';
 
 class MessageWidget extends StatelessWidget {
   final int messageCategory;
   final int chatType;
-  final dynamic message;
+  final message;
 
   const MessageWidget({
     Key key,
@@ -40,7 +35,7 @@ class MessageWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                message['user_name'],
+                message.username,
                 style: TextStyle(
                   color: Colors.orange,
                   fontWeight: FontWeight.w500,
@@ -77,17 +72,15 @@ class MessageWidget extends StatelessWidget {
     //       text: '$message');
     //   return ForwardMessageWidget(text: 'forward: ${message}');
     // }
-    // return Text('$message');
     switch (messageType) {
       case 0:
         return TextMessageWidget(text: message);
         break;
       case 1:
         return ImageMessageWidget(
-          text: '${message['text']}',
-          url: message['attachment_url'],
-          media: message['attachments'] != null && message['attachments'] != ''
-              ? json.decode(message['attachments'])[0]['filename']
+          text: '${message.text}',
+          media: message.attachments != null && message.attachments != ''
+              ? json.decode(message.attachments)[0]['filename']
               : null,
         );
         break;
@@ -97,9 +90,10 @@ class MessageWidget extends StatelessWidget {
         break;
       case 3:
         return AudioMessageWidget(
-          text: '${message['text']}',
-          mediaUrl: message['attachment_url'],
-          media: json.decode(message['attachments'])[0]['filename'],
+          text: '${message.text}',
+          media: message.attachments != null
+              ? json.decode(message.attachments)[0]['filename']
+              : null,
         );
         break;
       // case 5:
@@ -107,39 +101,35 @@ class MessageWidget extends StatelessWidget {
       //   break;
       case 4:
         return VideoMessageWidget(
-          text: '${message['text']}',
-          mediaUrl: message['attachment_url'],
-          media: message['attachments'] != null
-              ? json.decode(message['attachments'])[0]['filename']
+          text: '${message.text}',
+          media: '${message.attachments}' != 'null'
+              ? json.decode(message.attachments)[0]['filename']
               : null,
         );
         break;
       case 7:
-        return DeviderMessageWidget(text: message['text']);
+        return DeviderMessageWidget(text: message.text);
         break;
       case 10:
         return ReplyMessageWidget(text: message);
         break;
       case 11:
         return MoneyMessageWidget(
-          amount: message['text'],
-          username: message['another_user_name'],
+          amount: message.text,
+          moneyData: message.moneyData,
           category: messageCategory,
-          userAvatar: message['another_user_avatar'],
         );
         break;
       case 12:
         return LinkMessageWidget(
-            url: json.decode(message['attachments'])[0]['link']);
+            url: json.decode(message.attachments)[0]['link']);
         break;
       case 13:
-        return ForwardMessageWidget(text: 'forward: ${message['text']}');
+        return ForwardMessageWidget(text: 'forward: ${message.text}');
         break;
       case 14:
         return StickerMessage(
-            stickerUrl: '${message['attachment_url']}',
-            // stickerUrl: 'https://media.chat.indigo24.xyz/media/stickers/',
-            sticker: '${json.decode(message['attachments'])[0]['path']}');
+            sticker: '${json.decode(message.attachments)[0]['path']}');
         break;
       default:
         return Text('default type $messageType');
@@ -152,27 +142,21 @@ class MessageWidget extends StatelessWidget {
       child: MessageCategoryWidget(
         message: message,
         messageCategory: messageCategory,
-        avatar: message['avatar_url'] + message['avatar'],
+        avatar: message.avatar,
         chatType: chatType,
-        messageId:
-            message['id'] != null ? message['id'] : message['message_id'],
-        read: '${message['write'].toString()}' == '1' ? true : false,
-        chatId: int.parse(message['chat_id'].toString()),
+        messageId: message.id,
+        read: message.read,
+        chatId: message.chatId,
         child: MessageFrameWidget(
           message: message,
           messageCategory: messageCategory,
-          messageId:
-              message['id'] != null ? message['id'] : message['message_id'],
-          chatId: int.parse(message['chat_id'].toString()),
-          time: time(int.parse(message['time'].toString())),
-          read: '${message['write'].toString()}' == '1' ? true : false,
+          messageId: message.id,
+          chatId: message.chatId,
+          time: time(message.time),
+          read: message.read,
           child: identifyChatType(
             chatType,
-            identifyMessageType(
-              int.parse(
-                message['type'].toString(),
-              ),
-            ),
+            identifyMessageType(message.type),
           ),
         ),
       ),

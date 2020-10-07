@@ -1,11 +1,7 @@
-import 'dart:io';
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/full_photo.dart';
-import 'package:indigo24/widgets/player.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -33,111 +29,6 @@ class DeviderMessageWidget extends StatelessWidget {
             style: TextStyle(fontSize: 16, color: darkGreyColor2),
           ),
         ),
-      ),
-    );
-  }
-}
-
-File uploadingImage;
-
-List imageCount = [];
-var test;
-
-class AudioMessage extends StatelessWidget {
-  final url;
-  AudioMessage(this.url);
-
-  @override
-  Widget build(BuildContext context) {
-    return PlayerWidget(url: url);
-  }
-}
-
-class ImageMessage extends StatelessWidget {
-  final imageUrl;
-  final fullImageUrl;
-  final content;
-  final imageCount;
-  ImageMessage(this.imageUrl, this.fullImageUrl,
-      {this.content, this.imageCount});
-
-  Widget placeholder(context) {
-    return Container(
-      child: uploadingImage != null
-          ? Stack(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  height: MediaQuery.of(context).size.width * 0.7,
-                  child: Image.file(uploadingImage, fit: BoxFit.cover),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  height: MediaQuery.of(context).size.width * 0.7,
-                  color: Colors.grey.withOpacity(0.5),
-                ),
-                Center(),
-              ],
-            )
-          : Center(),
-      width: MediaQuery.of(context).size.width * 0.7,
-      height: MediaQuery.of(context).size.width * 0.7,
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.all(
-          Radius.circular(8.0),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.7,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          FlatButton(
-            splashColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Material(
-              color: Colors.transparent,
-              child: CachedNetworkImage(
-                placeholder: (context, url) => placeholder(context),
-                errorWidget: (context, url, error) => Material(
-                  child: Image.asset(
-                    'assets/preloader.gif',
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    height: MediaQuery.of(context).size.width * 0.7,
-                    fit: BoxFit.contain,
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8.0),
-                  ),
-                  clipBehavior: Clip.hardEdge,
-                ),
-                imageUrl: imageUrl,
-                width: MediaQuery.of(context).size.width * 0.7,
-                height: MediaQuery.of(context).size.width * 0.7,
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-              clipBehavior: Clip.hardEdge,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FullPhoto(url: fullImageUrl),
-                ),
-              );
-            },
-            padding: EdgeInsets.all(0),
-          ),
-          content.toString() != 'null' ? Text('$content') : Center(),
-        ],
       ),
     );
   }

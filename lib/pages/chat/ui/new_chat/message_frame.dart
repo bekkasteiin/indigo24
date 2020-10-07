@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/socket.dart';
+import '../../ui/new_chat/chat_models/messages_model.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 
@@ -10,7 +10,7 @@ class MessageFrameWidget extends StatefulWidget {
   final bool read;
   final String messageId;
   final int chatId;
-  final dynamic message;
+  final MessageModel message;
   const MessageFrameWidget({
     Key key,
     this.child,
@@ -31,7 +31,7 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: int.parse(widget.message['type'].toString()) == 14 ? Colors.transparent : whiteColor,
+        color: widget.message.type == 14 ? Colors.transparent : whiteColor,
         borderRadius: identifyBorderRadius(widget.messageCategory),
       ),
       child: Column(
@@ -42,7 +42,7 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              widget.message['edit'].toString() == '1'
+              widget.message.edited
                   ? Text(
                       '${localization.editedMessage} ',
                       style: TextStyle(

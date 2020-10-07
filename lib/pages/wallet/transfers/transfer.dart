@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +14,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 
@@ -64,6 +64,12 @@ class TransferContactsDialogPageState
   void initState() {
     super.initState();
     actualList.addAll(myContacts);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -210,7 +216,6 @@ class _TransferPageState extends State<TransferPage> {
   Api api = Api();
 
   showAlertDialog(BuildContext context, String type, String message) {
-    // set up the button
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
@@ -218,7 +223,6 @@ class _TransferPageState extends State<TransferPage> {
         Navigator.pop(context);
       },
     );
-
     CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text(type == '0'
           ? "${localization.attention}"
@@ -228,8 +232,6 @@ class _TransferPageState extends State<TransferPage> {
         okButton,
       ],
     );
-
-    // show the dialog
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -246,8 +248,6 @@ class _TransferPageState extends State<TransferPage> {
 
   @override
   void initState() {
-    print('${widget.amount}');
-
     if (widget.phone != null) {
       receiverController.text = widget.phone;
       if (widget.amount != null) {
@@ -308,9 +308,11 @@ class _TransferPageState extends State<TransferPage> {
                               fit: BoxFit.fill,
                             ),
                             Positioned(
-                              child: AppBar(
-                                centerTitle: true,
-                                title: Text("${localization.toIndigo24Client}"),
+                              child: IndigoAppBarWidget(
+                                title: Text(
+                                  localization.toIndigo24Client,
+                                  textAlign: TextAlign.center,
+                                ),
                                 leading: IconButton(
                                   icon: Container(
                                     padding: EdgeInsets.all(10),
@@ -324,20 +326,25 @@ class _TransferPageState extends State<TransferPage> {
                                     Navigator.pop(context);
                                   },
                                 ),
-                                backgroundColor: Colors.transparent,
                                 elevation: 0,
+                                backgroundColor: Colors.transparent,
                               ),
                             ),
                             Container(
-                              margin:
-                                  EdgeInsets.only(top: 45, left: 0, right: 20),
+                              margin: EdgeInsets.only(
+                                top: 45,
+                                left: 0,
+                                right: 20,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Container(
                                     height: 0.6,
                                     margin: EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
                                     color: brightGreyColor,
                                   ),
                                   Container(
@@ -474,35 +481,6 @@ class _TransferPageState extends State<TransferPage> {
     );
   }
 
-  AppBar buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        "${localization.toIndigo24Client}",
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
   final StreamController<bool> _verificationNotifier =
       StreamController<bool>.broadcast();
   bool checked = false;
@@ -583,38 +561,44 @@ class _TransferPageState extends State<TransferPage> {
       Widget cancelButton,
       List<String> digits}) {
     Navigator.push(
-        context,
-        PageRouteBuilder(
-          opaque: opaque,
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              PasscodeScreen(
-            title: '$title',
-            withPin: withPin,
-            passwordEnteredCallback: _onPasscodeEntered,
-            cancelButton: cancelButton,
-            deleteButton: Text(
-              'Delete',
-              style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-              semanticsLabel: 'Delete',
-            ),
-            shouldTriggerVerification: _verificationNotifier.stream,
-            backgroundColor: milkWhiteColor,
-            cancelCallback: _onPasscodeCancelled,
-            digits: digits,
+      context,
+      PageRouteBuilder(
+        opaque: opaque,
+        pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
+          title: '$title',
+          withPin: withPin,
+          passwordEnteredCallback: _onPasscodeEntered,
+          cancelButton: cancelButton,
+          deleteButton: Text(
+            'Delete',
+            style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+            semanticsLabel: 'Delete',
           ),
-        ));
+          shouldTriggerVerification: _verificationNotifier.stream,
+          backgroundColor: milkWhiteColor,
+          cancelCallback: _onPasscodeCancelled,
+          digits: digits,
+        ),
+      ),
+    );
   }
 
   Container transferButton() {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
             color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
+            offset: Offset(
+              0.0,
+              0.0,
+            ),
+          )
+        ],
+      ),
       child: ButtonTheme(
         height: 40,
         child: RaisedButton(
@@ -625,12 +609,16 @@ class _TransferPageState extends State<TransferPage> {
             }
             if (receiverController.text.isNotEmpty &&
                 sumController.text.isNotEmpty) {
-              _showLockScreen(context, '${localization.enterPin}',
-                  opaque: false,
-                  cancelButton: Text('Cancel',
-                      style: const TextStyle(
-                          fontSize: 16, color: blackPurpleColor),
-                      semanticsLabel: 'Cancel'));
+              _showLockScreen(
+                context,
+                '${localization.enterPin}',
+                opaque: false,
+                cancelButton: Text(
+                  'Cancel',
+                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+                  semanticsLabel: 'Cancel',
+                ),
+              );
             }
           },
           child: Container(
@@ -820,8 +808,9 @@ class _TransferPageState extends State<TransferPage> {
   @override
   void dispose() {
     super.dispose();
+    receiverController.dispose();
+    sumController.dispose();
+    _commentController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
-
-  final amountController = TextEditingController();
 }

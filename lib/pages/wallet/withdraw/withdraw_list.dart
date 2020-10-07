@@ -5,6 +5,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class WithdrawListPage extends StatefulWidget {
   @override
@@ -37,38 +38,18 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
-      body: _mainScreen(context),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
+      appBar: IndigoAppBarWidget(
+        title: Text(
+          "${localization.withdraw}",
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
           ),
+          textAlign: TextAlign.center,
         ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
       ),
-      brightness: Brightness.light,
-      title: Text(
-        "${localization.withdraw}",
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      backgroundColor: whiteColor,
+      body: _mainScreen(context),
     );
   }
 
@@ -107,7 +88,6 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
   }
 
   Container _withdrawElement(BuildContext context, dynamic provider) {
-    print(provider);
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, top: 10),
       decoration: BoxDecoration(

@@ -1,8 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/service_widget.dart';
 
 import 'payments_history.dart';
 import 'payments_region.dart';
@@ -60,7 +63,37 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
         }
       },
       child: Scaffold(
-        appBar: _buildAppBar(),
+        appBar: IndigoAppBarWidget(
+          title: Text(
+            localization.payments,
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Container(
+                padding: EdgeInsets.all(5),
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/history.png',
+                  ),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentHistoryPage(),
+                  ),
+                );
+              },
+            )
+          ],
+        ),
         body: _categories != null
             ? Stack(
                 children: <Widget>[
@@ -134,19 +167,47 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                                       : 0,
                                   itemBuilder:
                                       (BuildContext context, int index) {
+                                    dynamic category =
+                                        _categories["categories"][index];
+                                    String title = category['title'];
+                                    String categoryLogo =
+                                        _categories["logoURL"] +
+                                            category['logo'];
+                                    dynamic categoryId = category['ID'];
+                                    dynamic locationType =
+                                        category['location_type'];
+
                                     return Padding(
                                       padding: const EdgeInsets.only(top: 10),
-                                      child: _paymentsList(
-                                          context,
-                                          _categories["logoURL"] +
-                                              _categories["categories"][index]
-                                                  ['logo'],
-                                          _categories["categories"][index]
-                                              ['title'],
-                                          _categories["categories"][index]
-                                              ['ID'],
-                                          _categories['categories'][index]
-                                              ['location_type']),
+                                      child: ServiceWidget(
+                                        title: title,
+                                        logo: categoryLogo,
+                                        onPressed: () {
+                                          if (locationType != null) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PaymentsRegion(
+                                                  categoryId: categoryId,
+                                                  locationType: locationType,
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PaymentsServices(
+                                                  categoryId,
+                                                  title,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
                                     );
                                   },
                                 ),
@@ -170,6 +231,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
 
   bool isReadyToSend = true;
   bool needToShowServices = false;
+
   searchOnChanged() {
     if (_searchController.text.isEmpty) {
       setState(() {
@@ -197,185 +259,24 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
     }
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        "${localization.payments}",
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      actions: <Widget>[
-        IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(5),
-            child: Image(
-              image: AssetImage(
-                'assets/images/history.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentHistoryPage(),
-              ),
-            );
-          },
-        )
-      ],
-      backgroundColor: Colors.white,
-    );
-  }
-
-  Container _servicesList(BuildContext context, String logo, String name,
+  Widget _servicesList(BuildContext context, String logo, String name,
       int index, int isConvertable, locationType) {
-    return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, top: 10),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
-      child: ButtonTheme(
-        height: 40,
-        child: RaisedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentsServicePage(index, logo, name,
-                    isConvertable: isConvertable),
-              ),
-            );
-          },
-          child: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 35,
-                  height: 40,
-                  margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
-                  child: Image.network(
-                    '$logo',
-                    width: 30.0,
-                  ),
-                ),
-                Container(width: 10),
-                Expanded(
-                  child: Text(
-                    '$name',
-                    style: TextStyle(fontSize: 14, color: blackPurpleColor),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+    return ServiceWidget(
+      title: name,
+      logo: logo,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentsServicePage(
+              index,
+              logo,
+              name,
+              isConvertable: isConvertable,
             ),
           ),
-          color: whiteColor,
-          textColor: blackPurpleColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              10.0,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Container _paymentsList(
-      BuildContext context, String logo, String name, int index, locationType) {
-    return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, top: 10),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            spreadRadius: -2,
-            offset: Offset(0.0, 0.0))
-      ]),
-      child: ButtonTheme(
-        height: 40,
-        child: RaisedButton(
-          onPressed: () {
-            if (locationType != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PaymentsRegion(
-                    categoryId: index,
-                    locationType: locationType,
-                  ),
-                ),
-              );
-            } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PaymentsServices(
-                    index,
-                    name,
-                  ),
-                ),
-              );
-            }
-          },
-          child: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 35,
-                  height: 40,
-                  margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
-                  child: Image.network(
-                    '$logo',
-                    width: 30.0,
-                  ),
-                ),
-                Container(width: 10),
-                Expanded(
-                  child: Text(
-                    '$name',
-                    style: TextStyle(fontSize: 14, color: blackPurpleColor),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          color: whiteColor,
-          textColor: blackPurpleColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              10.0,
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

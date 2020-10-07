@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/db/country_dao.dart';
@@ -173,7 +171,8 @@ class _IntroPageState extends State<IntroPage> {
     Future.delayed(Duration.zero, () {
       if (!isLanguageSelected) _showLanguages();
     });
-    // _api.getNews().then((result) async { // TODO TURN ON THIS
+    // _api.getNews().then((result) async {
+    //   // TODO TURN ON THIS
     //   print('result of main $result');
     //   SharedPreferences preferences = await SharedPreferences.getInstance();
 

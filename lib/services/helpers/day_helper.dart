@@ -1,6 +1,6 @@
 import 'package:indigo24/services/localization.dart' as localization;
 
-newIdentifyDay(int day) {
+String newIdentifyDay(int day) {
   switch (day) {
     case 1:
       return '${localization.monday}';

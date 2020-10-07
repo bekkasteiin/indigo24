@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
 
 class VideoMessageWidget extends StatefulWidget {
   final String text;
-  final String mediaUrl; // TODO fix
   final String media;
 
   const VideoMessageWidget({
     Key key,
     this.text,
     @required this.media,
-    @required this.mediaUrl,
   }) : super(key: key);
 
   @override
@@ -25,7 +24,7 @@ class _VideoMessageWidgetState extends State<VideoMessageWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          VideoPlayerWidget("${widget.mediaUrl}${widget.media}", "network"),
+          VideoPlayerWidget("$videoUrl${widget.media}", "network"),
           widget.text != 'null' ? Text('${widget.text}') : Center(),
         ],
       ),

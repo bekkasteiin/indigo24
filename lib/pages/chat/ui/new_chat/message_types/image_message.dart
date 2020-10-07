@@ -1,16 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/full_photo.dart';
 
 class ImageMessageWidget extends StatefulWidget {
   final String text;
-  final String url;
   final String media;
 
   const ImageMessageWidget({
     Key key,
     this.text,
-    @required this.url,
     @required this.media,
   }) : super(key: key);
   @override
@@ -63,7 +62,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                   ),
                   clipBehavior: Clip.hardEdge,
                 ),
-                imageUrl: '${widget.url}' + '${widget.media}',
+                imageUrl: '$imageUrl' + '${widget.media}',
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.width * 0.7,
                 fit: BoxFit.cover,
@@ -75,8 +74,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      FullPhoto(url: widget.url + widget.media),
+                  builder: (context) => FullPhoto(url: imageUrl + widget.media),
                 ),
               );
             },

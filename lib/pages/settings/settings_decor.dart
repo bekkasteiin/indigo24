@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/message_category.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/message_frame.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/new_ui/text_message.dart';
-import 'package:indigo24/pages/chat/ui/received.dart';
-import 'package:indigo24/pages/chat/ui/sended.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat_models/messages_model.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/message_category.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/message_frame.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/message_types/text_message.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class SettingsDecorPage extends StatefulWidget {
   @override
@@ -25,36 +25,36 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     super.dispose();
   }
 
+  MessageModel chatModel = MessageModel(
+    id: '1',
+    chatId: 1,
+    userId: 1,
+    avatar: '1',
+    read: true,
+    username: ';hellol',
+    text: 'hi',
+    type: 1,
+    time: 100,
+    attachments: null,
+    reply_data: null,
+    forward_data: null,
+    edited: true,
+    moneyData: null,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      appBar: IndigoAppBarWidget(
         title: Text(
           "${localization.decor}",
-          style:
-              TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontWeight: FontWeight.w400,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        backgroundColor: Colors.white,
-        brightness: Brightness.light,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -90,37 +90,35 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                         chatType: 0,
                         read: true,
                         chatId: 1000,
+                        messageId: null,
+                        message: null,
                         child: MessageFrameWidget(
                           messageCategory: 0,
                           chatId: -1000,
                           time: '11:00',
+                          message: chatModel,
                           read: true,
-                          child:
-                              TextMessageWidget(text: '${localization.hello}'),
+                          messageId: chatModel.id,
+                          child: TextMessageWidget(text: chatModel),
                         ),
                       ),
                       MessageCategoryWidget(
                         messageCategory: 2,
                         chatType: 0,
-                        read: false,
+                        read: true,
                         chatId: 1000,
+                        messageId: null,
+                        message: null,
                         child: MessageFrameWidget(
-                          messageCategory: 1,
+                          messageCategory: 0,
                           chatId: -1000,
-                          time: '11:02',
-                          read: true,
-                          child: TextMessageWidget(text: '${localization.hi}'),
+                          time: '11:01',
+                          message: chatModel,
+                          read: false,
+                          messageId: chatModel.id,
+                          child: TextMessageWidget(text: chatModel),
                         ),
                       ),
-                      // Container(
-                      //   alignment: Alignment.centerRight,
-                      //   child: SendedMessageWidget(
-                      //     content: '${localization.hi}',
-                      //     time: '13:45',
-                      //     write: '1',
-                      //     type: "0",
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -151,7 +149,6 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                         setState(() {
                           user.chatBackground = 'ligth';
                         });
-                        print('${user.chatBackground}');
                       },
                     ),
                     SizedBox(
@@ -178,7 +175,6 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                         setState(() {
                           user.chatBackground = 'dark';
                         });
-                        print('${user.chatBackground}');
                       },
                     )
                   ],

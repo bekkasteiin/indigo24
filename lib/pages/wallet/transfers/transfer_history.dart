@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -61,13 +61,24 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   void dispose() {
     super.dispose();
     _refreshController.dispose();
+    _filterController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: buildAppBar(),
+      appBar: IndigoAppBarWidget(
+        title: Text(
+          localization.transfers,
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -379,9 +390,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
       });
       _page++;
     });
-    // _api.getTransactions(_page).then((histories) {
-    //
-    // });
   }
 
   SafeArea _transferHistoryBody(snapshot, context) {
@@ -429,36 +437,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
           ),
         ],
       ),
-    );
-  }
-
-  AppBar buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        "${localization.transfers}",
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      backgroundColor: Colors.white,
     );
   }
 }

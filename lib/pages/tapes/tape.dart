@@ -6,6 +6,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class TapePage extends StatefulWidget {
   final tape;
@@ -56,22 +57,7 @@ class _TapePageState extends State<TapePage>
     if (_commentController.text.isNotEmpty)
       _letterCount = 100 - _commentController.text.length;
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        brightness: Brightness.light,
+      appBar: IndigoAppBarWidget(
         title: Text(
           "${localization.comments}",
           style: TextStyle(
@@ -81,7 +67,6 @@ class _TapePageState extends State<TapePage>
           ),
           textAlign: TextAlign.center,
         ),
-        backgroundColor: Colors.white,
       ),
       body: FutureBuilder(
         future: _future,
@@ -114,7 +99,7 @@ class _TapePageState extends State<TapePage>
                               itemCount: _comments.length,
                               itemBuilder: (context, index) {
                                 _saved.add({'index': index, 'maxLines': 5});
-                               // print('${_comments}');
+                                // print('${_comments}');
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[

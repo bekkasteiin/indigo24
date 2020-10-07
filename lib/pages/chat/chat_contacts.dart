@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/chat/chat.dart';
-import 'package:indigo24/pages/chat/chat_list.dart';
 import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -84,13 +82,13 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                        chatName: '${e.json['data']['name']}',
-                        chatId: int.parse(e.json['data']['chat_id'].toString()),
-                        chatType: 0,
-                        userIds: e.json['data']['user_id'].toString(),
-                        avatar: '${e.json['data']['avatar']}',
-                        avatarUrl: '${e.json['data']['avatar_url']}')),
+                  builder: (context) => ChatPage(
+                    chatName: '${e.json['data']['name']}',
+                    chatId: int.parse(e.json['data']['chat_id'].toString()),
+                    chatType: 0,
+                    avatar: '${e.json['data']['avatar']}',
+                  ),
+                ),
               ).whenComplete(() {
                 // this is bool for check load more is needed or not
                 ChatRoom.shared.forceGetChat();
@@ -122,7 +120,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   chatName: '${e.json['data']['chat_name']}',
                   chatId: int.parse(e.json['data']['chat_id'].toString()),
                   chatType: 0,
-                  userIds: e.json['data']['user_id'],
                 ),
               ),
             ).whenComplete(() {

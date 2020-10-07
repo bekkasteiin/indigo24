@@ -5,7 +5,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'filter.dart';
@@ -23,7 +23,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
   int _balanceHistoryPage;
 
   String _text;
-
+  String _emptyResponseString = '';
   List _historyBalanceList;
   List _splittedDates;
 
@@ -72,7 +72,17 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: IndigoAppBarWidget(
+        title: Text(
+          "${localization.historyBalance}",
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
       body: SafeArea(
         child: Stack(
           children: <Widget>[
@@ -254,36 +264,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      centerTitle: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(10),
-          child: Image(
-            image: AssetImage(
-              'assets/images/back.png',
-            ),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      brightness: Brightness.light,
-      title: Text(
-        "${localization.historyBalance}",
-        style: TextStyle(
-          color: blackPurpleColor,
-          fontSize: 22,
-          fontWeight: FontWeight.w400,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      backgroundColor: Colors.white,
-    );
-  }
-
   SafeArea _paymentHistroyBalance(snapshot, context) {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
@@ -335,10 +315,12 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                     setState(() {
                       _isProccessing = true;
                     });
-                    print(selectedDate);
                     _api
-                        .getFilteredHistoryBalance(_balanceHistoryPage,
-                            selectedDate[0], selectedDate[1])
+                        .getFilteredHistoryBalance(
+                      _balanceHistoryPage,
+                      selectedDate[0],
+                      selectedDate[1],
+                    )
                         .then((historyBalance) {
                       setState(() {
                         _isProccessing = false;
@@ -357,6 +339,11 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                           if (historyBalance['result'].isEmpty) {
                             setState(() {
                               _emptyResponse = true;
+                              _emptyResponseString = 'Нет историй';
+                            });
+                          } else {
+                            setState(() {
+                              _emptyResponse = false;
                             });
                           }
                           _balanceHistoryPage++;
@@ -410,7 +397,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                         )
                   : SafeArea(
                       child: Center(
-                        child: CircularProgressIndicator(),
+                        child: Text('$_emptyResponseString'),
                       ),
                     )
               : Center(

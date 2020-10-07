@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsTermsPage extends StatefulWidget {
@@ -24,101 +25,80 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.of(context).pop(true);
-          },
-        ),
+      appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.terms}",
+          localization.terms,
           style:
               TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        backgroundColor: Colors.white,
-        brightness: Brightness.light,
       ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 20,)
-            ,
-Container(
-  alignment: Alignment.topCenter,
-  child:   ConstrainedBox(
-                            constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.42),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 10.0,
-                                      spreadRadius: -2,
-                                      offset: Offset(0.0, 0.0))
-                                ],
-                              ),
-                              child: ButtonTheme(
-                                minWidth:
-                                    MediaQuery.of(context).size.width * 0.42,
-                                height: 50,
-                                child: RaisedButton(
-                                  onPressed: () async {
-                                    if (await canLaunch(
-                                        'https://indigo24.com/security.html')) {
-                                      await launch(
-                                        'https://indigo24.com/security.html',
-                                        forceSafariVC: false,
-                                        forceWebView: false,
-                                        headers: <String, String>{
-                                          'my_header_key': 'my_header_value'
-                                        },
-                                      );
-                                    } else {
-                                      throw 'Could not launch https://indigo24.com/security.html';
-                                    }
-                                  },
-                                  child: FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text(
-                                      "${localization.privacyPolicy}",
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ),
-                                  color: whiteColor,
-                                  textColor: whiteColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      10.0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.42),
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10.0,
+                          spreadRadius: -2,
+                          offset: Offset(0.0, 0.0))
+                    ],
+                  ),
+                  child: ButtonTheme(
+                    minWidth: MediaQuery.of(context).size.width * 0.42,
+                    height: 50,
+                    child: RaisedButton(
+                      onPressed: () async {
+                        if (await canLaunch(
+                            'https://indigo24.com/security.html')) {
+                          await launch(
+                            'https://indigo24.com/security.html',
+                            forceSafariVC: false,
+                            forceWebView: false,
+                            headers: <String, String>{
+                              'my_header_key': 'my_header_value'
+                            },
+                          );
+                        } else {
+                          throw 'Could not launch https://indigo24.com/security.html';
+                        }
+                      },
+                      child: FittedBox(
+                        fit: BoxFit.fitWidth,
+                        child: Text(
+                          "${localization.privacyPolicy}",
+                          style: TextStyle(
+                            color: Colors.grey[700],
                           ),
-),
-                        SizedBox(
-                          height: 10,
                         ),
-
+                      ),
+                      color: whiteColor,
+                      textColor: whiteColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          10.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Container(
               padding: EdgeInsets.only(
                 left: 20,
@@ -185,29 +165,14 @@ Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // FlatButton(
-                  //   onPressed: () {},
-                  //   child: Text('Скачать на устройство'),
-                  // ),
                   FlatButton(
                     onPressed: () async {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  PDFViewer('assets/terms.pdf')));
-                      // if (await canLaunch('https://indigo24.com/rules.html')) {
-                      //   await launch(
-                      //     'https://indigo24.com/rules.html',
-                      //     forceSafariVC: false,
-                      //     forceWebView: false,
-                      //     headers: <String, String>{
-                      //       'my_header_key': 'my_header_value'
-                      //     },
-                      //   );
-                      // } else {
-                      //   throw 'Could not launch https://indigo24.com/rules.html';
-                      // }
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PDFViewer('assets/terms.pdf'),
+                        ),
+                      );
                     },
                     child: Text('${localization.open}'),
                   )

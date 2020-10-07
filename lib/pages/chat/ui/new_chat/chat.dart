@@ -6,40 +6,42 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/message_categories/divider_message.dart';
 import 'package:indigo24/pages/chat/ui/new_chat/message.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/message_types/audio_message.dart';
 import 'package:indigo24/pages/chat/ui/new_widgets/new_widgets.dart';
 import 'package:indigo24/pages/chat/ui/new_extensions.dart';
 import 'package:indigo24/pages/chat/ui/users_list_draggable.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
-import 'package:indigo24/services/test_timer.dart';
+import 'package:indigo24/services/timer.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/backgrounds.dart';
-import 'package:indigo24/widgets/photo.dart';
+import 'package:indigo24/widgets/full_photo.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/preview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:record_mp3/record_mp3.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:vibration/vibration.dart';
+import 'chat_models/hive_names.dart';
+import '../../ui/new_chat/chat_models/messages_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../../main.dart';
 import '../../chat_info.dart';
 import '../chats_list_draggable.dart';
-import 'divider_message.dart';
 
 class ChatPage extends StatefulWidget {
   final int chatId;
   final int chatType;
-  final String userIds;
   final String chatName;
-  final String avatarUrl;
   final String avatar;
   final int memberCount;
   final phone;
@@ -47,11 +49,9 @@ class ChatPage extends StatefulWidget {
     Key key,
     @required this.chatId,
     @required this.chatType,
-    this.userIds,
     @required this.chatName,
     this.phone,
     @required this.avatar,
-    @required this.avatarUrl,
     this.memberCount,
   }) : super(key: key);
   @override
@@ -67,7 +67,6 @@ class _NewChatPageState extends State<ChatPage> {
   bool _stickersIsActive;
   int _messagesPage;
   int _lastMessageTime;
-  List _messagesList;
   List _typingUsers;
   dynamic _stickersList;
   bool _isMessagesLoading;
@@ -78,7 +77,6 @@ class _NewChatPageState extends State<ChatPage> {
   Api _api;
   File _image;
   ImagePicker _picker = ImagePicker();
-  File uploadingImage;
   bool _isUploaded;
   bool _multiPick = false;
   String _path;
@@ -184,7 +182,6 @@ class _NewChatPageState extends State<ChatPage> {
     _stickersIsActive = false;
     closeMainChat = true;
     _messagesPage = 1;
-    _messagesList = [];
     _typingUsers = [];
     toForwardMessages = [];
     _stickersList = [];
@@ -193,7 +190,7 @@ class _NewChatPageState extends State<ChatPage> {
     myFocusNode = FocusNode();
     _api = Api();
     ChatRoom.shared.setNewChatStream();
-    ChatRoom.shared.checkUserOnline(widget.userIds);
+    // ChatRoom.shared.checkUserOnline(widget.userIds); // ADD WITH NEW BACKEND VALUE
     ChatRoom.shared.getStickers();
     listen();
     ChatRoom.shared.getMessages(widget.chatId, page: _messagesPage);
@@ -215,24 +212,22 @@ class _NewChatPageState extends State<ChatPage> {
         int.parse(unix.toString()) * 1000);
   }
 
-  _buildMessage(index, Widget child) {
-    if (_messagesList[index]['time'].toString() != '') {
-      if (_messagesList[index]['time'].toString() == '1') {
+  _buildMessage(int message, index, Widget child) {
+    if (message.toString() != '') {
+      if (message.toString() == '1') {
         return SizedBox(height: 0, width: 0);
       } else {
         if (index == 0) {
-          _lastMessageTime = int.parse(_messagesList[0]['time'].toString());
+          _lastMessageTime = int.parse(message.toString());
         }
-        DateTime actualUnixDate = getDateFromUnix(_messagesList[index]['time']);
+        DateTime actualUnixDate = getDateFromUnix(message);
 
         DateTime lastUnixDate = getDateFromUnix(
-          _lastMessageTime == null
-              ? _messagesList[index]['time']
-              : _lastMessageTime,
+          _lastMessageTime == null ? message : _lastMessageTime,
         );
 
         int differenceInDays = lastUnixDate.difference(actualUnixDate).inDays;
-        _lastMessageTime = int.parse(_messagesList[index]['time'].toString());
+        _lastMessageTime = int.parse(message.toString());
         if (differenceInDays != 0) {
           return Column(
             children: <Widget>[
@@ -255,45 +250,93 @@ class _NewChatPageState extends State<ChatPage> {
     }
   }
 
+  _identifyType(type) {
+    // const TEXT_MESSAGE_TYPE = 0;
+    // const IMAGE_MESSAGE_TYPE = 1;
+    // const DOCUMENT_MESSAGE_TYPE = 2;
+    // const VOICE_MESSAGE_TYPE = 3;
+    // const VIDEO_MESSAGE_TYPE = 4;
+    // const SYSTEM_MESSAGE_TYPE = 7;
+    // const SYSTEM_MESSAGE_DIVIDER_TYPE = 8;
+    // const GEO_POINT_MESSAGE_TYPE = 9;
+    // const REPLY_MESSAGE_TYPE = 10;
+    // const MONEY_MESSAGE_TYPE = 11;
+    // const LINK_MESSAGE_TYPE = 12;
+    // const FORWARD_MESSAGE_TYPE = 13;
+    switch ('$type') {
+      case '0':
+        return '${localization.textMessage}';
+        break;
+      case '1':
+        return '${localization.photo}';
+        break;
+      case '2':
+        return '${localization.document}';
+        break;
+      case '3':
+        return '${localization.voiceMessage}';
+        break;
+      case '4':
+        return '${localization.video}';
+        break;
+      case '7':
+        return '${localization.systemMessage}';
+        break;
+      // case '8':
+      // return 'Дивайдер сообщение';
+      // break;
+      case '9':
+        return '${localization.location}';
+        break;
+      case '10':
+        return '${localization.reply}';
+        break;
+      case '11':
+        return '${localization.money}';
+        break;
+      case '12':
+        return '${localization.link}';
+        break;
+      case '13':
+        return '${localization.forwardedMessage}';
+        break;
+      default:
+        return '${localization.message}';
+    }
+  }
+
+  List<String> audios = [
+    'Cr40YlNezldbtLBHYcbvuEnmscTN3C4KB.mp3',
+    'Cr40YlNezldbtLBHYcbvuEnmscTN3C4KB.mp3',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: indigoAppBar(
-        context,
-        withBack: true,
+      appBar: IndigoAppBarWidget(
+        elevation: 0.5,
         actions: [
-          MaterialButton(
-            elevation: 0,
-            color: Colors.transparent,
-            textColor: Colors.white,
-            child: ClipRRect(
+          IconButton(
+            padding: EdgeInsets.all(5),
+            icon: ClipRRect(
               borderRadius: BorderRadius.circular(25.0),
-              child: Container(
-                height: 50,
-                width: 50,
-                color: greyColor,
-                child: ClipOval(
-                    child: Image.network(
-                  '${widget.chatType.toString() == '1' ? groupAvatarUrl : widget.avatarUrl}${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
-                  width: 35,
-                  height: 35,
-                )),
+              child: CachedNetworkImage(
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/preloader.gif',
+                ),
+                imageUrl:
+                    '$avatarUrl${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
               ),
             ),
-            shape: CircleBorder(),
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FullScreenWrapper(
-                      imageProvider: CachedNetworkImageProvider(
-                          "${widget.avatarUrl}${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}"),
-                      minScale: PhotoViewComputedScale.contained,
-                      maxScale: PhotoViewComputedScale.contained * 3,
-                      backgroundDecoration:
-                          BoxDecoration(color: Colors.transparent),
-                    ),
-                  )).whenComplete(() {
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FullPhoto(
+                      url:
+                          "$avatarUrl${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('200x200', 'AxB')}"),
+                ),
+              ).whenComplete(() {
                 ChatRoom.shared.getMessages(widget.chatId);
               });
             },
@@ -308,8 +351,7 @@ class _NewChatPageState extends State<ChatPage> {
                 builder: (context) => ChatProfileInfo(
                   chatType: widget.chatType,
                   chatName: widget.chatName,
-                  chatAvatar:
-                      widget.avatar == null ? 'noAvatar.png' : widget.avatar,
+                  chatAvatar: widget.avatar,
                   memberCount: widget.memberCount,
                   chatId: widget.chatId,
                   phone: widget.phone,
@@ -353,14 +395,15 @@ class _NewChatPageState extends State<ChatPage> {
                             fontWeight: FontWeight.w400,
                           ),
                         )
-                  : Text(
-                      '${localization.members} ${widget.memberCount}',
-                      style: TextStyle(
-                        color: blackPurpleColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
+                  : SizedBox(height: 0, width: 0),
+              // Text(
+              //     '${localization.members} ${widget.memberCount}',
+              //     style: TextStyle(
+              //       color: blackPurpleColor,
+              //       fontSize: 14,
+              //       fontWeight: FontWeight.w400,
+              //     ),
+              //   ),
               _isSomeoneTyping
                   ? Text(
                       _typingUsers.join(', '),
@@ -401,81 +444,60 @@ class _NewChatPageState extends State<ChatPage> {
                   }
                 },
                 child: Expanded(
-                  child: ScrollablePositionedList.builder(
-                    itemCount: _messagesList.length,
-                    reverse: true,
-                    itemScrollController: _itemScrollController,
-                    itemBuilder: (BuildContext context, int i) {
-                      var message = _messagesList[i];
+                  child: ValueListenableBuilder(
+                    valueListenable:
+                        Hive.box<MessageModel>(HiveBoxes.messages).listenable(),
+                    builder: (context, Box box, newWidget) {
+                      var numbers = box.values
+                          .where((message) => message.chatId == widget.chatId)
+                          .toList();
 
-                      return InkWell(
-                        onTap: () {
-                          FocusScopeNode currentFocus = FocusScope.of(context);
-                          if (!currentFocus.hasPrimaryFocus) {
-                            currentFocus.unfocus();
-                          }
-                          if (showForwardingProcess &&
-                              message['type'].toString() != '7') {
-                            if (message['message_id'] == null) {
-                              print(
-                                  'clicki31231ng ${message['id']} \n $toForwardMessages');
+                      if (numbers.isNotEmpty)
+                        numbers.sort((a, b) {
+                          return b.time.compareTo(a.time);
+                        });
 
-                              if (toForwardMessages.contains(message['id'])) {
-                                setState(() {
-                                  toForwardMessages.remove(message['id']);
-                                });
-                              } else {
-                                setState(() {
-                                  toForwardMessages.add(message['id']);
-                                });
+                      return ScrollablePositionedList.builder(
+                        itemCount: numbers.length,
+                        reverse: true,
+                        itemScrollController: _itemScrollController,
+                        itemBuilder: (BuildContext context, int i) {
+                          MessageModel message = numbers[i];
+                          if (numbers.isEmpty)
+                            return SizedBox(height: 0, width: 0);
+                          return InkWell(
+                            onTap: () {
+                              FocusScopeNode currentFocus =
+                                  FocusScope.of(context);
+                              if (!currentFocus.hasPrimaryFocus) {
+                                currentFocus.unfocus();
                               }
-                            } else {
-                              if (toForwardMessages
-                                  .contains(message['message_id'])) {
-                                print(
-                                    'contains ${message['message_id']} \n $toForwardMessages');
-                                setState(() {
-                                  toForwardMessages
-                                      .remove(message['message_id']);
-                                });
-                              } else {
-                                print('not $toForwardMessages');
-
-                                setState(() {
-                                  toForwardMessages.add(message['message_id']);
-                                });
+                              if (showForwardingProcess && message.type != 7) {
+                                if (toForwardMessages.contains(message.id)) {
+                                  setState(() {
+                                    toForwardMessages.remove(message.id);
+                                  });
+                                } else {
+                                  setState(() {
+                                    toForwardMessages.add(message.id);
+                                  });
+                                }
                               }
-                            }
-                          }
-                        },
-                        child: Row(
-                          children: <Widget>[
-                            showForwardingProcess &&
-                                    message['type'].toString() != '7'
-                                ? Container(
-                                    margin: EdgeInsets.all(5),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.blue),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(5),
-                                        child: message['message_id'] == null
-                                            ? toForwardMessages
-                                                    .contains(message['id'])
-                                                ? Icon(
-                                                    Icons.check,
-                                                    size: 15,
-                                                    color: Colors.white,
-                                                  )
-                                                : Icon(
-                                                    Icons
-                                                        .check_box_outline_blank,
-                                                    size: 15,
-                                                    color: Colors.blue,
-                                                  )
-                                            : toForwardMessages
-                                                    .contains(message['id'])
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                showForwardingProcess && message.type != 7
+                                    ? Container(
+                                        margin: EdgeInsets.all(5),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.blue),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(5),
+                                            child: toForwardMessages
+                                                    .contains(message.id)
                                                 ? Icon(
                                                     Icons.check,
                                                     size: 15,
@@ -487,36 +509,37 @@ class _NewChatPageState extends State<ChatPage> {
                                                     size: 15,
                                                     color: Colors.blue,
                                                   ),
-                                      ),
-                                    ),
-                                  )
-                                : SizedBox(height: 0, width: 0),
-                            Flexible(
-                              child: Column(
-                                children: <Widget>[
-                                  _buildMessage(
-                                    i,
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 5,
-                                        horizontal: 5,
-                                      ),
-                                      child: MessageWidget(
-                                        messageCategory: identifyCategory(
-                                          int.parse(
-                                            message['user_id'].toString(),
                                           ),
                                         ),
-                                        chatType: widget.chatType,
-                                        message: message,
+                                      )
+                                    : SizedBox(height: 0, width: 0),
+                                Flexible(
+                                  child: Column(
+                                    children: <Widget>[
+                                      _buildMessage(
+                                        message.time,
+                                        i,
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 5,
+                                            horizontal: 5,
+                                          ),
+                                          child: MessageWidget(
+                                            messageCategory: identifyCategory(
+                                              message.userId,
+                                            ),
+                                            chatType: widget.chatType,
+                                            message: message,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     },
                   ),
@@ -543,16 +566,16 @@ class _NewChatPageState extends State<ChatPage> {
                                         color: primaryColor,
                                       ),
                                       Container(width: 5),
-                                      _replyMessage["attachment_url"] != null
-                                          ? Container(
-                                              width: 40,
-                                              height: 40,
-                                              child: CachedNetworkImage(
-                                                imageUrl:
-                                                    "${_replyMessage["attachment_url"]}${json.decode(_replyMessage["attachments"])[0]["r_filename"]}",
-                                              ),
-                                            )
-                                          : Container(),
+                                      // _replyMessage["attachment_url"] != null
+                                      //     ? Container(
+                                      //         width: 40,
+                                      //         height: 40,
+                                      //         child: CachedNetworkImage(
+                                      //           imageUrl:
+                                      //               "${_replyMessage["attachment_url"]}${json.decode(_replyMessage["attachments"])[0]["r_filename"]}",
+                                      //         ),
+                                      //       )
+                                      //     : Container(),
                                       Container(width: 5),
                                       Expanded(
                                         child: Column(
@@ -564,7 +587,8 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  "${_replyMessage["user_name"]}",
+                                                  // "${_replyMessage["user_name"]}",
+                                                  "${_replyMessage['username']}",
                                                   style: TextStyle(
                                                       color: primaryColor),
                                                   overflow:
@@ -577,7 +601,9 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  "${_replyMessage['message_text_for_type']}",
+                                                  // "${_replyMessage['message_text_for_type']}",
+                                                  "${_replyMessage['type'] == 0 ? _replyMessage['text'] : _identifyType(_replyMessage['type'])}",
+
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   maxLines: 1,
@@ -626,16 +652,16 @@ class _NewChatPageState extends State<ChatPage> {
                                         color: primaryColor,
                                       ),
                                       Container(width: 5),
-                                      _editMessage["attachment_url"] != null
-                                          ? Container(
-                                              width: 40,
-                                              height: 40,
-                                              child: CachedNetworkImage(
-                                                imageUrl:
-                                                    "${_editMessage["attachment_url"]}${json.decode(_editMessage["attachments"])[0]["r_filename"]}",
-                                              ),
-                                            )
-                                          : Container(),
+                                      // _editMessage["attachment_url"] != null
+                                      //     ? Container(
+                                      //         width: 40,
+                                      //         height: 40,
+                                      //         child: CachedNetworkImage(
+                                      //           imageUrl:
+                                      //               "${_editMessage["attachment_url"]}${json.decode(_editMessage["attachments"])[0]["r_filename"]}",
+                                      //         ),
+                                      //       )
+                                      //     : Container(),
                                       Container(width: 5),
                                       Expanded(
                                         child: Column(
@@ -647,7 +673,8 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  "${_editMessage["user_name"]}",
+                                                  // "${_editMessage["user_name"]}",
+                                                  "${_editMessage['username']}",
                                                   style: TextStyle(
                                                       color: primaryColor),
                                                   overflow:
@@ -660,7 +687,7 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  "${_editMessage["type"].toString() == '1' ? "Изображение" : _editMessage["type"].toString() == '4' ? "Видео" : _editMessage["text"]}",
+                                                  "${_editMessage['text']}",
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   maxLines: 1,
@@ -681,6 +708,7 @@ class _NewChatPageState extends State<ChatPage> {
                                     onPressed: () {
                                       setState(() {
                                         _editMessage = null;
+                                        _messageController.clear();
                                       });
                                     },
                                   ),
@@ -699,7 +727,6 @@ class _NewChatPageState extends State<ChatPage> {
                               IconButton(
                                 icon: Icon(Icons.cancel),
                                 onPressed: () {
-                                  print("cancelling forward");
                                   setState(() {
                                     showForwardingProcess = false;
                                     toForwardMessages.clear();
@@ -712,9 +739,7 @@ class _NewChatPageState extends State<ChatPage> {
                                   setState(() {
                                     showForwardingProcess = false;
                                   });
-                                  print('going to reply');
                                   ChatRoom.shared.setChatsListDialogStream();
-
                                   Navigator.push(
                                     context,
                                     CupertinoPageRoute(
@@ -1026,75 +1051,141 @@ class _NewChatPageState extends State<ChatPage> {
         case 'message:deleted:all':
           var mId = e.json['data']['message_id'];
           print("deleting $mId");
-          var i = _messagesList.indexWhere((element) =>
-              (element['id'] == null ? element['message_id'] : element['id']) ==
-              mId);
-          print("deleting ${e.json}");
-          setState(() {
-            _messagesList.removeAt(i);
-          });
+
+          Box<MessageModel> contactsBox =
+              Hive.box<MessageModel>(HiveBoxes.messages);
+
+          contactsBox.delete(mId);
+          // var i = _messagesList.indexWhere((element) =>
+          //     (element['id'] == null ? element['message_id'] : element['id']) ==
+          //     mId);
+          // print("deleting ${e.json}");
+          // setState(() {
+          //   _messagesList.removeAt(i);
+          // });
           break;
         case "message:edit":
-          var mId = e.json['data']['message_id'];
-          var i = _messagesList.indexWhere((element) =>
-              (element['id'] == null ? element['message_id'] : element['id']) ==
-              mId);
           print("editing ${e.json}");
-          setState(() {
-            _messagesList[i] = e.json['data'];
-          });
+          Box<MessageModel> contactsBox =
+              Hive.box<MessageModel>(HiveBoxes.messages);
+          contactsBox.put(
+            data['message_id'],
+            MessageModel(
+              id: data['message_id'] as String,
+              chatId: int.parse(data['chat_id'].toString()),
+              userId: int.parse(data['user_id'].toString()),
+              avatar: data['avatar'] as String,
+              read: data['write'].toString() == '1' ? true : false,
+              username: data['user_name'] as String,
+              text: data['text'] as String,
+              type: int.parse(data['type'].toString()),
+              time: int.parse(data['time'].toString()),
+              attachments: data['attachments'] != null
+                  ? json.decode(data['attachments'])
+                  : null,
+              reply_data: data['attachments'] != null
+                  ? json.decode(data['reply_data'])
+                  : null,
+              edited: data['edit'].toString() == '1' ? true : false,
+              moneyData: {
+                'avatar': data['another_user_avatar'],
+                'name': data['another_user_name']
+              },
+            ),
+          );
           break;
         case "chat:get":
           if (data.isNotEmpty) {
+            print('chat get is $data');
             _messagesPage++;
+            Box<MessageModel> contactsBox =
+                Hive.box<MessageModel>(HiveBoxes.messages);
+            data.forEach((message) {
+              contactsBox.put(
+                message['id'],
+                MessageModel(
+                  id: message['id'] as String,
+                  chatId: int.parse(message['chat_id'].toString()),
+                  userId: int.parse(message['user_id'].toString()),
+                  avatar: message['avatar'] as String,
+                  read: message['write'].toString() == '1' ? true : false,
+                  username: message['user_name'] as String,
+                  text: message['text'] as String,
+                  type: int.parse(message['type'].toString()),
+                  time: int.parse(message['time'].toString()),
+                  attachments: message['attachments'],
+                  reply_data: message['reply_data'],
+                  edited: message['edit'].toString() == '1' ? true : false,
+                  moneyData: {
+                    'avatar': message['another_user_avatar'],
+                    'name': message['another_user_name']
+                  },
+                ),
+              );
+            });
             setState(() {
-              _messagesList.addAll(data);
               _isMessagesLoading = false;
             });
-            if (replyMessage != null) {
-              int i = _messagesList.indexWhere((e) {
-                return e['id'] == replyMessage['message_id'];
-              });
-              if (i != -1) {
-                setState(() {
-                  _itemScrollController.scrollTo(
-                      index: i, duration: Duration(milliseconds: 500));
-                  replyMessage = null;
-                });
-              } else {
-                _loadMore();
-              }
-            }
           }
 
           break;
 
         case "findMessage":
-          print("Scrolling to ${e.json['index']['message_id']}");
+          print("Scrolling to ${e.json['index']}");
           // while(_myLis
-          var id = e.json['index']['message_id'];
+          String id = e.json['index'];
+          Box<MessageModel> contactsBox =
+              Hive.box<MessageModel>(HiveBoxes.messages);
 
-          int i = _messagesList.indexWhere((e) {
-            return e['id'] == id;
+          List messages = contactsBox.values
+              .where((message) => message.chatId == widget.chatId)
+              .toList();
+
+          messages.sort((a, b) {
+            return b.time.compareTo(a.time);
           });
+          var i = messages.indexWhere((element) => element.id == id);
 
+          print('and i is $i');
           if (i != -1) {
-            if (_messagesList.length > 10) {
-              setState(() {
-                _itemScrollController.scrollTo(
-                    index: i, duration: Duration(milliseconds: 500));
-              });
-            }
+            setState(() {
+              _itemScrollController.scrollTo(
+                index: i,
+                duration: Duration(milliseconds: 500),
+              );
+            });
           } else {
             _loadMore();
           }
           break;
 
         case "message:create":
-          if (widget.chatId == int.parse(data['chat_id'].toString()))
-            setState(() {
-              _messagesList.insert(0, data);
-            });
+          if (widget.chatId == int.parse(data['chat_id'].toString())) {
+            Box<MessageModel> contactsBox =
+                Hive.box<MessageModel>(HiveBoxes.messages);
+            contactsBox.put(
+              data['message_id'],
+              MessageModel(
+                id: data['message_id'] as String,
+                chatId: int.parse(data['chat_id'].toString()),
+                userId: int.parse(data['user_id'].toString()),
+                avatar: data['avatar'] as String,
+                read: data['write'].toString() == '1' ? true : false,
+                username: data['user_name'] as String,
+                text: data['text'] as String,
+                type: int.parse(data['type'].toString()),
+                time: data['time'],
+                attachments: data['attachments'],
+                reply_data: data['reply_data'],
+                edited: data['edit'].toString() == '1' ? true : false,
+                moneyData: {
+                  'avatar': data['another_user_avatar'],
+                  'name': data['another_user_name']
+                },
+              ),
+            );
+          }
+
           var senderId = e.json["data"]['user_id'].toString();
           var userId = user.id.toString();
           if ('${e.json['data']['chat_id']}' == '${widget.chatId}' &&
@@ -1134,43 +1225,32 @@ class _NewChatPageState extends State<ChatPage> {
           break;
         case "message:write":
           print('message read');
-          var i = _messagesList.indexWhere((element) {
-            if (element['message_id'].toString() == 'null') {
-              return element['id'] == data['message_id'];
-            } else {
-              return element['message_id'] == data['message_id'];
-            }
-          });
 
-          setState(() {
-            _messagesList[i]['write'] = '1';
-          });
           break;
         case "forwardMessage":
           setState(() {
             showForwardingProcess = true;
             print('add to forward is ${e.json}');
-            print('add to forward is ${e.json}');
-            print('add to forward is ${e.json}');
-            print('add to forward is ${e.json}');
             toForwardMessages.add(e.json['id']);
           });
           break;
         case "user:check:online":
-          setState(() {
-            data.forEach((element) {
-              if (element['user_id'] == widget.userIds) {
-                _onlineString = element['online'];
-              }
-            });
-          });
+          // setState(() {
+          //   data.forEach((element) {
+          //     if (element['user_id'] == widget.userIds) {
+          //       _onlineString = element['online'];
+          //     }
+          //   });
+          // });
           break;
         case "chat:stickers":
           setState(() {
             stickersUrl = data['media_url'];
-            data['packs'].forEach((stickerPack) {
-              _stickersList.addAll(stickerPack['stickers']);
-            });
+            List stickers = data['packs'];
+            if (stickers != null && stickers.isNotEmpty)
+              data['packs'].forEach((stickerPack) {
+                _stickersList.addAll(stickerPack['stickers']);
+              });
           });
           break;
       }

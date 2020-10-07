@@ -1,15 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/widgets/full_photo.dart';
+import 'package:indigo24/services/constants.dart';
 
 class StickerMessage extends StatefulWidget {
   final String sticker;
-  final String stickerUrl;
 
   const StickerMessage({
     Key key,
     @required this.sticker,
-    @required this.stickerUrl,
   }) : super(key: key);
   @override
   _StickerMessageState createState() => _StickerMessageState();
@@ -22,7 +20,7 @@ class _StickerMessageState extends State<StickerMessage> {
       width: MediaQuery.of(context).size.width * 0.3,
       height: MediaQuery.of(context).size.width * 0.3,
       child: CachedNetworkImage(
-        imageUrl: '${widget.stickerUrl}${widget.sticker}',
+        imageUrl: '$stickerUrl${widget.sticker}',
       ),
     );
   }

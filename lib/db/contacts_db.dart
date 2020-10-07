@@ -12,11 +12,12 @@ class ContactsDB {
     final finder = Finder(filter: Filter.equals('id', contact.id));
     print("finder $finder");
     await _contactsFolder.add(await _db, contact.toJson());
-    // print('$contact Inserted successfully !!');
   }
 
   Future updateOrInsert(MyContact contact) async {
-    await _contactsFolder.record(int.parse('${contact.id}')).put(await _db, contact.toJson());
+    await _contactsFolder
+        .record(int.parse('${contact.id}'))
+        .put(await _db, contact.toJson());
   }
 
   Future insertList(List<MyContact> contacts) async {

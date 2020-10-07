@@ -6,10 +6,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indigo24/db/chats_db.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/intro.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat_models/chat_model.dart';
+import 'package:indigo24/pages/chat/ui/new_chat/chat_models/messages_model.dart';
+import '../chat/ui/new_chat/chat_models/hive_names.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -51,6 +54,10 @@ class _UserProfilePageState extends State<UserProfilePage>
     _api = Api();
     _api.getProfile().then((result) {
       print('profile result is $result');
+      if (result['message'] == 'Not authenticated' &&
+          result['success'].toString() == 'false') {
+        logOut(context);
+      }
       if (result['success'] == true) {
         if (mounted) {
           setState(() {
@@ -183,7 +190,6 @@ class _UserProfilePageState extends State<UserProfilePage>
   File _image;
 
   final picker = ImagePicker();
-  var api = Api();
 
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(
@@ -470,88 +476,33 @@ class _UserProfilePageState extends State<UserProfilePage>
   TextEditingController emailController =
       TextEditingController(text: '${user.email}');
 
-  Widget _buildEmailSection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("${localization.email}"),
-          SizedBox(height: 5),
-          Text(
-            '${user.email}',
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 18, color: blackPurpleColor),
+  Widget _buildSection(Size screenSize, String header, String text) {
+    return Column(
+      children: [
+        SizedBox(height: 10),
+        Container(
+          width: screenSize.width / 1.3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(header),
+              SizedBox(height: 5),
+              Text(
+                text,
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 18, color: blackPurpleColor),
+              ),
+              SizedBox(height: 5)
+            ],
           ),
-          SizedBox(height: 5)
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCitySection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("${localization.city}"),
-          SizedBox(height: 5),
-          Text(
-            '${user.city}',
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 18, color: blackPurpleColor),
-          ),
-          SizedBox(height: 5)
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCountrySection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("${localization.country}"),
-          SizedBox(height: 5),
-          Text(
-            '${user.country}',
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 18, color: blackPurpleColor),
-          ),
-          SizedBox(height: 5)
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPhoneSection(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("${localization.phoneNumber}"),
-          SizedBox(height: 5),
-          Text(
-            '${user.phone}',
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 18, color: blackPurpleColor),
-          ),
-          SizedBox(height: 5),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSeparator(Size screenSize) {
-    return Container(
-      width: screenSize.width / 1.3,
-      height: 0.5,
-      color: Colors.black54,
-      margin: EdgeInsets.only(top: 4.0),
+        ),
+        Container(
+          width: screenSize.width / 1.3,
+          height: 0.5,
+          color: Colors.black54,
+          margin: EdgeInsets.only(top: 4.0),
+        ),
+      ],
     );
   }
 
@@ -568,36 +519,29 @@ class _UserProfilePageState extends State<UserProfilePage>
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          SizedBox(height: 160),
-                          _buildPhoneSection(screenSize),
-                          _buildSeparator(screenSize),
-                        ],
+                      SizedBox(height: 160),
+                      _buildSection(
+                        screenSize,
+                        localization.phoneNumber,
+                        user.phone,
                       ),
-                      Column(
-                        children: <Widget>[
-                          SizedBox(height: 10),
-                          _buildEmailSection(screenSize),
-                          _buildSeparator(screenSize),
-                        ],
+                      _buildSection(
+                        screenSize,
+                        localization.email,
+                        user.email,
                       ),
                       user.country != ''
-                          ? Column(
-                              children: <Widget>[
-                                SizedBox(height: 10),
-                                _buildCountrySection(screenSize),
-                                _buildSeparator(screenSize),
-                              ],
+                          ? _buildSection(
+                              screenSize,
+                              localization.country,
+                              user.country,
                             )
                           : Center(),
                       user.city != ''
-                          ? Column(
-                              children: <Widget>[
-                                SizedBox(height: 10),
-                                _buildCitySection(screenSize),
-                                _buildSeparator(screenSize),
-                              ],
+                          ? _buildSection(
+                              screenSize,
+                              localization.city,
+                              user.city,
                             )
                           : Center(),
                       SizedBox(height: 10),
@@ -896,7 +840,6 @@ class CustomDialog extends StatelessWidget {
   dialogContent(BuildContext context) {
     return Stack(
       children: <Widget>[
-        //...bottom card part,
         Container(
           margin: EdgeInsets.only(top: Consts.avatarRadius),
           decoration: new BoxDecoration(
@@ -909,14 +852,13 @@ class CustomDialog extends StatelessWidget {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(
-                  // top: Consts.avatarRadius + Consts.padding,
                   top: Consts.padding + 24,
                   bottom: Consts.padding,
                   left: Consts.padding,
                   right: Consts.padding,
                 ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // To make the card compact
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     title != null
                         ? Text(
@@ -927,7 +869,6 @@ class CustomDialog extends StatelessWidget {
                             ),
                           )
                         : Container(),
-                    // SizedBox(height: 16.0),
                     Text(
                       description,
                       textAlign: TextAlign.center,
@@ -942,8 +883,9 @@ class CustomDialog extends StatelessWidget {
                   color: blackPurpleColor,
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(Consts.padding),
-                      bottomRight: Radius.circular(Consts.padding)),
+                    bottomLeft: Radius.circular(Consts.padding),
+                    bottomRight: Radius.circular(Consts.padding),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -953,6 +895,8 @@ class CustomDialog extends StatelessWidget {
                         onPressed: () async {
                           var preferences =
                               await SharedPreferences.getInstance();
+                          Hive.box<MessageModel>(HiveBoxes.messages).clear();
+                          Hive.box<ChatModel>(HiveBoxes.chats).clear();
 
                           // await api.updateFCM('logoutToken');
                           preferences.setString('phone', 'null');
@@ -963,8 +907,6 @@ class CustomDialog extends StatelessWidget {
                             ),
                             (r) => false,
                           );
-                          ChatsDB _chatsDB = ChatsDB();
-                          _chatsDB.deleteAll();
                           await api.logOutHttp().then((result) {
                             print(result);
                             if (result['message'] == 'Not authenticated' &&
@@ -980,13 +922,18 @@ class CustomDialog extends StatelessWidget {
                           });
                         },
                         child: Container(
-                            height: 50,
-                            child: Center(
-                                child: Text("${localization.yes}",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w500)))),
+                          height: 50,
+                          child: Center(
+                            child: Text(
+                              "${localization.yes}",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     Container(width: 1, height: 50, color: Colors.white),
@@ -996,13 +943,18 @@ class CustomDialog extends StatelessWidget {
                           Navigator.of(context).pop(); // To close the dialog
                         },
                         child: Container(
-                            height: 50,
-                            child: Center(
-                                child: Text("${localization.no}",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w500)))),
+                          height: 50,
+                          child: Center(
+                            child: Text(
+                              "${localization.no}",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -1011,16 +963,6 @@ class CustomDialog extends StatelessWidget {
             ],
           ),
         ),
-        //...top circlular image part,
-        // Positioned(
-        //   left: Consts.padding,
-        //   right: Consts.padding,
-        //   child: CircleAvatar(
-        //     backgroundColor: Colors.transparent,
-        //     radius: Consts.avatarRadius,
-        //     child: ClipOval(child: image),
-        //   ),
-        // ),
       ],
     );
   }

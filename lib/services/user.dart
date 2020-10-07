@@ -1,28 +1,17 @@
-var id = "";
-var avatar = "";
-var email = "";
-var name = "";
-var unique = "";
-var phone = "";
-var balance = "";
-var balanceInBlock = "";
-var pin = "false";
-String chatBackground = 'ligth';
 bool identified = false;
+
+String id = "";
+String avatar = "";
+String email = "";
+String name = "";
+String unique = "";
+String phone = "";
+String balance = "";
+String balanceInBlock = "";
+String pin = "false";
+String chatBackground = 'ligth';
 String country = '';
 String city = '';
-
-var avatarUrl = "https://indigo24.com/uploads/avatars/";
+String avatarUrl = "https://indigo24.com/uploads/avatars/";
+String sound = 'message_in.mp3';
 Map<String, dynamic> settings;
-
-void delete() {
-  id = "";
-  avatar = "";
-  email = "";
-  name = "";
-  unique = "";
-  phone = "";
-  balance = "";
-  balanceInBlock = "";
-  pin = "";
-}

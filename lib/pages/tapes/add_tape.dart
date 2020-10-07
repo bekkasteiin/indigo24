@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -67,217 +69,139 @@ class _AddTapePageState extends State<AddTapePage> {
         }
       },
       child: Scaffold(
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          appBar: AppBar(
-            centerTitle: true,
-            leading: IconButton(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        appBar: IndigoAppBarWidget(
+          title: Text(
+            "${localization.newTape}",
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          actions: <Widget>[
+            IconButton(
               icon: Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(5),
                 child: Image(
                   image: AssetImage(
-                    'assets/images/back.png',
+                    'assets/images/add.png',
                   ),
                 ),
               ),
-              onPressed: () {
-                Navigator.pop(context);
+              onPressed: () async {
+                // print(singleFile);
+
+                // if (singleFile != null) {
+                //   // var json = singleFile.toJson();
+                //   // print(json['path']);
+                //   setState(() {
+                //     // _currentFile = File(json['path']);
+                //     _currentFile = File(singleFile);
+                //     singleFile = null;
+                //     isNotPicked = false;
+                //   });
+                // }
+                print("Pressed with $_currentFile");
+                if (_descriptionController.text == '' ||
+                    _titleController.text == '') {
+                  showAlertDialog(context, "${localization.fillAllFields}");
+                } else if (_currentFile == null) {
+                  showAlertDialog(context, "${localization.selectFile}");
+                } else {
+                  print("Current file $_currentFile");
+                  _pauseVideo();
+                  await addTape(context);
+                }
               },
             ),
-            iconTheme: IconThemeData(
-              color: Colors.black,
-            ),
-            brightness: Brightness.light,
-            title: Text('${localization.newTape}',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w400,
-                ),
-                textAlign: TextAlign.center),
-            actions: <Widget>[
-              IconButton(
-                icon: Container(
-                  padding: EdgeInsets.all(5),
-                  child: Image(
-                    image: AssetImage(
-                      'assets/images/add.png',
-                    ),
+          ],
+        ),
+        body: Center(
+          child: ListView(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: TextField(
+                        controller: _titleController,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(40),
+                        ],
+                        decoration: InputDecoration(
+                            labelText: '${localization.title}')),
                   ),
-                ),
-                onPressed: () async {
-                  // print(singleFile);
-
-                  // if (singleFile != null) {
-                  //   // var json = singleFile.toJson();
-                  //   // print(json['path']);
-                  //   setState(() {
-                  //     // _currentFile = File(json['path']);
-                  //     _currentFile = File(singleFile);
-                  //     singleFile = null;
-                  //     isNotPicked = false;
-                  //   });
-                  // }
-                  print("Pressed with $_currentFile");
-                  if (_descriptionController.text == '' ||
-                      _titleController.text == '') {
-                    showAlertDialog(context, "${localization.fillAllFields}");
-                  } else if (_currentFile == null) {
-                    showAlertDialog(context, "${localization.selectFile}");
-                  } else {
-                    print("Current file $_currentFile");
-                    _pauseVideo();
-                    await addTape(context);
-                  }
-                },
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: TextField(
+                        minLines: 1,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(200),
+                        ],
+                        keyboardType: TextInputType.text,
+                        maxLines: 4,
+                        controller: _descriptionController,
+                        decoration: InputDecoration(
+                            labelText: '${localization.description}')),
+                  ),
+                ],
               ),
-            ],
-            backgroundColor: Colors.white,
-          ),
-          body:
-              // Center(
-              //   child: Container(
-              //     child: Center(
-              //       child: Text("test"),
-              //     ),
+
+              _isNotPicked
+                  ? Container()
+                  : _isVideo ? _previewVideo() : _previewImage(),
+
+              // Image(
+              //   image: AssetDataImage(
+              //     singleFile,
+              //     targetWidth: Utils.width2px(context, ratio: 3),
+              //     targetHeight: Utils.width2px(context, ratio: 3),
               //   ),
+              //   fit: BoxFit.cover,
+              //   width: double.infinity,
+              //   height: double.infinity,
               // ),
-              Center(
-            child: ListView(
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      child: TextField(
-                          controller: _titleController,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(40),
-                          ],
-                          decoration: InputDecoration(
-                              labelText: '${localization.title}')),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      child: TextField(
-                          minLines: 1,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(80),
-                          ],
-                          keyboardType: TextInputType.text,
-                          maxLines: 4,
-                          controller: _descriptionController,
-                          decoration: InputDecoration(
-                              labelText: '${localization.description}')),
-                    ),
-                  ],
-                ),
-
-                _isNotPicked
-                    ? Container()
-                    : _isVideo ? _previewVideo() : _previewImage(),
-
-                // Image(
-                //   image: AssetDataImage(
-                //     singleFile,
-                //     targetWidth: Utils.width2px(context, ratio: 3),
-                //     targetHeight: Utils.width2px(context, ratio: 3),
-                //   ),
-                //   fit: BoxFit.cover,
-                //   width: double.infinity,
-                //   height: double.infinity,
-                // ),
-              ],
-            ),
-          ),
-          floatingActionButton: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: FloatingActionButton(
-                  backgroundColor: Colors.white,
-                  onPressed: () {
-                    _isVideo = false;
-                    action();
-                    // _settingModalBottomSheet(context);
-                    // MY COMMENT
-                    // _onImageButtonPressed(ImageSource.camera);
-                  },
-                  heroTag: 'image',
-                  tooltip: 'Pick Image from camera',
-                  child: Image.asset("assets/images/camera.png", width: 30),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: FloatingActionButton(
-                  backgroundColor: Colors.white,
-                  onPressed: () {
-                    _isVideo = true;
-                    action();
-                    // _onImageButtonPressed(ImageSource.camera);
-                  },
-                  heroTag: 'video',
-                  tooltip: 'Pick Video from camera',
-                  child: Image.asset("assets/images/video.png", width: 30),
-                ),
-              ),
             ],
-          )
-          // Column(
-          //   mainAxisAlignment: MainAxisAlignment.end,
-          //   children: <Widget>[
-          // FloatingActionButton(
-          //   onPressed: () {
-          //     isVideo = false;
-          //     _onImageButtonPressed(ImageSource.gallery);
-          //   },
-          //   heroTag: 'image0',
-          //   tooltip: 'Pick Image from gallery',
-          //   child: const Icon(Icons.photo_library),
-          // ),
-          //     Padding(
-          //       padding: const EdgeInsets.only(top: 16.0),
-          //       child: FloatingActionButton(
-          //         onPressed: () {
-          //           isVideo = false;
-          //           _onImageButtonPressed(ImageSource.camera);
-          //         },
-          //         heroTag: 'image1',
-          //         tooltip: 'Take a Photo',
-          //         child: const Icon(Icons.camera_alt),
-          //       ),
-          //     ),
-          //     Padding(
-          //       padding: const EdgeInsets.only(top: 16.0),
-          //       child: FloatingActionButton(
-          //         backgroundColor: Colors.red,
-          //         onPressed: () {
-          //           isVideo = true;
-          //           _onImageButtonPressed(ImageSource.gallery);
-          //         },
-          //         heroTag: 'video0',
-          //         tooltip: 'Pick Video from gallery',
-          //         child: const Icon(Icons.video_library),
-          //       ),
-          //     ),
-          //     Padding(
-          //       padding: const EdgeInsets.only(top: 16.0),
-          //       child: FloatingActionButton(
-          //         backgroundColor: Colors.red,
-          //         onPressed: () {
-          // isVideo = true;
-          // _onImageButtonPressed(ImageSource.camera);
-          //         },
-          //         heroTag: 'video1',
-          //         tooltip: 'Take a Video',
-          //         child: const Icon(Icons.videocam),
-          //       ),
-          //     ),
-          //   ],
-          // ),
           ),
+        ),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: FloatingActionButton(
+                backgroundColor: Colors.white,
+                onPressed: () {
+                  _isVideo = false;
+                  _action();
+                  // _settingModalBottomSheet(context);
+                  // MY COMMENT
+                  // _onImageButtonPressed(ImageSource.camera);
+                },
+                heroTag: 'image',
+                tooltip: 'Pick Image from camera',
+                child: Image.asset("assets/images/camera.png", width: 30),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: FloatingActionButton(
+                backgroundColor: Colors.white,
+                onPressed: () {
+                  _isVideo = true;
+                  _action();
+                  // _onImageButtonPressed(ImageSource.camera);
+                },
+                heroTag: 'video',
+                tooltip: 'Pick Video from camera',
+                child: Image.asset("assets/images/video.png", width: 30),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -303,7 +227,7 @@ class _AddTapePageState extends State<AddTapePage> {
     });
   }
 
-  action() {
+  _action() {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();

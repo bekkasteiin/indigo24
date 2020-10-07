@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class HistoryFiletPage extends StatefulWidget {
   @override
@@ -13,35 +14,16 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        brightness: Brightness.light,
+      appBar: IndigoAppBarWidget(
         title: Text(
-          '${localization.filter}',
+          "${localization.filter}",
           style: TextStyle(
-            color: Colors.black,
+            color: blackPurpleColor,
             fontSize: 22,
             fontWeight: FontWeight.w400,
           ),
           textAlign: TextAlign.center,
         ),
-        backgroundColor: Colors.white,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,10 +91,14 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10.0,
-              spreadRadius: -2,
-              offset: Offset(0.0, 0.0))
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: -2,
+            offset: Offset(
+              0.0,
+              0.0,
+            ),
+          )
         ],
       ),
       child: ButtonTheme(

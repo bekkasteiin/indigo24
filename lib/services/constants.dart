@@ -4,7 +4,6 @@ String domen = 'xyz';
 String avatarUrl = domen == 'com'
     ? 'https://media.indigo24.com/avatars/'
     : 'https://indigo24.xyz/uploads/avatars/';
-String groupAvatarUrl = 'https://media.chat.indigo24.$domen/media/group/';
 String uploadTapes = 'https://indigo24.$domen/uploads/tapes/';
 
 String socket = 'wss://chat.indigo24.$domen:9502';
@@ -12,6 +11,11 @@ String socket = 'wss://chat.indigo24.$domen:9502';
 String baseUrl = 'https://api.indigo24.$domen/';
 
 String mediaChat = 'https://media.chat.indigo24.$domen/upload';
+
+String voiceUrl = 'https://media.chat.indigo24.$domen/media/voice/';
+String imageUrl = 'https://media.chat.indigo24.$domen/media/images/';
+String videoUrl = 'https://media.chat.indigo24.$domen/media/video/';
+String stickerUrl = 'https://media.chat.indigo24.$domen/media/stickers/';
 
 String logos = 'https://api.indigo24.$domen/logos/';
 

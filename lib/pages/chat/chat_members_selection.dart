@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +7,6 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 
 import '../../main.dart';
-import 'chat_contacts.dart';
 
 class ChatMembersSelection extends StatefulWidget {
   final chatId;
@@ -245,7 +243,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                   ),
                   Container(
                     height: 50,
-                    padding: const EdgeInsets.only(
+                    padding: EdgeInsets.only(
                       top: 10,
                       left: 10,
                       right: 10,
@@ -253,7 +251,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                     ),
                     child: Center(
                       child: TextField(
-                        decoration: new InputDecoration(
+                        decoration: InputDecoration(
                           prefixIcon: Icon(
                             Icons.search,
                             color: blackPurpleColor,

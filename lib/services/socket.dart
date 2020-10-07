@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/chat/chat_list.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -99,11 +97,11 @@ class ChatRoom {
   void inSound() async {
     print("msg in sound is called");
     final player = AudioCache();
-    await player.play("sound/message_in.mp3");
+    await player.play('sound/' + user.sound);
   }
 
   sendSocketData(data) {
-    print('adding to socket $channel $data');
+    print('adding to socket $data');
     channel.sink.add(data);
   }
 
@@ -427,6 +425,18 @@ class ChatRoom {
     sendSocketData(data);
   }
 
+  userCheckById(id) {
+    String data = json.encode({
+      "cmd": "check:user:id",
+      "data": {
+        "user_id": "${user.id}",
+        "userToken": "${user.unique}",
+        "check_user_id": id,
+      }
+    });
+    sendSocketData(data);
+  }
+
   changeChatName(chatId, chatName) {
     String data = json.encode({
       "cmd": "chat:change:name",
@@ -499,14 +509,12 @@ class ChatRoom {
     print("EDITING IN SOCKET $m");
     var object = {
       "cmd": "editMessage",
-      "text": m['text'],
-      "message_id": m['id'],
-      "message": m
+      "text": m.text,
+      "message_id": m.id,
+      "message": m.toJson()
     };
-    var json = jsonDecode(jsonEncode(object));
 
-    // if (chatController != null) chatController.add(new MyChatEvent(json));
-    if (newChatController != null) newChatController.add(NewChatEvent(json));
+    if (newChatController != null) newChatController.add(NewChatEvent(object));
   }
 
   localForwardMessage(String id) {
@@ -520,27 +528,25 @@ class ChatRoom {
     newChatController.add(NewChatEvent(json));
   }
 
-  findMessage(i) {
+  findMessage(id) {
     var object = {
       "cmd": "findMessage",
-      "index": i,
+      "index": id,
     };
-    var json = jsonDecode(jsonEncode(object));
 
     // if (chatController != null) chatController.add(new MyChatEvent(json));
-    if (newChatController != null) newChatController.add(NewChatEvent(json));
+    if (newChatController != null) newChatController.add(NewChatEvent(object));
   }
 
   replyingMessage(m) {
-    print("REPLYING IN SOCKET $m");
+    print("REPLYING IN SOCKET ${m.toJson()}");
     var object = {
       "cmd": "replyMessage",
-      "text": m['text'],
-      "message_id": m['id'],
-      "message": m
+      "text": m.text,
+      "message_id": m.id,
+      "message": m.toJson()
     };
-    var json = jsonDecode(jsonEncode(object));
-    if (newChatController != null) newChatController.add(NewChatEvent(json));
+    if (newChatController != null) newChatController.add(NewChatEvent(object));
   }
 
   forwardMessage(m, String text, String chatIds) {
@@ -720,7 +726,8 @@ class ChatRoom {
               }
               break;
             case "chats:get":
-              newChatsController.add(NewChatsEvent(json));
+              if (newChatsController != null)
+                newChatsController.add(NewChatsEvent(json));
               if (chatsListDialogController != null &&
                   !chatsListDialogController.isClosed) {
                 chatsListDialogController.add(ChatListDialog(json));
@@ -879,7 +886,7 @@ class ChatRoom {
         }
       },
       onDone: () {
-        print("ON DONE IS CALLED"); // TODO
+        print("ON DONE IS CALLED");
         Future.delayed(const Duration(seconds: 1), () {
           connect(context);
           init();

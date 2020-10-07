@@ -12,18 +12,17 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/db/chats_model.dart';
+import 'package:hive/hive.dart';
 import 'package:indigo24/db/contact.dart';
 import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/pages/auth/intro.dart';
-import 'package:indigo24/pages/chat/chat.dart';
 import 'package:indigo24/pages/chat/chat_contacts.dart';
-import 'package:indigo24/pages/chat/chat_list.dart';
 import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
+
 import 'package:indigo24/pages/tapes/tapes.dart';
 import 'package:indigo24/pages/wallet/wallet.dart';
 import 'package:indigo24/services/helper.dart';
-
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/services/constants.dart';
@@ -34,8 +33,12 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'db/chats_db.dart';
-import 'pages/chat/ui/new_chat/chats_list.dart';
+import 'pages/chat/ui/new_chat/chats.dart';
+import 'pages/chat/ui/new_chat/chat_models/hive_names.dart';
+import 'pages/chat/ui/new_chat/chat_models/chat_model.dart';
+import 'pages/chat/ui/new_chat/chat_models/messages.g_model.dart';
+import 'pages/chat/ui/new_chat/chat_models/messages_model.dart';
+
 import 'pages/profile/profile.dart';
 import 'services/api.dart';
 import 'services/my_connectivity.dart';
@@ -148,7 +151,11 @@ Future<void> main() async {
   print('phone: $phone');
   print('unuque: $unique');
   print('customerID: $customerID');
-
+  await Hive.initFlutter();
+  Hive.registerAdapter(ChatAdapter());
+  await Hive.openBox<ChatModel>(HiveBoxes.chats);
+  Hive.registerAdapter(MessagesAdapter());
+  await Hive.openBox<MessageModel>(HiveBoxes.messages);
   //   await ContactsService.addContact(Contact(
   //       displayName: "Name $i",
   //       givenName: 'Givenname $i',
@@ -266,8 +273,7 @@ inAppPush(m) {
   }
 }
 
-_goToChat(name, chatID, context,
-    {chatType, memberCount, userIds, avatar, avatarUrl}) {
+_goToChat(name, chatID, context, {chatType, memberCount, userIds, avatar}) {
   // ChatRoom.shared.setChatStream();
   ChatRoom.shared.checkUserOnline(userIds);
   Navigator.push(
@@ -277,9 +283,7 @@ _goToChat(name, chatID, context,
               chatName: name,
               chatId: chatID,
               chatType: chatType,
-              userIds: userIds,
               avatar: avatar,
-              avatarUrl: avatarUrl,
             )),
   ).whenComplete(() {
     // this is bool for check load more is needed or not
@@ -361,9 +365,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   StreamSubscription _intentDataStreamSubscription;
   List<SharedMediaFile> _sharedFiles;
-  String _sharedText;
+  String ss;
   bool _isSharedVideo = false;
-  ChatsDB _chatsDB = ChatsDB();
 
   ContactsDB _contactsDB = ContactsDB();
 
@@ -406,7 +409,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         ReceiveSharingIntent.getTextStream().listen((String value) {
       setState(() {
         print("Shared:" + (value ?? ""));
-        _sharedText = value;
+        ss = value;
       });
     }, onError: (err) {
       print("getLinkStream error: $err");
@@ -415,7 +418,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialText().then((String value) {
       setState(() {
-        _sharedText = value;
+        ss = value;
       });
     });
   }
@@ -431,6 +434,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     user.avatar = await SharedPreferencesHelper.getString('avatar');
     user.unique = await SharedPreferencesHelper.getString('unique');
     user.pin = await SharedPreferencesHelper.getString('pin');
+    user.sound = await SharedPreferencesHelper.getString('sound');
     return user.id;
   }
 
@@ -647,6 +651,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       print('user id: ${user.id}');
       print('user name: ${user.name}');
       print('user balance: ${user.balance}');
+      print('user sound: ${user.sound}');
       _init();
       _connectivity.initialise();
       _connectivity.myStream.listen((source) {
@@ -717,18 +722,13 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           }
           break;
         default:
-          print("default in main ${e.json}");
+          print("default in main $cmd");
           break;
       }
     });
   }
 
-  updateOrInsertChat(ChatsModel chat) async {
-    // await chatsDB.deleteAll();
-    await _chatsDB.updateOrInsert(chat);
-  }
-
-  _goToChat(name, chatID, {chatType, memberCount, userIds, avatar, avatarUrl}) {
+  _goToChat(name, chatID, {chatType, memberCount, userIds, avatar}) {
     // ChatRoom.shared.setChatStream();
     ChatRoom.shared.checkUserOnline(userIds);
     Navigator.push(
@@ -738,9 +738,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           chatName: name,
           chatId: chatID,
           chatType: chatType,
-          userIds: userIds,
           avatar: avatar,
-          avatarUrl: avatarUrl,
         ),
       ),
     ).whenComplete(() {
@@ -1084,8 +1082,6 @@ dioError(context) async {
   );
 }
 
-ChatsDB _chatsDB = ChatsDB();
-
 logOut(BuildContext context) async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   ChatRoom.shared.channel = null;
@@ -1095,7 +1091,6 @@ logOut(BuildContext context) async {
   Widget okButton = CupertinoDialogAction(
     child: Text("OK"),
     onPressed: () async {
-      _chatsDB.deleteAll();
       Navigator.pop(context);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class SettingsLanguagePage extends StatefulWidget {
   @override
@@ -22,24 +23,7 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        iconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.of(context).pop(true);
-          },
-        ),
+      appBar: IndigoAppBarWidget(
         title: Text(
           "${localization.language}",
           style: TextStyle(
@@ -49,8 +33,6 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        backgroundColor: Colors.white,
-        brightness: Brightness.light,
       ),
       body: SafeArea(
         child: ListView.builder(

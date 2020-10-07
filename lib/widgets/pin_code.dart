@@ -3,13 +3,11 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:vibration/vibration.dart';
 
 import 'circle.dart';
 import 'keyboard.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/services/user.dart' as user;
 
 typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();

@@ -6,7 +6,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/custom_dropdown.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class WithdrawPage extends StatefulWidget {
   final provider;
@@ -18,23 +18,17 @@ class WithdrawPage extends StatefulWidget {
 }
 
 class _WithdrawPageState extends State<WithdrawPage> {
-  bool prealodaer = false;
+  bool _preloader = false;
 
   String _commission = '0';
 
   TextEditingController _amountController;
 
   Api _api;
-  List _methods;
+
   @override
   void initState() {
     super.initState();
-    _methods = [
-      'Visa Mastercard РФ',
-      'Visa Mastercard иностранных банков',
-      'Visa Mastercard Украина',
-      'Qiwi кошелек'
-    ];
     _api = Api();
 
     _amountController = TextEditingController();
@@ -59,22 +53,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       },
       child: Scaffold(
         backgroundColor: milkWhiteColor,
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          brightness: Brightness.light,
+        appBar: IndigoAppBarWidget(
           title: Text(
             localization.withdraw,
             style: TextStyle(
@@ -82,9 +61,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
               fontSize: 22,
               fontWeight: FontWeight.w400,
             ),
-            textAlign: TextAlign.center,
           ),
-          backgroundColor: Colors.white,
         ),
         body: Stack(
           children: <Widget>[
@@ -96,19 +73,23 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   ),
                   Center(
                     child: Text(
-                        '${localization.commission} ${widget.provider['commission']}%'),
+                      '${localization.commission} ${widget.provider['commission']}%',
+                    ),
                   ),
                   Center(
                     child: Text(
-                        '${localization.minAmount} ${widget.provider['min']} KZT'),
+                      '${localization.minAmount} ${widget.provider['min']} KZT',
+                    ),
                   ),
                   Center(
                     child: Text(
-                        '${localization.minCommission} ${widget.provider['min_commission']} KZT'),
+                      '${localization.minCommission} ${widget.provider['min_commission']} KZT',
+                    ),
                   ),
                   Center(
                     child: Text(
-                        '${localization.maxAmount} ${widget.provider['max']} KZT'),
+                      '${localization.maxAmount} ${widget.provider['max']} KZT',
+                    ),
                   ),
                   Container(
                     color: Colors.white,
@@ -193,7 +174,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                             }
 
                             setState(() {
-                              prealodaer = true;
+                              _preloader = true;
                             });
 
                             _api
@@ -203,7 +184,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                               print('Withdraw result $withdrawResult');
 
                               setState(() {
-                                prealodaer = false;
+                                _preloader = false;
                               });
 
                               if (withdrawResult['success'].toString() ==
@@ -252,7 +233,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 ],
               ),
             ),
-            prealodaer
+            _preloader
                 ? Center(
                     child: CircularProgressIndicator(),
                   )

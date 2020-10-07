@@ -1,14 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/style/colors.dart';
 
-import '../../../chat_info.dart';
-import '../divider_message.dart';
-import '../received_message.dart';
-import '../sended_message.dart';
+import '../../chat_info.dart';
+import 'message_categories/divider_message.dart';
+import 'message_categories/received_message.dart';
+import 'message_categories/sended_message.dart';
 
 class MessageCategoryWidget extends StatefulWidget {
   final int messageCategory;
@@ -64,23 +65,26 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                             MaterialPageRoute(
                               builder: (context) => ChatProfileInfo(
                                 chatType: 0,
-                                chatName: '${widget.message['user_name']}',
+                                chatName: '${widget.message.username}',
                                 chatAvatar: widget.avatar,
-                                chatId: widget.chatId,
-                                phone: widget.message['phone'],
+                                userId: widget.message.userId,
                               ),
                             ),
                           ).whenComplete(() {
                             // ChatRoom.shared.closeCabinetInfoStream();
                           });
                         },
-                        child: ClipOval(
-                          child: Container(
-                            color: greyColor,
-                            child: Image.network(
-                              widget.avatar.replaceAll('AxB', '200x200'),
-                              width: 30,
-                              height: 30,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: CachedNetworkImage(
+                              errorWidget: (context, url, error) => Image.asset(
+                                'assets/preloader.gif',
+                              ),
+                              imageUrl: avatarUrl +
+                                  widget.avatar.replaceAll('AxB', '200x200'),
                             ),
                           ),
                         ),
@@ -138,15 +142,9 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                           ),
                           onPressed: () {
                             print('Файлы');
-                            if (widget.message['message_id'] == null) {
-                              ChatRoom.shared.localForwardMessage(
-                                widget.message['id'],
-                              );
-                            } else {
-                              ChatRoom.shared.localForwardMessage(
-                                widget.message['message_id'],
-                              );
-                            }
+                            ChatRoom.shared.localForwardMessage(
+                              widget.message.id,
+                            );
                             Navigator.pop(context);
                           },
                         ),

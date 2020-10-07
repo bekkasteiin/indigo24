@@ -1,15 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
-
-import '../chat.dart';
 
 class UsersListDraggableWidget extends StatefulWidget {
   final int chatId;
@@ -88,12 +85,18 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
                           width: 0,
                         );
                       return ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: Image.network(
-                            '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
-                            width: 35,
-                            height: 35,
+                        leading: Container(
+                          width: 35,
+                          height: 35,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: CachedNetworkImage(
+                              errorWidget: (context, url, error) => Image.asset(
+                                'assets/preloader.gif',
+                              ),
+                              imageUrl:
+                                  '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                            ),
                           ),
                         ),
                         title: Text(
@@ -129,7 +132,6 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
     setState(() {
       _isMembersLoading = true;
     });
-
     ChatRoom.shared.chatMembers(widget.chatId, page: _membersPage);
   }
 
@@ -155,36 +157,5 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
           print('USERS LIST DRAGABLE DEFasdasdAULT');
       }
     });
-  }
-
-  String _time(timestamp) {
-    if (timestamp != null) {
-      if (timestamp != '') {
-        var messageUnixDate = DateTime.fromMillisecondsSinceEpoch(
-          int.parse("$timestamp") * 1000,
-        );
-        TimeOfDay messageDate =
-            TimeOfDay.fromDateTime(DateTime.parse('$messageUnixDate'));
-        var hours;
-        var minutes;
-        hours = '${messageDate.hour}';
-        minutes = '${messageDate.minute}';
-        var diff = DateTime.now().difference(messageUnixDate);
-        if (messageDate.hour.toString().length == 1)
-          hours = '0${messageDate.hour}';
-        if (messageDate.minute.toString().length == 1)
-          minutes = '0${messageDate.minute}';
-        if (diff.inDays == 0) {
-          return '${localization.today}\n$hours:$minutes';
-        } else if (diff.inDays < 7) {
-          int weekDay = messageUnixDate.weekday;
-          return newIdentifyDay(weekDay) + '\n$hours:$minutes';
-        } else {
-          return '$messageUnixDate'.substring(0, 10).replaceAll('-', '.') +
-              '\n$hours:$minutes';
-        }
-      }
-    }
-    return '??:??';
   }
 }

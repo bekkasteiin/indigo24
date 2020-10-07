@@ -6,6 +6,7 @@ import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   @override
@@ -27,6 +28,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _cityController.dispose();
     super.dispose();
   }
 
@@ -56,22 +58,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        centerTitle: true,
-        brightness: Brightness.light,
+      appBar: IndigoAppBarWidget(
         title: Text(
           "${localization.profile}",
           style: TextStyle(
@@ -84,15 +71,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         actions: <Widget>[
           FlatButton(
             child: Text('${localization.save}'),
-            // Container(
-            //   height: 20,
-            //   width: 20,
-            //   child: Image(
-            //     image: AssetImage(
-            //       'assets/images/save.png',
-            //     ),
-            //   ),
-            // ),
             onPressed: () async {
               if (_nameController.text.isNotEmpty) {
                 _api
@@ -117,7 +95,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             },
           )
         ],
-        backgroundColor: Colors.white,
       ),
       body: Column(
         children: <Widget>[

@@ -58,6 +58,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     super.dispose();
+    loginController.dispose();
+    passwordController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
@@ -371,7 +373,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Countries(countries)),
+      MaterialPageRoute(
+        builder: (context) => Countries(countries),
+      ),
     );
 
     if (_selectedCountry != null)
