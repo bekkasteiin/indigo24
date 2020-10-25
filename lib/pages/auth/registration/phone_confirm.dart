@@ -59,8 +59,8 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
         preferredSize: Size.fromHeight(0.0),
         child: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.white, // status bar color
-          brightness: Brightness.light, // status bar brightness
+          backgroundColor: Colors.white,
+          brightness: Brightness.light,
         ),
       ),
       body: GestureDetector(
@@ -112,8 +112,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
   void _startTimer() {
     const oneSec = const Duration(seconds: 1);
     if (_timer == null) {
-      print('staring time');
-      print(_isPageOpened);
       _timer = Timer.periodic(oneSec, (Timer timer) {
         if (start == 0) {
           _timer.cancel();
@@ -212,7 +210,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                       onPressed: () async {
                         if (start == 0) {
                           _api.sendSms(widget.phone).then((sendSmsResult) {
-                            print(sendSmsResult);
                             setState(() {
                               start = 59;
                               _startTimer();
@@ -235,7 +232,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         child: Container(
                           padding: EdgeInsets.all(5),
                           child: Text(
-                            "${localization.repeat} SMS", // TODO ADD LOCALIZATION
+                            "${localization.repeat} SMS",
                             style: TextStyle(
                               color: Colors.grey[700],
                             ),
@@ -262,7 +259,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         await _api
                             .checkSms(widget.phone, _smsController.text)
                             .then((checkSmsResponse) async {
-                          print('this is checkSmsResponse $checkSmsResponse');
                           if (checkSmsResponse['success'] == true) {
                             setState(() {
                               smsError = "";

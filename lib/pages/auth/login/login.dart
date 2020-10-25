@@ -2,15 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
+import 'package:hive/hive.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/chat_model.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/hive_names.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/messages_model.dart';
 import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
-import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/restore_password.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
-
+import '../../../tabs.dart';
 import '../countries.dart';
 
 class LoginPage extends StatefulWidget {
@@ -50,7 +53,6 @@ class _LoginPageState extends State<LoginPage> {
     _api = Api();
     _countryDao = CountryDao();
     _getCountries().then((value) {
-      print(value);
       setState(() {});
     });
   }
@@ -337,9 +339,10 @@ class _LoginPageState extends State<LoginPage> {
                                     passwordController.text)
                                 .then((response) async {
                               _singInResult = response;
-                              print(
-                                  "LOGIN RESULT $phonePrefix${loginController.text} $response");
                               if ('${response['success']}' == 'true') {
+                                Hive.box<MessageModel>(HiveBoxes.messages)
+                                    .clear();
+                                Hive.box<ChatModel>(HiveBoxes.chats).clear();
                                 await _api.getBalance();
                                 Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(

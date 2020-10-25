@@ -35,7 +35,6 @@ class _PreviewMediaState extends State<PreviewMedia> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // color: Colors.white,
       decoration: BoxDecoration(
           image: DecorationImage(
               image: previewBackgoundProvider, fit: BoxFit.fitWidth)),
@@ -54,20 +53,13 @@ class _PreviewMediaState extends State<PreviewMedia> {
                     flex: 11,
                     child: widget.type == 'video'
                         ? VideoPlayerWidget(widget.filePath, "file")
-                        // ChewieVideo(
-                        //     controller: VideoPlayerController.file(file),
-                        //   )
                         : PhotoView(
                             imageProvider: FileImage(file),
                             minScale: PhotoViewComputedScale.contained,
                             maxScale: PhotoViewComputedScale.contained * 3,
                             backgroundDecoration:
                                 BoxDecoration(color: Colors.transparent),
-                          )
-                    // Container(
-                    //   child: Image.file(file),
-                    // ),
-                    ),
+                          )),
                 Expanded(
                   flex: 1,
                   child: Container(

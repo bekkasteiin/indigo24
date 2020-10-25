@@ -170,10 +170,15 @@ String saturday = 'Суббота';
 String sunday = 'Воскресенье';
 String today = 'Сегодня';
 String city = 'Город';
-String name = 'Имя'; // TODO;
-String example = 'Пример'; // TODO;
-String more = 'Еще'; // TODO;
-String less = 'Меньше'; // TODO;
+String name = 'Имя';
+String example = 'Пример';
+String more = 'Еще';
+String less = 'Меньше';
+String newPayment = 'Новый платеж';
+String pending = 'В обработке';
+String hours = 'Часа';
+String minutes = 'Минут';
+String likes = 'Лайки';
 
 List filters = [
   {'text': 'За неделю', 'code': 'week'},
@@ -194,7 +199,6 @@ setLanguage(code) {
   SharedPreferencesHelper.setString('languageCode', '$code');
   switch (code) {
     case 'en':
-      print('en');
       registration = 'Registration';
       title = 'Title';
       login = 'Login';
@@ -371,6 +375,11 @@ setLanguage(code) {
       example = 'Example';
       more = 'More';
       less = 'Less';
+      newPayment = 'New payment';
+      pending = 'Pending';
+      hours = 'Hours';
+      minutes = 'Minutes';
+      likes = 'Likes';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -547,7 +556,11 @@ setLanguage(code) {
       example = 'Пример';
       more = 'Еще';
       less = 'Меньше';
-      print('ru');
+      newPayment = 'Новый платеж';
+      pending = 'В обработке';
+      hours = 'Часа';
+      minutes = 'Минут';
+      likes = 'Лайки';
       break;
     case 'kz':
       registration = 'Тіркелу';
@@ -724,7 +737,11 @@ setLanguage(code) {
       example = 'Мысал';
       more = 'Тағы';
       less = 'Аз';
-      print('kz');
+      newPayment = 'Жаңа төлем';
+      pending = 'Орындалуда';
+      hours = 'Сағат';
+      minutes = 'Минут';
+      likes = 'Лайктер';
       break;
     case 'uz':
       registration = 'Рўйхатдан ўтиш';
@@ -796,7 +813,7 @@ setLanguage(code) {
       save = 'Сақлаш';
       share = 'Бўлишиш';
       photo = 'Сурат';
-      sessionIsOver = 'Сизнинг ҳисоб бошқа қурилма орқали кирган'; // НЕТ
+      sessionIsOver = 'Сизнинг ҳисоб бошқа қурилма орқали кирган';
       cancel = 'Бекор қилиш';
       allowContacts = 'Контактларга рухсат бериш';
       openSettings = 'Созламаларни очиш';
@@ -899,7 +916,11 @@ setLanguage(code) {
       example = 'бр Мисол';
       more = 'Кўпроқ';
       less = 'Камроқ';
-      print('uz');
+      newPayment = 'Янги тўлов';
+      pending = 'Кутилаётганлар';
+      hours = 'Соат';
+      minutes = 'Дақиқа';
+      likes = 'Каби';
       break;
     case 'uzb':
       registration = 'Ro\'yxatdan o\'tish';
@@ -1075,7 +1096,11 @@ setLanguage(code) {
       example = 'Misol';
       more = 'Ko\'proq';
       less = 'Kamroq';
-      print('uzb');
+      newPayment = 'Yangi to\'lov';
+      pending = 'Kutilayotganlar';
+      hours = 'Soat';
+      minutes = 'Daqiqa';
+      likes = 'Kabi';
       break;
     default:
   }

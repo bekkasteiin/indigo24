@@ -90,14 +90,12 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
 
   itemCounter() {
     int c = 0;
-    // TODO FIX II
     // for (int i = 0; i < listMessages.length; i++) {
     //   if (listMessages[i]['type'].toString() == '1') {
     //     c = c + 1;
     //     tempList.add(listMessages[i]);
     //   }
     // }
-    // print("ITEM counter ${tempList[0]}");
     return c;
   }
 
@@ -258,14 +256,11 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
 
   void _saveNetworkImage(url) async {
     GallerySaver.saveImage(url).then((bool success) {
-      setState(() {
-        print('Image is saved');
-      });
+      setState(() {});
       if (success)
         setState(() {
           showAlertDialog(
               context, "${localization.success}", "${localization.uploaded}");
-          print('Image is saved');
         });
       else
         showAlertDialog(context, "${localization.error}",

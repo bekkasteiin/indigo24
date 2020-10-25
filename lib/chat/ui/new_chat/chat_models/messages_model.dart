@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:indigo24/services/localization.dart';
 
 @HiveType(typeId: 1)
 class MessageModel extends HiveObject {

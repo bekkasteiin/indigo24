@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
@@ -31,17 +32,23 @@ class _MoneyMessageWidgetState extends State<MoneyMessageWidget> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: greyColor,
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image:
-                        NetworkImage('$avatarUrl${widget.moneyData['avatar']}'),
-                  ),
                 ),
+                child: widget.moneyData == null
+                    ? ClipOval(
+                        child: CachedNetworkImage(
+                            imageUrl: '$avatarUrl' + 'noAvatar.png'),
+                      )
+                    : ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: '$avatarUrl${widget.moneyData['avatar']}'
+                              .replaceAll('AxB', '200x200'),
+                        ),
+                      ),
               ),
               SizedBox(width: 5),
               Flexible(
                 child: Text(
-                  "${widget.moneyData['name']}",
+                  widget.moneyData == null ? "" : "${widget.moneyData['name']}",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

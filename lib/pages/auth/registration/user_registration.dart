@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_pages/chat_page_view_test.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
-import 'package:indigo24/pages/chat/chat_page_view_test.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
@@ -31,11 +31,11 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = new TextEditingController();
-    _emailController = new TextEditingController();
-    _lastNameController = new TextEditingController();
-    _passwordController = new TextEditingController();
-    _passwordController2 = new TextEditingController();
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _lastNameController = TextEditingController();
+    _passwordController = TextEditingController();
+    _passwordController2 = TextEditingController();
   }
 
   @override
@@ -459,7 +459,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                   setState(() {
                                     globalError = '';
                                   });
-                                  print('is not empty ');
                                   if (_passwordController.text ==
                                       _passwordController2.text) {
                                     password = _passwordController.text;
@@ -478,8 +477,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                             "$password",
                                             "${_emailController.text}")
                                         .then((registerResponse) {
-                                      print(
-                                          'this is register result $registerResponse');
                                       if (registerResponse['success'] == true) {
                                         Navigator.of(context)
                                             .pushAndRemoveUntil(
@@ -507,7 +504,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                       }
                                     });
                                   } else {
-                                    print('different passwords');
                                     setState(() {
                                       firstPasswordError =
                                           '${localization.passwordNotMatch}';
@@ -516,7 +512,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                     });
                                   }
                                 } else {
-                                  print('empty');
                                   setState(() {
                                     globalError =
                                         '${localization.fillAllFields}';

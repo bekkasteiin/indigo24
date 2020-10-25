@@ -18,6 +18,15 @@ class AudioMessageWidget extends StatefulWidget {
 class _AudioMessageWidgetState extends State<AudioMessageWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(child: PlayerWidget(url: "$voiceUrl${widget.media}"));
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PlayerWidget(url: "$voiceUrl${widget.media}"),
+          widget.text.toString() != 'null' ? Text('${widget.text}') : Center(),
+        ],
+      ),
+    );
   }
 }

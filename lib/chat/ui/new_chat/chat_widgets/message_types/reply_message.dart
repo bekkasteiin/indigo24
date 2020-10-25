@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_pages/chat.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
 class ReplyMessageWidget extends StatefulWidget {
@@ -22,12 +22,8 @@ class _ReplyMessageWidgetState extends State<ReplyMessageWidget> {
       ),
       child: GestureDetector(
         onTap: () {
-          print('added to find with deleted value ${widget.text.reply_data}');
           replyMessage = widget.text.reply_data;
           if (replyMessage != null) {
-            // print('going to ${(widget.text.reply_data['is_deleted'])}');
-
-            print('going to if ${widget.text.reply_data}');
             ChatRoom.shared.findMessage(widget.text.reply_data['message_id']);
           }
         },
@@ -65,11 +61,6 @@ class _ReplyMessageWidgetState extends State<ReplyMessageWidget> {
                                         maxLines: 3,
                                       )
                                 : Text("")
-
-                            // Text(
-                            //   '${widget.text ? widget.text['reply_data']['text'].toString() : widget.text['reply_data']['message_text_for_type'].toString()}',
-                            //   overflow: TextOverflow.ellipsis,
-                            // ),
                           ],
                         ),
                       ),

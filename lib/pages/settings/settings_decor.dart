@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/chat_models/messages_model.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/message_category.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/message_frame.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/message_types/text_message.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/messages_model.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_widgets/message_category.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_widgets/message_frame.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_widgets/message_types/text_message.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';

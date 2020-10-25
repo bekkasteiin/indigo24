@@ -134,7 +134,6 @@ class _TapesPageState extends State<TapesPage>
   @override
   void dispose() {
     super.dispose();
-    print("dispose TAPES PAGES");
     _videoPlayerController.dispose();
     _chewieController.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -152,7 +151,6 @@ class _TapesPageState extends State<TapesPage>
       RefreshController(initialRefresh: false);
 
   showAlertDialog(BuildContext context, String message) {
-    print("Alert");
     Widget okButton = CupertinoDialogAction(
       child: Text("OK"),
       onPressed: () {
@@ -201,7 +199,6 @@ class _TapesPageState extends State<TapesPage>
               setState(() {
                 _tapesDatabaseData = _tapesDatabaseData;
               });
-              print('$data' '$_tapesDatabaseData');
               showAlertDialog(context, "${data['title']} ${localization.hide}");
             },
           ),
@@ -216,13 +213,11 @@ class _TapesPageState extends State<TapesPage>
               );
 
               await _tapeDb.updateOrInsert(tape);
-              _api.blockUser(data[
-                  'customerId']); // TODO CHECK IT WHEN BACKEND FIXES REQUEST
+              _api.blockUser(data['customerId']);
               _tapesDatabaseData = await _tapeDb.getAll();
               setState(() {
                 _tapesDatabaseData = _tapesDatabaseData;
               });
-              print('$data' '$_tapesDatabaseData');
               showAlertDialog(
                   context, "${data['title']} ${localization.block}");
             },
@@ -317,7 +312,6 @@ class _TapesPageState extends State<TapesPage>
                         bool needToHide = false;
                         bool needToBlock = false;
                         _tapesDatabaseData.forEach((element) {
-                          // print('${element.toJson()['isBlocked']} ${element.toJson()['id']} ${result[index]['id']}');
                           if ('${element.toJson()['id']}' ==
                               '${_result[index]['id']}') {
                             needToHide = true;
@@ -329,17 +323,6 @@ class _TapesPageState extends State<TapesPage>
                             needToBlock = true;
                           }
                         });
-                        // if (result[index]['media'].endsWith('mp4')) {
-                        //   print(result[index]['media']);
-                        //   _controller =
-                        //       VideoPlayerController.network(result[index]['media'])
-                        //         ..initialize().then((_) {
-                        //           print('inited');
-                        //           setState(() {});
-                        //         });
-                        // }
-                        // if (result[index]['media'].endsWith('mp4'))
-                        //   return Container();
                         return needToHide
                             ? Container()
                             : VisibilityDetector(
@@ -347,7 +330,6 @@ class _TapesPageState extends State<TapesPage>
                                 onVisibilityChanged: (visibility) {
                                   if (visibility.visibleFraction == 0 &&
                                       this.mounted) {
-                                    print("Tapes disposed");
                                     _flickMultiManager.pause();
                                   }
                                 },
@@ -560,19 +542,11 @@ class _TapesPageState extends State<TapesPage>
                                                                           ? _result[index]
                                                                               [
                                                                               'frame']
-                                                                          : 'assets/preloader.gif',
+                                                                          : '${avatarUrl}noAvatar.png',
                                                                     )
-                                                                  // new ChewieVideo(
-                                                                  //     controller:
-                                                                  //         VideoPlayerController
-                                                                  //             .network(
-                                                                  //                 "$uploadTapes${result[index]['media']}"),
-                                                                  //   )
                                                                   : AspectRatio(
                                                                       aspectRatio:
                                                                           1 / 1,
-                                                                      // Puts a "mask" on the child, so that it will keep its original, unzoomed size
-                                                                      // even while it's being zoomed in
                                                                       child:
                                                                           ClipRect(
                                                                         child:
@@ -583,10 +557,8 @@ class _TapesPageState extends State<TapesPage>
                                                                           ),
                                                                           backgroundDecoration:
                                                                               BoxDecoration(color: Colors.transparent),
-                                                                          // Contained = the smallest possible size to fit one dimension of the screen
                                                                           minScale:
                                                                               PhotoViewComputedScale.contained,
-                                                                          // Covered = the smallest possible size to fit the whole screen
                                                                           maxScale:
                                                                               PhotoViewComputedScale.contained,
                                                                           enableRotation:
@@ -594,12 +566,6 @@ class _TapesPageState extends State<TapesPage>
                                                                         ),
                                                                       ),
                                                                     ),
-
-                                                              // Image(
-                                                              //   image: NetworkImage(
-                                                              //     "https://indigo24.xyz/uploads/tapes/${result[index]['media']}",
-                                                              //   ),
-                                                              // ),
                                                             ),
                                                           ),
                                                         ),
@@ -631,7 +597,6 @@ class _TapesPageState extends State<TapesPage>
                                                                         '${_result[index]['id']}')
                                                                     .then(
                                                                         (value) {
-                                                                  print(value);
                                                                   setState(() {
                                                                     _likeResult =
                                                                         value;
@@ -701,26 +666,6 @@ class _TapesPageState extends State<TapesPage>
                                                                       '${_result[index]['commentsCount']}',
                                                                     ),
                                                                   ),
-                                                            // IconButton(
-                                                            //   icon: Container(
-                                                            //     width: 35,
-                                                            //     height: 35,
-                                                            //     child: Image(
-                                                            //       image: AssetImage(
-                                                            //         'assets/images/send.png',
-                                                            //       ),
-                                                            //     ),
-                                                            //   ),
-                                                            //   onPressed: () {
-                                                            //     print("${result[index]['id']}");
-                                                            //   },
-                                                            // ),
-                                                            // Container(
-                                                            //   width: 30,
-                                                            //   child: Text(
-                                                            //     '${result[index]['commentsCount']}',
-                                                            //   ),
-                                                            // ),
                                                             Expanded(
                                                               child: Text(''),
                                                             ),
@@ -853,128 +798,11 @@ class _TapesPageState extends State<TapesPage>
           ),
         );
       } else {
-        return SizedBox(
-          height: 0,
-          width: 0,
-        );
+        return SizedBox(height: 0, width: 0);
       }
     });
   }
 
   @override
   bool get wantKeepAlive => true;
-}
-
-class ChewieVideo extends StatefulWidget {
-  final VideoPlayerController controller;
-  final size;
-  ChewieVideo({this.controller, this.size});
-
-  @override
-  _ChewieVideoState createState() => _ChewieVideoState();
-}
-
-class _ChewieVideoState extends State<ChewieVideo> {
-  VideoPlayerController _controller;
-  ChewieController _chewieController;
-
-  Future<void> _future;
-
-  Future<void> initVideoPlayer() async {
-    await _controller.initialize();
-    setState(() {
-      print(_controller.value.aspectRatio);
-      _chewieController = ChewieController(
-        videoPlayerController: _controller,
-        aspectRatio: _controller.value.aspectRatio,
-        deviceOrientationsAfterFullScreen: [
-          DeviceOrientation.landscapeRight,
-          DeviceOrientation.landscapeLeft,
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-        ],
-        autoInitialize: true,
-        autoPlay: false,
-        looping: false,
-        placeholder: _buildPlaceholderImage(),
-        errorBuilder: (context, errorMessage) {
-          return Center(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                errorMessage,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          );
-        },
-      );
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _setControllers();
-  }
-
-  _setControllers() {
-    _controller = widget.controller;
-    _future = initVideoPlayer();
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    print("deactive");
-    if (_controller != null && _chewieController != null) {
-      _controller.dispose();
-      _chewieController.dispose();
-      _future = null;
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    // routeObserver.subscribe(this, ModalRoute.of(context));
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    if (_controller != null && _chewieController != null) {
-      _controller.dispose();
-      _chewieController.dispose();
-      _future = null;
-    }
-    // _chewieController.videoPlayerController.dispose();
-  }
-
-  //
-
-  _buildPlaceholderImage() {
-    return Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: FutureBuilder(
-            future: _future,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting)
-                return _buildPlaceholderImage();
-              if (_chewieController == null) return _buildPlaceholderImage();
-              return Chewie(
-                controller: _chewieController,
-              );
-            }),
-      ),
-    );
-  }
 }

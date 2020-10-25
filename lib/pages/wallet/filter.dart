@@ -111,11 +111,9 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
             String nowFirst = nowSplit.first;
 
             DateTime prevValue;
-            // print(date.)
             switch (code) {
               case 'week':
                 prevValue = date.subtract(Duration(days: 7));
-                print(prevValue);
                 break;
               case 'month':
                 prevValue = DateTime(date.year, date.month - 1, date.day);

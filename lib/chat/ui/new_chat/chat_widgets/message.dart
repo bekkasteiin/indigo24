@@ -1,21 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import '../new_chat/message_types/audio_message.dart';
-import '../new_chat/message_types/image_message.dart';
 import 'message_category.dart';
-import '../new_chat/message_types/service_message.dart';
-import '../new_chat/message_types/text_message.dart';
-import '../new_chat/message_types/video_message.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-
-import '../new_chat/message_types/document_message.dart';
-import '../new_chat/message_types/forward_message.dart';
-import '../new_chat/message_types/link_message.dart';
 import 'message_frame.dart';
-import '../new_chat/message_types/money_message.dart';
-import '../new_chat/message_types/reply_message.dart';
-import '../new_chat/message_types/sticker_message.dart';
+import 'message_types/audio_message.dart';
+import 'message_types/document_message.dart';
+import 'message_types/forward_message.dart';
+import 'message_types/image_message.dart';
+import 'message_types/link_message.dart';
+import 'message_types/money_message.dart';
+import 'message_types/reply_message.dart';
+import 'message_types/service_message.dart';
+import 'message_types/sticker_message.dart';
+import 'message_types/text_message.dart';
+import 'message_types/video_message.dart';
 
 class MessageWidget extends StatelessWidget {
   final int messageCategory;
@@ -53,7 +50,7 @@ class MessageWidget extends StatelessWidget {
   // const VOICE_MESSAGE_TYPE = 3;
   // const VIDEO_MESSAGE_TYPE = 4;
   // const SYSTEM_MESSAGE_TYPE = 7;
-  // const SYSTEM_MESSAGE_DIVIDER_TYPE = 8; --
+  // const SYSTEM_MESSAGE_DIVIDER_TYPE = 8;
   // const GEO_POINT_MESSAGE_TYPE = 9;
   // const REPLY_MESSAGE_TYPE = 10;
   // const MONEY_MESSAGE_TYPE = 11;
@@ -61,17 +58,6 @@ class MessageWidget extends StatelessWidget {
   // const FORWARD_MESSAGE_TYPE = 13;
 
   identifyMessageType(int messageType) {
-    // print('identifying type $messageType');
-    // if (message['forward_data'] != null) {
-    //   ForwardMessageWidget(
-    //       child: identifyMessageType(
-    //         int.parse(
-    //           message['type'].toString(),
-    //         ),
-    //       ),
-    //       text: '$message');
-    //   return ForwardMessageWidget(text: 'forward: ${message}');
-    // }
     switch (messageType) {
       case 0:
         return TextMessageWidget(text: message);
@@ -80,19 +66,20 @@ class MessageWidget extends StatelessWidget {
         return ImageMessageWidget(
           text: '${message.text}',
           media: message.attachments != null && message.attachments != ''
-              ? json.decode(message.attachments)[0]['filename']
+              ? message.attachments[0]['filename']
               : null,
         );
         break;
       case 2:
         return DocumentMessageWidget(
-            text: '${localization.document}: ${localization.error}');
+          text: '${localization.document}: ${localization.error}',
+        );
         break;
       case 3:
         return AudioMessageWidget(
-          text: '${message.text}',
+          text: message.text,
           media: message.attachments != null
-              ? json.decode(message.attachments)[0]['filename']
+              ? message.attachments[0]['filename']
               : null,
         );
         break;
@@ -102,8 +89,8 @@ class MessageWidget extends StatelessWidget {
       case 4:
         return VideoMessageWidget(
           text: '${message.text}',
-          media: '${message.attachments}' != 'null'
-              ? json.decode(message.attachments)[0]['filename']
+          media: message.attachments != null
+              ? message.attachments[0]['filename']
               : null,
         );
         break;
@@ -122,14 +109,18 @@ class MessageWidget extends StatelessWidget {
         break;
       case 12:
         return LinkMessageWidget(
-            url: json.decode(message.attachments)[0]['link']);
+          url: message.attachments[0]['link'],
+        );
         break;
       case 13:
-        return ForwardMessageWidget(text: 'forward: ${message.text}');
+        return ForwardMessageWidget(
+          text: 'forward: ${message.text}',
+        );
         break;
       case 14:
         return StickerMessage(
-            sticker: '${json.decode(message.attachments)[0]['path']}');
+          sticker: message.attachments[0]['path'],
+        );
         break;
       default:
         return Text('default type $messageType');
@@ -156,11 +147,24 @@ class MessageWidget extends StatelessWidget {
           read: message.read,
           child: identifyChatType(
             chatType,
-            identifyMessageType(message.type),
+            checkForward(
+              child: identifyMessageType(message.type),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  checkForward({Widget child}) {
+    if (message.forward_data != null) {
+      return ForwardMessageWidget(
+        child: child,
+        text: message,
+      );
+    } else {
+      return child;
+    }
   }
 
   time(int timestamp) {
@@ -168,7 +172,6 @@ class MessageWidget extends StatelessWidget {
     TimeOfDay roomBooked = TimeOfDay.fromDateTime(DateTime.parse('$date'));
     String hours = '${roomBooked.hour}';
     String minutes = '${roomBooked.minute}';
-
     return '${validate(hours)}:${validate(minutes)}';
   }
 

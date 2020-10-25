@@ -1,6 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -31,30 +29,38 @@ class _PaymentsServicesState extends State<PaymentsServices> {
   @override
   void initState() {
     super.initState();
+
     _api = Api();
+
     if (widget.locationId != null && widget.locationType != null) {
-      print('getting with location');
       _api
-          .getServices(widget.categoryID,
-              locationId: widget.locationId, locationType: widget.locationType)
-          .then((services) {
-        if (services['message'] == 'Not authenticated' &&
-            services['success'].toString() == 'false') {
-          logOut(context);
-        } else if (services['success'].toString() == 'false') {
-          indigoCupertinoDialogAction(context, services['message'],
-              isDestructiveAction: false, leftButtonCallBack: () {
-            Navigator.pop(context);
-          });
-        } else {
-          setState(() {
-            _services = services;
-            print('services is $_services');
-          });
-        }
-      });
+          .getServices(
+        widget.categoryID,
+        locationId: widget.locationId,
+        locationType: widget.locationType,
+      )
+          .then(
+        (services) {
+          if (services['message'] == 'Not authenticated' &&
+              services['success'].toString() == 'false') {
+            logOut(context);
+          } else if (services['success'].toString() == 'false') {
+            indigoCupertinoDialogAction(
+              context,
+              services['message'],
+              isDestructiveAction: false,
+              leftButtonCallBack: () {
+                Navigator.pop(context);
+              },
+            );
+          } else {
+            setState(() {
+              _services = services;
+            });
+          }
+        },
+      );
     } else {
-      print('getting without location');
       _api.getServices(widget.categoryID).then((services) {
         if (services['message'] == 'Not authenticated' &&
             services['success'].toString() == 'false') {
@@ -125,9 +131,7 @@ class _PaymentsServicesState extends State<PaymentsServices> {
                 ),
               ),
             )
-          : Center(
-              child: CircularProgressIndicator(),
-            ),
+          : Center(child: CircularProgressIndicator()),
     );
   }
 }

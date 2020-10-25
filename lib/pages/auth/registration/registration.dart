@@ -284,7 +284,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         color: primaryColor,
                         onPressed: () async {
                           if (start == 0) {
-                            print('pressed within start');
                             if (loginController.text.isNotEmpty) {
                               var temp = loginController.text
                                   .replaceAll(' ', '')
@@ -293,8 +292,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 await api
                                     .checkRegistration(temp)
                                     .then((checkPhoneResult) async {
-                                  print(
-                                      'empty check Registration $checkPhoneResult');
                                   if (checkPhoneResult['success'] == false) {
                                     await api
                                         .sendSms(temp)
@@ -303,7 +300,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                         start = 59;
                                       });
                                       startTimer();
-                                      print('smsSendResult $sendSmsResult');
                                       if (sendSmsResult['success'] == true) {
                                         setState(() {
                                           loginError = '';

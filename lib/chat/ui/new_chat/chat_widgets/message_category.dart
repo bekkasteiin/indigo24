@@ -2,11 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_pages/chat_info.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-import '../../chat_info.dart';
 import 'message_categories/divider_message.dart';
 import 'message_categories/received_message.dart';
 import 'message_categories/sended_message.dart';
@@ -59,7 +59,6 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                       padding: EdgeInsets.only(right: 5),
                       child: GestureDetector(
                         onTap: () {
-                          ChatRoom.shared.setChatInfoStream();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -80,8 +79,9 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(25.0),
                             child: CachedNetworkImage(
-                              errorWidget: (context, url, error) => Image.asset(
-                                'assets/preloader.gif',
+                              errorWidget: (context, url, error) =>
+                                  Image.network(
+                                '${avatarUrl}noAvatar.png',
                               ),
                               imageUrl: avatarUrl +
                                   widget.avatar.replaceAll('AxB', '200x200'),
@@ -97,60 +97,62 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
               GestureDetector(
                 child: widget.child,
                 onLongPress: () {
-                  _showMessageAction(context, actions: [
-                    widget.child,
-                    Container(
-                      height: 50,
-                      child: Theme(
-                        data: ThemeData(),
-                        child: FlatButton(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Text(
-                                '${localization.reply}',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                            ],
+                  _showMessageAction(
+                    context,
+                    actions: [
+                      widget.child,
+                      Container(
+                        height: 50,
+                        child: Theme(
+                          data: ThemeData(),
+                          child: FlatButton(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  '${localization.reply}',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                Icon(CupertinoIcons.reply_thick_solid, size: 20)
+                              ],
+                            ),
+                            onPressed: () {
+                              ChatRoom.shared.replyingMessage(widget.message);
+                              Navigator.pop(context);
+                            },
                           ),
-                          onPressed: () {
-                            ChatRoom.shared.replyingMessage(widget.message);
-                            Navigator.pop(context);
-                          },
                         ),
                       ),
-                    ),
-                    Container(
-                      height: 50,
-                      child: Theme(
-                        data: ThemeData(),
-                        child: FlatButton(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Text(
-                                '${localization.forward}',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              Icon(CupertinoIcons.reply_all, size: 20)
-                            ],
+                      Container(
+                        height: 50,
+                        child: Theme(
+                          data: ThemeData(),
+                          child: FlatButton(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  '${localization.forward}',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                Icon(CupertinoIcons.reply_all, size: 20)
+                              ],
+                            ),
+                            onPressed: () {
+                              ChatRoom.shared.localForwardMessage(
+                                widget.message.id,
+                              );
+                              Navigator.pop(context);
+                            },
                           ),
-                          onPressed: () {
-                            print('Файлы');
-                            ChatRoom.shared.localForwardMessage(
-                              widget.message.id,
-                            );
-                            Navigator.pop(context);
-                          },
                         ),
                       ),
-                    ),
-                  ]);
+                    ],
+                  );
                 },
               ),
             ],
@@ -185,37 +187,41 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                       ],
                     ),
                     onPressed: () {
-                      ChatRoom.shared
-                          .deleteFromAll(widget.chatId, widget.messageId);
+                      ChatRoom.shared.deleteFromAll(
+                        widget.chatId,
+                        widget.messageId,
+                      );
                       Navigator.pop(context);
                     },
                   ),
                 ),
               ),
-              Container(
-                height: 50,
-                child: Theme(
-                  data: ThemeData(),
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          '${localization.edit}',
-                          style: TextStyle(fontSize: 14),
+              widget.message.type == 11 && widget.message.forward_data != null
+                  ? SizedBox(height: 0, width: 0)
+                  : Container(
+                      height: 50,
+                      child: Theme(
+                        data: ThemeData(),
+                        child: FlatButton(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                '${localization.edit}',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              Icon(CupertinoIcons.pen, size: 20)
+                            ],
+                          ),
+                          onPressed: () {
+                            ChatRoom.shared.editingMessage(widget.message);
+                            Navigator.pop(context);
+                          },
                         ),
-                        Icon(CupertinoIcons.pen, size: 20)
-                      ],
+                      ),
                     ),
-                    onPressed: () {
-                      ChatRoom.shared.editingMessage(widget.message);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
               Container(
                 height: 50,
                 child: Theme(

@@ -1,6 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
@@ -38,7 +36,6 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
           categories['success'].toString() == 'false') {
         logOut(context);
       } else {
-        print(categories);
         setState(() {
           _categories = categories;
           _logoUrl = _categories["logoURL"];
@@ -112,10 +109,6 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                               Flexible(
                                 child: TextField(
                                   decoration: InputDecoration(
-                                    prefixIcon: Icon(
-                                      Icons.search,
-                                      color: blackPurpleColor,
-                                    ),
                                     hintText: "${localization.search}",
                                     fillColor: blackPurpleColor,
                                   ),

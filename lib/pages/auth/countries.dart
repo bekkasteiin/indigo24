@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class Countries extends StatelessWidget {
   final countries;
@@ -8,32 +9,16 @@ class Countries extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        brightness: Brightness.light,
+      appBar: IndigoAppBarWidget(
         title: Text(
           "${localization.country}",
           style: TextStyle(
             color: blackPurpleColor,
-            fontSize: 22,
             fontWeight: FontWeight.w400,
+            fontSize: 22,
           ),
           textAlign: TextAlign.center,
         ),
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Container(

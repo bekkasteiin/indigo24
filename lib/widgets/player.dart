@@ -146,7 +146,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
 
     _playerErrorSubscription = _audioPlayer.onPlayerError.listen((msg) {
-      print('audioPlayer error : $msg');
       setState(() {
         _playerState = PlayerState.stopped;
         _duration = Duration(seconds: 0);
@@ -170,13 +169,11 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<int> _play() async {
-    print("Play position $_position");
     audioPlayers.forEach((audioPlayer) {
       if (audioPlayer != null) {
         audioPlayer.pause();
       }
     });
-    print('_____________ audioPlayers length ${audioPlayers.length}');
     if (!audioPlayers.contains(_audioPlayer)) {
       audioPlayers.add(_audioPlayer);
     }
@@ -192,8 +189,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         _position.inMilliseconds == 0 ||
         _position.inMilliseconds == null ||
         _position == _duration) {
-      print("123 test");
-
       // playerStates.add(_playerState);
       result = await _audioPlayer.play(url, position: playPosition);
       if (result == 1) setState(() => _playerState = PlayerState.playing);
@@ -212,7 +207,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   Future<int> _pause() async {
-    print("Pause position $_position");
     final result = await _audioPlayer.pause();
     if (result == 1) setState(() => _playerState = PlayerState.paused);
     return result;

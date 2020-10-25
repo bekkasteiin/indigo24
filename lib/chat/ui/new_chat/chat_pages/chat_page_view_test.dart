@@ -1,38 +1,9 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-
-class DeviderMessageWidget extends StatelessWidget {
-  final date;
-  const DeviderMessageWidget({Key key, this.date}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        margin: EdgeInsets.all(5),
-        padding: EdgeInsets.all(5),
-        width: MediaQuery.of(context).size.width / 2,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.all(
-            Radius.circular(12.0),
-          ),
-        ),
-        child: Center(
-          child: Text(
-            '$date',
-            style: TextStyle(fontSize: 16, color: darkGreyColor2),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class VideoMessage extends StatefulWidget {
   final url;
@@ -150,7 +121,6 @@ class _PDFViewerState extends State<PDFViewer> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
-            centerTitle: true,
             leading: IconButton(
               icon: Container(
                 padding: EdgeInsets.all(10),
@@ -164,7 +134,15 @@ class _PDFViewerState extends State<PDFViewer> {
                 Navigator.pop(context);
               },
             ),
-            title: Text('${localization.file}'),
+            title: Text(
+              "${localization.file}",
+              style: TextStyle(
+                color: blackPurpleColor,
+                fontWeight: FontWeight.w400,
+                fontSize: 22,
+              ),
+              textAlign: TextAlign.center,
+            ),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.navigate_before),

@@ -113,7 +113,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             videoPlayerController.value.position.inMilliseconds.toDouble();
       });
     });
-    print(videoUrl);
   }
 
   @override
@@ -196,7 +195,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                     if (videoPlayer != null) {
                                       videoPlayer.pause();
                                     }
-                                    print('player state forEeach $videoPlayer');
                                   });
                                   videoPlayers.add(videoPlayerController);
                                   videoPlayerController.play();

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,12 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/message_categories/divider_message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/message.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/message_types/audio_message.dart';
-import 'package:indigo24/pages/chat/ui/new_widgets/new_widgets.dart';
-import 'package:indigo24/pages/chat/ui/new_extensions.dart';
-import 'package:indigo24/pages/chat/ui/users_list_draggable.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/hive_names.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/messages_model.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_widgets/message.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_widgets/message_categories/divider_message.dart';
+import 'package:indigo24/chat/ui/new_extensions.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
@@ -30,13 +30,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:record_mp3/record_mp3.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:vibration/vibration.dart';
-import 'chat_models/hive_names.dart';
-import '../../ui/new_chat/chat_models/messages_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import '../../../../main.dart';
-import '../../chat_info.dart';
-import '../chats_list_draggable.dart';
+import '../../../../tabs.dart';
+import 'chat_info.dart';
+import 'chats_list_draggable.dart';
+import 'users_list_draggable.dart';
 
 class ChatPage extends StatefulWidget {
   final int chatId;
@@ -91,6 +89,7 @@ class _NewChatPageState extends State<ChatPage> {
   ItemScrollController _itemScrollController = ItemScrollController();
   final bgChat = AssetImage("assets/images/background_chat.png");
   final bgChat2 = AssetImage("assets/images/background_chat_2.png");
+
   @override
   void didChangeDependencies() {
     precacheImage(bgChat, context);
@@ -146,7 +145,6 @@ class _NewChatPageState extends State<ChatPage> {
       _dependencies = new Dependencies();
 
       _api.uploadMedia(_recordFilePath, 3).then((r) async {
-        print("RRRRR $r");
         if (r["status"]) {
           var a = [
             {
@@ -162,7 +160,6 @@ class _NewChatPageState extends State<ChatPage> {
           dir.deleteSync(recursive: true);
         } else {
           indigoCupertinoDialogAction(context, '${r["message"]}');
-          print("error");
         }
       });
 
@@ -189,22 +186,24 @@ class _NewChatPageState extends State<ChatPage> {
     _messageController = TextEditingController();
     myFocusNode = FocusNode();
     _api = Api();
-    ChatRoom.shared.setNewChatStream();
     // ChatRoom.shared.checkUserOnline(widget.userIds); // ADD WITH NEW BACKEND VALUE
-    ChatRoom.shared.getStickers();
+    // ChatRoom.shared.getStickers();
     listen();
+    if (widget.chatType == 0) {
+      ChatRoom.shared.chatMembers(widget.chatId);
+    }
     ChatRoom.shared.getMessages(widget.chatId, page: _messagesPage);
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     closeMainChat = false;
-    ChatRoom.shared.closeNewChatStream();
     _messageController.dispose();
     myFocusNode.dispose();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
 
     super.dispose();
+    await subscription.cancel();
   }
 
   getDateFromUnix(unix) {
@@ -320,12 +319,17 @@ class _NewChatPageState extends State<ChatPage> {
             padding: EdgeInsets.all(5),
             icon: ClipRRect(
               borderRadius: BorderRadius.circular(25.0),
-              child: CachedNetworkImage(
-                errorWidget: (context, url, error) => Image.asset(
-                  'assets/preloader.gif',
+              child: Container(
+                color: greyColor,
+                child: CachedNetworkImage(
+                  errorWidget: (context, url, error) => Material(
+                    child: Image.network(
+                      '${avatarUrl}noAvatar.png',
+                    ),
+                  ),
+                  imageUrl:
+                      '$avatarUrl${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
                 ),
-                imageUrl:
-                    '$avatarUrl${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('AxB', '200x200')}',
               ),
             ),
             onPressed: () {
@@ -337,14 +341,13 @@ class _NewChatPageState extends State<ChatPage> {
                           "$avatarUrl${(widget.avatar == '' || widget.avatar == null) ? "noAvatar.png" : widget.avatar.toString().replaceAll('200x200', 'AxB')}"),
                 ),
               ).whenComplete(() {
-                ChatRoom.shared.getMessages(widget.chatId);
+                // ChatRoom.shared.getMessages(widget.chatId);
               });
             },
           ),
         ],
         title: InkWell(
           onTap: () async {
-            ChatRoom.shared.setChatInfoStream();
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -358,10 +361,7 @@ class _NewChatPageState extends State<ChatPage> {
                 ),
               ),
             ).whenComplete(() {
-              setState(() {
-                // ChatRoom.shared.setChatStream();
-                ChatRoom.shared.getMessages(widget.chatId);
-              });
+              setState(() {});
             });
           },
           child: Column(
@@ -566,16 +566,6 @@ class _NewChatPageState extends State<ChatPage> {
                                         color: primaryColor,
                                       ),
                                       Container(width: 5),
-                                      // _replyMessage["attachment_url"] != null
-                                      //     ? Container(
-                                      //         width: 40,
-                                      //         height: 40,
-                                      //         child: CachedNetworkImage(
-                                      //           imageUrl:
-                                      //               "${_replyMessage["attachment_url"]}${json.decode(_replyMessage["attachments"])[0]["r_filename"]}",
-                                      //         ),
-                                      //       )
-                                      //     : Container(),
                                       Container(width: 5),
                                       Expanded(
                                         child: Column(
@@ -652,16 +642,6 @@ class _NewChatPageState extends State<ChatPage> {
                                         color: primaryColor,
                                       ),
                                       Container(width: 5),
-                                      // _editMessage["attachment_url"] != null
-                                      //     ? Container(
-                                      //         width: 40,
-                                      //         height: 40,
-                                      //         child: CachedNetworkImage(
-                                      //           imageUrl:
-                                      //               "${_editMessage["attachment_url"]}${json.decode(_editMessage["attachments"])[0]["r_filename"]}",
-                                      //         ),
-                                      //       )
-                                      //     : Container(),
                                       Container(width: 5),
                                       Expanded(
                                         child: Column(
@@ -687,7 +667,7 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  "${_editMessage['text']}",
+                                                  "${_editMessage['type'] == 0 ? _editMessage['text'] : _identifyType(_editMessage['type'])}",
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   maxLines: 1,
@@ -739,7 +719,6 @@ class _NewChatPageState extends State<ChatPage> {
                                   setState(() {
                                     showForwardingProcess = false;
                                   });
-                                  ChatRoom.shared.setChatsListDialogStream();
                                   Navigator.push(
                                     context,
                                     CupertinoPageRoute(
@@ -749,10 +728,8 @@ class _NewChatPageState extends State<ChatPage> {
                                               messages: toForwardMessages),
                                     ),
                                   ).whenComplete(() {
-                                    ChatRoom.shared
-                                        .closeChatsListDialogStream();
                                     // ChatRoom.shared.setChatStream();
-                                    ChatRoom.shared.getMessages(widget.chatId);
+                                    // ChatRoom.shared.getMessages(widget.chatId);
                                   });
                                 },
                               ),
@@ -766,7 +743,6 @@ class _NewChatPageState extends State<ChatPage> {
                                   IconButton(
                                     icon: Icon(Icons.attach_file),
                                     onPressed: () {
-                                      print("Прикрепить");
                                       FocusScopeNode currentFocus =
                                           FocusScope.of(context);
                                       if (!currentFocus.hasPrimaryFocus) {
@@ -818,30 +794,30 @@ class _NewChatPageState extends State<ChatPage> {
                                                   },
                                                 ),
                                               ),
-                                              IconButton(
-                                                padding: EdgeInsets.all(0),
-                                                icon: Icon(
-                                                    _stickersIsActive
-                                                        ? Icons.keyboard
-                                                        : Icons.sms_failed,
-                                                    size: 30),
-                                                onPressed: () {
-                                                  if (!_stickersIsActive) {
-                                                    SystemChannels.textInput
-                                                        .invokeMethod(
-                                                            'TextInput.hide');
-                                                  } else {
-                                                    SystemChannels.textInput
-                                                        .invokeMethod(
-                                                            'TextInput.show');
-                                                    myFocusNode.requestFocus();
-                                                  }
-                                                  setState(() {
-                                                    _stickersIsActive =
-                                                        !_stickersIsActive;
-                                                  });
-                                                },
-                                              ),
+                                              // IconButton(
+                                              //   padding: EdgeInsets.all(0),
+                                              //   icon: Icon(
+                                              //       _stickersIsActive
+                                              //           ? Icons.keyboard
+                                              //           : Icons.sms_failed,
+                                              //       size: 30),
+                                              //   onPressed: () {
+                                              //     if (!_stickersIsActive) {
+                                              //       SystemChannels.textInput
+                                              //           .invokeMethod(
+                                              //               'TextInput.hide');
+                                              //     } else {
+                                              //       SystemChannels.textInput
+                                              //           .invokeMethod(
+                                              //               'TextInput.show');
+                                              //       myFocusNode.requestFocus();
+                                              //     }
+                                              //     setState(() {
+                                              //       _stickersIsActive =
+                                              //           !_stickersIsActive;
+                                              //     });
+                                              //   },
+                                              // ),
                                             ],
                                           ),
                                         )
@@ -876,7 +852,6 @@ class _NewChatPageState extends State<ChatPage> {
                                             if (_messageController
                                                 .text.isNotEmpty) {
                                               if (_editMessage != null) {
-                                                print("Edit message is called");
                                                 var mId = _editMessage['id'] ==
                                                         null
                                                     ? _editMessage['message_id']
@@ -927,7 +902,6 @@ class _NewChatPageState extends State<ChatPage> {
                                         )
                                       : GestureDetector(
                                           onLongPressUp: () {
-                                            print("long press UP");
                                             _stopRecord();
                                           },
                                           onLongPress: () async {
@@ -963,7 +937,6 @@ class _NewChatPageState extends State<ChatPage> {
                                             _stickersList.length, (index) {
                                           return InkWell(
                                             onTap: () {
-                                              print('adding $index');
                                               ChatRoom.shared.sendMessage(
                                                 widget.chatId,
                                                 '',
@@ -1029,20 +1002,25 @@ class _NewChatPageState extends State<ChatPage> {
   }
 
   bool typingProcessing = false;
+
+  StreamSubscription subscription;
   listen() {
-    ChatRoom.shared.onNewChatChange.listen((e) {
-      print("NEW CHAT EVENT ${e.json}");
+    subscription = ChatRoom.shared.onNewChatChange.listen((e) {
+      print("NEW CHAT EVENT ${e.json['cmd']}");
       var cmd = e.json['cmd'];
       var data = e.json['data'];
       switch (cmd) {
         case "replyMessage":
           setState(() {
+            _editMessage = null;
             _replyMessage = e.json['message'];
           });
           break;
         case "editMessage":
           setState(() {
-            _messageController.text = e.json['text'];
+            _replyMessage = null;
+            if (e.json['text'].toString() != 'null')
+              _messageController.text = e.json['text'];
             _editMessage = e.json['message'];
           });
 
@@ -1050,8 +1028,6 @@ class _NewChatPageState extends State<ChatPage> {
 
         case 'message:deleted:all':
           var mId = e.json['data']['message_id'];
-          print("deleting $mId");
-
           Box<MessageModel> contactsBox =
               Hive.box<MessageModel>(HiveBoxes.messages);
 
@@ -1059,13 +1035,11 @@ class _NewChatPageState extends State<ChatPage> {
           // var i = _messagesList.indexWhere((element) =>
           //     (element['id'] == null ? element['message_id'] : element['id']) ==
           //     mId);
-          // print("deleting ${e.json}");
           // setState(() {
           //   _messagesList.removeAt(i);
           // });
           break;
         case "message:edit":
-          print("editing ${e.json}");
           Box<MessageModel> contactsBox =
               Hive.box<MessageModel>(HiveBoxes.messages);
           contactsBox.put(
@@ -1080,46 +1054,64 @@ class _NewChatPageState extends State<ChatPage> {
               text: data['text'] as String,
               type: int.parse(data['type'].toString()),
               time: int.parse(data['time'].toString()),
-              attachments: data['attachments'] != null
-                  ? json.decode(data['attachments'])
-                  : null,
-              reply_data: data['attachments'] != null
-                  ? json.decode(data['reply_data'])
-                  : null,
+              attachments: data['attachmentsNew'] != null
+                  ? data['attachmentsNew']
+                  : data['attachments'] != null ? data['attachments'] : null,
+              reply_data: data['reply_dataNew'] != null
+                  ? data['reply_dataNew']
+                  : data['reply_data'] != null
+                      ? json.decode(data['reply_data'])
+                      : null,
               edited: data['edit'].toString() == '1' ? true : false,
               moneyData: {
                 'avatar': data['another_user_avatar'],
                 'name': data['another_user_name']
               },
+              forward_data: data['forward_dataNew'] != null
+                  ? data['forward_dataNew']
+                  : data['forward_data'],
             ),
           );
           break;
         case "chat:get":
           if (data.isNotEmpty) {
-            print('chat get is $data');
             _messagesPage++;
             Box<MessageModel> contactsBox =
                 Hive.box<MessageModel>(HiveBoxes.messages);
             data.forEach((message) {
+              var att;
+              if (message['attachments'] != null &&
+                  message['attachments'].toString().replaceAll(' ', '') != '') {
+                att = json.decode(message['attachments']);
+              }
+
               contactsBox.put(
                 message['id'],
                 MessageModel(
                   id: message['id'] as String,
                   chatId: int.parse(message['chat_id'].toString()),
                   userId: int.parse(message['user_id'].toString()),
-                  avatar: message['avatar'] as String,
+                  avatar: message['avatar'].toString(),
                   read: message['write'].toString() == '1' ? true : false,
-                  username: message['user_name'] as String,
+                  username: message['user_name'].toString(),
                   text: message['text'] as String,
                   type: int.parse(message['type'].toString()),
                   time: int.parse(message['time'].toString()),
-                  attachments: message['attachments'],
-                  reply_data: message['reply_data'],
+                  attachments: message['attachmentsNew'] != null
+                      ? message['attachmentsNew']
+                      : message['attachments'] != null ? att : null,
+                  reply_data:
+                      message['reply_dataNew'] ?? message['reply_data'] != null
+                          ? message['reply_data']
+                          : null,
                   edited: message['edit'].toString() == '1' ? true : false,
                   moneyData: {
                     'avatar': message['another_user_avatar'],
                     'name': message['another_user_name']
                   },
+                  forward_data: message['forward_dataNew'] != null
+                      ? message['forward_dataNew']
+                      : message['forward_data'],
                 ),
               );
             });
@@ -1128,10 +1120,16 @@ class _NewChatPageState extends State<ChatPage> {
             });
           }
 
+          if (e.json['page'].toString() == 1.toString())
+            setState(() {
+              _itemScrollController.scrollTo(
+                index: 0,
+                duration: Duration(milliseconds: 500),
+              );
+            });
           break;
 
         case "findMessage":
-          print("Scrolling to ${e.json['index']}");
           // while(_myLis
           String id = e.json['index'];
           Box<MessageModel> contactsBox =
@@ -1146,7 +1144,6 @@ class _NewChatPageState extends State<ChatPage> {
           });
           var i = messages.indexWhere((element) => element.id == id);
 
-          print('and i is $i');
           if (i != -1) {
             setState(() {
               _itemScrollController.scrollTo(
@@ -1169,19 +1166,28 @@ class _NewChatPageState extends State<ChatPage> {
                 id: data['message_id'] as String,
                 chatId: int.parse(data['chat_id'].toString()),
                 userId: int.parse(data['user_id'].toString()),
-                avatar: data['avatar'] as String,
+                avatar: data['avatar'].toString(),
                 read: data['write'].toString() == '1' ? true : false,
-                username: data['user_name'] as String,
+                username: data['user_name'].toString(),
                 text: data['text'] as String,
                 type: int.parse(data['type'].toString()),
                 time: data['time'],
-                attachments: data['attachments'],
-                reply_data: data['reply_data'],
+                attachments: data['attachmentsNew'] != null
+                    ? data['attachmentsNew']
+                    : data['attachments'] != null ? data['attachments'] : null,
+                reply_data: data['reply_dataNew'] != null
+                    ? data['reply_dataNew']
+                    : data['reply_data'] != null
+                        ? json.decode(data['reply_data'])
+                        : null,
                 edited: data['edit'].toString() == '1' ? true : false,
                 moneyData: {
                   'avatar': data['another_user_avatar'],
                   'name': data['another_user_name']
                 },
+                forward_data: data['forward_dataNew'] != null
+                    ? data['forward_dataNew']
+                    : data['forward_data'],
               ),
             );
           }
@@ -1200,7 +1206,6 @@ class _NewChatPageState extends State<ChatPage> {
           }
           break;
         case "user:writing":
-          print('writing');
           if (data[0]['chat_id'] == widget.chatId) {
             typingProcessing = true;
             setState(() {
@@ -1223,25 +1228,59 @@ class _NewChatPageState extends State<ChatPage> {
             });
           }
           break;
-        case "message:write":
-          print('message read');
-
+        case "message:read":
+          var mId = e.json['data']['message_id'];
+          Box<MessageModel> contactsBox =
+              Hive.box<MessageModel>(HiveBoxes.messages);
+          MessageModel updatedMessage = contactsBox.get(mId);
+          updatedMessage.read = '${data['write']}' == '1' ? true : false;
+          contactsBox.put((data['message_id']), updatedMessage);
           break;
         case "forwardMessage":
           setState(() {
             showForwardingProcess = true;
-            print('add to forward is ${e.json}');
             toForwardMessages.add(e.json['id']);
           });
           break;
         case "user:check:online":
-          // setState(() {
-          //   data.forEach((element) {
-          //     if (element['user_id'] == widget.userIds) {
-          //       _onlineString = element['online'];
-          //     }
-          //   });
-          // });
+          if (data[0]['onlineNew'] != null) {
+            if (data[0]['onlineNew'] != 'online' &&
+                data[0]['onlineNew'].toString() != 'offline')
+              setState(() {
+                DateTime actualUnixDate = getDateFromUnix(data[0]['onlineNew']);
+
+                DateTime now = DateTime.now();
+
+                int differenceInMinutes =
+                    now.difference(actualUnixDate).inMinutes;
+                int differenceInHours = now.difference(actualUnixDate).inHours;
+                int differenceInDays = now.difference(actualUnixDate).inDays;
+
+                if (differenceInMinutes < 59)
+                  _onlineString = differenceInMinutes.toString() +
+                      ' ' +
+                      localization.minutes;
+                else if (differenceInHours < 23)
+                  _onlineString =
+                      differenceInHours.toString() + ' ' + localization.hours;
+                else if (differenceInDays < 360)
+                  _onlineString =
+                      differenceInDays.toString() + ' ' + localization.days;
+                else
+                  _onlineString = actualUnixDate.year.toString();
+
+                _onlineString += ' ago';
+              });
+            else
+              setState(() {
+                _onlineString = data[0]['onlineNew'];
+              });
+          } else {
+            setState(() {
+              _onlineString = data[0]['online'];
+            });
+          }
+
           break;
         case "chat:stickers":
           setState(() {
@@ -1252,6 +1291,17 @@ class _NewChatPageState extends State<ChatPage> {
                 _stickersList.addAll(stickerPack['stickers']);
               });
           });
+          break;
+        case "chat:members":
+          if (widget.chatType == 0) {
+            data.forEach((userFromData) {
+              if (int.parse(userFromData['user_id'].toString()) !=
+                  int.parse(user.id.toString())) {
+                ChatRoom.shared.checkUserOnline(userFromData['user_id']);
+              }
+            });
+          }
+
           break;
       }
     });
@@ -1364,7 +1414,6 @@ class _NewChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               onPressed: () {
-                                print('Деньги');
                                 Navigator.pop(context);
                                 Navigator.push(
                                   context,
@@ -1376,7 +1425,7 @@ class _NewChatPageState extends State<ChatPage> {
                                     ),
                                   ),
                                 ).whenComplete(() {
-                                  ChatRoom.shared.getMessages(widget.chatId);
+                                  // ChatRoom.shared.getMessages(widget.chatId);
                                 });
                                 // widget.chatType == 0
                                 // ? Navigator.push(
@@ -1427,7 +1476,6 @@ class _NewChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               onPressed: () {
-                                print('Галерея');
                                 Navigator.pop(context);
                                 _galleryActions();
                               },
@@ -1468,7 +1516,6 @@ class _NewChatPageState extends State<ChatPage> {
                                 ],
                               ),
                               onPressed: () {
-                                print('Файлы');
                                 Navigator.pop(context);
                                 _openFileExplorer();
                               },
@@ -1501,7 +1548,6 @@ class _NewChatPageState extends State<ChatPage> {
               currentFocus.unfocus();
             }
             _getImage(ImageSource.camera);
-            print('Камера');
           },
         ),
         CupertinoActionSheetAction(
@@ -1541,7 +1587,6 @@ class _NewChatPageState extends State<ChatPage> {
 
       if (popResult['cmd'] == "sending") {
         _api.uploadMedia(_image.path, 1).then((r) async {
-          print("RRR $r");
           if (r["status"]) {
             var a = [
               {
@@ -1554,7 +1599,6 @@ class _NewChatPageState extends State<ChatPage> {
                 type: 1, attachments: jsonDecode(jsonEncode(a)));
           } else {
             // _showAlertDialog(context, r["message"]);
-            print("error");
           }
         });
       }
@@ -1567,8 +1611,6 @@ class _NewChatPageState extends State<ChatPage> {
       setState(() {
         _image = File(pickedFile.path);
       });
-      print(_image);
-
       final popResult = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -1581,7 +1623,6 @@ class _NewChatPageState extends State<ChatPage> {
 
       if (popResult['cmd'] == "sending") {
         _api.uploadMedia(_image.path, 4).then((r) async {
-          print("RRR $r");
           if (r["status"]) {
             var a = [
               {"filename": "${r["file_name"]}"}
@@ -1591,7 +1632,6 @@ class _NewChatPageState extends State<ChatPage> {
                 type: 4, attachments: jsonDecode(jsonEncode(a)));
           } else {
             // _showAlertDialog(context, r["message"]);
-            print("error");
           }
         });
       }
@@ -1612,8 +1652,6 @@ class _NewChatPageState extends State<ChatPage> {
           type: _pickingType,
           allowedExtensions: ['jpg', 'pdf', 'doc'],
         );
-
-        print(_path);
       }
     } on PlatformException catch (e) {
       print("Unsupported operation" + e.toString());
@@ -1623,12 +1661,9 @@ class _NewChatPageState extends State<ChatPage> {
       _fileName = _path != null
           ? _path.split('/').last
           : _paths != null ? _paths.keys.toString() : '...';
-
-      print("path name $_path");
     });
     if ('$_path' != 'null') {
       _api.uploadMedia(_path, 2).then((r) async {
-        print("RRR ${r["message"]}");
         if (r["status"]) {
           var a = [
             {
@@ -1641,7 +1676,6 @@ class _NewChatPageState extends State<ChatPage> {
               attachments: jsonDecode(jsonEncode(a)));
         } else {
           // _showAlertDialog(context, r["message"]);
-          print("error");
         }
       });
     }
@@ -1661,7 +1695,6 @@ class _NewChatPageState extends State<ChatPage> {
             }
             Navigator.pop(context);
             _getImage(ImageSource.gallery);
-            print('Камера');
           },
         ),
         CupertinoActionSheetAction(

@@ -1,14 +1,15 @@
+import 'dart:async';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/db/contacts_db.dart';
-import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import '../../../../tabs.dart';
+import 'chat.dart';
 
 var contacts = [];
 
@@ -30,7 +31,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   void initState() {
     super.initState();
     _actualList.addAll(myContacts);
-    ChatRoom.shared.setContactsStream();
     _listen();
     getContacts(context).then((getContactsResult) {
       var result = getContactsResult is List ? false : !getContactsResult;
@@ -60,13 +60,16 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
     _searchController.dispose();
+    await subscription.cancel();
   }
 
+  StreamSubscription subscription;
+
   _listen() {
-    ChatRoom.shared.onContactChange.listen((e) {
+    subscription = ChatRoom.shared.onContactChange.listen((e) {
       print("Contact EVENT ${e.json}");
       var cmd = e.json['cmd'];
 
@@ -76,8 +79,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
           } else {
             if (e.json['data']['chat_id'].toString() != 'false' &&
                 e.json['data']['status'].toString() == 'true') {
-              // ChatRoom.shared.setChatStream();
-
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -90,29 +91,17 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   ),
                 ),
               ).whenComplete(() {
-                // this is bool for check load more is needed or not
                 ChatRoom.shared.forceGetChat();
-                ChatRoom.shared.closeChatStream();
               });
             } else if (e.json['data']['status'].toString() == 'true') {
-              // print('____________________');
-              // print('else if e.jsonDataStatus == true');
-              // print({e.json['data']['user_id']});
-              // print('____________________');
-              // ChatRoom.shared.setChatStream();
               ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
             }
           }
 
           break;
         case "chat:create":
-          print("CHAT CREATE ${e.json['data']}");
           if (e.json["data"]["status"].toString() == "true") {
-            // ChatRoom.shared.setChatStream();
             Navigator.pop(context);
-            // print('_________________________________');
-            // print('chat contacts user ids ${e.json['data']['user_id']}');
-            // print('_________________________________');
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -123,12 +112,9 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                 ),
               ),
             ).whenComplete(() {
-              // this is bool for check load more is needed or not
               ChatRoom.shared.forceGetChat();
-              ChatRoom.shared.closeChatStream();
             });
           } else {
-            // ChatRoom.shared.setChatStream();
             var name = e.json["data"]["name"];
             var chatID = e.json["data"]["chat_id"];
             Navigator.pop(context);
@@ -144,7 +130,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               ),
             ).whenComplete(() {
               ChatRoom.shared.forceGetChat();
-              ChatRoom.shared.closeChatStream();
             });
           }
           break;
@@ -158,7 +143,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     if (query.isNotEmpty) {
       List<dynamic> matches = List<dynamic>();
       myContacts.forEach((item) {
-        print('${item.name} ${item.phone}');
         if (item.name != null && item.phone != null) {
           if (item.name
                   .toString()
@@ -168,7 +152,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                   .toString()
                   .toLowerCase()
                   .contains(query.toLowerCase())) {
-            print('a');
             matches.add(item);
           }
         }
@@ -196,22 +179,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          centerTitle: true,
-          brightness: Brightness.light,
+        appBar: IndigoAppBarWidget(
           title: Text(
             "${localization.contacts}",
             style: TextStyle(
@@ -236,7 +204,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               color: blackPurpleColor,
               onPressed: () async {
                 _boolForPrevenceUserCheck = false;
-                print('update contacts');
                 await getContactsTemplate(context);
                 await _contactsDB.getAll().then((value) {
                   myContacts = value;
@@ -248,7 +215,6 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               },
             )
           ],
-          backgroundColor: Colors.white,
         ),
         body: SafeArea(
           child: Column(

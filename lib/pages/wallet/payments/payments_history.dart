@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -93,13 +92,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         body: _paymentHistroyBody(_resultList, context));
   }
 
-  void _onRefresh() {
-    print("_onRefresh ");
-    _refreshController.refreshCompleted();
-  }
-
   void _onLoading() async {
-    print("_onLoading ");
     if (_filterController.text.isNotEmpty) {
       _api
           .getFilteredHistories(
@@ -124,10 +117,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     _refreshController.loadComplete();
   }
 
-  // TODO ADD THIS WHEN WE CAN ABLE TO DOWNLOAD PDF
   // void _showDownloadProgress(received, total) {
   //   if (total != -1) {
-  //     print((received / total * 100).toStringAsFixed(0) + "%");
   //   }
   // }
 
@@ -143,7 +134,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   //             return status < 500;
   //           }),
   //     );
-  //     print(response.headers);
   //     File file = File(savePath);
   //     var raf = file.openSync(mode: FileMode.write);
   //     raf.writeFromSync(response.data);
@@ -154,7 +144,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
   //     );
   //     await raf.close();
   //   } catch (e) {
-  //     print(e);
   //   }
   // }
 
@@ -261,29 +250,56 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                     : "+${amount.toStringAsFixed(2)} KZT"
                 : "${amount.toStringAsFixed(2)} KZT",
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               color: blackPurpleColor,
             ),
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 5),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: Container(
-              height: 15,
-              width: 15,
-              color: status == '4'
-                  ? Colors.green
-                  : status == '3'
-                      ? Colors.orange
-                      : status == '2'
-                          ? Colors.red
-                          : (status == '1' || status == '0')
-                              ? Colors.yellow
-                              : Colors.grey,
-            ),
-          ),
+          paymentStatus(int.parse(status)),
         ],
+      ),
+    );
+  }
+
+  Widget paymentStatus(int status) {
+    String text = '';
+
+    Color color = greyColor;
+    switch (status) {
+      case 0:
+        text = localization.newPayment;
+        color = Colors.yellow;
+        break;
+      case 1:
+        text = localization.newPayment;
+        color = Colors.yellow;
+        break;
+      case 2:
+        text = localization.error;
+        color = Colors.red;
+        break;
+      case 3:
+        text = localization.pending;
+        color = Colors.orange;
+        break;
+      case 4:
+        text = localization.success;
+        color = Colors.green;
+        break;
+      default:
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        color: color,
       ),
     );
   }
@@ -296,6 +312,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         children: <Widget>[
           Text(
             title,
+            maxLines: 5,
             style: TextStyle(
               fontSize: 14,
               color: brightGreyColor2,
@@ -304,7 +321,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            account,
+            '+' + account,
+            maxLines: 2,
             style: TextStyle(
               fontSize: 14,
               color: blackPurpleColor,
@@ -314,6 +332,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
           ),
           Text(
             date,
+            maxLines: 2,
             style: TextStyle(
               fontSize: 10,
               color: blackPurpleColor,
@@ -328,14 +347,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   Future _loadData() async {
     _api.getHistories(_page).then((histories) {
-      print(histories);
       if (histories['payments'].isNotEmpty) {
         List temp = histories['payments'].toList();
         setState(() {
           _resultList.addAll(temp);
         });
         _page++;
-        print(_page);
       }
     });
   }

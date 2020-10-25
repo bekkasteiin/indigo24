@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/pages/chat/chat_page_view_test.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_pages/chat_page_view_test.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
@@ -28,8 +28,10 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
       appBar: IndigoAppBarWidget(
         title: Text(
           localization.terms,
-          style:
-              TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontWeight: FontWeight.w400,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -50,10 +52,11 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10.0,
-                          spreadRadius: -2,
-                          offset: Offset(0.0, 0.0))
+                        color: Colors.black26,
+                        blurRadius: 10.0,
+                        spreadRadius: -2,
+                        offset: Offset(0.0, 0.0),
+                      )
                     ],
                   ),
                   child: ButtonTheme(

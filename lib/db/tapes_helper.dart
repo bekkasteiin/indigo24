@@ -11,7 +11,6 @@ class TapeDB {
 
   Future insertOne(MyTape tape) async {
     final finder = Finder(filter: Filter.equals('id', tape.id));
-    print("finder $finder");
     await _tapeFolder.add(await _db, tape.toJson());
   }
 
@@ -23,8 +22,6 @@ class TapeDB {
     tapes.forEach((chat) async {
       await _tapeFolder.add(await _db, chat.toJson());
     });
-
-    print('$tapes Inserted successfully !!');
   }
 
   Future<List<MyTape>> getAll() async {
@@ -36,7 +33,6 @@ class TapeDB {
   }
 
   Future deleteAll() async {
-    print("Deleted all data from local db");
     await _tapeFolder.delete(await _db);
   }
 }

@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-
 import 'filter.dart';
 
 class BalanceHistoryPage extends StatefulWidget {
@@ -98,13 +96,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
-  void _onBalanceRefresh() {
-    print("_onRefresh ");
-    _balanceRefreshController.refreshCompleted();
-  }
-
   void _onBalanceLoading() async {
-    print("_onBalanceLoading ");
     if (_filterController.text.isNotEmpty) {
       _loadFilteredBalanceData();
     } else {
@@ -137,7 +129,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
 
   Future _loadBalanceData() async {
     _api.getHistoryBalance(_balanceHistoryPage + 1).then((balanceHistory) {
-      print(balanceHistory);
       if (balanceHistory['result'].isNotEmpty) {
         _balanceHistoryPage++;
         List temp = balanceHistory['result'].toList();
@@ -199,6 +190,51 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     );
   }
 
+  Widget paymentStatus(int status) {
+    String text = '';
+
+    Color color = greyColor;
+    switch (status) {
+      case 0:
+        text = localization.newPayment;
+        color = Colors.yellow;
+        break;
+      case 1:
+        text = localization.newPayment;
+        color = Colors.yellow;
+
+        break;
+
+      case 2:
+        text = localization.error;
+        color = Colors.red;
+        break;
+      case 3:
+        text = localization.pending;
+        color = Colors.orange;
+
+        break;
+      case 4:
+        text = localization.success;
+        color = Colors.green;
+        break;
+      default:
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        color: color,
+      ),
+    );
+  }
+
   Container _paymentAmount(String amount, String status, {type}) {
     return Container(
       child: Column(
@@ -215,22 +251,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 5),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: Container(
-              height: 15,
-              width: 15,
-              color: status == '4'
-                  ? Colors.green
-                  : status == '3'
-                      ? Colors.orange
-                      : status == '2'
-                          ? Colors.red
-                          : (status == '1') || (status == '0')
-                              ? Colors.yellow
-                              : Colors.grey,
-            ),
-          ),
+          paymentStatus(int.parse(status)),
         ],
       ),
     );
@@ -334,7 +355,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                           _historyBalanceList = null;
                           _text = historyBalance['message'];
                         } else {
-                          print('setStates');
                           _historyBalanceList = historyBalance['result'];
                           if (historyBalance['result'].isEmpty) {
                             setState(() {
@@ -374,7 +394,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                             ),
                             controller: _balanceRefreshController,
                             onLoading: _onBalanceLoading,
-                            onRefresh: _onBalanceRefresh,
                             child: ListView.builder(
                               padding: const EdgeInsets.only(bottom: 10),
                               itemCount: snapshot != null ? snapshot.length : 0,

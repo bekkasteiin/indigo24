@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
@@ -7,6 +9,7 @@ import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class UsersListDraggableWidget extends StatefulWidget {
   final int chatId;
@@ -26,44 +29,31 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
     _isMembersLoading = false;
     _users = [];
     _membersPage = 1;
-    ChatRoom.shared.setNewUsersListStream();
     _listen();
     ChatRoom.shared.chatMembers(widget.chatId);
     super.initState();
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
+    await subscription.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
+      appBar: IndigoAppBarWidget(
+        title: Text(
+          "${localization.chats}",
+          style: TextStyle(
+            color: blackPurpleColor,
+            fontWeight: FontWeight.w400,
+            fontSize: 22,
+          ),
+          textAlign: TextAlign.center,
+        ),
         elevation: 0.5,
-        leading: IconButton(
-          color: blackPurpleColor,
-          icon: Icon(Icons.cancel),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Column(
-          children: <Widget>[
-            Text(
-              localization.chats,
-              style: TextStyle(
-                fontSize: 22.0,
-                color: blackPurpleColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        brightness: Brightness.light,
       ),
       body: SafeArea(
         child: Container(
@@ -91,8 +81,9 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(25.0),
                             child: CachedNetworkImage(
-                              errorWidget: (context, url, error) => Image.asset(
-                                'assets/preloader.gif',
+                              errorWidget: (context, url, error) =>
+                                  Image.network(
+                                '${avatarUrl}noAvatar.png',
                               ),
                               imageUrl:
                                   '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
@@ -135,15 +126,16 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
     ChatRoom.shared.chatMembers(widget.chatId, page: _membersPage);
   }
 
+  StreamSubscription subscription;
+
   _listen() {
-    ChatRoom.shared.onUsersListDialogChange.listen((e) {
+    subscription = ChatRoom.shared.onUsersListDialogChange.listen((e) {
       print("USERS DRAGABLE EVENT ${e.json['cmd']}");
       var cmd = e.json['cmd'];
       var data = e.json['data'];
       switch (cmd) {
         case "chat:members":
           _isMembersLoading = false;
-          print('$data');
           if (data.isNotEmpty) {
             _membersPage++;
             setState(() {

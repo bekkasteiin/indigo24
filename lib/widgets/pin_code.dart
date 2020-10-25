@@ -119,7 +119,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
         child: Image(
             fit: BoxFit.fill,
             image:
-                // user.chatBackground == 'ligth' // TODO TURN ON THIS
+                // user.chatBackground == 'ligth' //
                 // ?
                 AssetImage("assets/images/background_chat.png")
             // : AssetImage("assets/images/background_chat_2.png"),

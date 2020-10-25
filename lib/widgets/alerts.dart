@@ -8,7 +8,7 @@ indigoCupertinoDialogAction(
   rightButtonCallBack(),
   leftButtonCallBack(),
   String content,
-  bool isDestructiveAction,
+  bool isDestructiveAction = false,
   String rightButtonText,
   String leftButtonText,
 }) {
@@ -39,6 +39,7 @@ indigoCupertinoDialogAction(
     content: Text(content != null ? content : ''),
     actions: actions,
   );
+  
   showDialog(
     context: context,
     barrierDismissible: false,

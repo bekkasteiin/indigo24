@@ -2,7 +2,7 @@ extension StringExtension on String {
   String capitalize() {
     if (this == null) {
       return this;
-      // throw new ArgumentError("string: $this"); // TODO TURN ON WHEN WE REFACTOR BACKEND
+      // throw new ArgumentError("string: $this");
     }
     if (this.length == 0) {
       return this;

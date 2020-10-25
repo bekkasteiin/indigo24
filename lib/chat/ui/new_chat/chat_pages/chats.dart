@@ -1,25 +1,26 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/chat_model.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/hive_names.dart';
 
-import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
-import 'package:indigo24/pages/chat/ui/new_widgets/new_widgets.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/pages/chat/ui/new_extensions.dart';
+import 'package:indigo24/chat/ui/new_extensions.dart';
 import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
-import '../../chat_contacts.dart';
-import '../../chat_group_selection.dart';
-import 'chat_models/hive_names.dart';
-import 'chat_models/chat_model.dart';
+import 'chat.dart';
+import 'chat_contacts.dart';
+import 'chat_group_selection.dart';
 
 class TestChatsListPage extends StatefulWidget {
   @override
@@ -36,15 +37,15 @@ class _TestChatsListPageState extends State<TestChatsListPage>
   @override
   void initState() {
     super.initState();
-    ChatRoom.shared.setNewChatsStream();
     listen();
     _isChatsLoading = false;
     _chatsPage = 2;
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
+    await subscription.cancel();
   }
 
   _loadMore() {
@@ -67,9 +68,11 @@ class _TestChatsListPageState extends State<TestChatsListPage>
               avatar: chat.avatar,
             ),
           ),
-        ).whenComplete(() {
-          ChatRoom.shared.forceGetChat();
-        });
+        ).whenComplete(
+          () {
+            ChatRoom.shared.forceGetChat();
+          },
+        );
       },
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(25.0),
@@ -79,8 +82,8 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           color: greyColor,
           child: CachedNetworkImage(
             errorWidget: (context, url, error) => Material(
-              child: Image.asset(
-                'assets/preloader.gif',
+              child: Image.network(
+                '${avatarUrl}noAvatar.png',
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.width * 0.7,
               ),
@@ -93,13 +96,30 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           ),
         ),
       ),
-      title: Text(
-        chat.name.toString().capitalize(),
-        maxLines: 1,
-        style: TextStyle(color: blackPurpleColor, fontWeight: FontWeight.w400),
+      title: Row(
+        children: [
+          Flexible(
+            child: Text(
+              chat.name.toString().capitalize(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: blackPurpleColor, fontWeight: FontWeight.w400),
+            ),
+          ),
+          chat.isMuted
+              ? Icon(
+                  Icons.volume_mute,
+                  color: greyColor,
+                )
+              : SizedBox(
+                  height: 0,
+                  width: 0,
+                )
+        ],
       ),
       subtitle: Text(
-        chat.messagePreview == null ? chat.message : chat.messagePreview,
+        chat.message == 'null' ? chat.messagePreview : chat.message,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
         style: TextStyle(color: darkGreyColor2),
@@ -175,9 +195,9 @@ class _TestChatsListPageState extends State<TestChatsListPage>
         title: Text(
           localization.chats,
           style: TextStyle(
-            fontSize: 22.0,
             color: blackPurpleColor,
-            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
           ),
         ),
         actions: <Widget>[
@@ -194,7 +214,6 @@ class _TestChatsListPageState extends State<TestChatsListPage>
             iconSize: 30,
             color: blackPurpleColor,
             onPressed: () {
-              ChatRoom.shared.setChatUserProfileInfoStream();
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -263,6 +282,10 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                     MaterialPageRoute(
                       builder: (context) => ChatGroupSelection(),
                     ),
+                  ).whenComplete(
+                    () {
+                      ChatRoom.shared.forceGetChat();
+                    },
                   );
                 },
               ),
@@ -342,11 +365,13 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     );
   }
 
+  StreamSubscription subscription;
+
   listen() {
-    ChatRoom.shared.onNewChatsChange.listen((e) async {
+    subscription = ChatRoom.shared.onNewChatsChange.listen((e) async {
       var cmd = e.json["cmd"];
       var data = e.json["data"];
-      print('Chats list listen $_chatsPage ${e.json}');
+      print('Chats ${e.json}');
       switch (cmd) {
         case "chats:get":
           if (_isChatsLoading) {
@@ -359,19 +384,22 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                     int.parse(chat['id'].toString()),
                     ChatModel(
                       name: chat['name'] as String,
-                      chatId: int.parse(chat['id'].toString()),
+                      chatId: int.parse(chat['id']),
                       chatType: chat['type'] as int,
                       avatar: chat['avatar'] as String,
-                      isMuted: chat['mute'] == 0 ? false : true,
-                      unreadCount: chat['unread_messages'],
+                      isMuted: int.parse(chat['mute'].toString()) == 0
+                          ? false
+                          : true,
+                      unreadCount:
+                          int.parse(chat['unread_messages'].toString()),
                       messageTime:
                           int.parse(chat['last_message']['time'].toString()),
                       messageId: chat['last_message']['message_id'],
                       messageAvatar: chat['last_message']['avatar'] as String,
-                      messagePreview:
-                          chat['last_message']['message_for_type'] as String,
+                      messagePreview: identifyMessagePreview(
+                          int.parse(chat['last_message']['type'].toString())),
                       messageUsername: '${chat['last_message']['user_name']}',
-                      message: chat['last_message']['text'] as String,
+                      message: chat['last_message']['text'],
                     ),
                   );
                 });
@@ -390,16 +418,17 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                     chatId: int.parse(chat['id'].toString()),
                     chatType: chat['type'] as int,
                     avatar: chat['avatar'] as String,
-                    isMuted: chat['mute'] == 0 ? false : true,
-                    unreadCount: chat['unread_messages'],
+                    isMuted:
+                        int.parse(chat['mute'].toString()) == 0 ? false : true,
+                    unreadCount: int.parse(chat['unread_messages'].toString()),
                     messageTime:
                         int.parse(chat['last_message']['time'].toString()),
                     messageId: chat['last_message']['message_id'],
-                    messageAvatar: chat['last_message']['avatar'] as String,
-                    messagePreview:
-                        chat['last_message']['message_for_type'] as String,
+                    messageAvatar: chat['last_message']['avatar'],
+                    messagePreview: identifyMessagePreview(
+                        int.parse(chat['last_message']['type'].toString())),
                     messageUsername: '${chat['last_message']['user_name']}',
-                    message: chat['last_message']['text'] as String,
+                    message: chat['last_message']['text'],
                   ),
                 );
               });
@@ -443,13 +472,10 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           Box<ChatModel> contactsBox = Hive.box<ChatModel>(HiveBoxes.chats);
           ChatModel updatedChatValue =
               contactsBox.get(int.parse(data['chat_id'].toString()));
-          print('updates chat is ${data['chat_id']} $updatedChatValue');
           updatedChatValue.isMuted = '${data['mute']}' == '0' ? true : false;
           contactsBox.put(
               int.parse(data['chat_id'].toString()), updatedChatValue);
-          ChatModel updatedChatValue2 =
-              contactsBox.get(int.parse(data['chat_id'].toString()));
-          print('updates chat is ${data['chat_id']} $updatedChatValue2');
+
           break;
 
         default:
@@ -457,5 +483,48 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           break;
       }
     });
+  }
+
+  String identifyMessagePreview(int messageType) {
+    switch (messageType) {
+      case 0:
+        return localization.textMessage;
+        break;
+      case 1:
+        return localization.photo;
+        break;
+      case 2:
+        return localization.document;
+        break;
+      case 3:
+        return localization.voiceMessage;
+        break;
+      case 4:
+        return localization.video;
+        break;
+      case 7:
+        return localization.systemMessage;
+        break;
+      // case 8:
+      // return 'Дивайдер сообщение';
+      // break;
+      case 9:
+        return localization.location;
+        break;
+      case 10:
+        return localization.reply;
+        break;
+      case 11:
+        return localization.money;
+        break;
+      case 12:
+        return localization.link;
+        break;
+      case 13:
+        return localization.forwardedMessage;
+        break;
+      default:
+        return localization.message;
+    }
   }
 }

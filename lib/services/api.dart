@@ -11,7 +11,7 @@ import 'helper.dart';
 class Api {
   static BaseOptions _options = BaseOptions(
     baseUrl: '$baseUrl',
-    connectTimeout: 15000,
+    connectTimeout: 60000,
     receiveTimeout: 3000,
   );
 
@@ -34,7 +34,6 @@ class Api {
     Response response;
     try {
       response = await _dio.post(path, data: data);
-      // print('post resulе $path $response');
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -163,10 +162,8 @@ class Api {
     return _postRequest('api/v2.1/get/profile', data);
   }
 
-  getNews() async {
-    // return _getRequest('https://postman-echo.com/get?foo1=bar1&foo2=bar2',
-    // null); // TODO CHANGE URL PATH
-  }
+  // getNews() async {
+  // }
 
   getHistoryBalance(page) async {
     dynamic data = {
@@ -256,8 +253,6 @@ class Api {
           'balanceInBlock', '${result['result']['balanceInBlock']}');
       user.balance = '${result['result']['balance']}';
       user.balanceInBlock = '${result['result']['balanceInBlock']}';
-
-      print('Balance in block ${user.balanceInBlock}');
     }
     return result;
   }
@@ -334,7 +329,6 @@ class Api {
           'amount': '$amount',
         };
       }
-      print('data is $data');
       return _postRequest('api/v2.1/check/send/money', data);
     } else {
       return _postRequest('api/v2.1/check/send/money', {
@@ -389,8 +383,6 @@ class Api {
   }
 
   calculateSum(serviceID, account, amount, int providerId) async {
-    print('provider id id $providerId');
-    print('provider id id $providerId');
     print('provider id id $providerId');
     switch (providerId) {
       case 6:
@@ -458,15 +450,12 @@ class Api {
         'location_id': locationId
       };
     } else {
-      print('with else');
-
       data = {
         'customerID': '${user.id}',
         'unique': '${user.unique}',
         'categoryID': '$categoryID'
       };
     }
-    print('$data is data');
     return _postRequest('api/v2.1/get/services', data);
   }
 
@@ -574,7 +563,6 @@ class Api {
     return _postRequest('api/v2.1/get/tape', data);
   }
 
-  //TODO fix it
   addTape(_path, title, description, context) async {
     _sendingMsgProgressBar = ProgressBar();
     var p;

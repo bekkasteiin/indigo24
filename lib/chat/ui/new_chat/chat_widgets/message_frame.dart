@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../ui/new_chat/chat_models/messages_model.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/messages_model.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 

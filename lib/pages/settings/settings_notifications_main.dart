@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class SettingsNotificationsMainPage extends StatefulWidget {
   final Map<String, dynamic> settings;
@@ -35,35 +36,16 @@ class _SettingsNotificationsMainPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          iconTheme: IconThemeData(
-            color: Colors.black,
-          ),
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+        appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.notifications}",
+            '${localization.notifications}',
             style: TextStyle(
               color: blackPurpleColor,
               fontWeight: FontWeight.w400,
+              fontSize: 22,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
-          backgroundColor: Colors.white,
-          brightness: Brightness.light,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -82,21 +64,27 @@ class _SettingsNotificationsMainPageState
                   child: Column(
                     children: <Widget>[
                       Container(
-                          margin: EdgeInsets.only(left: 20),
-                          height: 0.5,
-                          color: greyColor),
+                        margin: EdgeInsets.only(left: 20),
+                        height: 0.5,
+                        color: greyColor,
+                      ),
                       Container(
                         padding: EdgeInsets.only(
-                            left: 20, right: 20, bottom: 10, top: 10),
+                          left: 20,
+                          right: 20,
+                          bottom: 10,
+                          top: 10,
+                        ),
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
                                 '${localization.hideNotifications}',
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackPurpleColor),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: blackPurpleColor,
+                                ),
                               ),
                               CupertinoSwitch(
                                 trackColor: brightGreyColor3,

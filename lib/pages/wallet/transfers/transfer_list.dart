@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'transfer.dart';
@@ -91,7 +90,10 @@ class _TransferListPageState extends State<TransferListPage> {
             color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-            offset: Offset(0.0, 0.0),
+            offset: Offset(
+              0.0,
+              0.0,
+            ),
           )
         ],
       ),
@@ -115,9 +117,12 @@ class _TransferListPageState extends State<TransferListPage> {
                   child: Image.asset('assets/images/profile.png', width: 30.0),
                 ),
                 Container(width: 10),
-                Text(
-                  '${localization.toIndigo24Client}',
-                  style: TextStyle(fontSize: 14, color: blackPurpleColor),
+                Expanded(
+                  child: Text(
+                    '${localization.toIndigo24Client}',
+                    style: TextStyle(fontSize: 14, color: blackPurpleColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),

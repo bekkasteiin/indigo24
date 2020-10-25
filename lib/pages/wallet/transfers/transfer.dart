@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
+import 'package:indigo24/pages/wallet/transfers/transfer_draggrable.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/socket.dart';
-
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
@@ -17,191 +17,6 @@ import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
-
-class TransferContactsDialogPage extends StatefulWidget {
-  @override
-  TransferContactsDialogPageState createState() =>
-      TransferContactsDialogPageState();
-}
-
-class TransferContactsDialogPageState
-    extends State<TransferContactsDialogPage> {
-  TextEditingController _searchController = TextEditingController();
-
-  List actualList = List<dynamic>();
-
-  search(String query) {
-    if (query.isNotEmpty) {
-      List<dynamic> matches = List<dynamic>();
-      myContacts.forEach((item) {
-        if (item.name != null && item.phone != null) {
-          if (item.name
-                  .toString()
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              item.phone
-                  .toString()
-                  .toLowerCase()
-                  .contains(query.toLowerCase())) {
-            matches.add(item);
-          }
-        }
-      });
-      setState(() {
-        actualList = [];
-        actualList.addAll(matches);
-      });
-      return;
-    } else {
-      setState(() {
-        actualList = [];
-        actualList.addAll(myContacts);
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    actualList.addAll(myContacts);
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: whiteColor,
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(
-              "${localization.contacts}",
-              style: TextStyle(
-                color: blackPurpleColor,
-                fontSize: 22,
-                fontWeight: FontWeight.w400,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            elevation: 0,
-            centerTitle: true,
-            leading: IconButton(
-              icon: Container(
-                padding: EdgeInsets.all(10),
-                child: Image(
-                  image: AssetImage(
-                    'assets/images/back.png',
-                  ),
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            backgroundColor: whiteColor,
-            brightness: Brightness.light,
-          ),
-          body: SafeArea(
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(
-                      top: 10.0, left: 10.0, right: 10, bottom: 0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: blackPurpleColor,
-                      ),
-                      hintText: "${localization.search}",
-                      fillColor: blackPurpleColor,
-                    ),
-                    onChanged: (value) {
-                      search(value);
-                    },
-                    controller: _searchController,
-                  ),
-                ),
-                Flexible(
-                  child: ListView.builder(
-                    itemCount: actualList != null ? actualList.length : 0,
-                    shrinkWrap: true,
-                    itemBuilder: (context, i) {
-                      if (actualList[i].phone == null ||
-                          actualList[i].id == user.id)
-                        return SizedBox(
-                          height: 0,
-                          width: 0,
-                        );
-                      return Center(
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context, actualList[i]);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 20,
-                              horizontal: 40,
-                            ),
-                            child: Row(
-                              children: <Widget>[
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(25.0),
-                                  child: Image.network(
-                                    '${actualList[i].avatar}' == ''
-                                        ? '${avatarUrl}noAvatar.png'
-                                        : '$avatarUrl${actualList[i].avatar.replaceAll('AxB', '200x200')}',
-                                    width: 35,
-                                    height: 35,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Container(
-                                        child: Text(
-                                          '${actualList[i].name}',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Text(
-                                          '${actualList[i].phone}',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class TransferPage extends StatefulWidget {
   final phone;
@@ -245,9 +60,12 @@ class _TransferPageState extends State<TransferPage> {
   final sumController = TextEditingController();
   TextEditingController _commentController = TextEditingController();
   bool boolForPreloader = false;
-
+  Color phoneColor;
+  Color sumColor;
   @override
   void initState() {
+    phoneColor = blackColor;
+    sumColor = blackColor;
     if (widget.phone != null) {
       receiverController.text = widget.phone;
       if (widget.amount != null) {
@@ -259,7 +77,6 @@ class _TransferPageState extends State<TransferPage> {
       });
       if (receiverController.text.length > 10) {
         api.checkPhoneForSendMoney('${widget.phone}').then((r) {
-          print(r);
           if (r['success'].toString() == 'true') {
             setState(() {
               toName = r['name'];
@@ -492,12 +309,10 @@ class _TransferPageState extends State<TransferPage> {
         Navigator.pop(context);
         if (receiverController.text.isNotEmpty &&
             sumController.text.isNotEmpty) {
-          print('global bool resetted to true');
           setState(() {
             boolForPreloader = true;
           });
           api.checkPhoneForSendMoney(receiverController.text).then((result) {
-            print('transfer result $result');
             setState(() {
               boolForPreloader = false;
             });
@@ -521,7 +336,6 @@ class _TransferPageState extends State<TransferPage> {
                   setState(() {
                     boolForPreloader = false;
                   });
-                  print('this is res $res');
                   if (res['success'].toString() == 'false')
                     showAlertDialog(context, '0', res['message']);
                   else {
@@ -607,18 +421,34 @@ class _TransferPageState extends State<TransferPage> {
             if (!currentFocus.hasPrimaryFocus) {
               currentFocus.unfocus();
             }
-            if (receiverController.text.isNotEmpty &&
-                sumController.text.isNotEmpty) {
-              _showLockScreen(
-                context,
-                '${localization.enterPin}',
-                opaque: false,
-                cancelButton: Text(
-                  'Cancel',
-                  style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-                  semanticsLabel: 'Cancel',
-                ),
-              );
+            if (receiverController.text.isNotEmpty) {
+              setState(() {
+                phoneColor = blackColor;
+              });
+              if (sumController.text.isNotEmpty) {
+                setState(() {
+                  sumColor = blackColor;
+                });
+                _showLockScreen(
+                  context,
+                  '${localization.enterPin}',
+                  opaque: false,
+                  cancelButton: Text(
+                    'Cancel',
+                    style:
+                        const TextStyle(fontSize: 16, color: blackPurpleColor),
+                    semanticsLabel: 'Cancel',
+                  ),
+                );
+              } else {
+                setState(() {
+                  sumColor = redColor;
+                });
+              }
+            } else {
+              setState(() {
+                phoneColor = redColor;
+              });
             }
           },
           child: Container(
@@ -669,6 +499,10 @@ class _TransferPageState extends State<TransferPage> {
                         ],
                         decoration: InputDecoration.collapsed(
                           hintText: '${localization.phoneNumber}',
+                          hintStyle: TextStyle(
+                            color: phoneColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         controller: receiverController,
                         style: TextStyle(fontSize: 20),
@@ -679,7 +513,6 @@ class _TransferPageState extends State<TransferPage> {
                           });
                           if (receiverController.text.length > 10) {
                             api.checkPhoneForSendMoney('$value').then((r) {
-                              print(r);
                               if (r['success'].toString() == 'true') {
                                 setState(() {
                                   toName = r['name'];
@@ -727,7 +560,6 @@ class _TransferPageState extends State<TransferPage> {
                         api
                             .checkPhoneForSendMoney('${returnData.phone}')
                             .then((r) {
-                          print(r);
                           if (r['success'].toString() == 'true') {
                             setState(() {
                               toName = r['name'];
@@ -773,7 +605,12 @@ class _TransferPageState extends State<TransferPage> {
                     ],
                     controller: sumController,
                     decoration: InputDecoration.collapsed(
-                        hintText: '${localization.amount}'),
+                      hintText: '${localization.amount}',
+                      hintStyle: TextStyle(
+                        color: sumColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     style: TextStyle(fontSize: 20),
                     onChanged: (value) {
                       if (sumController.text[0] == '0') {
@@ -786,14 +623,32 @@ class _TransferPageState extends State<TransferPage> {
             ],
           ),
           Container(
+            height: 20,
+            alignment: Alignment.centerRight,
+            child: Text(
+              '',
+              maxLines: 4,
+            ),
+          ),
+          Container(
+            height: 1.0,
+            color: Colors.grey,
+          ),
+          Container(
+            height: 10,
+          ),
+          Container(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                _commentButton(size, '100', sumController),
-                _commentButton(size, '500', sumController),
                 _commentButton(size, '1000', sumController),
+                _commentButton(size, '5000', sumController),
+                _commentButton(size, '20000', sumController),
               ],
             ),
+          ),
+          Container(
+            height: 10,
           ),
         ],
       ),

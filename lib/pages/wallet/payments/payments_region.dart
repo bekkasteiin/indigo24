@@ -31,7 +31,6 @@ class _PaymentsRegionState extends State<PaymentsRegion> {
           categories['success'].toString() == 'false') {
         logOut(context);
       } else {
-        print(categories);
         setState(() {
           _categories = categories;
         });

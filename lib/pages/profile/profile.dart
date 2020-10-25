@@ -8,11 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/chat_model.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/hive_names.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_models/messages_model.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/intro.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/chat_models/chat_model.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/chat_models/messages_model.dart';
-import '../chat/ui/new_chat/chat_models/hive_names.dart';
 import 'package:indigo24/pages/settings/settings_main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/helper.dart';
@@ -53,7 +53,6 @@ class _UserProfilePageState extends State<UserProfilePage>
     super.initState();
     _api = Api();
     _api.getProfile().then((result) {
-      print('profile result is $result');
       if (result['message'] == 'Not authenticated' &&
           result['success'].toString() == 'false') {
         logOut(context);
@@ -71,7 +70,6 @@ class _UserProfilePageState extends State<UserProfilePage>
             }
             if (result['city'] != null) {
               if (result['city'].contains(';')) {
-                print(result['city']);
                 List cities = result['city'].split(';');
                 if (needToAskCity) _showSelectCity(cities);
               } else {
@@ -204,9 +202,6 @@ class _UserProfilePageState extends State<UserProfilePage>
         pickedFile.path,
         targetPath,
       );
-      File test = File(pickedFile.path);
-      compressedImage.length().then((value) => print(value));
-      print("Picked file ${test.lengthSync()}");
       setState(() {
         _image = compressedImage;
         // _image = File(pickedFile.path);
@@ -219,8 +214,6 @@ class _UserProfilePageState extends State<UserProfilePage>
             return r;
           } else {
             if (r["success"]) {
-              print("avatar url ${r["fileName"]}");
-
               await SharedPreferencesHelper.setString(
                   'avatar', '${r["fileName"]}');
               setState(() {
@@ -345,7 +338,6 @@ class _UserProfilePageState extends State<UserProfilePage>
               CupertinoActionSheetAction(
                 child: Text('${localization.watch}'),
                 onPressed: () {
-                  print("посмотреть ${user.avatarUrl}${user.avatar}");
                   Navigator.pop(context);
                   Navigator.push(
                     context,
@@ -651,7 +643,6 @@ class _UserProfilePageState extends State<UserProfilePage>
                             height: 50,
                             child: RaisedButton(
                               onPressed: () async {
-                                print('exit is pressed');
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) =>
@@ -716,16 +707,13 @@ class _UserProfilePageState extends State<UserProfilePage>
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: () async {
-                            ChatRoom.shared.setSettingsStream();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SettingsMainPage(),
                               ),
                             ).whenComplete(
-                              () => setState(() {
-                                ChatRoom.shared.closeSettingsStream();
-                              }),
+                              () => setState(() {}),
                             );
                           },
                           child: Ink(
@@ -914,10 +902,7 @@ class CustomDialog extends StatelessWidget {
                               logOut(context);
                             } else {
                               if (result['success'] == true) {
-                              } else {
-                                print(
-                                    'else because we cannot log out with no reason $result');
-                              }
+                              } else {}
                             }
                           });
                         },

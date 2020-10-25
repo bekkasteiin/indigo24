@@ -91,11 +91,8 @@ class _AddTapePageState extends State<AddTapePage> {
                 ),
               ),
               onPressed: () async {
-                // print(singleFile);
-
                 // if (singleFile != null) {
                 //   // var json = singleFile.toJson();
-                //   // print(json['path']);
                 //   setState(() {
                 //     // _currentFile = File(json['path']);
                 //     _currentFile = File(singleFile);
@@ -103,14 +100,12 @@ class _AddTapePageState extends State<AddTapePage> {
                 //     isNotPicked = false;
                 //   });
                 // }
-                print("Pressed with $_currentFile");
                 if (_descriptionController.text == '' ||
                     _titleController.text == '') {
                   showAlertDialog(context, "${localization.fillAllFields}");
                 } else if (_currentFile == null) {
                   showAlertDialog(context, "${localization.selectFile}");
                 } else {
-                  print("Current file $_currentFile");
                   _pauseVideo();
                   await addTape(context);
                 }
@@ -267,7 +262,6 @@ class _AddTapePageState extends State<AddTapePage> {
     }
     if (_isVideo) {
       final pickedFile = await _picker.getVideo(source: source);
-      print(File(pickedFile.path).lengthSync());
 
       if (File(pickedFile.path).lengthSync() > 104857600) {
         showAlertDialog(context, "Файл превышает 100 Мб");
@@ -284,7 +278,6 @@ class _AddTapePageState extends State<AddTapePage> {
           _isNotPicked = false;
         });
 
-        print("video file from $_videoFile");
         await _playVideo(_videoFile);
       }
     } else {
@@ -298,7 +291,6 @@ class _AddTapePageState extends State<AddTapePage> {
             _currentFile = File(pickedFile.path);
             _isNotPicked = false;
           });
-          print("image file from $_imageFile");
           setState(() {});
         }
       } catch (e) {
@@ -392,7 +384,6 @@ class _AddTapePageState extends State<AddTapePage> {
   }
 
   Future addTape(context) async {
-    print("MY current file ${_currentFile.path}");
     _disposeVideoController();
     _api
         .addTape(_currentFile.path, _titleController.text,
@@ -410,7 +401,6 @@ class _AddTapePageState extends State<AddTapePage> {
           // Navigator.pop(context, r['result']);
           Navigator.of(context).pop(r['result']);
         } else {
-          print("false false false ");
           showAlertDialog(context, r["message"] ?? "");
         }
         return r;

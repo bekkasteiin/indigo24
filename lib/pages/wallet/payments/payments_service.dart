@@ -48,8 +48,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
 
   StreamController<bool> _verificationNotifier;
 
-  RegExp _accountRegex;
-
   Map<String, dynamic> _service;
 
   double _amount = 0.0;
@@ -479,28 +477,20 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 .replaceAll(' ', '');
 
             if (widget.isConvertable == 0 || isCalculated == true) {
-              String str =
-                  "${controllers[amountControllerIndex]['controller'].text.replaceAll(' ', '').replaceAll('+', '')}";
-              bool matches = _accountRegex.hasMatch(str);
-              if (int.parse(account) >= _service['service']['min']) {
-                if (int.parse(sum) >= _service['service']['max']) {
-                  if (matches) {
-                    await _showLockScreen(
-                      context,
-                      '${localization.enterPin}',
-                      opaque: false,
-                      cancelButton: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF001D52),
-                        ),
+              if (int.parse(sum) >= _service['service']['min']) {
+                if (int.parse(sum) <= _service['service']['max']) {
+                  await _showLockScreen(
+                    context,
+                    '${localization.enterPin}',
+                    opaque: false,
+                    cancelButton: Text(
+                      localization.cancel,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF001D52),
                       ),
-                    );
-                  } else {
-                    showAlertDialog(
-                        context, '0', '${localization.enterValidAccount}');
-                  }
+                    ),
+                  );
                 } else {
                   showAlertDialog(context, '0',
                       '${localization.enterBelowMax} ${int.parse(controllers[1]['controller'].text.replaceAll(' ', '')) < _service['service']['max']} ${_service['service']['max']}');
@@ -509,7 +499,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 showAlertDialog(context, '0', '${localization.enterAboveMin}');
               }
             } else {
-              print('ptinr $sum ${controllers[1]['controller'].text}');
               _api
                   .calculateSum(
                       widget.serviceID,
@@ -517,12 +506,10 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                       int.parse(sum),
                       widget.providerId)
                   .then((result) {
-                print(' calculated is $result');
                 if (result['message'] == 'Not authenticated' &&
                     result['success'].toString() == 'false') {
                   logOut(context);
                 } else if (result['success'].toString() == 'true') {
-                  print('this is $result');
                   setState(() {
                     isCalculated = true;
                     _amount = double.parse(result['Amount'].toString());
@@ -588,6 +575,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 ),
                 Container(
                   width: 30,
+                  height: 30,
                   child: CachedNetworkImage(imageUrl: '${widget._logo}'),
                 ),
               ],
@@ -639,13 +627,28 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               );
             },
             separatorBuilder: (context, index) {
-              return Text('');
+              return Column(
+                children: [
+                  SizedBox(height: 10),
+                  Container(
+                    height: 1.0,
+                    color: Colors.grey,
+                  ),
+                  Text(""),
+                ],
+              );
             },
             itemCount: snapshot['result'].length,
           ),
-          Container(
-            height: 1.0,
-            color: Colors.grey,
+          Column(
+            children: [
+              SizedBox(height: 10),
+              Container(
+                height: 1.0,
+                color: Colors.grey,
+              ),
+              Text(""),
+            ],
           ),
         ],
       ),

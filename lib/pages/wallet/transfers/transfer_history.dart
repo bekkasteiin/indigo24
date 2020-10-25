@@ -1,5 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
@@ -128,7 +128,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                         .getFilteredTransactions(
                             _page, selectedDate[0], selectedDate[1])
                         .then((transactions) {
-                      print(transactions);
                       if (transactions['message'] == 'Not authenticated' &&
                           transactions['success'].toString() == 'false') {
                         logOut(context);
@@ -137,8 +136,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                         if (transactions['success'].toString() == 'true') {
                           setState(() {
                             if (_page == 1) {
-                              print('setStates');
-
                               _transferHistories =
                                   transactions['transactions'].toList();
                               if (transactions['transactions'].isEmpty) {
@@ -183,14 +180,55 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
+  Widget paymentStatus(int status) {
+    String text = '';
+    Color color = greyColor;
+    switch (status) {
+      case 0:
+        text = localization.newPayment;
+        color = Colors.yellow;
+        break;
+      case 1:
+        text = localization.newPayment;
+        color = Colors.yellow;
+        break;
+      case 2:
+        text = localization.error;
+        color = Colors.red;
+        break;
+      case 3:
+        text = localization.pending;
+        color = Colors.orange;
+        break;
+      case 4:
+        text = localization.success;
+        color = Colors.green;
+        break;
+      default:
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        color: color,
+      ),
+    );
+  }
+
   Container _transferLogo(String logo) {
     return Container(
       margin: EdgeInsets.only(right: 10),
       alignment: Alignment.topCenter,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
-        child: Image.network(
-          '${logo.replaceAll("AxB", "200x200")}',
+        child: CachedNetworkImage(
+          imageUrl: logo.replaceAll('AxB', '200x200'),
           width: 50,
           height: 50,
         ),
@@ -214,19 +252,19 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                 color: blackPurpleColor,
               ),
             ),
-            SizedBox(
-              height: 5,
-            ),
-            Container(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: Container(
-                  height: 15,
-                  width: 15,
-                  color: type == 'in' ? Colors.green : Colors.red,
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   height: 5,
+            // ),
+            // Container(
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(25),
+            //     child: Container(
+            //       height: 15,
+            //       width: 15,
+            //       color: type == 'in' ? Colors.green : Colors.red,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         SizedBox(width: 5),
@@ -262,7 +300,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
               MaterialPageRoute(
                 builder: (context) => TransferPage(
                   phone: phone,
-                  amount: amount,
+                  amount: '0',
                 ),
               ),
             );
@@ -290,7 +328,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            "$phone",
+            "+$phone",
             style: TextStyle(
               fontSize: 12,
               color: blackPurpleColor,
@@ -380,7 +418,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
   }
 
   Future _loadFilteredData() async {
-    print('page $_page');
     _api
         .getFilteredTransactions(_page, splittedDates[0], splittedDates[1])
         .then((histories) {

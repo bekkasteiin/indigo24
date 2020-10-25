@@ -1,5 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/pages/wallet/withdraw/withdraw.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
@@ -117,10 +117,12 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
                   width: 35,
                   height: 40,
                   margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
-                  child: Image.network(
-                    '$logos${provider['logo']}',
-                    width: 30.0,
-                    height: 30,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: '$logos${provider['logo']}',
+                      width: 30,
+                      height: 30,
+                    ),
                   ),
                 ),
                 Container(width: 10),

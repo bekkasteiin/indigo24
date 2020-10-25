@@ -10,7 +10,6 @@ class ContactsDB {
 
   Future insertOne(MyContact contact) async {
     final finder = Finder(filter: Filter.equals('id', contact.id));
-    print("finder $finder");
     await _contactsFolder.add(await _db, contact.toJson());
   }
 
@@ -24,8 +23,6 @@ class ContactsDB {
     contacts.forEach((chat) async {
       await _contactsFolder.add(await _db, chat.toJson());
     });
-
-    print('$contacts Inserted successfully !!');
   }
 
   Future<List<MyContact>> getAll() async {

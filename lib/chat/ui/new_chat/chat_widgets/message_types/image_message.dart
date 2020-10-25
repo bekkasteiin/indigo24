@@ -51,8 +51,8 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               child: CachedNetworkImage(
                 placeholder: (context, url) => placeholder(context),
                 errorWidget: (context, url, error) => Material(
-                  child: Image.asset(
-                    'assets/preloader.gif',
+                  child: Image.network(
+                    '${avatarUrl}noAvatar.png',
                     width: MediaQuery.of(context).size.width * 0.7,
                     height: MediaQuery.of(context).size.width * 0.7,
                     fit: BoxFit.contain,

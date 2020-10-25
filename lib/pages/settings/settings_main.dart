@@ -8,7 +8,6 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
-
 import 'settings_decor.dart';
 
 class SettingsMainPage extends StatefulWidget {
@@ -23,7 +22,6 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
 
   @override
   void initState() {
-    print('this is init of main');
     _listen();
     ChatRoom.shared.getUserSettings();
     super.initState();
@@ -62,81 +60,6 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                       _buildLanguage(),
                       _buildTermsOfUse(),
                       _buildSounds(),
-                      // Container(
-                      //   margin: EdgeInsets.only(left: 20),
-                      //   height: 0.5,
-                      //   color: greyColor
-                      // ),
-                      // Material(
-                      //   child: InkWell(
-                      //     // onTap: (){
-                      //       // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsSoundPage()));
-                      //     // },
-                      //     child: Container(
-                      //       padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
-                      //       height: 60,
-                      //       child: Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //         children: <Widget>[
-                      //           Text('${localization.notifications}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color:blackPurpleColor),),
-                      //           Row(
-                      //             mainAxisSize: MainAxisSize.min,
-                      //             children: [
-                      //               // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
-                      //               Container(
-                      //                 margin: EdgeInsets.only(right: 15),
-                      //                 child: Image(
-                      //                   image: AssetImage(
-                      //                     'assets/images/forward.png',
-                      //                   ),
-                      //                   width: 15,
-                      //                   height: 15,
-                      //                 ),
-                      //               ),
-                      //             ]
-                      //           )
-                      //         ]
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      Container(
-                          margin: EdgeInsets.only(left: 20),
-                          height: 0.5,
-                          color: greyColor),
-                      // Container(
-                      //   padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 10),
-                      //   child: Row(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //     children: <Widget>[
-                      //       Text('${localization.currentLanguage}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color:blackPurpleColor),),
-                      //       Row(
-                      //         mainAxisSize: MainAxisSize.min,
-                      //         children: [
-                      //           // Text('${localization.currentLanguage}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color:blackPurpleColor),),
-                      //           IconButton(
-                      //             icon: Container(
-                      //               padding: EdgeInsets.symmetric(vertical: 10),
-                      //               child: Image(
-                      //                 image: AssetImage(
-                      //                   'assets/images/forward.png',
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             onPressed: () {
-                      //               Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsSoundPage()));
-                      //             },
-                      //           ),
-                      //         ]
-                      //       )
-                      //     ]
-                      //   ),
-                      // ),
-                      // Container(
-                      //   margin: EdgeInsets.only(left: 20),
-                      //   height: 0.5,
-                      //   color: greyColor
-                      // ),
                     ],
                   ),
                 ),
@@ -149,16 +72,12 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
   _listen() {
     ChatRoom.shared.onSettingsChange.listen((e) {
       print("Settings EVENT");
-      print(e.json);
       var cmd = e.json['cmd'];
       var message = e.json['data'];
 
       switch (cmd) {
         case "user:settings:get":
           _settings = message;
-          break;
-
-        case "chat:members:delete":
           break;
         default:
           print('Default of settings $message');
@@ -375,18 +294,15 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
     return Material(
       child: InkWell(
         onTap: () {
-          ChatRoom.shared.setNotificationSettingsStream();
-          print('this is push');
-          print(_settings);
           Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          SettingsNotificationsMainPage(settings: _settings)))
-              .whenComplete(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  SettingsNotificationsMainPage(settings: _settings),
+            ),
+          ).whenComplete(
             () => setState(
               () {
-                ChatRoom.shared.closeNotificationSettingsStream();
                 ChatRoom.shared.getUserSettings();
               },
             ),

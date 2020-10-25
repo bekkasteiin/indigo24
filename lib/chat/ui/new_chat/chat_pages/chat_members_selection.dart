@@ -1,12 +1,12 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
-
-import '../../main.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import '../../../../tabs.dart';
 
 class ChatMembersSelection extends StatefulWidget {
   final chatId;
@@ -33,23 +33,22 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
 
     _actualList = myContacts;
 
-    ChatRoom.shared.setContactsStream();
-
     _listen();
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
-    // ChatRoom.shared.contactController.close();
     _searchController.dispose();
+    await subscription.cancel();
   }
 
+  StreamSubscription subscription;
+
   _listen() {
-    ChatRoom.shared.onContactChange.listen((e) {
+    subscription = ChatRoom.shared.onContactChange.listen((e) {
       var cmd = e.json['cmd'];
       print("MEMBER SELECTION EVENT $cmd");
-      print(e.json);
       if (ModalRoute.of(context).isCurrent) {
         switch (cmd) {
           case "user:check":
@@ -65,10 +64,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
             }
             break;
           case "chat:members:add":
-            print('______CHAT MEMBERS ADD______');
-            // Navigator.pop(context);
             Navigator.pop(context);
-            ChatRoom.shared.getMessages(widget.chatId);
             break;
           default:
             print('this is default');
@@ -101,22 +97,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        centerTitle: true,
-        brightness: Brightness.light,
+      appBar: IndigoAppBarWidget(
         title: Text(
           "${localization.addToGroup}",
           style: TextStyle(
@@ -141,7 +122,6 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
             },
           )
         ],
-        backgroundColor: Colors.white,
       ),
       body: myContacts.isNotEmpty
           ? SafeArea(

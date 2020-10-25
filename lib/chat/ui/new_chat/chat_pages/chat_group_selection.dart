@@ -2,13 +2,13 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/pages/chat/ui/new_chat/chat.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
-
-import '../../main.dart';
+import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import '../../../../tabs.dart';
+import 'chat.dart';
 
 class ChatGroupSelection extends StatefulWidget {
   @override
@@ -25,7 +25,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   void initState() {
     super.initState();
     _actualList.addAll(myContacts);
-    ChatRoom.shared.setContactsStream();
     _selectedsList.add({
       "phone": "${user.phone}",
       "user_id": "${user.id}",
@@ -35,31 +34,27 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
     _searchController.dispose();
     _titleController.dispose();
-    // ChatRoom.shared.contactController.close();
+    await subscription.cancel();
   }
 
+  StreamSubscription subscription;
+
   _listen() {
-    ChatRoom.shared.onContactChange.listen((e) {
+    subscription = ChatRoom.shared.onContactChange.listen((e) {
       print("GROUP SELECTION EVENT");
-      print(e.json);
       var cmd = e.json['cmd'];
       switch (cmd) {
         case "chat:create":
-          print("STATUS ${e.json["data"]["status"]}");
           if (e.json["data"]["status"].toString() == "true") {
             var name = e.json["data"]["chat_name"];
             var chatID = e.json["data"]["chat_id"];
-            print(e.json['data']['type']);
             // ChatRoom.shared.setChatStream();
-            ChatRoom.shared.getMessages(chatID);
+            // ChatRoom.shared.getMessages(chatID);
             Navigator.pop(context);
-            print('${e.json['data']['avatar']}');
-            print('${e.json['data']['type']}');
-            print('${e.json['data']['chat_name']}');
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -71,12 +66,8 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                   chatType: e.json['data']['type'],
                 ),
               ),
-            ).whenComplete(() {
-              ChatRoom.shared.closeChatStream();
-            });
-          } else {
-            print('++++++++++++++++++++');
-          }
+            ).whenComplete(() {});
+          } else {}
           break;
 
         default:
@@ -129,22 +120,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(10),
-            child: Image(
-              image: AssetImage(
-                'assets/images/back.png',
-              ),
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        centerTitle: true,
-        brightness: Brightness.light,
+      appBar: IndigoAppBarWidget(
         title: Text(
           "${localization.createGroup}",
           style: TextStyle(
@@ -156,33 +132,29 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
         ),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.group_add),
-              iconSize: 30,
-              color: blackPurpleColor,
-              onPressed: () {
-                if (_selectedsList.length > 2) {
-                  if (_titleController.text.isNotEmpty) {
-                    String userIds = '';
-                    _selectedsList.removeAt(0);
-                    _selectedsList.forEach((element) {
-                      userIds += '${element['user_id']}' + ',';
-                      print(element);
-                    });
-                    print(userIds);
-                    userIds = userIds.substring(0, userIds.length - 1);
-                    ChatRoom.shared.cabinetCreate(userIds, 1,
-                        title: _titleController.text);
-                  } else {
-                    print('chat name is empty');
-                    _showError(context, '${localization.noChatName}');
-                  }
+            icon: Icon(Icons.group_add),
+            iconSize: 30,
+            color: blackPurpleColor,
+            onPressed: () {
+              if (_selectedsList.length > 2) {
+                if (_titleController.text.isNotEmpty) {
+                  String userIds = '';
+                  _selectedsList.removeAt(0);
+                  _selectedsList.forEach((element) {
+                    userIds += '${element['user_id']}' + ',';
+                  });
+                  userIds = userIds.substring(0, userIds.length - 1);
+                  ChatRoom.shared
+                      .cabinetCreate(userIds, 1, title: _titleController.text);
                 } else {
-                  print('member count less than 3');
-                  _showError(context, '${localization.minMembersCount}');
+                  _showError(context, '${localization.noChatName}');
                 }
-              })
+              } else {
+                _showError(context, '${localization.minMembersCount}');
+              }
+            },
+          ),
         ],
-        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Column(
@@ -191,9 +163,11 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-                padding: EdgeInsets.only(top: 10, left: 10),
-                child:
-                    Text('${_selectedsList.length} ${localization.contacts}')),
+              padding: EdgeInsets.only(top: 10, left: 10),
+              child: Text(
+                '${_selectedsList.length} ${localization.contacts}',
+              ),
+            ),
             Container(
               height: _selectedsList.length == 0 ? 0 : 82,
               child: ListView.builder(
@@ -219,9 +193,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                   child: Text(
                                     '${_selectedsList[index]['name'][0].toUpperCase()}',
                                     style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.w500),
+                                      color: Colors.white,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ),

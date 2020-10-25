@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
@@ -23,6 +24,7 @@ class _TapePageState extends State<TapePage>
   TextEditingController _commentController = TextEditingController();
   var _tapeResult;
   List _comments = [];
+  List _likes = [];
   int _letterCount = 100;
   Api _api = Api();
   String _tempCount = " ";
@@ -36,8 +38,10 @@ class _TapePageState extends State<TapePage>
         logOut(context);
         return true;
       } else {
-        print('Get tape result $result');
         _commentCount = result['result']['comments'].length;
+        setState(() {
+          _likes = result["result"]["likes"].toList();
+        });
         return setTape(result);
       }
     });
@@ -88,6 +92,50 @@ class _TapePageState extends State<TapePage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
+                              '${localization.likes} : ${_likes.length}',
+                              style: TextStyle(
+                                  color: blackPurpleColor,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                            Container(
+                              height: 100,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _likes.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  return Column(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        child: CachedNetworkImage(
+                                          height: 50,
+                                          width: 50,
+                                          imageUrl: avatarUrl +
+                                              _likes[index]['avatar'],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 70,
+                                        child: Center(
+                                          child: Text(
+                                            _likes[index]['name'].toString(),
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                              color: blackPurpleColor,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            Text(
                               '${localization.comments} : $_commentCount',
                               style: TextStyle(
                                   color: blackPurpleColor,
@@ -99,7 +147,6 @@ class _TapePageState extends State<TapePage>
                               itemCount: _comments.length,
                               itemBuilder: (context, index) {
                                 _saved.add({'index': index, 'maxLines': 5});
-                                // print('${_comments}');
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -186,7 +233,6 @@ class _TapePageState extends State<TapePage>
                                           //       maxLine = 10;
                                           //       _saved[index]['maxLines'] = 1000;
                                           //     });
-                                          //     print('eshe');
                                           //   },
                                           //   ),
                                         ],
@@ -228,7 +274,7 @@ class _TapePageState extends State<TapePage>
                 CircleAvatar(
                   radius: 20.0,
                   backgroundImage: NetworkImage('$avatarUrl${user.avatar}'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.grey,
                 ),
                 Expanded(
                   child: Container(
@@ -283,7 +329,6 @@ class _TapePageState extends State<TapePage>
                           _tempCount = value;
                         },
                         decoration: InputDecoration(
-                          // contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.send),
                             onPressed: () async {
@@ -299,7 +344,6 @@ class _TapePageState extends State<TapePage>
                                   '${widget.tape['id']}',
                                 )
                                     .then((v) {
-                                  print('addCommentResult $v');
                                   var result = {
                                     "avatar": "${user.avatar}",
                                     "comment": "${_commentController.text}",
@@ -336,7 +380,6 @@ class _TapePageState extends State<TapePage>
 
   Future setTape(result) async {
     setState(() {
-      // print('this is result $result');
       _tapeResult = result["result"];
       _comments = result["result"]["comments"].toList();
       _future = Future(foo);

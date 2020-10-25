@@ -33,7 +33,6 @@ class TimerPageState extends State<TimerPage> {
   void leftButtonPressed() {
     setState(() {
       if (dependencies.stopwatch.isRunning) {
-        print("${dependencies.stopwatch.elapsedMilliseconds}");
       } else {
         dependencies.stopwatch.reset();
       }

@@ -12,7 +12,6 @@ class CountryDao {
 
   Future insertOne(Country country) async {
     final finder = Finder(filter: Filter.equals('id', country.id));
-    print("finder $finder");
     await _countryFolder.add(await _db, country.toJson());
   }
 
@@ -24,7 +23,6 @@ class CountryDao {
     countries.forEach((country) async {
       await _countryFolder.add(await _db, country.toJson());
     });
-    print('$countries Inserted successfully !!');
   }
 
   Future<List<Country>> getAll() async {
@@ -36,7 +34,6 @@ class CountryDao {
   }
 
   Future deleteAll() async {
-    print("Deleted all data from local db");
     await _countryFolder.delete(await _db);
   }
 }

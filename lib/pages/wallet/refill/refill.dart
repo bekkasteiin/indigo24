@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:indigo24/pages/wallet/refill/refill_web.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -51,32 +52,16 @@ class _RefillPageState extends State<RefillPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            icon: Container(
-              padding: EdgeInsets.all(10),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/back.png',
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          brightness: Brightness.light,
+        appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.refill}",
+            '${localization.refill}',
             style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
+              color: blackPurpleColor,
               fontWeight: FontWeight.w400,
+              fontSize: 22,
             ),
             textAlign: TextAlign.center,
           ),
-          backgroundColor: Colors.white,
         ),
         body: Stack(
           children: [
@@ -159,26 +144,17 @@ class _RefillPageState extends State<RefillPage> {
                     child: Text('${localization.commission} $_commission KZT'),
                   ),
                   Container(
-                    height: 50,
-                    width: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
+                    margin: EdgeInsets.only(left: 20, right: 20, top: 20),
+                    decoration: BoxDecoration(boxShadow: [
+                      BoxShadow(
                           color: Colors.black26,
                           blurRadius: 10.0,
                           spreadRadius: -2,
-                          offset: Offset(0.0, 0.0),
-                        )
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    margin: EdgeInsets.only(top: 20, bottom: 10),
+                          offset: Offset(0.0, 0.0))
+                    ]),
                     child: ButtonTheme(
-                      minWidth: double.infinity,
-                      height: 100.0,
-                      child: FlatButton(
+                      height: 40,
+                      child: RaisedButton(
                         onPressed: () async {
                           if (_amountController.text.isNotEmpty) {
                             FocusScopeNode currentFocus =
@@ -200,8 +176,8 @@ class _RefillPageState extends State<RefillPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => buildWebviewScaffold(
-                                      refillResult['redirectURL'],
+                                    builder: (context) => RefillWebView(
+                                      url: refillResult['redirectURL'],
                                     ),
                                   ),
                                 );
@@ -230,60 +206,34 @@ class _RefillPageState extends State<RefillPage> {
                             });
                           }
                         },
-                        child: Text(
-                          '${localization.refill}',
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontWeight: FontWeight.w800,
+                        child: Container(
+                          height: 50,
+                          width: 200,
+                          child: Center(
+                            child: Text(
+                              '${localization.refill}',
+                              style: TextStyle(
+                                  color: Color(0xFF0543B8),
+                                  fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ),
+                        color: Color(0xFFFFFFFF),
+                        textColor: Color(0xFF001D52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            10.0,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 30),
                 ],
               ),
             ),
-            _preloader
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : Center()
+            _preloader ? Center(child: CircularProgressIndicator()) : Center()
           ],
-        ),
-      ),
-    );
-  }
-
-  WillPopScope buildWebviewScaffold(url) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        appBar: IndigoAppBarWidget(
-          title: Text(
-            localization.refill,
-            style: TextStyle(
-              color: blackPurpleColor,
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        body: SafeArea(
-          child: WebviewScaffold(
-            url: '$url',
-            withZoom: true,
-            withLocalStorage: true,
-            hidden: false,
-            initialChild: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
         ),
       ),
     );
