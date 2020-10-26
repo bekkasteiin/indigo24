@@ -737,17 +737,22 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                           //       )
                           //     : Center(),
                           SizedBox(height: 10),
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            margin: EdgeInsets.only(left: 20),
-                            child: Text(
-                              '${localization.members}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
+                          widget.chatType == 1
+                              ? Container(
+                                  alignment: Alignment.centerLeft,
+                                  margin: EdgeInsets.only(left: 20),
+                                  child: Text(
+                                    '${localization.members}',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: 0,
+                                  width: 0,
+                                ),
                           _actualMembersList.isEmpty
                               ? Center(
                                   child: Text('${localization.emptyContacts}'))

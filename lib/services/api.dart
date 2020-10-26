@@ -576,9 +576,6 @@ class Api {
         'description': '$description'
       });
 
-      print(
-          'Adding tape with data ${formData.files[0].value.length}\n    FIEDLS ${formData.fields}');
-
       _sendingMsgProgressBar.show(context, '$p');
 
       Response response = await _dio.post(
@@ -586,11 +583,9 @@ class Api {
         data: formData,
         onSendProgress: (int sent, int total) {
           String percent = (sent / total * 100).toStringAsFixed(2);
-          print('$percent% $total');
         },
       );
 
-      print('Getting response from TAPE upload ${response.data}');
       _sendingMsgProgressBar.hide();
       return response.data;
     } on DioError catch (e) {
@@ -600,7 +595,6 @@ class Api {
         print(e.request);
         print(e.message);
       }
-      print('Error when upload TAPE: ${e.response.data}');
       _sendingMsgProgressBar.hide();
       return e.response.data;
     }

@@ -1050,7 +1050,7 @@ class _NewChatPageState extends State<ChatPage> {
               userId: int.parse(data['user_id'].toString()),
               avatar: data['avatar'] as String,
               read: data['write'].toString() == '1' ? true : false,
-              username: data['user_name'] as String,
+              username: data['user_name'].toString() as String,
               text: data['text'] as String,
               type: int.parse(data['type'].toString()),
               time: int.parse(data['time'].toString()),
