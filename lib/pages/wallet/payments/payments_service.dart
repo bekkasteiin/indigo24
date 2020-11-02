@@ -10,6 +10,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/keyboard.dart';
@@ -210,6 +211,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                               color: darkGreyColor2,
                                             ),
                                           ),
+                                          Text(
+                                            '$account',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color: blackPurpleColor,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       Row(
@@ -223,24 +231,33 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                               color: darkGreyColor2,
                                             ),
                                           ),
-                                          Row(
-                                            children: <Widget>[
-                                              Text(
-                                                '${widget.title}',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: blackPurpleColor,
+                                          SizedBox(width: 10),
+                                          Flexible(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child: Text(
+                                                    '${widget.title}',
+                                                    maxLines: 10,
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: blackPurpleColor,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                              SizedBox(width: 5),
-                                              Container(
-                                                width: 30,
-                                                height: 30,
-                                                child: CachedNetworkImage(
-                                                  imageUrl: '${widget._logo}',
+                                                SizedBox(width: 5),
+                                                Container(
+                                                  width: 30,
+                                                  height: 30,
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: '${widget._logo}',
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -256,7 +273,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             ),
                                           ),
                                           Text(
-                                            '${_amount.toStringAsFixed(2)}',
+                                            '${_amount.toStringAsFixed(2)} KZT',
                                             style: TextStyle(
                                               fontSize: 20,
                                               color: blackPurpleColor,
@@ -276,7 +293,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             ),
                                           ),
                                           Text(
-                                            '${_expectedAmount.toStringAsFixed(2)}',
+                                            '${_expectedAmount.toStringAsFixed(2)} $_expectedCurrency',
                                             style: TextStyle(
                                               fontSize: 20,
                                               color: blackPurpleColor,
@@ -342,44 +359,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     );
   }
 
-  showAlertDialog(BuildContext context, String type, String message,
-      {bool withPop}) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        SystemChannels.textInput.invokeMethod('TextInput.hide');
-        if (withPop != null) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
-        } else {
-          Navigator.pop(context);
-        }
-      },
-    );
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 1.0),
-          child: CupertinoAlertDialog(
-            title: Text(type == '0'
-                ? "${localization.attention}"
-                : type == '1'
-                    ? '${localization.success}'
-                    : '${localization.error}'),
-            content: Text(message),
-            actions: [
-              okButton,
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   _showLockScreen(BuildContext context, String title,
       {bool withPin,
       bool opaque,
@@ -431,9 +410,25 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             return services;
           } else {
             if (services['success'].toString() == 'false')
-              showAlertDialog(context, '0', services['message']);
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => CustomDialog(
+                  description: '${services['message']}',
+                  yesCallBack: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              );
             else {
-              showAlertDialog(context, '1', services['message']);
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => CustomDialog(
+                  description: '${services['message']}',
+                  yesCallBack: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              );
               _api.getBalance().then((result) {
                 setState(() {});
               });
@@ -492,11 +487,26 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     ),
                   );
                 } else {
-                  showAlertDialog(context, '0',
-                      '${localization.enterBelowMax} ${int.parse(controllers[1]['controller'].text.replaceAll(' ', '')) < _service['service']['max']} ${_service['service']['max']}');
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => CustomDialog(
+                      description: '${localization.enterBelowMax}',
+                      yesCallBack: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
                 }
               } else {
-                showAlertDialog(context, '0', '${localization.enterAboveMin}');
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => CustomDialog(
+                    description: '${localization.enterAboveMin}',
+                    yesCallBack: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                );
               }
             } else {
               _api
@@ -520,8 +530,15 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     _expectedCurrency = result['ExpectedCurrency'];
                   });
                 } else {
-                  showAlertDialog(
-                      context, '${localization.error}', '${result['message']}');
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => CustomDialog(
+                      description: '${result['message']}',
+                      yesCallBack: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
                 }
               });
             }

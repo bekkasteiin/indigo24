@@ -8,6 +8,7 @@ import 'package:indigo24/pages/auth/registration/registration.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/custom_dropdown.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
@@ -345,23 +346,15 @@ class _IntroPageState extends State<IntroPage> {
   }
 
   dioError(context) async {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text('${localization.httpError}'),
-      actions: [
-        okButton,
-      ],
-    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return CustomDialog(
+          description: "${localization.httpError}",
+          yesCallBack: () {
+            Navigator.pop(context);
+          },
+        );
       },
     );
   }

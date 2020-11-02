@@ -19,6 +19,7 @@ import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
@@ -65,24 +66,19 @@ getContactsTemplate(context) async {
     }
 
     if (result) {
-      Widget okButton = CupertinoDialogAction(
-        child: Text("${localization.openSettings}"),
-        onPressed: () {
-          Navigator.pop(context);
-          AppSettings.openAppSettings();
-        },
-      );
-      CupertinoAlertDialog alert = CupertinoAlertDialog(
-        title: Text("${localization.error}"),
-        content: Text('${localization.allowContacts}'),
-        actions: [
-          okButton,
-        ],
-      );
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return alert;
+          return CustomDialog(
+            description: localization.allowContacts,
+            yesCallBack: () {
+              Navigator.pop(context);
+              AppSettings.openAppSettings();
+            },
+            noCallBack: () {
+              Navigator.pop(context);
+            },
+          );
         },
       );
     }
@@ -233,20 +229,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
     if ('${user.pin}'.toString() == 'waiting' &&
         _tempPasscode != enteredPasscode) {
-      return showDialog<void>(
+      return showDialog(
         context: context,
         builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text('${localization.error}'),
-            content: Text('${localization.incorrectPin}'),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                child: Text('Ok'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          return CustomDialog(
+            description: localization.incorrectPin,
+            yesCallBack: () {
+              Navigator.pop(context);
+            },
           );
         },
       );
@@ -342,11 +332,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    print('init state');
     api.getConfig();
     permissions();
     pushPermission();
     share();
-    _init();
     // initDownloader();
     final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
     var fcmTokenStream = _firebaseMessaging.onTokenRefresh;
@@ -368,8 +358,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                   semanticsLabel: '${localization.cancel}'))
           : Text('');
     });
-
-    getContactsTemplate(context);
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -393,20 +381,21 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     _tabController = new TabController(length: 4, vsync: this);
 
     setUser().then((result) async {
+      _init();
       _connectivity.initialise();
       _connectivity.myStream.listen((source) {
-        setState(() => _source = source);
         switch (source.keys.toList()[0]) {
           case ConnectivityResult.none:
             print("NO INTERNET");
             ChatRoom.shared.closeConnection();
             break;
           default:
+            print('default connect');
             _init();
             break;
         }
       });
-
+      getContactsTemplate(context);
       setState(() {});
     });
     super.initState();
@@ -800,7 +789,17 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         _isSharedVideo = false;
         Navigator.pop(context);
       } else {
-        showAlertDialog(context, r["message"]);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialog(
+              description: r["message"],
+              yesCallBack: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
       }
     });
   }
@@ -854,27 +853,5 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       } else {}
       return e.response.data;
     }
-  }
-
-  showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
   }
 }

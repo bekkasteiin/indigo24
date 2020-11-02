@@ -34,7 +34,6 @@ class ContactsDB {
   }
 
   Future deleteAll() async {
-    print("Deleted all data from local db");
     await _contactsFolder.delete(await _db);
   }
 }

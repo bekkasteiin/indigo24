@@ -6,6 +6,7 @@ import 'package:indigo24/chat/ui/new_chat/chat_pages/chat_page_view_test.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -77,26 +78,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Future<void> _showError(BuildContext context, m) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('${localization.error}'),
-          content: Text('$m'),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -490,8 +471,18 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                         });
                                       } else if (registerResponse['message'] !=
                                           null) {
-                                        _showError(context,
-                                            registerResponse['message']);
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return CustomDialog(
+                                              description:
+                                                  "${registerResponse['message']}",
+                                              yesCallBack: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            );
+                                          },
+                                        );
                                       } else {
                                         setState(() {
                                           firstPasswordError =

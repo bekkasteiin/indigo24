@@ -16,6 +16,8 @@ import 'chat/ui/new_chat/chat_models/messages_model.dart';
 import 'services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'widgets/alerts.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -81,30 +83,23 @@ logOut(BuildContext context) async {
   preferences.setString('pin', 'false');
   Hive.box<MessageModel>(HiveBoxes.messages).clear();
   Hive.box<ChatModel>(HiveBoxes.chats).clear();
-  Widget okButton = CupertinoDialogAction(
-    child: Text("OK"),
-    onPressed: () async {
-      Navigator.pop(context);
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => IntroPage(),
-        ),
-        (r) => false,
-      );
-    },
-  );
-  CupertinoAlertDialog alert = CupertinoAlertDialog(
-    title: Text("${localization.error}"),
-    content: Text('${localization.sessionIsOver}'),
-    actions: [
-      okButton,
-    ],
-  );
+
   showDialog(
     barrierDismissible: false,
     context: context,
     builder: (BuildContext context) {
-      return alert;
+      return CustomDialog(
+        description: "${localization.sessionIsOver}",
+        yesCallBack: () {
+          Navigator.pop(context);
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => IntroPage(),
+            ),
+            (r) => false,
+          );
+        },
+      );
     },
   );
 }

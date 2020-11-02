@@ -8,7 +8,6 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:indigo24/chat/ui/new_chat/chat_models/chat_model.dart';
 import 'package:indigo24/chat/ui/new_chat/chat_models/hive_names.dart';
-
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/socket.dart';
@@ -33,6 +32,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
   bool get wantKeepAlive => true;
   bool _isChatsLoading;
   int _chatsPage;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -45,6 +45,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
   @override
   void dispose() async {
     super.dispose();
+    _searchController.dispose();
     await subscription.cancel();
   }
 
@@ -185,39 +186,22 @@ class _TestChatsListPageState extends State<TestChatsListPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: IndigoAppBarWidget(
-        elevation: 0.5,
-        leading: SizedBox(
-          height: 0,
-          width: 0,
-        ),
-        title: Text(
-          localization.chats,
-          style: TextStyle(
-            color: blackPurpleColor,
-            fontSize: 22,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Container(
-              height: 20,
-              width: 20,
-              child: Image(
-                image: AssetImage(
-                  'assets/images/contacts.png',
-                ),
-              ),
-            ),
-            iconSize: 30,
-            color: blackPurpleColor,
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: IndigoAppBarWidget(
+          elevation: 0.5,
+          leading: IconButton(
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ChatContactsPage(),
+                  builder: (context) => ChatGroupSelection(),
                 ),
               ).whenComplete(
                 () {
@@ -225,142 +209,173 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                 },
               );
             },
-          )
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 10),
-            child: ButtonTheme(
-              height: 0,
-              child: RaisedButton(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        '${localization.createGroup}',
-                        style: TextStyle(color: blackPurpleColor),
+            icon: Container(
+              child: Row(
+                children: [
+                  Container(
+                    height: 10,
+                    width: 10,
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/add.png',
                       ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        height: 10,
-                        width: 10,
-                        child: Image(
-                          image: AssetImage(
-                            'assets/images/add.png',
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: 30,
-                        width: 20,
-                        child: Image(
-                          image: AssetImage(
-                            'assets/images/group.png',
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                textColor: blackPurpleColor,
-                color: whiteColor,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatGroupSelection(),
                     ),
-                  ).whenComplete(
-                    () {
-                      ChatRoom.shared.forceGetChat();
-                    },
-                  );
-                },
+                  ),
+                  Container(
+                    height: 30,
+                    width: 20,
+                    child: Image(
+                      image: AssetImage(
+                        'assets/images/group.png',
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
           ),
-          NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scrollInfo) {
-              if (!_isChatsLoading &&
-                  scrollInfo.metrics.pixels ==
-                      scrollInfo.metrics.maxScrollExtent) {
-                _loadMore();
-              }
-            },
-            child: Flexible(
-              child: ValueListenableBuilder(
-                  valueListenable:
-                      Hive.box<ChatModel>(HiveBoxes.chats).listenable(),
-                  builder: (context, Box box, widget) {
-                    List numbers = box.values.toList();
-                    numbers.sort((a, b) {
-                      return b.messageTime.compareTo(a.messageTime);
-                    });
-                    return ScrollablePositionedList.builder(
-                      itemCount: numbers.length,
-                      itemBuilder: (BuildContext context, int i) {
-                        if (numbers.length == 0)
-                          return SizedBox(height: 0, width: 0);
-                        return Slidable(
-                          actionPane: SlidableDrawerActionPane(),
-                          actionExtentRatio: 0.25,
-                          secondaryActions: <Widget>[
-                            IconSlideAction(
-                              caption:
-                                  '${numbers.elementAt(i).isMuted == true ? localization.unmute : localization.mute}',
-                              color: numbers.elementAt(i).isMuted == true
-                                  ? Colors.grey
-                                  : redColor,
-                              icon: numbers.elementAt(i).isMuted == true
-                                  ? Icons.settings_backup_restore
-                                  : Icons.volume_mute,
-                              onTap: () {
-                                numbers.elementAt(i).isMuted == true
-                                    ? ChatRoom.shared.muteChat(
-                                        numbers.elementAt(i).chatId, 1)
-                                    : ChatRoom.shared.muteChat(
-                                        numbers.elementAt(i).chatId, 0);
-                              },
-                            ),
-                            IconSlideAction(
-                              caption: '${localization.delete}',
-                              color: Colors.red,
-                              icon: Icons.delete,
-                              onTap: () {
-                                indigoCupertinoDialogAction(
-                                  context,
-                                  '${localization.delete} ${localization.chat} ${numbers.elementAt(i).name}?',
-                                  isDestructiveAction: true,
-                                  rightButtonText: localization.delete,
-                                  rightButtonCallBack: () {
-                                    ChatRoom.shared.deleteChat(
-                                        numbers.elementAt(i).chatId);
-                                    Navigator.pop(context);
-                                  },
-                                );
-                              },
-                            )
-                          ],
-                          child: _chatListTile(numbers.elementAt(i)),
-                        );
-                      },
-                    );
-                  }),
+          title: Text(
+            localization.chats,
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontSize: 22,
+              fontWeight: FontWeight.w400,
             ),
           ),
-        ],
+          actions: <Widget>[
+            IconButton(
+              icon: Container(
+                height: 20,
+                width: 20,
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/contacts.png',
+                  ),
+                ),
+              ),
+              iconSize: 30,
+              color: blackPurpleColor,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatContactsPage(),
+                  ),
+                ).whenComplete(
+                  () {
+                    ChatRoom.shared.forceGetChat();
+                  },
+                );
+              },
+            )
+          ],
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 0, left: 10.0, right: 10, bottom: 0),
+              child: TextField(
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: blackPurpleColor,
+                  ),
+                  hintText: "${localization.search}",
+                  fillColor: blackPurpleColor,
+                ),
+                onChanged: (value) {
+                  setState(() {});
+                },
+                controller: _searchController,
+              ),
+            ),
+            NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!_isChatsLoading &&
+                    scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) {
+                  _loadMore();
+                }
+              },
+              child: Flexible(
+                child: ValueListenableBuilder(
+                    valueListenable:
+                        Hive.box<ChatModel>(HiveBoxes.chats).listenable(),
+                    builder: (context, Box box, widget) {
+                      List<ChatModel> numbers = box.values.where((element) {
+                        return _searchController.text.isNotEmpty
+                            ? element.name
+                                .toString()
+                                .toLowerCase()
+                                .contains(_searchController.text.toLowerCase())
+                            : true;
+                      }).toList();
+                      numbers.sort((a, b) {
+                        return b.messageTime.compareTo(a.messageTime);
+                      });
+                      return ScrollablePositionedList.builder(
+                        itemCount: numbers.length,
+                        itemBuilder: (BuildContext context, int i) {
+                          if (numbers.length == 0)
+                            return SizedBox(height: 0, width: 0);
+                          return Slidable(
+                            actionPane: SlidableDrawerActionPane(),
+                            actionExtentRatio: 0.25,
+                            secondaryActions: <Widget>[
+                              IconSlideAction(
+                                caption:
+                                    '${numbers.elementAt(i).isMuted == true ? localization.unmute : localization.mute}',
+                                color: numbers.elementAt(i).isMuted == true
+                                    ? Colors.grey
+                                    : redColor,
+                                icon: numbers.elementAt(i).isMuted == true
+                                    ? Icons.settings_backup_restore
+                                    : Icons.volume_mute,
+                                onTap: () {
+                                  numbers.elementAt(i).isMuted == true
+                                      ? ChatRoom.shared.muteChat(
+                                          numbers.elementAt(i).chatId, 1)
+                                      : ChatRoom.shared.muteChat(
+                                          numbers.elementAt(i).chatId, 0);
+                                },
+                              ),
+                              IconSlideAction(
+                                caption: '${localization.delete}',
+                                color: Colors.red,
+                                icon: Icons.delete,
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return CustomDialog(
+                                        description:
+                                            '${localization.delete} ${localization.chat} ${numbers.elementAt(i).name}?',
+                                        yesCallBack: () {
+                                          ChatRoom.shared.deleteChat(
+                                            numbers.elementAt(i).chatId,
+                                          );
+                                          Navigator.pop(context);
+                                        },
+                                        noCallBack: () {
+                                          Navigator.pop(context);
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              )
+                            ],
+                            child: _chatListTile(numbers.elementAt(i)),
+                          );
+                        },
+                      );
+                    }),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -371,7 +386,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     subscription = ChatRoom.shared.onNewChatsChange.listen((e) async {
       var cmd = e.json["cmd"];
       var data = e.json["data"];
-      print('Chats ${e.json}');
+      print('CHATS EVENT $cmd');
       switch (cmd) {
         case "chats:get":
           if (_isChatsLoading) {
@@ -384,7 +399,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                     int.parse(chat['id'].toString()),
                     ChatModel(
                       name: chat['name'] as String,
-                      chatId: int.parse(chat['id']),
+                      chatId: int.parse(chat['id'].toString()),
                       chatType: chat['type'] as int,
                       avatar: chat['avatar'] as String,
                       isMuted: int.parse(chat['mute'].toString()) == 0

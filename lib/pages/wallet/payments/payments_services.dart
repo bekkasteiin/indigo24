@@ -45,11 +45,9 @@ class _PaymentsServicesState extends State<PaymentsServices> {
               services['success'].toString() == 'false') {
             logOut(context);
           } else if (services['success'].toString() == 'false') {
-            indigoCupertinoDialogAction(
-              context,
-              services['message'],
-              isDestructiveAction: false,
-              leftButtonCallBack: () {
+            CustomDialog(
+              description: services['message'],
+              yesCallBack: () {
                 Navigator.pop(context);
               },
             );

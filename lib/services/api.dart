@@ -118,10 +118,8 @@ class Api {
     };
     var result = await _postRequest('api/v2.1/token/fcm/update', data);
     if (result['success'] == true) {
-      print('Token updated to $token $result');
       return true;
     } else {
-      print('Else token updated to $token $result');
       return result;
     }
   }
@@ -308,11 +306,8 @@ class Api {
 
   doTransfer(toID, amount, {transferChat, String comment}) async {
     dynamic data;
-    print('this is $transferChat');
     if (transferChat == null) {
-      print('when if not null $transferChat');
       if (comment != null) {
-        print('when comment != null $transferChat');
         data = {
           'customerID': '${user.id}',
           'unique': '${user.unique}',
@@ -321,7 +316,6 @@ class Api {
           'comment': comment,
         };
       } else {
-        print('when comment == null $transferChat');
         data = {
           'customerID': '${user.id}',
           'unique': '${user.unique}',
@@ -348,8 +342,6 @@ class Api {
       'page': '$page',
     };
     if (fromDate != null && toDate != null) {
-      print(fromDate);
-      print(toDate);
       data = {
         'customerID': '${user.id}',
         'unique': '${user.unique}',
@@ -383,7 +375,6 @@ class Api {
   }
 
   calculateSum(serviceID, account, amount, int providerId) async {
-    print('provider id id $providerId');
     switch (providerId) {
       case 6:
         dynamic queryParameters = {
@@ -441,7 +432,6 @@ class Api {
   getServices(categoryID, {locationId, locationType}) async {
     dynamic data;
     if (locationId != null && locationType != null) {
-      print('with');
       data = {
         'customerID': '${user.id}',
         'unique': '${user.unique}',

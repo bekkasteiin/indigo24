@@ -19,6 +19,7 @@ import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:package_info/package_info.dart';
@@ -99,29 +100,9 @@ class _UserProfilePageState extends State<UserProfilePage>
     }
   }
 
-  showCustomDialog(BuildContext context, String message) async {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () async {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
   _showSelectCity(cities) {
+    var api = Api();
+
     needToAskCity = false;
     Size size = MediaQuery.of(context).size;
     Dialog errorDialog = Dialog(
@@ -137,11 +118,7 @@ class _UserProfilePageState extends State<UserProfilePage>
               margin: EdgeInsets.all(10),
               child: Text('${localization.selectOption}'),
             ),
-            Container(
-              height: 1,
-              width: size.width,
-              color: blackColor,
-            ),
+            Container(height: 1, width: size.width, color: blackColor),
             Flexible(
               child: ListView.separated(
                 padding: EdgeInsets.all(0),
@@ -156,11 +133,20 @@ class _UserProfilePageState extends State<UserProfilePage>
                           setState(() {
                             user.city = cities[index];
                           });
-                          showCustomDialog(context, '${result['message']}');
+                          Navigator.of(context).pop();
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CustomDialog(
+                                description: "${result["message"]}",
+                                yesCallBack: () {
+                                  Navigator.of(context).pop();
+                                },
+                              );
+                            },
+                          );
                         }
                       });
-
-                      Navigator.pop(context);
                     },
                   );
                 },
@@ -176,7 +162,6 @@ class _UserProfilePageState extends State<UserProfilePage>
         ),
       ),
     );
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -220,8 +205,17 @@ class _UserProfilePageState extends State<UserProfilePage>
                 user.avatar = r["fileName"];
               });
             } else {
-              showAlertDialog(context, "${r["message"]}");
-              print("error");
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return CustomDialog(
+                    description: "${r["message"]}",
+                    yesCallBack: () {
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+              );
             }
             return r;
           }
@@ -254,8 +248,6 @@ class _UserProfilePageState extends State<UserProfilePage>
         "file": await MultipartFile.fromFile(_path),
       });
 
-      print("Uploading avatar with data ${formData.fields}");
-
       // _sendingMsgProgressBar.show(context, "");
 
       response = await dio.post(
@@ -269,7 +261,6 @@ class _UserProfilePageState extends State<UserProfilePage>
             uploadPercent = sent / total;
             percent = "$p %";
           });
-          print("$percent");
         },
         onReceiveProgress: (count, total) {
           setState(() {
@@ -292,28 +283,6 @@ class _UserProfilePageState extends State<UserProfilePage>
         print(e.message);
       }
     }
-  }
-
-  showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
   }
 
   Widget _buildCoverImage(Size screenSize) {
@@ -647,12 +616,40 @@ class _UserProfilePageState extends State<UserProfilePage>
                                   context: context,
                                   builder: (BuildContext context) =>
                                       CustomDialog(
-                                    title: null,
                                     description: "${localization.wantToExit}?",
-                                    buttonText: "Okay",
-                                    image: CachedNetworkImage(
-                                      imageUrl: '$avatarUrl${user.avatar}',
-                                    ),
+                                    yesCallBack: () async {
+                                      var api = Api();
+                                      var preferences =
+                                          await SharedPreferences.getInstance();
+                                      Hive.box<MessageModel>(HiveBoxes.messages)
+                                          .clear();
+                                      Hive.box<ChatModel>(HiveBoxes.chats)
+                                          .clear();
+
+                                      preferences.setString('phone', 'null');
+                                      ChatRoom.shared.channel = null;
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                          builder: (context) => IntroPage(),
+                                        ),
+                                        (r) => false,
+                                      );
+                                      await api.logOutHttp().then((result) {
+                                        print(result);
+                                        if (result['message'] ==
+                                                'Not authenticated' &&
+                                            result['success'].toString() ==
+                                                'false') {
+                                          logOut(context);
+                                        } else {
+                                          if (result['success'] == true) {
+                                          } else {}
+                                        }
+                                      });
+                                    },
+                                    noCallBack: () {
+                                      Navigator.pop(context);
+                                    },
                                   ),
                                 );
                                 // SharedPreferences preferences =
@@ -721,9 +718,6 @@ class _UserProfilePageState extends State<UserProfilePage>
                               "assets/images/settings.png",
                               width: 35,
                             ),
-                            // child: Text("${localization.exit}",
-                            //     style: TextStyle(
-                            //         color: Colors.white, fontSize: 18)),
                           )),
                     ),
                     SizedBox(width: 15),
@@ -798,164 +792,4 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   @override
   bool get wantKeepAlive => true;
-}
-
-var api = Api();
-
-class CustomDialog extends StatelessWidget {
-  final String title, description, buttonText;
-  final CachedNetworkImage image;
-
-  CustomDialog({
-    @required this.title,
-    @required this.description,
-    @required this.buttonText,
-    this.image,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Consts.padding),
-      ),
-      elevation: 0.0,
-      backgroundColor: Colors.transparent,
-      child: dialogContent(context),
-    );
-  }
-
-  dialogContent(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(top: Consts.avatarRadius),
-          decoration: new BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(Consts.padding),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(
-                  top: Consts.padding + 24,
-                  bottom: Consts.padding,
-                  left: Consts.padding,
-                  right: Consts.padding,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    title != null
-                        ? Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )
-                        : Container(),
-                    Text(
-                      description,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18.0, color: blackPurpleColor),
-                    ),
-                    SizedBox(height: 24.0),
-                  ],
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: blackPurpleColor,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(Consts.padding),
-                    bottomRight: Radius.circular(Consts.padding),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Expanded(
-                      child: FlatButton(
-                        onPressed: () async {
-                          var preferences =
-                              await SharedPreferences.getInstance();
-                          Hive.box<MessageModel>(HiveBoxes.messages).clear();
-                          Hive.box<ChatModel>(HiveBoxes.chats).clear();
-
-                          // await api.updateFCM('logoutToken');
-                          preferences.setString('phone', 'null');
-                          ChatRoom.shared.channel = null;
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => IntroPage(),
-                            ),
-                            (r) => false,
-                          );
-                          await api.logOutHttp().then((result) {
-                            print(result);
-                            if (result['message'] == 'Not authenticated' &&
-                                result['success'].toString() == 'false') {
-                              logOut(context);
-                            } else {
-                              if (result['success'] == true) {
-                              } else {}
-                            }
-                          });
-                        },
-                        child: Container(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              "${localization.yes}",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(width: 1, height: 50, color: Colors.white),
-                    Expanded(
-                      child: FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(); // To close the dialog
-                        },
-                        child: Container(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              "${localization.no}",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class Consts {
-  Consts._();
-
-  static const double padding = 16.0;
-  static const double avatarRadius = 66.0;
 }

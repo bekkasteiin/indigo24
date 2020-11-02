@@ -7,6 +7,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class RefillPage extends StatefulWidget {
@@ -182,24 +183,15 @@ class _RefillPageState extends State<RefillPage> {
                                   ),
                                 );
                               } else {
-                                Widget okButton = CupertinoDialogAction(
-                                  child: Text("OK"),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                );
-                                CupertinoAlertDialog alert =
-                                    CupertinoAlertDialog(
-                                  title: Text("${localization.attention}"),
-                                  content: Text('${refillResult['message']}'),
-                                  actions: [
-                                    okButton,
-                                  ],
-                                );
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
-                                    return alert;
+                                    return CustomDialog(
+                                      description: "${refillResult['message']}",
+                                      yesCallBack: () {
+                                        Navigator.pop(context);
+                                      },
+                                    );
                                   },
                                 );
                               }

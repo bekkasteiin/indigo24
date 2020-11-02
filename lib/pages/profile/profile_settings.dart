@@ -6,6 +6,7 @@ import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
@@ -30,28 +31,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     _nameController.dispose();
     _cityController.dispose();
     super.dispose();
-  }
-
-  showCustomDialog(BuildContext context, String message) async {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () async {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
   }
 
   @override
@@ -88,7 +67,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       'city',
                       _cityController.text,
                     );
-                    showCustomDialog(context, result['message']);
+
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => CustomDialog(
+                        description: result['message'],
+                        yesCallBack: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    );
                   }
                 });
               }

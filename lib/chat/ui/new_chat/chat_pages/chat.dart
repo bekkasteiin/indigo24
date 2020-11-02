@@ -41,7 +41,6 @@ class ChatPage extends StatefulWidget {
   final int chatType;
   final String chatName;
   final String avatar;
-  final int memberCount;
   final phone;
   const ChatPage({
     Key key,
@@ -50,7 +49,6 @@ class ChatPage extends StatefulWidget {
     @required this.chatName,
     this.phone,
     @required this.avatar,
-    this.memberCount,
   }) : super(key: key);
   @override
   _NewChatPageState createState() => _NewChatPageState();
@@ -159,7 +157,15 @@ class _NewChatPageState extends State<ChatPage> {
           var dir = Directory(sdPath);
           dir.deleteSync(recursive: true);
         } else {
-          indigoCupertinoDialogAction(context, '${r["message"]}');
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+              description: '${r["message"]}',
+              yesCallBack: () {
+                Navigator.pop(context);
+              },
+            ),
+          );
         }
       });
 
@@ -355,7 +361,6 @@ class _NewChatPageState extends State<ChatPage> {
                   chatType: widget.chatType,
                   chatName: widget.chatName,
                   chatAvatar: widget.avatar,
-                  memberCount: widget.memberCount,
                   chatId: widget.chatId,
                   phone: widget.phone,
                 ),
@@ -1006,7 +1011,7 @@ class _NewChatPageState extends State<ChatPage> {
   StreamSubscription subscription;
   listen() {
     subscription = ChatRoom.shared.onNewChatChange.listen((e) {
-      print("NEW CHAT EVENT ${e.json['cmd']}");
+      print("CHAT EVENT ${e.json['cmd']}");
       var cmd = e.json['cmd'];
       var data = e.json['data'];
       switch (cmd) {
@@ -1597,9 +1602,7 @@ class _NewChatPageState extends State<ChatPage> {
             ChatRoom.shared.sendMessage(
                 '${widget.chatId}', "${popResult['text']}",
                 type: 1, attachments: jsonDecode(jsonEncode(a)));
-          } else {
-            // _showAlertDialog(context, r["message"]);
-          }
+          } else {}
         });
       }
     }
@@ -1630,9 +1633,7 @@ class _NewChatPageState extends State<ChatPage> {
             ChatRoom.shared.sendMessage(
                 '${widget.chatId}', "${popResult['text']}",
                 type: 4, attachments: jsonDecode(jsonEncode(a)));
-          } else {
-            // _showAlertDialog(context, r["message"]);
-          }
+          } else {}
         });
       }
     }
@@ -1674,9 +1675,7 @@ class _NewChatPageState extends State<ChatPage> {
               type: 2,
               fileId: r["file_id"],
               attachments: jsonDecode(jsonEncode(a)));
-        } else {
-          // _showAlertDialog(context, r["message"]);
-        }
+        } else {}
       });
     }
   }

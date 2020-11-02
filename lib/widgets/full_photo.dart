@@ -11,6 +11,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:share/share.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'alerts.dart';
+
 class FullPhoto extends StatelessWidget {
   final String url;
 
@@ -269,23 +271,15 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
   }
 
   showAlertDialog(BuildContext context, String title, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("$title"),
-      content: Text("$message"),
-      actions: [
-        okButton,
-      ],
-    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return CustomDialog(
+          description: "$message",
+          yesCallBack: () {
+            Navigator.pop(context);
+          },
+        );
       },
     );
   }

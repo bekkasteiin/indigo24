@@ -89,26 +89,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
     );
   }
 
-  Future<void> showError(BuildContext context, m) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('${localization.error}'),
-          content: Text(m),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _startTimer() {
     const oneSec = const Duration(seconds: 1);
     if (_timer == null) {

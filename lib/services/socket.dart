@@ -83,7 +83,7 @@ class ChatRoom {
   }
 
   sendSocketData(data) {
-    print('adding to socket $data');
+    print('adding to socket ${json.decode(data)}');
     channel.sink.add(data);
   }
 

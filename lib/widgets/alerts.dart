@@ -1,50 +1,136 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 
-indigoCupertinoDialogAction(
-  BuildContext context,
-  String title, {
-  rightButtonCallBack(),
-  leftButtonCallBack(),
-  String content,
-  bool isDestructiveAction = false,
-  String rightButtonText,
-  String leftButtonText,
-}) {
-  List<Widget> actions = [];
+class CustomDialog extends StatelessWidget {
+  final String title, description;
+  final Function yesCallBack;
+  final Function noCallBack;
 
-  CupertinoDialogAction rightButton = CupertinoDialogAction(
-    child: Text('$rightButtonText'),
-    isDestructiveAction: isDestructiveAction,
-    onPressed: () {
-      rightButtonCallBack();
-    },
-  );
-  CupertinoDialogAction leftButton = CupertinoDialogAction(
-    child: Text(
-      '${leftButtonText == null ? localization.cancel : leftButtonText}',
-    ),
-    onPressed: () {
-      leftButtonCallBack == null
-          ? Navigator.pop(context)
-          : leftButtonCallBack();
-    },
-  );
-  actions.add(leftButton);
-  rightButtonText != null ? actions.add(rightButton) : Center();
+  static const double padding = 16.0;
+  static const double avatarRadius = 66.0;
 
-  CupertinoAlertDialog alert = CupertinoAlertDialog(
-    title: Text(title),
-    content: Text(content != null ? content : ''),
-    actions: actions,
-  );
-  
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return alert;
-    },
-  );
+  CustomDialog({
+    this.title,
+    @required this.description,
+    @required this.yesCallBack,
+    this.noCallBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(padding),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: dialogContent(context),
+    );
+  }
+
+  dialogContent(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(top: avatarRadius),
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(padding),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(
+                  top: padding + 24,
+                  bottom: padding,
+                  left: padding,
+                  right: padding,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    title != null
+                        ? Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        : Container(),
+                    Text(
+                      description,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 18.0, color: blackPurpleColor),
+                    ),
+                    SizedBox(height: 24.0),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: blackPurpleColor,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(padding),
+                    bottomRight: Radius.circular(padding),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Expanded(
+                      child: FlatButton(
+                        onPressed: yesCallBack,
+                        child: Container(
+                          height: 50,
+                          child: Center(
+                            child: Text(
+                              "OK".toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    noCallBack == null
+                        ? SizedBox(height: 0, width: 0)
+                        : Container(width: 1, height: 50, color: Colors.white),
+                    noCallBack == null
+                        ? SizedBox(height: 0, width: 0)
+                        : Expanded(
+                            child: FlatButton(
+                              onPressed: noCallBack,
+                              child: Container(
+                                height: 50,
+                                child: Center(
+                                  child: Text(
+                                    "${localization.no}".toUpperCase(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }

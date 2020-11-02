@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -102,11 +103,27 @@ class _AddTapePageState extends State<AddTapePage> {
                 // }
                 if (_descriptionController.text == '' ||
                     _titleController.text == '') {
-                  showAlertDialog(context, "${localization.fillAllFields}");
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => CustomDialog(
+                      description: localization.fillAllFields,
+                      yesCallBack: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
                 } else if (_currentFile == null) {
-                  showAlertDialog(context, "${localization.selectFile}");
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => CustomDialog(
+                      description: localization.selectFile,
+                      yesCallBack: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
                 } else {
-                  _pauseVideo();
+                  if (_controller != null) _pauseVideo();
                   await addTape(context);
                 }
               },
@@ -300,23 +317,15 @@ class _AddTapePageState extends State<AddTapePage> {
   }
 
   showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return CustomDialog(
+          description: "$message",
+          yesCallBack: () {
+            Navigator.of(context).pop();
+          },
+        );
       },
     );
   }

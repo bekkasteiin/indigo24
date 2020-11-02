@@ -205,11 +205,11 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                         child: FlatButton(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               Text(
-                                '${localization.edit}',
+                                '${localization.edit}  ',
                                 style: TextStyle(fontSize: 14),
                               ),
                               Icon(CupertinoIcons.pen, size: 20)

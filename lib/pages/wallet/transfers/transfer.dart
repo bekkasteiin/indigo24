@@ -12,6 +12,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
@@ -31,27 +32,16 @@ class _TransferPageState extends State<TransferPage> {
   Api api = Api();
 
   showAlertDialog(BuildContext context, String type, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text(type == '0'
-          ? "${localization.attention}"
-          : type == '1' ? '${localization.success}' : '${localization.error}'),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
-        return alert;
+        return CustomDialog(
+          description: "$message",
+          yesCallBack: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        );
       },
     );
   }
@@ -337,9 +327,25 @@ class _TransferPageState extends State<TransferPage> {
                     boolForPreloader = false;
                   });
                   if (res['success'].toString() == 'false')
-                    showAlertDialog(context, '0', res['message']);
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => CustomDialog(
+                        description: '${res['message']}',
+                        yesCallBack: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    );
                   else {
-                    showAlertDialog(context, '1', res['message']);
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => CustomDialog(
+                        description: '${res['message']}',
+                        yesCallBack: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    );
                     if (res['transfer_money_chat_token'].toString() != 'null')
                       ChatRoom.shared.sendMoney(
                           res['transfer_money_chat_token'],
@@ -350,14 +356,30 @@ class _TransferPageState extends State<TransferPage> {
                   }
                 });
               } else {
-                showAlertDialog(context, '0', result['message']);
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => CustomDialog(
+                    description: '${result['message']}',
+                    yesCallBack: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                );
               }
 
               return result;
             }
           });
         } else {
-          showAlertDialog(context, '0', '${localization.fillAllFields}');
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+              description: '${localization.fillAllFields}',
+              yesCallBack: () {
+                Navigator.pop(context);
+              },
+            ),
+          );
         }
       });
     }

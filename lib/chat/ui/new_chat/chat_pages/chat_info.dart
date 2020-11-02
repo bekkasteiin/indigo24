@@ -15,6 +15,7 @@ import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/full_photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -68,6 +69,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
 
   RefreshController _refreshController;
   String chatAvatar;
+  bool loaderCheck = true;
+  dynamic _member;
+
   @override
   void initState() {
     if (widget.chatAvatar != null && '${widget.chatAvatar}' != '')
@@ -94,10 +98,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     _chatTitle = '${widget.chatName}';
 
     _listen();
-
     if (widget.chatId != null) {
       ChatRoom.shared.chatMembers(widget.chatId, page: _chatMembersPage);
-    } else {
+    } else if (widget.chatType == 0) {
       ChatRoom.shared.userCheckById(widget.userId);
     }
     if (widget.chatName.length > 2) {
@@ -137,6 +140,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                 _membersList.forEach((member) {
                   if (member['user_id'].toString() == '${user.id}') {
                     _myPrivilege = member['role'].toString();
+                    _member = member;
                   }
                   if (member['online'] == 'online') {
                     _onlineCount++;
@@ -219,23 +223,32 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
             if (e.json['data']['chat_id'].toString() != 'false' &&
                 e.json['data']['status'].toString() == 'true') {
               // ChatRoom.shared.setChatStream();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatPage(
-                    chatName: '${e.json['data']['name']}',
-                    chatId: int.parse(e.json['data']['chat_id'].toString()),
-                    chatType: 0,
-                    avatar: '${e.json['data']['avatar']}',
+              if (loaderCheck == false) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                      chatName: '${e.json['data']['name']}',
+                      chatId: int.parse(e.json['data']['chat_id'].toString()),
+                      chatType: 0,
+                      avatar: '${e.json['data']['avatar']}',
+                    ),
                   ),
-                ),
-              ).whenComplete(() {});
+                ).whenComplete(() {});
+                loaderCheck = false;
+              } else {
+                setState(() {
+                  _member = e.json['data'];
+                });
+              }
             } else if (e.json['data']['status'].toString() == 'true') {
-              ChatRoom.shared.cabinetCreate("${e.json['data']['user_id']}", 0);
+              if (loaderCheck == false) {
+                ChatRoom.shared
+                    .cabinetCreate("${e.json['data']['user_id']}", 0);
+              } else {}
             }
             break;
           default:
-            print('Default of chat info $message');
         }
       }
     });
@@ -322,28 +335,6 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     }
   }
 
-  showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: Text("${localization.error}"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(
       source: imageSource,
@@ -373,7 +364,17 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
               ChatRoom.shared.setGroupAvatar(
                   int.parse(widget.chatId.toString()), r["file_name"]);
             } else {
-              showAlertDialog(context, "${r["message"]}");
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return CustomDialog(
+                    description: "${r["message"]}",
+                    yesCallBack: () {
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              );
             }
             return r;
           }
@@ -390,6 +391,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
           child: Text('${localization.watch}'),
           onPressed: () async {
             Navigator.pop(context);
+
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -435,14 +437,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
           if (_myPrivilege == '$ownerRole' || _myPrivilege == '$adminRole')
             buildProfileImageAction();
         } else {
-          dynamic member;
           if (widget.chatType == 0) {
-            _actualMembersList.forEach((element) {
-              if (element['user_id'].toString() != user.id) {
-                member = element;
-              }
-            });
-            newAction(member: member, chatId: widget.chatId);
+            newAction(member: _member, chatId: widget.chatId);
           }
         }
       },
@@ -528,33 +524,19 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
             isDestructiveAction: true,
             child: Text('${localization.exitGroup}'),
             onPressed: () {
-              Widget okButton = CupertinoDialogAction(
-                isDestructiveAction: true,
-                child: Text("${localization.yes}"),
-                onPressed: () {
-                  Navigator.pop(context);
-                  ChatRoom.shared.leaveChat(widget.chatId);
-                },
-              );
-              Widget noButton = CupertinoDialogAction(
-                child: Text("${localization.no}"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              );
-              CupertinoAlertDialog alert = CupertinoAlertDialog(
-                title: Text("${localization.attention}"),
-                content: Text('${localization.sureExitGroup}'),
-                actions: [
-                  noButton,
-                  okButton,
-                ],
-              );
-              Navigator.pop(context);
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return alert;
+                  return CustomDialog(
+                    description: "${localization.sureExitGroup}",
+                    yesCallBack: () {
+                      Navigator.pop(context);
+                      ChatRoom.shared.leaveChat(widget.chatId);
+                    },
+                    noCallBack: () {
+                      Navigator.pop(context);
+                    },
+                  );
                 },
               );
             },
@@ -942,11 +924,13 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
   }
 
   newAction({String myPrivilege, dynamic member, dynamic chatId}) {
+    print(member);
     List<Widget> actions = [
       CupertinoActionSheetAction(
         child: Text('${localization.watch}'),
         onPressed: () {
           Navigator.pop(context);
+
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -961,6 +945,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
       CupertinoActionSheetAction(
         child: Text('${localization.goToChat}'),
         onPressed: () {
+          loaderCheck = false;
           ChatRoom.shared.userCheckById(member['user_id']);
           Navigator.pop(context);
         },

@@ -9,6 +9,7 @@ import 'package:indigo24/pages/tapes/add_tape.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/video/flick_multi_manager.dart';
 import 'package:indigo24/widgets/video/flick_multi_player.dart';
@@ -151,23 +152,15 @@ class _TapesPageState extends State<TapesPage>
       RefreshController(initialRefresh: false);
 
   showAlertDialog(BuildContext context, String message) {
-    Widget okButton = CupertinoDialogAction(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    CupertinoAlertDialog alert = CupertinoAlertDialog(
-      // title: Text("Alert"),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return CustomDialog(
+          description: "$message",
+          yesCallBack: () {
+            Navigator.pop(context);
+          },
+        );
       },
     );
   }
@@ -230,7 +223,9 @@ class _TapesPageState extends State<TapesPage>
           },
         ));
     showCupertinoModalPopup(
-        context: context, builder: (BuildContext context) => act);
+      context: context,
+      builder: (BuildContext context) => act,
+    );
   }
 
   @override

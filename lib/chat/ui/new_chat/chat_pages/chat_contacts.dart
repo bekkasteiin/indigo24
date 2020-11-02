@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'package:app_settings/app_settings.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/db/contacts_db.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import '../../../../tabs.dart';
 import 'chat.dart';
@@ -35,24 +38,19 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     getContacts(context).then((getContactsResult) {
       var result = getContactsResult is List ? false : !getContactsResult;
       if (result) {
-        Widget okButton = CupertinoDialogAction(
-          child: Text("${localization.openSettings}"),
-          onPressed: () {
-            Navigator.pop(context);
-            AppSettings.openAppSettings();
-          },
-        );
-        CupertinoAlertDialog alert = CupertinoAlertDialog(
-          title: Text("${localization.error}"),
-          content: Text('${localization.allowContacts}'),
-          actions: [
-            okButton,
-          ],
-        );
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return alert;
+            return CustomDialog(
+              description: localization.allowContacts,
+              yesCallBack: () {
+                Navigator.pop(context);
+                AppSettings.openAppSettings();
+              },
+              noCallBack: () {
+                Navigator.pop(context);
+              },
+            );
           },
         );
       }
@@ -221,7 +219,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(
-                    top: 10.0, left: 10.0, right: 10, bottom: 0),
+                    top: 0, left: 10.0, right: 10, bottom: 0),
                 child: TextField(
                   decoration: new InputDecoration(
                     prefixIcon: Icon(
@@ -263,21 +261,30 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                               borderRadius:
                                                   BorderRadius.circular(20.0),
                                               child: Container(
-                                                color: Colors.blue[400],
-                                                width: 35,
-                                                height: 35,
-                                                child: Center(
-                                                  child: Text(
-                                                    '${_actualList[index].name.toString()[0]}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16.0,
+                                                  color: Colors.blue[400],
+                                                  width: 35,
+                                                  height: 35,
+                                                  child: ClipOval(
+                                                    child: CachedNetworkImage(
+                                                      imageUrl:
+                                                          "$avatarUrl${_actualList[index].avatar}"
+                                                              .replaceAll('AxB',
+                                                                  '200x200'),
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              Center(
+                                                        child: Text(
+                                                          '${_actualList[index].name.toString()[0]}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16.0,
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
-                                                  ),
-                                                ),
-                                              ),
+                                                  )),
                                             ),
                                             SizedBox(
                                               width: 20,

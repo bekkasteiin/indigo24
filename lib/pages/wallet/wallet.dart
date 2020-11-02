@@ -11,6 +11,7 @@ import 'package:indigo24/pages/wallet/transfers/transfer_list.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
+import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
@@ -150,20 +151,14 @@ class _WalletTabState extends State<WalletTab> {
     }
     if ('${user.pin}'.toString() == 'waiting' &&
         _tempPasscode != enteredPasscode) {
-      return showDialog<void>(
+      return showDialog(
         context: context,
         builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text('${localization.error}'),
-            content: Text('${localization.incorrectPin}'),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                child: Text('Ok'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          return CustomDialog(
+            description: localization.incorrectPin,
+            yesCallBack: () {
+              Navigator.pop(context);
+            },
           );
         },
       );
