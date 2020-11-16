@@ -121,7 +121,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
             image:
                 // user.chatBackground == 'ligth' //
                 // ?
-                AssetImage("assets/images/background_chat.png")
+                AssetImage("assets/images/mainBack.png")
             // : AssetImage("assets/images/background_chat_2.png"),
             ),
       );
@@ -137,7 +137,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                     Text(
                       '${widget.title}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: blackPurpleColor, fontSize: 28),
+                      style: TextStyle(color: whiteColor, fontSize: 28),
                     ),
                     SizedBox(
                       height: 10,
@@ -145,7 +145,7 @@ class _PasscodeScreenState extends State<PasscodeScreen>
                     Text(
                       '$passCodeError',
                       style: TextStyle(
-                          color: blackPurpleColor, fontWeight: FontWeight.w400),
+                          color: whiteColor, fontWeight: FontWeight.w400),
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 10),

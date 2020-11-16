@@ -10,6 +10,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
+import 'package:indigo24/widgets/indigo_square.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../countries.dart';
 import 'phone_confirm.dart';
@@ -189,16 +190,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                       fontSize: 18,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
                                   Container(
-                                    child: Image(
-                                      width: 15,
-                                      height: 15,
-                                      image: AssetImage(
-                                        'assets/images/dropDown.png',
-                                      ),
+                                    child: Icon(
+                                      Icons.navigate_next,
+                                      color: blackPurpleColor,
                                     ),
                                   ),
                                 ],
@@ -216,6 +211,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
+                              IndigoSquare(),
+                              SizedBox(width: 10),
                               Text(
                                 "${localization.phoneNumber}",
                                 style: TextStyle(

@@ -32,15 +32,13 @@ class FullScreenWrapper extends StatelessWidget {
       color: Colors.white,
       child: Scaffold(
         appBar: IndigoAppBarWidget(
-          title: Text(
-            '${localization.photo}',
-            style: TextStyle(
-              color: blackPurpleColor,
-              fontWeight: FontWeight.w400,
-              fontSize: 22,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          title: Text('${localization.photo}',
+              style: TextStyle(
+                color: blackPurpleColor,
+                fontWeight: FontWeight.w400,
+                fontSize: 22,
+              ),
+              textAlign: TextAlign.center),
         ),
         body: SafeArea(
           bottom: false,

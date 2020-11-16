@@ -27,7 +27,6 @@ class AspectRatioVideoState extends State<AspectRatioVideo> {
   @override
   void initState() {
     super.initState();
-
     controller.addListener(_onVideoControllerUpdate);
   }
 

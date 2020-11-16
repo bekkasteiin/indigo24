@@ -9,6 +9,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/indigo_square.dart';
 
 class UserRegistrationPage extends StatefulWidget {
   final phone;
@@ -133,7 +134,9 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Text("Имя",
+                              IndigoSquare(),
+                              SizedBox(width: 10),
+                              Text("${localization.name}",
                                   style: TextStyle(
                                       color: primaryColor, fontSize: 16)),
                               SizedBox(
@@ -175,6 +178,8 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
+                              IndigoSquare(),
+                              SizedBox(width: 10),
                               Text("${localization.surname}",
                                   style: TextStyle(
                                       color: primaryColor, fontSize: 16)),
@@ -217,7 +222,9 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("Email",
+                              IndigoSquare(),
+                              SizedBox(width: 10),
+                              Text("${localization.email}",
                                   style: TextStyle(
                                       color: primaryColor, fontSize: 16)),
                               SizedBox(
@@ -259,6 +266,8 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
+                              IndigoSquare(),
+                              SizedBox(width: 10),
                               Text("${localization.password}",
                                   style: TextStyle(
                                       color: primaryColor, fontSize: 16)),
@@ -379,10 +388,14 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                       ),
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    PDFViewer('assets/terms.pdf')));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PDFViewer(
+                              'assets/terms.pdf',
+                              text: localization.terms,
+                            ),
+                          ),
+                        );
                       },
                     ),
                     _space(15),

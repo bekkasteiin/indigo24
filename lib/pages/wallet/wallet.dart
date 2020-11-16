@@ -44,6 +44,7 @@ class _WalletTabState extends State<WalletTab> {
 
   double _blockedAmount = 0;
   double _realAmount = 0;
+
   double _globalCoef = 1;
   double _tengeCoef = 1;
   double _euroCoef = 1;
@@ -71,7 +72,7 @@ class _WalletTabState extends State<WalletTab> {
               opaque: false,
               cancelButton: Text(
                 '${localization.cancel}',
-                style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+                style: const TextStyle(fontSize: 16, color: whiteColor),
                 semanticsLabel: '${localization.cancel}',
               ),
             )
@@ -81,7 +82,7 @@ class _WalletTabState extends State<WalletTab> {
               opaque: false,
               cancelButton: Text(
                 '${localization.cancel}',
-                style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+                style: const TextStyle(fontSize: 16, color: whiteColor),
                 semanticsLabel: '${localization.cancel}',
               ),
             );
@@ -132,7 +133,7 @@ class _WalletTabState extends State<WalletTab> {
           cancelButton: cancelButton,
           deleteButton: Text(
             '${localization.delete}',
-            style: const TextStyle(fontSize: 16, color: blackPurpleColor),
+            style: const TextStyle(fontSize: 16, color: whiteColor),
             semanticsLabel: '${localization.delete}',
           ),
           shouldTriggerVerification: _verificationNotifier.stream,
@@ -205,7 +206,6 @@ class _WalletTabState extends State<WalletTab> {
             });
           });
           setState(() {
-            // _amount = double.parse(user.balance);
             _realAmount = double.parse(user.balance);
             _blockedAmount = double.parse(user.balanceInBlock);
           });
@@ -229,7 +229,7 @@ class _WalletTabState extends State<WalletTab> {
                     child: Stack(
                       children: <Widget>[
                         Image.asset(
-                          'assets/images/walletBackground.png',
+                          'assets/images/wallet_header.png',
                           fit: BoxFit.fill,
                         ),
                         Container(
@@ -243,46 +243,6 @@ class _WalletTabState extends State<WalletTab> {
                                     child: Text(
                                       '${localization.wallet}',
                                       style: fS26(c: 'ffffff'),
-                                    ),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.topRight,
-                                    child: InkWell(
-                                      child: Container(
-                                        margin:
-                                            EdgeInsets.only(right: 30, top: 2),
-                                        color: whiteColor,
-                                        width: 40,
-                                        padding: EdgeInsets.all(5),
-                                        child: Column(
-                                          children: <Widget>[
-                                            Container(
-                                              child: Image.asset(
-                                                'assets/images/refresh.png',
-                                                width: 20,
-                                                height: 20,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      onTap: () async {
-                                        setState(() {
-                                          _needToPreloade = true;
-                                        });
-                                        await _api.getBalance().then((result) {
-                                          setState(() {
-                                            _needToPreloade = false;
-                                          });
-                                        });
-                                        setState(() {
-                                          // _amount = double.parse(user.balance);
-                                          _realAmount =
-                                              double.parse(user.balance);
-                                          _blockedAmount =
-                                              double.parse(user.balanceInBlock);
-                                        });
-                                      },
                                     ),
                                   ),
                                 ],

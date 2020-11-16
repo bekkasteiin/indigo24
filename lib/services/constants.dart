@@ -16,7 +16,6 @@ String voiceUrl = 'https://media.chat.indigo24.$domen/media/voice/';
 String imageUrl = 'https://media.chat.indigo24.$domen/media/images/';
 String videoUrl = 'https://media.chat.indigo24.$domen/media/video/';
 String stickerUrl = 'https://media.chat.indigo24.$domen/media/stickers/';
-
 String logos = 'https://api.indigo24.$domen/logos/';
 
 const String ownerRole = '100';

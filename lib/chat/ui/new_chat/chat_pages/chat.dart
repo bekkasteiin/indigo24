@@ -582,7 +582,6 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  // "${_replyMessage["user_name"]}",
                                                   "${_replyMessage['username']}",
                                                   style: TextStyle(
                                                       color: primaryColor),
@@ -596,9 +595,7 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  // "${_replyMessage['message_text_for_type']}",
                                                   "${_replyMessage['type'] == 0 ? _replyMessage['text'] : _identifyType(_replyMessage['type'])}",
-
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   maxLines: 1,
@@ -658,7 +655,6 @@ class _NewChatPageState extends State<ChatPage> {
                                             Flexible(
                                               child: Container(
                                                 child: Text(
-                                                  // "${_editMessage["user_name"]}",
                                                   "${_editMessage['username']}",
                                                   style: TextStyle(
                                                       color: primaryColor),
@@ -732,10 +728,7 @@ class _NewChatPageState extends State<ChatPage> {
                                           ChatListDraggablePage(
                                               messages: toForwardMessages),
                                     ),
-                                  ).whenComplete(() {
-                                    // ChatRoom.shared.setChatStream();
-                                    // ChatRoom.shared.getMessages(widget.chatId);
-                                  });
+                                  ).whenComplete(() {});
                                 },
                               ),
                             ],
@@ -753,7 +746,6 @@ class _NewChatPageState extends State<ChatPage> {
                                       if (!currentFocus.hasPrimaryFocus) {
                                         currentFocus.unfocus();
                                       }
-
                                       _showAttachmentBottomSheet(context);
                                     },
                                   ),
@@ -1028,21 +1020,12 @@ class _NewChatPageState extends State<ChatPage> {
               _messageController.text = e.json['text'];
             _editMessage = e.json['message'];
           });
-
           break;
-
         case 'message:deleted:all':
           var mId = e.json['data']['message_id'];
           Box<MessageModel> contactsBox =
               Hive.box<MessageModel>(HiveBoxes.messages);
-
           contactsBox.delete(mId);
-          // var i = _messagesList.indexWhere((element) =>
-          //     (element['id'] == null ? element['message_id'] : element['id']) ==
-          //     mId);
-          // setState(() {
-          //   _messagesList.removeAt(i);
-          // });
           break;
         case "message:edit":
           Box<MessageModel> contactsBox =
@@ -1055,7 +1038,7 @@ class _NewChatPageState extends State<ChatPage> {
               userId: int.parse(data['user_id'].toString()),
               avatar: data['avatar'] as String,
               read: data['write'].toString() == '1' ? true : false,
-              username: data['user_name'].toString() as String,
+              username: data['user_name'].toString(),
               text: data['text'] as String,
               type: int.parse(data['type'].toString()),
               time: int.parse(data['time'].toString()),
@@ -1274,7 +1257,7 @@ class _NewChatPageState extends State<ChatPage> {
                 else
                   _onlineString = actualUnixDate.year.toString();
 
-                _onlineString += ' ago';
+                _onlineString += ' ' + localization.ago.toLowerCase();
               });
             else
               setState(() {

@@ -264,7 +264,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
 
   Widget paymentStatus(int status) {
     String text = '';
-
     Color color = greyColor;
     switch (status) {
       case 0:

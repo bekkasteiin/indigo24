@@ -116,8 +116,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           Stack(
                             children: <Widget>[
                               Image.asset(
-                                'assets/images/background_little.png',
-                                fit: BoxFit.fill,
+                                'assets/images/wallet_header.png',
+                                fit: BoxFit.fitHeight,
                               ),
                               Column(
                                 children: <Widget>[
@@ -311,41 +311,61 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           isCalculated
                               ? Center(
                                   child: Text(
-                                      '1 $_expectedCurrency = ${_exchangeRate.toStringAsFixed(2)} KZT',
-                                      style:
-                                          TextStyle(color: Color(0xFF001D52))))
+                                    '1 $_expectedCurrency = ${_exchangeRate.toStringAsFixed(2)} KZT',
+                                    style: TextStyle(
+                                      color: Color(0xFF001D52),
+                                    ),
+                                  ),
+                                )
                               : Center(),
                           SizedBox(
                             height: 10,
                           ),
                           Center(
-                              child: Text(
-                                  '${localization.minAmount} ${_service['service']['min']} KZT',
-                                  style: TextStyle(color: Color(0xFF001D52)))),
-                          SizedBox(
-                            height: 10,
+                            child: Text(
+                              '${localization.commission} ${_service['service']['commission']}%',
+                              style: TextStyle(
+                                color: Color(
+                                  0xFF001D52,
+                                ),
+                              ),
+                            ),
                           ),
                           Center(
-                              child: Text(
-                                  '${localization.maxAmount} ${_service['service']['max']} KZT',
-                                  style: TextStyle(color: Color(0xFF001D52)))),
+                            child: Text(
+                              '${localization.minAmount} ${_service['service']['min']} KZT',
+                              style: TextStyle(
+                                color: Color(
+                                  0xFF001D52,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Center(
+                            child: Text(
+                              '${localization.maxAmount} ${_service['service']['max']} KZT',
+                              style: TextStyle(
+                                color: Color(
+                                  0xFF001D52,
+                                ),
+                              ),
+                            ),
+                          ),
                           _service['service']['commission'].toString() != '0'
                               ? Center(
                                   child: Text(
-                                      '${localization.commission} ${_service['service']['commission'] * _amount} KZT',
-                                      style:
-                                          TextStyle(color: Color(0xFF001D52))))
+                                    '${localization.commission} ${_service['service']['commission'] * _amount} KZT',
+                                    style: TextStyle(
+                                      color: Color(
+                                        0xFF001D52,
+                                      ),
+                                    ),
+                                  ),
+                                )
                               : SizedBox(
                                   height: 0,
                                   width: 0,
                                 ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Center(
-                              child: Text(
-                                  '${localization.commission} ${_service['service']['commission']}%',
-                                  style: TextStyle(color: Color(0xFF001D52)))),
                           _transferButton(_service),
                           SizedBox(
                             height: 20,
@@ -376,9 +396,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
           passwordEnteredCallback: _onPasscodeEntered,
           cancelButton: cancelButton,
           deleteButton: Text(
-            'Delete',
-            style: const TextStyle(fontSize: 16, color: Color(0xFF001D52)),
-            semanticsLabel: 'Delete',
+            '${localization.delete}',
+            style: const TextStyle(fontSize: 16, color: whiteColor),
+            semanticsLabel: '${localization.delete}',
           ),
           shouldTriggerVerification: _verificationNotifier.stream,
           backgroundColor: Color(0xFFF7F7F7),
@@ -401,9 +421,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     Future.delayed(const Duration(milliseconds: 250), () {
       if (isValid) {
         _onPasscodeCancelled();
-        _api
-            .payService(widget.serviceID, '${account.replaceAll('+', '')}', sum)
-            .then((services) {
+        _api.payService(widget.serviceID, controllers).then((services) {
           if (services['message'] == 'Not authenticated' &&
               services['success'].toString() == 'false') {
             logOut(context);
@@ -480,10 +498,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     opaque: false,
                     cancelButton: Text(
                       localization.cancel,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF001D52),
-                      ),
+                      style: const TextStyle(fontSize: 16, color: whiteColor),
                     ),
                   );
                 } else {
@@ -509,38 +524,62 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 );
               }
             } else {
-              _api
-                  .calculateSum(
-                      widget.serviceID,
-                      '${account.replaceAll(' ', '').replaceAll('+', '')}',
-                      int.parse(sum),
-                      widget.providerId)
-                  .then((result) {
-                if (result['message'] == 'Not authenticated' &&
-                    result['success'].toString() == 'false') {
-                  logOut(context);
-                } else if (result['success'].toString() == 'true') {
-                  setState(() {
-                    isCalculated = true;
-                    _amount = double.parse(result['Amount'].toString());
-                    _exchangeRate =
-                        double.parse(result['ExchangeRate'].toString());
-                    _expectedAmount =
-                        double.parse(result['ExpectedAmount'].toString());
-                    _expectedCurrency = result['ExpectedCurrency'];
+              if (int.parse(sum) >= _service['service']['min']) {
+                if (int.parse(sum) <= _service['service']['max']) {
+                  _api
+                      .calculateSum(
+                          widget.serviceID,
+                          '${account.replaceAll(' ', '').replaceAll('+', '')}',
+                          int.parse(sum),
+                          widget.providerId)
+                      .then((result) {
+                    if (result['message'] == 'Not authenticated' &&
+                        result['success'].toString() == 'false') {
+                      logOut(context);
+                    } else if (result['success'].toString() == 'true') {
+                      setState(() {
+                        isCalculated = true;
+                        _amount = double.parse(result['Amount'].toString());
+                        _exchangeRate =
+                            double.parse(result['ExchangeRate'].toString());
+                        _expectedAmount =
+                            double.parse(result['ExpectedAmount'].toString());
+                        _expectedCurrency = result['ExpectedCurrency'];
+                      });
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => CustomDialog(
+                          description: '${result['message']}',
+                          yesCallBack: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
+                    }
                   });
                 } else {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => CustomDialog(
-                      description: '${result['message']}',
+                      description: '${localization.enterBelowMax}',
                       yesCallBack: () {
                         Navigator.pop(context);
                       },
                     ),
                   );
                 }
-              });
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => CustomDialog(
+                    description: '${localization.enterAboveMin}',
+                    yesCallBack: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                );
+              }
             }
           },
           child: Container(

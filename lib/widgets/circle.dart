@@ -9,13 +9,12 @@ class CircleUIConfig {
   final double circleSize;
 
   const CircleUIConfig(
-      {this.borderColor = blackPurpleColor,
+      {this.borderColor = whiteColor,
       this.borderWidth = 1,
-      this.fillColor = blackPurpleColor,
+      this.fillColor = whiteColor,
       this.circleSize = 20});
 }
 
-// ignore: must_be_immutable
 class Circle extends StatelessWidget {
   final bool filled;
   final CircleUIConfig circleUIConfig;
@@ -35,7 +34,8 @@ class Circle extends StatelessWidget {
       width: circleUIConfig.circleSize,
       height: circleUIConfig.circleSize,
       decoration: BoxDecoration(
-        color: filled ? circleUIConfig.fillColor : Colors.transparent,
+        color:
+            filled ? circleUIConfig.fillColor : primaryColor.withOpacity(0.5),
         shape: BoxShape.circle,
         border: Border.all(
           color: circleUIConfig.borderColor,

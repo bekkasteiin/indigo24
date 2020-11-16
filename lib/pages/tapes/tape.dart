@@ -8,6 +8,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_search_widget.dart';
 
 class TapePage extends StatefulWidget {
   final tape;
@@ -96,19 +97,11 @@ class _TapePageState extends State<TapePage> {
                       Padding(
                         padding: const EdgeInsets.only(
                             top: 10.0, left: 10.0, right: 10, bottom: 0),
-                        child: TextField(
-                          decoration: new InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: blackPurpleColor,
-                            ),
-                            hintText: "${localization.search}",
-                            fillColor: blackPurpleColor,
-                          ),
-                          onChanged: (value) {
+                        child: IndigoSearchWidget(
+                          onChangeCallback: (value) {
                             _search(value);
                           },
-                          controller: _searchController,
+                          searchController: _searchController,
                         ),
                       ),
                       Container(
@@ -128,6 +121,7 @@ class _TapePageState extends State<TapePage> {
                                     color: blackPurpleColor,
                                     fontWeight: FontWeight.w300),
                               ),
+                              SizedBox(height: 10),
                               Container(
                                 height: 100,
                                 child: ListView.builder(
@@ -206,7 +200,6 @@ class _TapePageState extends State<TapePage> {
                                                 ),
                                               ],
                                             ),
-
                                             SizedBox(
                                               width: 10,
                                             ),
@@ -256,19 +249,6 @@ class _TapePageState extends State<TapePage> {
                                                 ],
                                               ),
                                             ),
-
-                                            // SizedBox(
-                                            // width: 10,
-                                            // ),
-                                            // InkWell(
-                                            //   child: Text('еще'),
-                                            //   onTap: (){
-                                            //     setState(() {
-                                            //       maxLine = 10;
-                                            //       _saved[index]['maxLines'] = 1000;
-                                            //     });
-                                            //   },
-                                            //   ),
                                           ],
                                         ),
                                       ),
@@ -277,7 +257,7 @@ class _TapePageState extends State<TapePage> {
                                 },
                               ),
                               SizedBox(
-                                height: 60,
+                                height: 100,
                               ),
                             ],
                           ),
@@ -450,7 +430,4 @@ class _TapePageState extends State<TapePage> {
   int foo() {
     return 1;
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

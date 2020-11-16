@@ -188,12 +188,8 @@ class _AddTapePageState extends State<AddTapePage> {
                 onPressed: () {
                   _isVideo = false;
                   _action();
-                  // _settingModalBottomSheet(context);
-                  // MY COMMENT
-                  // _onImageButtonPressed(ImageSource.camera);
                 },
                 heroTag: 'image',
-                tooltip: 'Pick Image from camera',
                 child: Image.asset("assets/images/camera.png", width: 30),
               ),
             ),
@@ -204,10 +200,8 @@ class _AddTapePageState extends State<AddTapePage> {
                 onPressed: () {
                   _isVideo = true;
                   _action();
-                  // _onImageButtonPressed(ImageSource.camera);
                 },
                 heroTag: 'video',
-                tooltip: 'Pick Video from camera',
                 child: Image.asset("assets/images/video.png", width: 30),
               ),
             ),
@@ -246,7 +240,6 @@ class _AddTapePageState extends State<AddTapePage> {
     }
     final act = CupertinoActionSheet(
         title: Text('${localization.selectOption}'),
-        // message: Text('Which option?'),
         actions: <Widget>[
           CupertinoActionSheetAction(
             child: Text('${localization.camera}'),

@@ -6,6 +6,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_search_widget.dart';
 import '../../../../tabs.dart';
 
 class ChatMembersSelection extends StatefulWidget {
@@ -23,7 +24,8 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
 
   TextEditingController _searchController;
 
-  List _actualList;
+  List _actualList = List<dynamic>();
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +33,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     _saved = List<dynamic>();
     _searchController = TextEditingController();
 
-    _actualList = myContacts;
+    _actualList.addAll(myContacts);
 
     _listen();
   }
@@ -206,8 +208,9 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                             onTap: () {
                                               setState(() {
                                                 _saved.removeWhere((item) {
-                                                  return '${item.phone}' ==
-                                                      '${_saved[index].phone}';
+                                                  print(item);
+                                                  return '${item['phone']}' ==
+                                                      '${_saved[index]['phone']}';
                                                 });
                                               });
                                             },
@@ -221,29 +224,14 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                       },
                     ),
                   ),
-                  Container(
-                    height: 50,
-                    padding: EdgeInsets.only(
-                      top: 10,
-                      left: 10,
-                      right: 10,
-                      bottom: 0,
-                    ),
-                    child: Center(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: blackPurpleColor,
-                          ),
-                          hintText: "${localization.search}",
-                          fillColor: blackPurpleColor,
-                        ),
-                        onChanged: (value) {
-                          _search(value);
-                        },
-                        controller: _searchController,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 10.0, left: 10.0, right: 10, bottom: 0),
+                    child: IndigoSearchWidget(
+                      onChangeCallback: (value) {
+                        _search(value);
+                      },
+                      searchController: _searchController,
                     ),
                   ),
                   Expanded(

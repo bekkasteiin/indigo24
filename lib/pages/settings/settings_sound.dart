@@ -13,6 +13,11 @@ class SettingsSoundPage extends StatefulWidget {
 }
 
 class _SettingsSoundPageState extends State<SettingsSoundPage> {
+  List<String> sounds = [
+    'message_in.mp3',
+    'messageIn.mp3',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -23,10 +28,6 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
     super.dispose();
   }
 
-  List<String> sounds = [
-    'message_in.mp3',
-    'messageIn.mp3',
-  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

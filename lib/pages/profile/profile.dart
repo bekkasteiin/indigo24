@@ -102,7 +102,6 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   _showSelectCity(cities) {
     var api = Api();
-
     needToAskCity = false;
     Size size = MediaQuery.of(context).size;
     Dialog errorDialog = Dialog(
@@ -189,7 +188,6 @@ class _UserProfilePageState extends State<UserProfilePage>
       );
       setState(() {
         _image = compressedImage;
-        // _image = File(pickedFile.path);
       });
       if (_image != null) {
         uploadAvatar(_image.path).then((r) async {
@@ -248,8 +246,6 @@ class _UserProfilePageState extends State<UserProfilePage>
         "file": await MultipartFile.fromFile(_path),
       });
 
-      // _sendingMsgProgressBar.show(context, "");
-
       response = await dio.post(
         "api/v2.1/avatar/upload",
         data: formData,
@@ -271,8 +267,6 @@ class _UserProfilePageState extends State<UserProfilePage>
         },
       );
       print("Getting response from avatar upload ${response.data}");
-      // _sendingMsgProgressBar.hide();
-
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -285,24 +279,11 @@ class _UserProfilePageState extends State<UserProfilePage>
     }
   }
 
-  Widget _buildCoverImage(Size screenSize) {
-    return Container(
-      height: 120,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/cover.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-
   Widget _buildProfileImage() {
     return InkWell(
       onTap: () {
         final act = CupertinoActionSheet(
             title: Text('${localization.selectOption}'),
-            // message: Text('Which option?'),
             actions: <Widget>[
               CupertinoActionSheetAction(
                 child: Text('${localization.watch}'),
@@ -349,32 +330,6 @@ class _UserProfilePageState extends State<UserProfilePage>
           builder: (BuildContext context) => act,
         );
       },
-      // PlatformActionSheet().displaySheet(
-      //     context: context,
-      //     message: Text("${localization.selectOption}"),
-      //     actions: [
-      //       ActionSheetAction(
-      //         text: "Сфотографировать",
-      //         onPressed: () {
-      //           getImage(ImageSource.camera);
-      //           Navigator.pop(context);
-      //         },
-      //         hasArrow: true,
-      //       ),
-      //       ActionSheetAction(
-      //         text: "Выбрать из галереи",
-      //         onPressed: () {
-      //           getImage(ImageSource.gallery);
-      //           Navigator.pop(context);
-      //         },
-      //       ),
-      //       ActionSheetAction(
-      //         text: "Назад",
-      //         onPressed: () => Navigator.pop(context),
-      //         isCancel: true,
-      //         defaultAction: true,
-      //       )
-      //     ]),
       child: Center(
         child: Stack(
           children: [
@@ -420,22 +375,13 @@ class _UserProfilePageState extends State<UserProfilePage>
 
     return GestureDetector(
       onTap: () {},
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        // mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            user.name,
-            style: _nameTextStyle,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+      child: Text(
+        user.name + user.name + user.name + user.name + user.name + user.name,
+        style: _nameTextStyle,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
-
-  TextEditingController emailController =
-      TextEditingController(text: '${user.email}');
 
   Widget _buildSection(Size screenSize, String header, String text) {
     return Column(
@@ -451,7 +397,11 @@ class _UserProfilePageState extends State<UserProfilePage>
               Text(
                 text,
                 textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 18, color: blackPurpleColor),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: blackPurpleColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               SizedBox(height: 5)
             ],
@@ -505,39 +455,19 @@ class _UserProfilePageState extends State<UserProfilePage>
                               user.city,
                             )
                           : Center(),
-                      SizedBox(height: 10),
-                      FlatButton(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text('${localization.edit}',
-                                style: TextStyle(fontSize: 16)),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Image.asset(
-                              'assets/images/pencil.png',
-                              width: 20,
-                              height: 20,
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfileSettingsPage(),
-                            ),
-                          ).whenComplete(() {
-                            setState(() {});
-                          });
-                        },
-                      )
+                      SizedBox(height: 30),
                     ],
                   ),
                   Column(
                     children: <Widget>[
+                      SizedBox(height: 10),
+                      Text(
+                        '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      SizedBox(height: 15),
                       ConstrainedBox(
                         constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * 0.42),
@@ -575,7 +505,8 @@ class _UserProfilePageState extends State<UserProfilePage>
                                 child: Text(
                                   "${localization.support}",
                                   style: TextStyle(
-                                    color: Colors.grey[700],
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -652,13 +583,6 @@ class _UserProfilePageState extends State<UserProfilePage>
                                     },
                                   ),
                                 );
-                                // SharedPreferences preferences =
-                                //       await SharedPreferences.getInstance();
-                                //   preferences.setString('phone', 'null');
-                                //   Navigator.of(context).pushAndRemoveUntil(
-                                //       MaterialPageRoute(
-                                //           builder: (context) => IntroPage()),
-                                //       (r) => false);
                               },
                               child: FittedBox(
                                 fit: BoxFit.fitWidth,
@@ -678,22 +602,21 @@ class _UserProfilePageState extends State<UserProfilePage>
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Text(
-                        '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Container(height: 0)
+                      Container(height: 20)
                     ],
                   ),
                 ],
               ),
             ),
-            _buildCoverImage(screenSize),
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/cover.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
             Column(
               children: <Widget>[
                 SizedBox(height: 15),
@@ -724,30 +647,65 @@ class _UserProfilePageState extends State<UserProfilePage>
                   ],
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(width: 10),
-                    _buildProfileImage(),
-                    SizedBox(width: 10),
-                    Flexible(
-                      child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 10),
-                            child: _buildFullName(),
-                          ),
-                          SizedBox(height: 15),
-                          Text(
-                            "${user.identified ? localization.identified : localization.notIdentified}",
-                            style: TextStyle(
-                              color: whiteColor,
+                          SizedBox(width: 10),
+                          _buildProfileImage(),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(top: 15),
+                                  child: _buildFullName(),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  "${user.identified ? localization.identified : localization.notIdentified}",
+                                  style: TextStyle(
+                                    color: whiteColor,
+                                  ),
+                                )
+                              ],
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
+                    Container(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: GestureDetector(
+                              child: Image.asset(
+                                'assets/images/pencil.png',
+                                width: 20,
+                                height: 20,
+                              ),
+                              onTap: () {
+                                print('pencvil');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfileSettingsPage(),
+                                  ),
+                                ).whenComplete(() {
+                                  setState(() {});
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ],
@@ -763,7 +721,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                         lineWidth: 13.0,
                         animation: false,
                         percent: uploadPercent,
-                        progressColor: primaryColor,
+                        progressColor: whiteColor,
                         backgroundColor: whiteColor,
                         center: Text(
                           percent,

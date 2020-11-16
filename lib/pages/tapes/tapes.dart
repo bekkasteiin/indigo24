@@ -361,7 +361,8 @@ class _TapesPageState extends State<TapesPage>
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        25.0),
+                                                              25.0,
+                                                            ),
                                                             child:
                                                                 Image.network(
                                                               needToHide

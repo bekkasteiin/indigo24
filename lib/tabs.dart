@@ -277,9 +277,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           passwordEnteredCallback: _onPasscodeEntered,
           cancelButton: (cancelButton),
           deleteButton: Text(
-            'Delete',
-            style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-            semanticsLabel: 'Delete',
+            '${localization.delete}',
+            style: const TextStyle(fontSize: 16, color: whiteColor),
+            semanticsLabel: '${localization.delete}',
           ),
           shouldTriggerVerification: _verificationNotifier.stream,
           backgroundColor: milkWhiteColor,
@@ -354,7 +354,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               withPin: false,
               opaque: false,
               cancelButton: Text('${localization.cancel}',
-                  style: TextStyle(fontSize: 16, color: blackPurpleColor),
+                  style: const TextStyle(fontSize: 16, color: whiteColor),
                   semanticsLabel: '${localization.cancel}'))
           : Text('');
     });

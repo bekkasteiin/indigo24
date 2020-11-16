@@ -53,19 +53,24 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                     },
                     child: Container(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      height: 60,
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      height: 40,
                       child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              '${localization.languages[index]['title']}',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: blackPurpleColor),
-                            ),
-                          ]),
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            '${localization.languages[index]['title']}',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: blackPurpleColor),
+                          ),
+                          localization.currentLanguage ==
+                                  '${localization.languages[index]['title']}'
+                              ? Icon(Icons.done)
+                              : Center()
+                        ],
+                      ),
                     ),
                   ),
                 ),

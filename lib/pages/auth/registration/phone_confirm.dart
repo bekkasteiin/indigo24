@@ -7,6 +7,7 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
+import 'package:indigo24/widgets/indigo_square.dart';
 import 'registration.dart';
 import 'user_registration.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -133,6 +134,8 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
+                          IndigoSquare(),
+                          SizedBox(width: 10),
                           Text(
                             "${localization.keyFromSms}",
                             style: TextStyle(

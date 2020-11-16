@@ -63,7 +63,7 @@ String lastSeen = 'Был в сети';
 String video = 'Видео';
 String selectOption = 'Выберите опцию';
 String gallery = 'Галерея';
-String wantToExit = 'Уверены, что хотите выйти?';
+String wantToExit = 'Уверены, что хотите выйти';
 String uploaded = 'Загружено';
 String somethingWentWrong = 'Что-то пошло не так';
 String save = 'Сохранить';
@@ -179,6 +179,8 @@ String pending = 'В обработке';
 String hours = 'Часа';
 String minutes = 'Минут';
 String likes = 'Лайки';
+String withdrawTerm =
+    "Подтверждаю, что указанный банковский счет/банковская карточка принадлежит мне и(или) я имею законное основание его/ее использования (распоряжения средствами, находящихся на счете)";
 
 List filters = [
   {'text': 'За неделю', 'code': 'week'},
@@ -204,7 +206,7 @@ setLanguage(code) {
       login = 'Login';
       phoneNumber = 'Phone number';
       password = 'Password';
-      forgotPassword = 'Forgot password?';
+      forgotPassword = 'Forgot password';
       next = 'Next';
       currentLanguage = 'English';
       email = 'Email';
@@ -380,6 +382,9 @@ setLanguage(code) {
       hours = 'Hours';
       minutes = 'Minutes';
       likes = 'Likes';
+      withdrawTerm =
+          "I confirm that the specified bank account / bank card belongs to me and (or) I have a legal basis for his / her use (disposal of funds on the account)";
+
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -445,7 +450,7 @@ setLanguage(code) {
       video = 'Видео';
       selectOption = 'Выберите опцию';
       gallery = 'Галерея';
-      wantToExit = 'Уверены, что хотите выйти?';
+      wantToExit = 'Уверены, что хотите выйти';
       uploaded = 'Загружено';
       somethingWentWrong = 'Что-то пошло не так';
       save = 'Сохранить';
@@ -561,6 +566,9 @@ setLanguage(code) {
       hours = 'Часа';
       minutes = 'Минут';
       likes = 'Лайки';
+      withdrawTerm =
+          "Подтверждаю, что указанный банковский счет/банковская карточка принадлежит мне и(или) я имею законное основание его/ее использования (распоряжения средствами, находящихся на счете)";
+
       break;
     case 'kz':
       registration = 'Тіркелу';
@@ -742,6 +750,8 @@ setLanguage(code) {
       hours = 'Сағат';
       minutes = 'Минут';
       likes = 'Лайктер';
+      withdrawTerm =
+          "Көрсетілген банктік шот / банктік карта маған тиесілі екенін растаймын және (немесе) менде оны пайдалануға (есепшоттағы қаражатты иеліктен шығаруға) заңды негіз бар";
       break;
     case 'uz':
       registration = 'Рўйхатдан ўтиш';
@@ -807,7 +817,7 @@ setLanguage(code) {
       video = 'Видео';
       selectOption = 'Бирор вариантни танланг';
       gallery = 'Галерея';
-      wantToExit = 'Ҳақиқатан ҳам чиқмоқчимисиз?';
+      wantToExit = 'Ҳақиқатан ҳам чиқмоқчимисиз';
       uploaded = 'Юкланди';
       somethingWentWrong = 'Хато юз берди';
       save = 'Сақлаш';
@@ -842,7 +852,7 @@ setLanguage(code) {
       setAdmin = 'Администратор сифатида тайинлаш';
       makeMember = 'Аъзо бўлинг';
       exitGroup = 'Гуруҳдан чиқиш';
-      sureExitGroup = 'Гуруҳдан чиқиб кетмоқчимисиз?';
+      sureExitGroup = 'Гуруҳдан чиқиб кетмоқчимисиз';
       delete = 'Ўчириш';
       noChatName = 'Чат номи йўқ';
       minMembersCount = 'Иштирокчиларнинг минимал сони: 3';
@@ -921,6 +931,8 @@ setLanguage(code) {
       hours = 'Соат';
       minutes = 'Дақиқа';
       likes = 'Каби';
+      withdrawTerm =
+          "Мен белгиланган Банк ҳисоб / банк картаси менга тегишли еканлигини тасдиқлаш ва (ёки) мен уни ишлатиш учун ҳуқуқий асос бор (ҳисоб ўтказилган маблағлар бериш)";
       break;
     case 'uzb':
       registration = 'Ro\'yxatdan o\'tish';
@@ -986,7 +998,7 @@ setLanguage(code) {
       video = 'Video';
       selectOption = 'Biror variantni tanlang';
       gallery = 'Galereya';
-      wantToExit = 'Haqiqatan ham chiqmoqchimisiz?';
+      wantToExit = 'Haqiqatan ham chiqmoqchimisiz';
       uploaded = 'Yuklab olingan';
       somethingWentWrong = 'Biror narsa noto\'g\'ri ketdi';
       save = 'Saqlash';
@@ -1101,6 +1113,8 @@ setLanguage(code) {
       hours = 'Soat';
       minutes = 'Daqiqa';
       likes = 'Kabi';
+      withdrawTerm =
+          "Belgilangan bank hisobvarag'i / bank kartasi menga tegishli ekanligini tasdiqlayman va (yoki) uni ishlatish (hisobdagi pul mablag'larini tasarruf etish) uchun qonuniy asoslarim bor";
       break;
     default:
   }

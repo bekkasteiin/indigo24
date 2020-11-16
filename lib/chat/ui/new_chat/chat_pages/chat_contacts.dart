@@ -11,6 +11,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_search_widget.dart';
 import '../../../../tabs.dart';
 import 'chat.dart';
 
@@ -219,20 +220,12 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(
-                    top: 0, left: 10.0, right: 10, bottom: 0),
-                child: TextField(
-                  decoration: new InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: blackPurpleColor,
-                    ),
-                    hintText: "${localization.search}",
-                    fillColor: blackPurpleColor,
-                  ),
-                  onChanged: (value) {
+                    top: 10.0, left: 10.0, right: 10, bottom: 0),
+                child: IndigoSearchWidget(
+                  onChangeCallback: (value) {
                     _search(value);
                   },
-                  controller: _searchController,
+                  searchController: _searchController,
                 ),
               ),
               Expanded(

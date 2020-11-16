@@ -17,6 +17,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/full_photo.dart';
+import 'package:indigo24/widgets/indigo_search_widget.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -670,25 +671,16 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                           widget.chatType == 1
                               ? Padding(
                                   padding: const EdgeInsets.only(
-                                    top: 10.0,
-                                    left: 10.0,
-                                    right: 10,
-                                    bottom: 0,
-                                  ),
-                                  child: TextField(
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(
-                                        Icons.search,
-                                        color: blackPurpleColor,
-                                      ),
-                                      hintText: "${localization.search}",
-                                      fillColor: blackPurpleColor,
-                                    ),
-                                    onChanged: (value) {
+                                      top: 10.0,
+                                      left: 10.0,
+                                      right: 10,
+                                      bottom: 0),
+                                  child: IndigoSearchWidget(
+                                    onChangeCallback: (value) {
                                       ChatRoom.shared.searchChatMembers(
                                           value, '${widget.chatId}');
                                     },
-                                    controller: _searchController,
+                                    searchController: _searchController,
                                   ),
                                 )
                               : Container(),
@@ -762,7 +754,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                           child: ListView.builder(
                                             itemCount:
                                                 _actualMembersList.length,
-                                            itemBuilder: (context, i) {
+                                            itemBuilder: (ContextAction, i) {
                                               return ListTile(
                                                 onTap: () {
                                                   if (_actualMembersList[i]

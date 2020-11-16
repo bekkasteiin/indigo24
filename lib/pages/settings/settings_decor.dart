@@ -32,7 +32,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     avatar: '1',
     read: true,
     username: ';hellol',
-    text: 'hi',
+    text: localization.hi,
     type: 1,
     time: 100,
     attachments: null,
@@ -42,6 +42,22 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     moneyData: null,
   );
 
+  MessageModel chatModel2 = MessageModel(
+    id: '1',
+    chatId: 1,
+    userId: 1,
+    avatar: '1',
+    read: true,
+    username: ';hellol',
+    text: localization.hello,
+    type: 1,
+    time: 100,
+    attachments: null,
+    reply_data: null,
+    forward_data: null,
+    edited: false,
+    moneyData: null,
+  );
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,9 +80,10 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
               Container(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
                 child: Text(
-                  '${localization.decorForChat}',
+                  '${localization.decorForChat.toUpperCase()}',
                   style: TextStyle(
-                    fontSize: 16,
+                    color: brightGreyColor2,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -82,7 +99,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                   ),
                 ),
                 child: Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
+                  margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                   child: Column(
                     children: <Widget>[
                       MessageCategoryWidget(
@@ -113,10 +130,10 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                           messageCategory: 0,
                           chatId: -1000,
                           time: '11:01',
-                          message: chatModel,
+                          message: chatModel2,
                           read: false,
                           messageId: chatModel.id,
-                          child: TextMessageWidget(text: chatModel),
+                          child: TextMessageWidget(text: chatModel2),
                         ),
                       ),
                     ],
@@ -125,7 +142,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
               ),
               SizedBox(height: 10),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 10),
+                margin: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: <Widget>[
                     InkWell(

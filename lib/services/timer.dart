@@ -69,11 +69,7 @@ class TimerPageState extends State<TimerPage> {
       body: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Image.asset(
-            "assets/record.gif",
-            width: 10,
-            height: 10,
-          ),
+          Image.asset("assets/record.gif", width: 10, height: 10),
           Expanded(
             child: TimerText(dependencies: widget.dependencies),
           )

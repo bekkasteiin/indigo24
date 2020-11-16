@@ -111,8 +111,8 @@ class _TransferPageState extends State<TransferPage> {
                         Stack(
                           children: <Widget>[
                             Image.asset(
-                              'assets/images/background_little.png',
-                              fit: BoxFit.fill,
+                              'assets/images/wallet_header.png',
+                              fit: BoxFit.fitHeight,
                             ),
                             Positioned(
                               child: IndigoAppBarWidget(
@@ -406,9 +406,9 @@ class _TransferPageState extends State<TransferPage> {
           passwordEnteredCallback: _onPasscodeEntered,
           cancelButton: cancelButton,
           deleteButton: Text(
-            'Delete',
-            style: const TextStyle(fontSize: 16, color: blackPurpleColor),
-            semanticsLabel: 'Delete',
+            '${localization.delete}',
+            style: const TextStyle(fontSize: 16, color: whiteColor),
+            semanticsLabel: '${localization.delete}',
           ),
           shouldTriggerVerification: _verificationNotifier.stream,
           backgroundColor: milkWhiteColor,
@@ -457,8 +457,7 @@ class _TransferPageState extends State<TransferPage> {
                   opaque: false,
                   cancelButton: Text(
                     'Cancel',
-                    style:
-                        const TextStyle(fontSize: 16, color: blackPurpleColor),
+                    style: const TextStyle(fontSize: 16, color: whiteColor),
                     semanticsLabel: 'Cancel',
                   ),
                 );
@@ -562,9 +561,10 @@ class _TransferPageState extends State<TransferPage> {
                       radius: 20,
                       child: ClipOval(
                         child: CachedNetworkImage(
-                            imageUrl: toAvatar == ''
-                                ? "${avatarUrl}noAvatar.png"
-                                : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}'),
+                          imageUrl: toAvatar == ''
+                              ? "${avatarUrl}noAvatar.png"
+                              : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}',
+                        ),
                       ),
                     ),
                     onTap: () async {

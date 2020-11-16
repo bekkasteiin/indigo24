@@ -189,7 +189,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         _position.inMilliseconds == 0 ||
         _position.inMilliseconds == null ||
         _position == _duration) {
-      // playerStates.add(_playerState);
       result = await _audioPlayer.play(url, position: playPosition);
       if (result == 1) setState(() => _playerState = PlayerState.playing);
 

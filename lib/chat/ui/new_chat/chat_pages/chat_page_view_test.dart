@@ -91,7 +91,8 @@ class _PlayPauseOverlay extends StatelessWidget {
 
 class PDFViewer extends StatefulWidget {
   final file;
-  PDFViewer(this.file);
+  final String text;
+  PDFViewer(this.file, {@required this.text});
 
   @override
   _PDFViewerState createState() => _PDFViewerState();
@@ -135,7 +136,7 @@ class _PDFViewerState extends State<PDFViewer> {
               },
             ),
             title: Text(
-              "${localization.file}",
+              "${widget.text}",
               style: TextStyle(
                 color: blackPurpleColor,
                 fontWeight: FontWeight.w400,
@@ -143,48 +144,87 @@ class _PDFViewerState extends State<PDFViewer> {
               ),
               textAlign: TextAlign.center,
             ),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.navigate_before),
-                onPressed: () {
-                  _pdfController.previousPage(
-                    curve: Curves.ease,
-                    duration: Duration(milliseconds: 100),
-                  );
-                },
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: Text(
-                  '$_actualPageNumber/$_allPagesCount',
-                  style: TextStyle(fontSize: 22),
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: PdfView(
+                  documentLoader: Center(child: CircularProgressIndicator()),
+                  pageLoader: Center(child: CircularProgressIndicator()),
+                  controller: _pdfController,
+                  onDocumentLoaded: (document) {
+                    setState(() {
+                      _allPagesCount = document.pagesCount;
+                    });
+                  },
+                  onPageChanged: (page) {
+                    setState(() {
+                      _actualPageNumber = page;
+                    });
+                  },
                 ),
               ),
-              IconButton(
-                icon: Icon(Icons.navigate_next),
-                onPressed: () {
-                  _pdfController.nextPage(
-                    curve: Curves.ease,
-                    duration: Duration(milliseconds: 100),
-                  );
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40),
+                      border: Border.all(
+                        width: 1,
+                        color: blackPurpleColor,
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.navigate_before,
+                        color: blackPurpleColor,
+                      ),
+                      onPressed: () {
+                        _pdfController.previousPage(
+                          curve: Curves.ease,
+                          duration: Duration(milliseconds: 100),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    width: 80,
+                    alignment: Alignment.center,
+                    child: Text(
+                      ' $_actualPageNumber / $_allPagesCount',
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: blackPurpleColor,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: blackPurpleColor,
+                      borderRadius: BorderRadius.circular(40),
+                      border: Border.all(
+                        width: 1,
+                        color: blackPurpleColor,
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.navigate_next,
+                        color: whiteColor,
+                      ),
+                      onPressed: () {
+                        _pdfController.nextPage(
+                          curve: Curves.ease,
+                          duration: Duration(milliseconds: 100),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(height: 100),
+                ],
               ),
             ],
-          ),
-          body: PdfView(
-            documentLoader: Center(child: CircularProgressIndicator()),
-            pageLoader: Center(child: CircularProgressIndicator()),
-            controller: _pdfController,
-            onDocumentLoaded: (document) {
-              setState(() {
-                _allPagesCount = document.pagesCount;
-              });
-            },
-            onPageChanged: (page) {
-              setState(() {
-                _actualPageNumber = page;
-              });
-            },
           ),
         ),
       );

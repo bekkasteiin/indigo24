@@ -33,9 +33,7 @@ class WithdrawWebView extends StatelessWidget {
             withZoom: true,
             withLocalStorage: true,
             hidden: false,
-            initialChild: Center(
-              child: CircularProgressIndicator(),
-            ),
+            initialChild: Center(child: CircularProgressIndicator()),
           ),
         ),
       ),

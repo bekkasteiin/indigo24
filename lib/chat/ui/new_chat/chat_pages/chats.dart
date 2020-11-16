@@ -16,6 +16,7 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/chat/ui/new_extensions.dart';
 import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_search_widget.dart';
 
 import 'chat.dart';
 import 'chat_contacts.dart';
@@ -108,15 +109,17 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                   color: blackPurpleColor, fontWeight: FontWeight.w400),
             ),
           ),
-          chat.isMuted
-              ? Icon(
-                  Icons.volume_mute,
-                  color: greyColor,
-                )
-              : SizedBox(
-                  height: 0,
-                  width: 0,
-                )
+          Container(
+            padding: EdgeInsets.all(5),
+            child: Center(
+                child: chat.isMuted
+                    ? Image.asset(
+                        'assets/images/unmuteChat.png',
+                        width: 10,
+                        height: 10,
+                      )
+                    : null),
+          )
         ],
       ),
       subtitle: Text(
@@ -275,20 +278,12 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(
-                  top: 0, left: 10.0, right: 10, bottom: 0),
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: blackPurpleColor,
-                  ),
-                  hintText: "${localization.search}",
-                  fillColor: blackPurpleColor,
-                ),
-                onChanged: (value) {
+                  top: 10.0, left: 10.0, right: 10, bottom: 0),
+              child: IndigoSearchWidget(
+                onChangeCallback: (value) {
                   setState(() {});
                 },
-                controller: _searchController,
+                searchController: _searchController,
               ),
             ),
             NotificationListener<ScrollNotification>(
@@ -327,12 +322,21 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                               IconSlideAction(
                                 caption:
                                     '${numbers.elementAt(i).isMuted == true ? localization.unmute : localization.mute}',
-                                color: numbers.elementAt(i).isMuted == true
-                                    ? Colors.grey
-                                    : redColor,
-                                icon: numbers.elementAt(i).isMuted == true
-                                    ? Icons.settings_backup_restore
-                                    : Icons.volume_mute,
+                                color: Colors.transparent,
+                                foregroundColor: blackPurpleColor,
+                                iconWidget: numbers.elementAt(i).isMuted == true
+                                    ? Container(
+                                        child: Center(
+                                          child: Image.asset(
+                                              'assets/images/muteChat.png'),
+                                        ),
+                                      )
+                                    : Container(
+                                        child: Center(
+                                          child: Image.asset(
+                                              'assets/images/unmuteChat.png'),
+                                        ),
+                                      ),
                                 onTap: () {
                                   numbers.elementAt(i).isMuted == true
                                       ? ChatRoom.shared.muteChat(
@@ -343,8 +347,14 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                               ),
                               IconSlideAction(
                                 caption: '${localization.delete}',
-                                color: Colors.red,
-                                icon: Icons.delete,
+                                color: Colors.transparent,
+                                foregroundColor: blackPurpleColor,
+                                iconWidget: Container(
+                                  child: Center(
+                                    child: Image.asset(
+                                        'assets/images/deleteChat.png'),
+                                  ),
+                                ),
                                 onTap: () {
                                   showDialog(
                                     context: context,

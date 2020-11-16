@@ -15,6 +15,13 @@ class Api {
     receiveTimeout: 3000,
   );
 
+  jsonConcat(o1, o2) {
+    for (var key in o2) {
+      o1[key] = o2[key];
+    }
+    return o1;
+  }
+
   Dio _dio = Dio(_options);
   static const _sendSmsToken = '2MSldk_7!FUh3zB18XoEfIe#nY69@0tcP5Q4';
   static const _registrationToken = 'BGkA2as4#h_J@5txId3fEq6e!F80UMj197ZC';
@@ -55,9 +62,9 @@ class Api {
 
   _getRequest(String path, queryParameters) async {
     Response response;
-    print('this is get request $queryParameters');
     try {
       response = await _dio.get(path, queryParameters: queryParameters);
+      print('this is get request $response');
       return json.decode(response.data);
     } on DioError catch (e) {
       if (e.response != null) {
@@ -67,7 +74,7 @@ class Api {
         print(e.response.statusCode);
         return e.response.data;
       } else {
-        print(e.request.baseUrl);
+        print(e.request.uri.toString());
         print(e.request.data);
         print(e.request.method);
       }
@@ -409,14 +416,19 @@ class Api {
     }
   }
 
-  payService(serviceID, account, amount) async {
+  payService(serviceID, controllers) async {
     dynamic data = {
       'customerID': '${user.id}',
       'unique': '${user.unique}',
       'serviceID': '$serviceID',
-      'amount': '$amount',
-      'account': '$account',
     };
+    controllers.forEach((element) {
+      var t = {
+        '${element['name']}':
+            '${element['controller'].text.toString().replaceAll(" ", '')}'
+      };
+      data.addAll(t);
+    });
     return _postRequest('api/v2.1/service/pay', data);
   }
 
@@ -571,9 +583,7 @@ class Api {
       Response response = await _dio.post(
         'api/v2.1/tape/add',
         data: formData,
-        onSendProgress: (int sent, int total) {
-          String percent = (sent / total * 100).toStringAsFixed(2);
-        },
+        onSendProgress: (int sent, int total) {},
       );
 
       _sendingMsgProgressBar.hide();

@@ -20,12 +20,11 @@ class KeyboardUIConfig {
     this.digitBorderWidth = 1,
     this.keyboardRowMargin = const EdgeInsets.only(top: 15, left: 4, right: 4),
     this.digitInnerMargin = const EdgeInsets.all(24),
-    this.primaryColor = blackPurpleColor,
+    this.primaryColor = whiteColor,
     this.digitFillColor = Colors.transparent,
-    this.digitTextStyle =
-        const TextStyle(fontSize: 30, color: blackPurpleColor),
+    this.digitTextStyle = const TextStyle(fontSize: 30, color: whiteColor),
     this.deleteButtonTextStyle =
-        const TextStyle(fontSize: 16, color: blackPurpleColor),
+        const TextStyle(fontSize: 16, color: whiteColor),
     this.keyboardSize,
   });
 }
@@ -80,7 +79,7 @@ class Keyboard extends StatelessWidget {
       margin: EdgeInsets.all(4),
       child: ClipOval(
         child: Material(
-          color: keyboardUIConfig.digitFillColor,
+          color: Colors.blue.withOpacity(0.2),
           child: InkWell(
             splashColor: keyboardUIConfig.primaryColor.withOpacity(0.4),
             onTap: () {
@@ -95,6 +94,7 @@ class Keyboard extends StatelessWidget {
                 ),
               ),
               decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.5),
                 shape: BoxShape.circle,
                 border: Border.all(
                     color: keyboardUIConfig.primaryColor,

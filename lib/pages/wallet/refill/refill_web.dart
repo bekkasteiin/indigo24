@@ -17,15 +17,13 @@ class RefillWebView extends StatelessWidget {
       },
       child: Scaffold(
         appBar: IndigoAppBarWidget(
-          title: Text(
-            localization.refill,
-            style: TextStyle(
-              color: blackPurpleColor,
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          title: Text(localization.refill,
+              style: TextStyle(
+                color: blackPurpleColor,
+                fontSize: 22,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center),
         ),
         body: SafeArea(
           child: WebviewScaffold(

@@ -109,8 +109,8 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
             DateTime date = DateTime.now();
             var nowSplit = date.toString().split(' ');
             String nowFirst = nowSplit.first;
-
             DateTime prevValue;
+
             switch (code) {
               case 'week':
                 prevValue = date.subtract(Duration(days: 7));

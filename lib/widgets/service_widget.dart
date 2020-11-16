@@ -23,10 +23,7 @@ class ServiceWidget extends StatelessWidget {
             color: Colors.black26,
             blurRadius: 10.0,
             spreadRadius: -2,
-            offset: Offset(
-              0.0,
-              0.0,
-            ),
+            offset: Offset(0.0, 0.0),
           )
         ],
       ),

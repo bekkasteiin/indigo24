@@ -147,7 +147,7 @@ class _IntroPageState extends State<IntroPage> {
   //     barrierDismissible: false,
   //     builder: (BuildContext context) {
   //       return errorDialog;
-  //     },
+  //     },a
   //   );
   // }
 
@@ -264,11 +264,15 @@ class _IntroPageState extends State<IntroPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
-                          flex: 2,
-                          child: Container(),
+                          flex: 3,
+                          child: Center(
+                            child: Image.asset(
+                              'assets/images/intro_logo.png',
+                            ),
+                          ),
                         ),
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: Column(
                             children: [
                               _signInButton(size),
@@ -282,52 +286,68 @@ class _IntroPageState extends State<IntroPage> {
                           child: Column(
                             children: [
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                height: 30,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 0,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.all(
-                                    Radius.circular(16.0),
+                                    Radius.circular(6.0),
                                   ),
                                 ),
                                 child: DropdownButtonHideUnderline(
-                                  child: Container(
-                                    child: CustomDropdownButton(
-                                      isExpanded: false,
-                                      hint: Text(
-                                          "${localization.currentLanguage}",
-                                          style: TextStyle(
-                                              color: blackPurpleColor)),
-                                      items:
-                                          localization.languages.map((value) {
-                                        return DropdownMenuItem(
-                                          child: Text('${value['title']}',
-                                              style: TextStyle(
-                                                  color: blackPurpleColor)),
-                                          value: value,
-                                        );
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        localization.setLanguage(value['code']);
-                                        setState(() {
-                                          localization.currentLanguage =
-                                              '${value['title']}';
-                                        });
-                                      },
+                                  child: CustomDropdownButton(
+                                    isExpanded: false,
+                                    hint: Text(
+                                      "${localization.currentLanguage}",
+                                      style: TextStyle(
+                                        color: blackPurpleColor,
+                                      ),
                                     ),
+                                    items: localization.languages.map((value) {
+                                      return DropdownMenuItem(
+                                        child: Container(
+                                          height: 30,
+                                          child: Text(
+                                            '${value['title']}',
+                                            style: TextStyle(
+                                              color: blackPurpleColor,
+                                            ),
+                                          ),
+                                        ),
+                                        value: value,
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      localization.setLanguage(
+                                        value['code'],
+                                      );
+                                      setState(() {
+                                        localization.currentLanguage =
+                                            '${value['title']}';
+                                      });
+                                    },
                                   ),
                                 ),
                               ),
                               FlatButton(
                                 child: Text(
                                   "${localization.terms}",
-                                  style: TextStyle(color: brightGreyColor),
+                                  style: TextStyle(
+                                    color: brightGreyColor,
+                                    decoration: TextDecoration.underline,
+                                  ),
                                 ),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          PDFViewer('assets/terms.pdf'),
+                                      builder: (context) => PDFViewer(
+                                        'assets/terms.pdf',
+                                        text: localization.terms,
+                                      ),
                                     ),
                                   );
                                 },
@@ -378,12 +398,6 @@ class _IntroPageState extends State<IntroPage> {
         });
       }
     });
-  }
-
-  _space(double h) {
-    return Container(
-      height: h,
-    );
   }
 
   _signInButton(Size size) {

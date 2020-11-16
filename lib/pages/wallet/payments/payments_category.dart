@@ -3,6 +3,7 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_search_widget.dart';
 import 'package:indigo24/widgets/service_widget.dart';
 
 import 'payments_history.dart';
@@ -107,24 +108,17 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                           child: Row(
                             children: <Widget>[
                               Flexible(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "${localization.search}",
-                                    fillColor: blackPurpleColor,
-                                  ),
-                                  onChanged: (value) {
+                                child: IndigoSearchWidget(
+                                  searchController: _searchController,
+                                  onChangeCallback: (value) {
                                     searchOnChanged();
                                   },
-                                  controller: _searchController,
+                                  callback: () {
+                                    if (_searchController.text.isNotEmpty)
+                                      search(_searchController.text);
+                                  },
                                 ),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.search),
-                                onPressed: () {
-                                  if (_searchController.text.isNotEmpty)
-                                    search(_searchController.text);
-                                },
-                              )
                             ],
                           ),
                         ),

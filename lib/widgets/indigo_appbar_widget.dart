@@ -30,9 +30,7 @@ class IndigoAppBarWidget extends StatelessWidget
               icon: Container(
                 padding: EdgeInsets.all(10),
                 child: Image(
-                  image: AssetImage(
-                    'assets/images/back.png',
-                  ),
+                  image: AssetImage('assets/images/back.png'),
                 ),
               ),
               onPressed: () {

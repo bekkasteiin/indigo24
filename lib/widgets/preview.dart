@@ -108,7 +108,8 @@ class _PreviewMediaState extends State<PreviewMedia> {
                     ),
                     onPressed: () {
                       Navigator.of(context).pop(
-                          {'cmd': 'sending', 'text': _messageController.text});
+                        {'cmd': 'sending', 'text': _messageController.text},
+                      );
                     },
                   ),
                 ),

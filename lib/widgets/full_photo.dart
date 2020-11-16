@@ -275,11 +275,10 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
       context: context,
       builder: (BuildContext context) {
         return CustomDialog(
-          description: "$message",
-          yesCallBack: () {
-            Navigator.pop(context);
-          },
-        );
+            description: "$message",
+            yesCallBack: () {
+              Navigator.pop(context);
+            });
       },
     );
   }

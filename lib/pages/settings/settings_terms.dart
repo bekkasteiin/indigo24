@@ -38,150 +38,149 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
       ),
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              height: 20,
-            ),
+          children: [
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 20),
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       boxShadow: [
+            //         BoxShadow(
+            //           color: Colors.black26,
+            //           blurRadius: 10.0,
+            //           spreadRadius: -2,
+            //           offset: Offset(0.0, 0.0),
+            //         )
+            //       ],
+            //     ),
+            //     child: ButtonTheme(
+            //       minWidth: MediaQuery.of(context).size.width * 0.42,
+            //       height: 50,
+            //       child: RaisedButton(
+            //         onPressed: () async {
+            //           if (await canLaunch(
+            //               'https://indigo24.com/security.html')) {
+            //             await launch(
+            //               'https://indigo24.com/security.html',
+            //               forceSafariVC: false,
+            //               forceWebView: false,
+            //               headers: <String, String>{
+            //                 'my_header_key': 'my_header_value'
+            //               },
+            //             );
+            //           } else {
+            //             throw 'Could not launch https://indigo24.com/security.html';
+            //           }
+            //         },
+            //         child: FittedBox(
+            //           fit: BoxFit.fitWidth,
+            //           child: Text(
+            //             "${localization.privacyPolicy}",
+            //             style: TextStyle(
+            //               color: Colors.grey[700],
+            //             ),
+            //           ),
+            //         ),
+            //         color: whiteColor,
+            //         textColor: whiteColor,
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(
+            //             10.0,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Container(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.42),
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10.0,
-                        spreadRadius: -2,
-                        offset: Offset(0.0, 0.0),
-                      )
-                    ],
-                  ),
-                  child: ButtonTheme(
-                    minWidth: MediaQuery.of(context).size.width * 0.42,
-                    height: 50,
-                    child: RaisedButton(
-                      onPressed: () async {
-                        if (await canLaunch(
-                            'https://indigo24.com/security.html')) {
-                          await launch(
-                            'https://indigo24.com/security.html',
-                            forceSafariVC: false,
-                            forceWebView: false,
-                            headers: <String, String>{
-                              'my_header_key': 'my_header_value'
-                            },
-                          );
-                        } else {
-                          throw 'Could not launch https://indigo24.com/security.html';
-                        }
-                      },
-                      child: FittedBox(
-                        fit: BoxFit.fitWidth,
-                        child: Text(
-                          "${localization.privacyPolicy}",
-                          style: TextStyle(
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ),
-                      color: whiteColor,
-                      textColor: whiteColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          10.0,
-                        ),
+              color: whiteColor,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+                    child: Text(
+                      '${localization.terms.toUpperCase()}',
+                      style: TextStyle(
+                        color: brightGreyColor2,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                bottom: 10,
-                top: 10,
-              ),
-              child: Text(
-                '${localization.terms}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: blackPurpleColor,
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                bottom: 10,
-                top: 10,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    "assets/images/pdf.png",
-                    width: 50,
-                    height: 50,
+                  Container(
+                    padding: EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      bottom: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          "assets/images/pdf.png",
+                          width: 50,
+                          height: 50,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${localization.terms}.pdf",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: blackPurpleColor),
+                            ),
+                            Flexible(
+                              child: Text(
+                                "381.0 KB",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: greyColor),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Terms.pdf",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: blackPurpleColor),
-                      ),
-                      Flexible(
-                        child: Text(
-                          "381.0 KB",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: greyColor),
-                        ),
-                      ),
-                    ],
+                  Container(
+                    padding: EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      bottom: 10,
+                      top: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        FlatButton(
+                          onPressed: () async {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PDFViewer(
+                                  'assets/terms.pdf',
+                                  text: localization.terms,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            '${localization.open}',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                bottom: 10,
-                top: 10,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  FlatButton(
-                    onPressed: () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PDFViewer('assets/terms.pdf'),
-                        ),
-                      );
-                    },
-                    child: Text('${localization.open}'),
-                  )
-                ],
-              ),
-            )
           ],
         ),
       ),
