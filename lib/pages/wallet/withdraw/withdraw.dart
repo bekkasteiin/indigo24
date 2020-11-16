@@ -50,6 +50,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -71,7 +72,8 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         children: <Widget>[
                           Image.asset(
                             'assets/images/wallet_header.png',
-                            fit: BoxFit.fitHeight,
+                              width: size.width,
+                          fit: BoxFit.fitWidth,
                           ),
                           Column(
                             children: <Widget>[

@@ -58,10 +58,7 @@ class GradientFab extends StatelessWidget {
             gradient: LinearGradient(
                 begin: Alignment.center,
                 end: Alignment.bottomRight,
-                colors: [
-                  Palette.gradientStartColor,
-                  Palette.gradientEndColor
-                ])),
+        )),
         child: child,
       ),
       onPressed: onPressed,

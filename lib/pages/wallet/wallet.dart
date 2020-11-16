@@ -230,7 +230,8 @@ class _WalletTabState extends State<WalletTab> {
                       children: <Widget>[
                         Image.asset(
                           'assets/images/wallet_header.png',
-                          fit: BoxFit.fill,
+                          width: size.width,
+                          fit: BoxFit.fitWidth,
                         ),
                         Container(
                           child: Column(

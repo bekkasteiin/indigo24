@@ -99,6 +99,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -117,7 +118,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                             children: <Widget>[
                               Image.asset(
                                 'assets/images/wallet_header.png',
-                                fit: BoxFit.fitHeight,
+                                 width: size.width,
+                          fit: BoxFit.fitWidth,
                               ),
                               Column(
                                 children: <Widget>[

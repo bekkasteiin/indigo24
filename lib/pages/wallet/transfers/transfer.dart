@@ -112,7 +112,8 @@ class _TransferPageState extends State<TransferPage> {
                           children: <Widget>[
                             Image.asset(
                               'assets/images/wallet_header.png',
-                              fit: BoxFit.fitHeight,
+                                width: size.width,
+                          fit: BoxFit.fitWidth,
                             ),
                             Positioned(
                               child: IndigoAppBarWidget(
