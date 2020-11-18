@@ -174,7 +174,7 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   )

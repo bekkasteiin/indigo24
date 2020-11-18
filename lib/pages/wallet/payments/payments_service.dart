@@ -62,6 +62,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   RegExp anyRegExp = RegExp(r'.');
 
   List<Map<String, dynamic>> controllers = [];
+
   String account = '';
   String sum = '';
   @override
@@ -74,12 +75,26 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
 
     _api.getService(widget.serviceID).then((getServiceResult) {
       getServiceResult['result'].forEach((element) {
-        TextEditingController elementController = TextEditingController(
-            text: element['mask'].toString() != 'null'
-                ? element['mask'].replaceAll('*', '').replaceAll(' ', '')
-                : '');
-        controllers
-            .add({'name': element['name'], 'controller': elementController});
+        TextEditingController elementController = TextEditingController();
+
+        MaskTextInputFormatter elementFormatter;
+        if ('${element['mask']}' != 'null') {
+          elementFormatter = MaskTextInputFormatter(
+            mask: '${element['mask']}',
+            filter: {"*": anyRegExp},
+          );
+        } else {
+          elementFormatter = MaskTextInputFormatter(
+            filter: {"*": anyRegExp},
+            mask: '***************************************',
+          );
+        }
+        controllers.add({
+          'name': element['name'],
+          'controller': elementController,
+          'regex': element['regex'],
+          'formatter': elementFormatter,
+        });
       });
       setState(() {
         _service = getServiceResult;
@@ -118,8 +133,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                             children: <Widget>[
                               Image.asset(
                                 'assets/images/wallet_header.png',
-                                 width: size.width,
-                          fit: BoxFit.fitWidth,
+                                width: size.width,
+                                fit: BoxFit.fitWidth,
                               ),
                               Column(
                                 children: <Widget>[
@@ -423,6 +438,19 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     Future.delayed(const Duration(milliseconds: 250), () {
       if (isValid) {
         _onPasscodeCancelled();
+        // controllers.forEach((controller) {
+        //   print(controller['controller'].text);
+        //   print(controller['regex']);
+        //   RegExp regExp = new RegExp(
+        //     controller['regex'],
+        //     caseSensitive: false,
+        //     multiLine: false,
+        //   );
+
+        //   print("hasMatch ${regExp.pattern} : " +
+        //       regExp.hasMatch(controller['controller'].text).toString());
+        // });
+
         _api.payService(widget.serviceID, controllers).then((services) {
           if (services['message'] == 'Not authenticated' &&
               services['success'].toString() == 'false') {
@@ -643,19 +671,16 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              MaskTextInputFormatter elementFormatter;
-              if ('${snapshot['result'][index]['mask']}' != 'null') {
-                elementFormatter = MaskTextInputFormatter(
-                  mask: '${snapshot['result'][index]['mask']}',
-                  filter: {"*": anyRegExp},
-                );
-              } else {
-                elementFormatter = MaskTextInputFormatter(
-                  filter: {"*": anyRegExp},
-                  mask: '***************************************',
-                );
-              }
+              print(snapshot['result'][index]);
+              var varMask = snapshot['result'][index]['mask'];
+              var varExample = snapshot['result'][index]['example'];
 
+              String mask = varMask == ''
+                  ? ''
+                  : varMask.toString() == 'null' ? '' : varMask;
+              String example = varExample == ''
+                  ? ''
+                  : varExample.toString() == 'null' ? '' : varExample;
               return Row(
                 children: [
                   Expanded(
@@ -665,7 +690,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         Container(
                           child: TextFormField(
                             inputFormatters: [
-                              elementFormatter,
+                              controllers[index]['formatter'],
                               LengthLimitingTextInputFormatter(50),
                             ],
                             decoration: InputDecoration.collapsed(
@@ -677,7 +702,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           ),
                         ),
                         Text(
-                            '${snapshot['result'][index]['mask'].toString() != 'null' ? localization.example + ' ' + snapshot['result'][index]['mask'] : ' '}')
+                            '${((mask.isNotEmpty || example.isNotEmpty) ? "${localization.example}: " : '') + (example.isNotEmpty ? example : mask.isNotEmpty ? mask : '')}')
                       ],
                     ),
                   ),

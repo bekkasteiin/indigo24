@@ -429,6 +429,7 @@ class Api {
       };
       data.addAll(t);
     });
+    print(data);
     return _postRequest('api/v2.1/service/pay', data);
   }
 

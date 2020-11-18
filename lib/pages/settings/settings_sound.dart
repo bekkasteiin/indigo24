@@ -33,7 +33,7 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.sound}",
+          localization.sound,
           style: TextStyle(
             color: blackPurpleColor,
             fontWeight: FontWeight.w400,
@@ -53,10 +53,9 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                   children: <Widget>[
                     ListView.separated(
                       separatorBuilder: (context, index) => Container(
-                        margin: EdgeInsets.only(left: 20),
-                        height: 0.5,
-                        color: greyColor,
-                      ),
+                          margin: EdgeInsets.only(left: 20),
+                          height: 0.5,
+                          color: greyColor),
                       shrinkWrap: true,
                       itemCount: sounds.length,
                       itemBuilder: (context, index) {

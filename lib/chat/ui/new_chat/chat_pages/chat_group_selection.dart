@@ -128,6 +128,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 if (_selectedsList.length > 2) {
                   if (_titleController.text.isNotEmpty) {
                     String userIds = '';
+                    var ownUser = _selectedsList[0];
                     _selectedsList.removeAt(0);
                     _selectedsList.forEach((element) {
                       userIds += '${element['user_id']}' + ',';
@@ -135,6 +136,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                     userIds = userIds.substring(0, userIds.length - 1);
                     ChatRoom.shared.cabinetCreate(userIds, 1,
                         title: _titleController.text);
+                    setState(() {
+                      _selectedsList.clear();
+                      _selectedsList.add(ownUser);
+                    });
                   } else {
                     showDialog(
                       context: context,

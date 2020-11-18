@@ -31,6 +31,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'identification/identification_credentials.dart';
 import 'profile_settings.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -666,10 +667,13 @@ class _UserProfilePageState extends State<UserProfilePage>
                                   child: _buildFullName(),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  "${user.identified ? localization.identified : localization.notIdentified}",
-                                  style: TextStyle(
-                                    color: whiteColor,
+                                InkWell(
+                                  onTap: () {},
+                                  child: Text(
+                                    "${user.identified ? localization.identified : localization.notIdentified}",
+                                    style: TextStyle(
+                                      color: whiteColor,
+                                    ),
                                   ),
                                 )
                               ],
@@ -690,7 +694,6 @@ class _UserProfilePageState extends State<UserProfilePage>
                                 height: 20,
                               ),
                               onTap: () {
-                                print('pencvil');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

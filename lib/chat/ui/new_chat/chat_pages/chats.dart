@@ -34,7 +34,6 @@ class _TestChatsListPageState extends State<TestChatsListPage>
   bool _isChatsLoading;
   int _chatsPage;
   TextEditingController _searchController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
