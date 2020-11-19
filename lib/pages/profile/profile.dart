@@ -377,7 +377,7 @@ class _UserProfilePageState extends State<UserProfilePage>
     return GestureDetector(
       onTap: () {},
       child: Text(
-        user.name + user.name + user.name + user.name + user.name + user.name,
+        user.name,
         style: _nameTextStyle,
         overflow: TextOverflow.ellipsis,
       ),
