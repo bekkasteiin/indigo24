@@ -13,6 +13,7 @@ class DeviderMessageWidget extends StatelessWidget {
       child: Center(
         child: Text(
           '$text',
+          textAlign: TextAlign.justify,
           style: TextStyle(fontSize: 12, color: darkGreyColor2),
         ),
       ),

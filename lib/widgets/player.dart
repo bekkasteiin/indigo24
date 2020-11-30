@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 
 enum PlayerState { stopped, playing, paused }
 enum PlayingRouteState { speakers, earpiece }
@@ -75,30 +76,28 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(0),
-              child: _isPlaying
-                  ? InkWell(
-                      onTap: _isPlaying ? () => _pause() : null,
-                      child: Icon(
-                        Icons.pause,
-                        color: Colors.cyan,
-                        size: 35,
-                      ),
-                    )
-                  : InkWell(
-                      onTap: _isPlaying ? null : () => _play(),
-                      child: Icon(
-                        Icons.play_arrow,
-                        color: Colors.cyan,
-                        size: 35,
-                      ),
+            _isPlaying
+                ? InkWell(
+                    onTap: _isPlaying ? () => _pause() : null,
+                    child: Image.asset(
+                      'assets/images/pause.png',
+                      width: 30,
+                      height: 30,
                     ),
-            ),
+                  )
+                : InkWell(
+                    onTap: _isPlaying ? null : () => _play(),
+                    child: Image.asset(
+                      'assets/images/play.png',
+                      width: 30,
+                      height: 30,
+                    ),
+                  ),
             Slider(
+              activeColor: primaryColor,
+              inactiveColor: greyColor,
               onChanged: (v) {
                 final p = v * _duration.inMilliseconds;
                 _audioPlayer.seek(Duration(milliseconds: p.round()));
@@ -110,17 +109,19 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   ? _position.inMilliseconds / _duration.inMilliseconds
                   : 0.0,
             ),
-
-            // Text('State: $_audioPlayerState')
           ],
         ),
         Text(
           _position != null
               ? '${_positionText ?? ''} / ${_durationText ?? ''}'
-              : _duration != null ? _durationText : '',
-          style: TextStyle(fontSize: 10.0),
+              : _duration != null
+                  ? _durationText
+                  : '',
+          style: TextStyle(
+            fontSize: 10.0,
+            color: primaryColor,
+          ),
         ),
-        // Text("${_durationText}")
       ],
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_pages/chat_info.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/tapes/add_tape.dart';
 import 'package:indigo24/services/api.dart';
@@ -296,7 +297,6 @@ class _TapesPageState extends State<TapesPage>
                     controller: _refreshController,
                     onRefresh: _onRefresh,
                     onLoading: _onLoading,
-                    header: WaterDropHeader(),
                     child: ListView.separated(
                       separatorBuilder: (context, int) => Container(
                         height: 0,
@@ -357,21 +357,49 @@ class _TapesPageState extends State<TapesPage>
                                                         mainAxisSize:
                                                             MainAxisSize.min,
                                                         children: <Widget>[
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                              25.0,
-                                                            ),
-                                                            child:
-                                                                Image.network(
-                                                              needToHide
-                                                                  ? '${avatarUrl}noAvatar.png'
-                                                                  : needToBlock
-                                                                      ? '${avatarUrl}noAvatar.png'
-                                                                      : '$avatarUrl${_result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
-                                                              width: 35,
-                                                              height: 35,
+                                                          InkWell(
+                                                            onTap: () {
+                                                              print(_result[
+                                                                  index]);
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          ChatProfileInfo(
+                                                                    chatType: 0,
+                                                                    chatName: _result[
+                                                                            index]
+                                                                        [
+                                                                        'name'],
+                                                                    chatAvatar:
+                                                                        _result[index]
+                                                                            [
+                                                                            'avatar'],
+                                                                    userId: _result[
+                                                                            index]
+                                                                        [
+                                                                        'customerID'],
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                25.0,
+                                                              ),
+                                                              child:
+                                                                  Image.network(
+                                                                needToHide
+                                                                    ? '${avatarUrl}noAvatar.png'
+                                                                    : needToBlock
+                                                                        ? '${avatarUrl}noAvatar.png'
+                                                                        : '$avatarUrl${_result[index]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                                                                width: 35,
+                                                                height: 35,
+                                                              ),
                                                             ),
                                                           ),
                                                           Flexible(

@@ -20,8 +20,6 @@ import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/circle.dart';
-import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -29,7 +27,6 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/user.dart' as user;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-
 import 'chat/ui/new_chat/chat_pages/chat.dart';
 import 'chat/ui/new_chat/chat_pages/chat_contacts.dart';
 import 'chat/ui/new_chat/chat_pages/chats.dart';
@@ -262,8 +259,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     String title, {
     bool withPin,
     bool opaque,
-    CircleUIConfig circleUIConfig,
-    KeyboardUIConfig keyboardUIConfig,
     Widget cancelButton,
     List<String> digits,
   }) {

@@ -69,8 +69,8 @@ class _RefillPageState extends State<RefillPage> {
                         children: <Widget>[
                           Image.asset(
                             'assets/images/wallet_header.png',
-                              width: size.width,
-                          fit: BoxFit.fitWidth,
+                            width: size.width,
+                            fit: BoxFit.fitWidth,
                           ),
                           Column(
                             children: <Widget>[
@@ -153,7 +153,6 @@ class _RefillPageState extends State<RefillPage> {
                         child: TextFormField(
                           textAlign: TextAlign.center,
                           inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(refillMax.length)
                           ],
                           keyboardType: TextInputType.number,
@@ -313,37 +312,6 @@ class _RefillPageState extends State<RefillPage> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-    GestureDetector(
-      onTap: () {
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
-      child: Scaffold(
-        appBar: IndigoAppBarWidget(
-          title: Text(
-            '${localization.refill}',
-            style: TextStyle(
-              color: blackPurpleColor,
-              fontWeight: FontWeight.w400,
-              fontSize: 22,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [],
-              ),
-            ),
-            _preloader ? Center(child: CircularProgressIndicator()) : Center()
-          ],
         ),
       ),
     );

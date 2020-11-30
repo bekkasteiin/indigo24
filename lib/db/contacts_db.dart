@@ -9,7 +9,6 @@ class ContactsDB {
   Future<Database> get _db async => await AppDatabase.instance.database;
 
   Future insertOne(MyContact contact) async {
-    final finder = Finder(filter: Filter.equals('id', contact.id));
     await _contactsFolder.add(await _db, contact.toJson());
   }
 

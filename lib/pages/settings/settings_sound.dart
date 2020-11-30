@@ -63,9 +63,12 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                           title: Text(
                             '${localization.sound} $index',
                           ),
-                          tileColor: user.sound == sounds[index]
-                              ? greenColor.withOpacity(0.3)
-                              : Colors.transparent,
+                          trailing: user.sound == sounds[index]
+                              ? Icon(Icons.done)
+                              : Icon(
+                                  Icons.done,
+                                  color: Colors.transparent,
+                                ),
                           onTap: () async {
                             final SharedPreferences prefs =
                                 await SharedPreferences.getInstance();

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import 'package:video_player/video_player.dart';
-import 'package:indigo24/services/localization.dart' as localization;
 
 class VideoMessage extends StatefulWidget {
   final url;

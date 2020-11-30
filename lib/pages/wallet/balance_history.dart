@@ -242,7 +242,9 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
         children: <Widget>[
           Text(
             type != null
-                ? type == 'out' ? "-$amount KZT" : "+$amount KZT"
+                ? type == 'out'
+                    ? "-$amount KZT"
+                    : "+$amount KZT"
                 : "$amount KZT",
             style: TextStyle(
               fontSize: 18,
@@ -291,18 +293,18 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
       child: Column(
         children: [
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 20),
+            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: [
                 Container(
                   width: size.width * 0.8 - 20,
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      hintText: 'YYYY-MM-DD / YYYY-MM-DD',
+                  child: Text(
+                    _filterController.text.isEmpty
+                        ? 'YYYY-MM-DD / YYYY-MM-DD'
+                        : _filterController.text,
+                    style: TextStyle(
+                      color: primaryColor,
                     ),
-                    controller: _filterController,
-                    textAlign: TextAlign.center,
-                    readOnly: true,
                   ),
                 ),
                 InkWell(

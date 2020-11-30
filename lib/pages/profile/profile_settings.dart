@@ -378,21 +378,51 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            TextFormField(
-              readOnly: readyOnly,
-              controller: controller,
-              style: TextStyle(
-                fontSize: 18,
-                color: blackPurpleColor,
-                fontWeight: FontWeight.w500,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(55),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 6,
+                    spreadRadius: -5,
+                    offset: Offset(0.0, 6.0),
+                  )
+                ],
               ),
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(100),
-              ],
-              decoration: InputDecoration(
-                labelText: text,
-                labelStyle: TextStyle(fontSize: 18, color: blackPurpleColor),
-                hintStyle: TextStyle(fontSize: 20, color: blackPurpleColor),
+              child: TextFormField(
+                readOnly: readyOnly,
+                controller: controller,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: blackPurpleColor,
+                  fontWeight: FontWeight.w500,
+                ),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(100),
+                ],
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: const BorderRadius.all(
+                      const Radius.circular(20.0),
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.only(
+                    left: 15,
+                    bottom: 10,
+                    top: 10,
+                    right: 15,
+                  ),
+                  labelText: text,
+                  labelStyle: TextStyle(fontSize: 18, color: blackPurpleColor),
+                  hintStyle: TextStyle(
+                    color: darkPrimaryColor,
+                  ),
+                  fillColor: whiteColor,
+                ),
               ),
             ),
             SizedBox(height: 20),

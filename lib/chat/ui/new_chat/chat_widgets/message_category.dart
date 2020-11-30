@@ -171,28 +171,31 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
               ),
               Container(
                 height: 50,
-                child: Theme(
-                  data: ThemeData(),
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          '${localization.delete}',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Icon(CupertinoIcons.delete, size: 20)
-                      ],
+                color: Colors.red,
+                child: FittedBox(
+                  child: Theme(
+                    data: ThemeData(),
+                    child: FlatButton(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Text(
+                            '${localization.delete}',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          Icon(CupertinoIcons.delete, size: 20)
+                        ],
+                      ),
+                      onPressed: () {
+                        ChatRoom.shared.deleteFromAll(
+                          widget.chatId,
+                          widget.messageId,
+                        );
+                        Navigator.pop(context);
+                      },
                     ),
-                    onPressed: () {
-                      ChatRoom.shared.deleteFromAll(
-                        widget.chatId,
-                        widget.messageId,
-                      );
-                      Navigator.pop(context);
-                    },
                   ),
                 ),
               ),

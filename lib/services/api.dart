@@ -52,7 +52,7 @@ class Api {
       } else {
         print('error while getting value');
         print('error named $e');
-        print(e.request.baseUrl);
+        print(e.request.uri);
         print(e.request.headers);
         print(e.request.data);
         print(e.request.method);
@@ -424,8 +424,11 @@ class Api {
     };
     controllers.forEach((element) {
       var t = {
-        '${element['name']}':
-            '${element['controller'].text.toString().replaceAll(" ", '')}'
+        if (element['name'] == 'account' || element['name'] == 'amount')
+          '${element['name']}':
+              '${element['controller'].text.toString().replaceAll(" ", '')}'
+        else
+          '${element['name']}': '${element['controller'].text}'
       };
       data.addAll(t);
     });

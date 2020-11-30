@@ -42,7 +42,7 @@ dependencies:
   chewie: ^0.9.10
   fab_circular_menu: ^1.0.0
   flutter_emoji: ^2.2.1+1
-  pull_to_refresh: ^1.5.8
+  pull_to_refresh: ^1.6.3
   audioplayers: ^0.15.1
   url_launcher: ^5.4.10
   file_picker: ^1.11.0+3
@@ -57,7 +57,7 @@ dependencies:
   gallery_saver: ^2.0.1
   metadata_fetch: ^0.3.2
   flutter_interactive_keyboard: ^0.1.3
-  share: any
+  share: ^0.6.5+4
   receive_sharing_intent: ^1.4.0+2
   flick_video_player: ^0.1.1
   flutter_widgets: ^0.1.12
@@ -67,6 +67,7 @@ dependencies:
   hive: ^1.4.4
   hive_flutter: ^0.3.0+2
   flutter_audio_recorder: ^0.5.5
+  screenshot: ^0.2.0
 
 dev_dependencies:
   flutter_test:
@@ -84,16 +85,16 @@ flutter:
     - assets/images/
     - assets/
 
-  fonts:
-     - family: Spectral
-       fonts:
-         - asset: assets/fonts/Spectral-Regular.ttf
-           weight: 400
-         - asset: assets/fonts/Spectral-Medium.ttf
-           weight: 500
-     - family: Roboto
-       fonts:
-         - asset: assets/fonts/Roboto-Light.ttf
-           weight: 200
-         - asset: assets/fonts/Roboto-Bold.ttf
-           weight: 700
+  # fonts:
+  #    - family: Spectral
+  #      fonts:
+  #        - asset: assets/fonts/Spectral-Regular.ttf
+  #          weight: 400
+  #        - asset: assets/fonts/Spectral-Medium.ttf
+  #          weight: 500
+  #    - family: Roboto
+  #      fonts:
+  #        - asset: assets/fonts/Roboto-Light.ttf
+  #          weight: 200
+  #        - asset: assets/fonts/Roboto-Bold.ttf
+  #          weight: 700

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'indigo_text_field.dart';
 
 class IndigoSearchWidget extends StatelessWidget {
   final Function callback;
@@ -10,7 +10,7 @@ class IndigoSearchWidget extends StatelessWidget {
   const IndigoSearchWidget({
     Key key,
     @required TextEditingController searchController,
-    @required this.callback,
+    this.callback,
     @required this.onChangeCallback,
   })  : _searchController = searchController,
         super(key: key);
@@ -29,36 +29,17 @@ class IndigoSearchWidget extends StatelessWidget {
           )
         ],
       ),
-      child: TextField(
-        decoration: InputDecoration(
-          suffixIcon: GestureDetector(
-              child: Icon(
-                Icons.search,
-                size: 26,
-              ),
-              onTap: callback),
-          isDense: true,
-          filled: true,
-          border: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: const BorderRadius.all(
-              const Radius.circular(20.0),
-            ),
+      child: IndigoTextField(
+        onChangeCallback: onChangeCallback,
+        textEditingController: _searchController,
+        suffixIcon: GestureDetector(
+          child: Icon(
+            Icons.search,
+            size: 26,
           ),
-          contentPadding: EdgeInsets.only(
-            left: 15,
-            bottom: 10,
-            top: 10,
-            right: 15,
-          ),
-          hintText: "${localization.search}",
-          hintStyle: TextStyle(
-            color: darkPrimaryColor,
-          ),
-          fillColor: whiteColor,
+          onTap: callback,
         ),
-        onChanged: onChangeCallback,
-        controller: _searchController,
+        hintText: localization.search,
       ),
     );
   }

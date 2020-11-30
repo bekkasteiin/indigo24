@@ -5,15 +5,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api.dart';
-
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
-import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -397,12 +394,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   }
 
   _showLockScreen(BuildContext context, String title,
-      {bool withPin,
-      bool opaque,
-      CircleUIConfig circleUIConfig,
-      KeyboardUIConfig keyboardUIConfig,
-      Widget cancelButton,
-      List<String> digits}) {
+      {bool withPin, bool opaque, Widget cancelButton, List<String> digits}) {
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -671,16 +663,19 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemBuilder: (context, index) {
-              print(snapshot['result'][index]);
               var varMask = snapshot['result'][index]['mask'];
               var varExample = snapshot['result'][index]['example'];
 
               String mask = varMask == ''
                   ? ''
-                  : varMask.toString() == 'null' ? '' : varMask;
+                  : varMask.toString() == 'null'
+                      ? ''
+                      : varMask;
               String example = varExample == ''
                   ? ''
-                  : varExample.toString() == 'null' ? '' : varExample;
+                  : varExample.toString() == 'null'
+                      ? ''
+                      : varExample;
               return Row(
                 children: [
                   Expanded(

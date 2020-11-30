@@ -76,7 +76,6 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                   Navigator.pop(context);
                 } else if (_selectedChats.length == 1) {
                   var jsonChat = _selectedChats[0];
-
                   ChatRoom.shared.forwardMessage(
                     widget.messages.join(','),
                     'asd',

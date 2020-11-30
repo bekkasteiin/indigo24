@@ -139,8 +139,8 @@ String open = 'Открыть';
 String thankYou = 'Спасибо';
 String returning = 'Возвращаю';
 String withLove = 'С любовью';
-String mute = 'Mute';
-String unmute = 'Unmute';
+String mute = 'Выключить звук';
+String unmute = 'Включить звук';
 String methods = 'Методы';
 String identification = 'Идентификация';
 String identified = 'Идентифицирован';
@@ -181,6 +181,9 @@ String minutes = 'Минут';
 String likes = 'Лайки';
 String withdrawTerm =
     "Подтверждаю, что указанный банковский счет/банковская карточка принадлежит мне и(или) я имею законное основание его/ее использования (распоряжения средствами, находящихся на счете)";
+String destination = 'Адрес платежа';
+String payFrom = 'Оплачено с этого аккаунта';
+String date = 'Дата';
 
 List filters = [
   {'text': 'За неделю', 'code': 'week'},
@@ -342,8 +345,6 @@ setLanguage(code) {
       thankYou = 'Thank you';
       returning = 'Returning';
       withLove = 'With love';
-      mute = 'Mute';
-      unmute = 'Unmute';
       methods = 'Methods';
       identification = 'Identification';
       identified = 'Identified';
@@ -384,7 +385,9 @@ setLanguage(code) {
       likes = 'Likes';
       withdrawTerm =
           "I confirm that the specified bank account / bank card belongs to me and (or) I have a legal basis for his / her use (disposal of funds on the account)";
-
+      payFrom = 'Paid from';
+      date = 'Date';
+      destination = 'Payment address';
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -526,8 +529,8 @@ setLanguage(code) {
       thankYou = 'Спасибо';
       returning = 'Возвращаю';
       withLove = 'С любовью';
-      mute = 'Mute';
-      unmute = 'Unmute';
+      mute = 'Выключить звук';
+      unmute = 'Включить звук';
       methods = 'Методы';
       identification = 'Идентификация';
       identified = 'Идентифицирован';
@@ -568,6 +571,9 @@ setLanguage(code) {
       likes = 'Лайки';
       withdrawTerm =
           "Подтверждаю, что указанный банковский счет/банковская карточка принадлежит мне и(или) я имею законное основание его/ее использования (распоряжения средствами, находящихся на счете)";
+      date = 'Дата';
+      payFrom = 'Оплачено с этого аккаунта';
+      destination = 'Адрес платежа';
 
       break;
     case 'kz':
@@ -710,8 +716,8 @@ setLanguage(code) {
       thankYou = 'Рахмет';
       returning = 'Қайтарып жатырмын';
       withLove = 'Махаббатпен';
-      mute = 'Mute';
-      unmute = 'Unmute';
+      mute = 'Дыбысын өшіру';
+      unmute = 'Дыбысын қосу';
       methods = 'Әдістер';
       identification = 'Сәйкестендіру';
       identified = 'Анықталған';
@@ -752,6 +758,10 @@ setLanguage(code) {
       likes = 'Лайктер';
       withdrawTerm =
           "Көрсетілген банктік шот / банктік карта маған тиесілі екенін растаймын және (немесе) менде оны пайдалануға (есепшоттағы қаражатты иеліктен шығаруға) заңды негіз бар";
+      payFrom = 'Осы шотпен төленді';
+      date = 'Күні';
+      destination = 'Төлем мекен-жайы';
+
       break;
     case 'uz':
       registration = 'Рўйхатдан ўтиш';
@@ -892,8 +902,8 @@ setLanguage(code) {
       thankYou = 'Шукр. гов. ве';
       returning = 'Қайтиш';
       withLove = 'Севги билан';
-      mute = 'Mute';
-      unmute = 'Unmute';
+      mute = 'Овозни ўчириш';
+      unmute = 'Овозни ёқинг';
       methods = 'Усуллари';
       identification = 'Аниқлаш';
       identified = 'Кашф етилган';
@@ -933,6 +943,9 @@ setLanguage(code) {
       likes = 'Каби';
       withdrawTerm =
           "Мен белгиланган Банк ҳисоб / банк картаси менга тегишли еканлигини тасдиқлаш ва (ёки) мен уни ишлатиш учун ҳуқуқий асос бор (ҳисоб ўтказилган маблағлар бериш)";
+      payFrom = 'Ушбу ҳисоб билан тўланган';
+      date = 'Сана';
+      destination = 'Тўлов манзили';
       break;
     case 'uzb':
       registration = 'Ro\'yxatdan o\'tish';
@@ -1074,8 +1087,8 @@ setLanguage(code) {
       thankYou = 'Rahmat';
       returning = 'Qaytib kelaman';
       withLove = 'Sevgi bilan';
-      mute = 'Mute';
-      unmute = 'Unmute';
+      mute = 'Ovozni o\'chirish';
+      unmute = 'Ovozni yoqing';
       methods = 'Usullari';
       identification = 'Aniqlash';
       identified = 'Kashf etilgan';
@@ -1115,6 +1128,10 @@ setLanguage(code) {
       likes = 'Kabi';
       withdrawTerm =
           "Belgilangan bank hisobvarag'i / bank kartasi menga tegishli ekanligini tasdiqlayman va (yoki) uni ishlatish (hisobdagi pul mablag'larini tasarruf etish) uchun qonuniy asoslarim bor";
+      payFrom = 'Ushbu hisob bilan to\'langan';
+      date = 'Sana';
+      destination = 'To\'lov manzili';
+
       break;
     default:
   }

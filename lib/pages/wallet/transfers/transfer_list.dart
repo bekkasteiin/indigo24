@@ -111,10 +111,17 @@ class _TransferListPageState extends State<TransferListPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  width: 35,
+                  width: 40,
                   height: 40,
                   margin: EdgeInsets.only(right: 20, top: 10, bottom: 10),
-                  child: Image.asset('assets/images/profile.png', width: 30.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: Image.asset(
+                      'assets/images/indigo24Logo.png',
+                      width: 30.0,
+                      height: 30,
+                    ),
+                  ),
                 ),
                 Container(width: 10),
                 Expanded(

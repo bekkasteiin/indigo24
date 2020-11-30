@@ -56,9 +56,10 @@ class GradientFab extends StatelessWidget {
         decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
-                begin: Alignment.center,
-                end: Alignment.bottomRight,
-        )),
+              begin: Alignment.center,
+              end: Alignment.bottomRight,
+              colors: [Colors.white],
+            )),
         child: child,
       ),
       onPressed: onPressed,

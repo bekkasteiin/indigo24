@@ -99,9 +99,13 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     _chatTitle = '${widget.chatName}';
 
     _listen();
+
+    print(widget.chatId);
+    print(widget.chatType);
+    print(widget.userId);
     if (widget.chatId != null) {
       ChatRoom.shared.chatMembers(widget.chatId, page: _chatMembersPage);
-    } else if (widget.chatType == 0) {
+    } else if (widget.chatType == 0 && widget.userId != null) {
       ChatRoom.shared.userCheckById(widget.userId);
     }
     if (widget.chatName.length > 2) {
@@ -141,6 +145,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                 _membersList.forEach((member) {
                   if (member['user_id'].toString() == '${user.id}') {
                     _myPrivilege = member['role'].toString();
+                  } else {
                     _member = member;
                   }
                   if (member['online'] == 'online') {
@@ -225,6 +230,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                 e.json['data']['status'].toString() == 'true') {
               // ChatRoom.shared.setChatStream();
               if (loaderCheck == false) {
+                print('loaderCheck ==== false');
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -238,15 +245,24 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                 ).whenComplete(() {});
                 loaderCheck = false;
               } else {
+                print('2sloaderCheck');
+
                 setState(() {
                   _member = e.json['data'];
                 });
               }
             } else if (e.json['data']['status'].toString() == 'true') {
               if (loaderCheck == false) {
+                print('loaderCheck false');
+
                 ChatRoom.shared
                     .cabinetCreate("${e.json['data']['user_id']}", 0);
-              } else {}
+              } else {
+                print('loaderCheck');
+                setState(() {
+                  _member = e.json['data'];
+                });
+              }
             }
             break;
           default:
@@ -349,10 +365,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
         pickedFile.path,
         targetPath,
       );
-      File test = File(pickedFile.path);
       setState(() {
         _image = compressedImage;
-        // _image = File(pickedFile.path);
       });
       if (_image != null) {
         uploadAvatar(_image.path).then((r) async {
@@ -458,7 +472,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
             child: Center(
               child:
                   // '${widget.chatType}' == '1'
+
                   // ? Stack(
+
                   //     children: <Widget>[
                   //       Flexible(
                   //         child: Container(
@@ -525,6 +541,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
             isDestructiveAction: true,
             child: Text('${localization.exitGroup}'),
             onPressed: () {
+              Navigator.pop(context);
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -1012,6 +1029,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
         break;
       default:
     }
+
     final act = CupertinoActionSheet(
       title: Text('${localization.selectOption}'),
       actions: actions,

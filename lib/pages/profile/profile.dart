@@ -30,8 +30,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
-
-import 'identification/identification_credentials.dart';
 import 'profile_settings.dart';
 
 class UserProfilePage extends StatefulWidget {

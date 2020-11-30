@@ -72,8 +72,8 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         children: <Widget>[
                           Image.asset(
                             'assets/images/wallet_header.png',
-                              width: size.width,
-                          fit: BoxFit.fitWidth,
+                            width: size.width,
+                            fit: BoxFit.fitWidth,
                           ),
                           Column(
                             children: <Widget>[
@@ -156,7 +156,6 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         child: TextFormField(
                           textAlign: TextAlign.center,
                           inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(withdrawMax.length)
                           ],
                           keyboardType: TextInputType.number,

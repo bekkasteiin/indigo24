@@ -2,11 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/models/transfer_model.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts/voucher.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-
 import '../filter.dart';
 import 'transfer.dart';
 
@@ -83,19 +84,27 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 20),
+            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: [
                 Container(
                   width: size.width * 0.8 - 20,
-                  child: TextFormField(
-                    controller: _filterController,
-                    decoration: InputDecoration(
-                      hintText: 'YYYY-MM-DD / YYYY-MM-DD',
+                  child: Text(
+                    _filterController.text.isEmpty
+                        ? 'YYYY-MM-DD / YYYY-MM-DD'
+                        : _filterController.text,
+                    style: TextStyle(
+                      color: primaryColor,
                     ),
-                    textAlign: TextAlign.center,
-                    readOnly: true,
                   ),
+                  // TextFormField(
+                  //   controller: _filterController,
+                  //   decoration: InputDecoration(
+                  //     hintText: 'YYYY-MM-DD / YYYY-MM-DD',
+                  //   ),
+                  //   textAlign: TextAlign.center,
+                  //   readOnly: true,
+                  // ),
                 ),
                 InkWell(
                   child: Container(
@@ -229,134 +238,165 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         borderRadius: BorderRadius.circular(25),
         child: CachedNetworkImage(
           imageUrl: logo.replaceAll('AxB', '200x200'),
-          width: 50,
-          height: 50,
+          width: 40,
+          height: 40,
         ),
       ),
     );
   }
 
-  Widget _transferAmount(String type, String amount, phone) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(),
-            Text(
-              type == 'in' ? '+$amount KZT' : "-$amount KZT",
-              style: TextStyle(
-                fontSize: 14,
-                color: blackPurpleColor,
-              ),
-            ),
-            // SizedBox(
-            //   height: 5,
-            // ),
-            // Container(
-            //   child: ClipRRect(
-            //     borderRadius: BorderRadius.circular(25),
-            //     child: Container(
-            //       height: 15,
-            //       width: 15,
-            //       color: type == 'in' ? Colors.green : Colors.red,
-            //     ),
-            //   ),
-            // ),
-          ],
-        ),
-        SizedBox(width: 5),
-        InkWell(
-          child: Container(
-            width: 40,
-            padding: EdgeInsets.all(5),
+  Widget _transferAmount(String type, String amount, phone, String comment) {
+    return Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Container(
-                  child: Image.asset(
-                    '$type' == 'in'
-                        ? 'assets/images/replyTransfer.png'
-                        : 'assets/images/repeat.png',
-                    width: 20,
-                    height: 20,
+                Text(
+                  type == 'in' ? '+$amount KZT' : "-$amount KZT",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: blackPurpleColor,
                   ),
                 ),
-                FittedBox(
-                  child: Text(
-                    '${type == 'in' ? localization.reply : localization.repeat}',
-                    style: TextStyle(
-                      color: Color(0xFF0543B8),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: type == 'in'
+                      ? Image.asset('assets/images/in.png')
+                      : Image.asset('assets/images/out.png'),
+                ),
+
+                if (comment != null)
+                  SizedBox(
+                    height: 5,
+                  ),
+                if (comment != null)
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 5.0,
+                          spreadRadius: -2,
+                          offset: Offset(
+                            0.0,
+                            0.0,
+                          ),
+                        )
+                      ],
+                      borderRadius: BorderRadius.circular(15),
+                      color: whiteColor,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 5,
+                      horizontal: 10,
+                    ),
+                    child: Text(
+                      comment,
+                      style: TextStyle(fontSize: 12, color: blackPurpleColor),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.justify,
+                      maxLines: 3,
                     ),
                   ),
-                )
+
+                // Container(
+                //   child: ClipRRect(
+                //     borderRadius: BorderRadius.circular(25),
+                //     child: Container(
+                //       height: 15,
+                //       width: 15,
+                //       color: type == 'in' ? Colors.green : Colors.red,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TransferPage(
-                  phone: phone,
-                  amount: '0',
-                ),
-              ),
-            );
-          },
-        ),
-      ],
+          // SizedBox(width: 5),
+          // InkWell(
+          //   child: Container(
+          //     width: 40,
+          //     padding: EdgeInsets.all(5),
+          //     child: Column(
+          //       children: <Widget>[
+          //         Container(
+          //           child: Image.asset(
+          //             '$type' == 'in'
+          //                 ? 'assets/images/replyTransfer.png'
+          //                 : 'assets/images/repeat.png',
+          //             width: 20,
+          //             height: 20,
+          //           ),
+          //         ),
+          //         FittedBox(
+          //           child: Text(
+          //             '${type == 'in' ? localization.reply : localization.repeat}',
+          //             style: TextStyle(
+          //               color: Color(0xFF0543B8),
+          //             ),
+          //           ),
+          //         )
+          //       ],
+          //     ),
+          //   ),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => TransferPage(
+          //           phone: phone,
+          //           amount: '0',
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
+        ],
+      ),
     );
   }
 
-  Expanded _transferInfo(
-      String name, String date, String phone, String comment) {
+  Widget _transferInfo(
+    String name,
+    String date,
+    String phone,
+  ) {
     date = date.substring(0, date.length - 3);
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            "$name",
-            style: TextStyle(
-              fontSize: 16,
-              color: blackPurpleColor,
-              fontWeight: FontWeight.w500,
-            ),
-            overflow: TextOverflow.ellipsis,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          "$name",
+          style: TextStyle(
+            fontSize: 16,
+            color: blackPurpleColor,
+            fontWeight: FontWeight.w500,
           ),
-          Text(
-            "+$phone",
-            style: TextStyle(
-              fontSize: 12,
-              color: blackPurpleColor,
-              fontWeight: FontWeight.w400,
-            ),
-            overflow: TextOverflow.ellipsis,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text(
+          "+$phone",
+          style: TextStyle(
+            fontSize: 12,
+            color: blackPurpleColor,
+            fontWeight: FontWeight.w400,
           ),
-          comment.toString() != null.toString()
-              ? Text(
-                  '$comment',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: blackPurpleColor,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                )
-              : Center(),
-          Text(
-            "$date",
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w300,
-            ),
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text(
+          "$date",
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w300,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -378,12 +418,14 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         children: <Widget>[
           Container(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 SizedBox(width: 20),
                 _transferLogo(logo),
-                _transferInfo(title, date, phone, comment),
-                _transferAmount(type, amount, phone),
+                _transferInfo(title, date, phone),
+                SizedBox(width: 5),
+                _transferAmount(type, amount, phone, comment),
                 SizedBox(width: 20),
               ],
             ),
@@ -454,18 +496,44 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                 padding: const EdgeInsets.only(bottom: 10),
                 shrinkWrap: false,
                 itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: _historyBuilder(
-                      context,
-                      "${_avatarUrl + snapshot[index]['avatar']}",
-                      "${snapshot[index]['amount']}",
-                      "${snapshot[index]['name']}",
-                      "${snapshot[index]['phone']}",
-                      '${snapshot[index]['type']}',
-                      "${snapshot[index]['data']}",
-                      '${snapshot[index]['comment']}',
-                      index,
+                  TransferModel transferModel =
+                      TransferModel.fromJson(snapshot[index]);
+                  return InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (BuildContext context) {
+                          return Voucher(
+                            transferModel: transferModel,
+                            buttonCallBack: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TransferPage(
+                                    phone: transferModel.phone,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: _historyBuilder(
+                        context,
+                        "${_avatarUrl + transferModel.avatar}",
+                        transferModel.amount.toString(),
+                        transferModel.name,
+                        transferModel.phone,
+                        transferModel.type,
+                        transferModel.data,
+                        transferModel.comment,
+                        index,
+                      ),
                     ),
                   );
                 },

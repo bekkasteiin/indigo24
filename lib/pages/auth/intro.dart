@@ -11,7 +11,6 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/custom_dropdown.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

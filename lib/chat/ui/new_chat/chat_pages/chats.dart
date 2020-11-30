@@ -111,14 +111,15 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           Container(
             padding: EdgeInsets.all(5),
             child: Center(
-                child: chat.isMuted
-                    ? Image.asset(
-                        'assets/images/unmuteChat.png',
-                        width: 10,
-                        height: 10,
-                      )
-                    : null),
-          )
+              child: chat.isMuted
+                  ? Image.asset(
+                      'assets/images/unmuteChat.png',
+                      width: 10,
+                      height: 10,
+                    )
+                  : null,
+            ),
+          ),
         ],
       ),
       subtitle: Text(
@@ -376,7 +377,19 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                                 },
                               )
                             ],
-                            child: _chatListTile(numbers.elementAt(i)),
+                            child: Column(
+                              children: [
+                                _chatListTile(numbers.elementAt(i)),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 65),
+                                  child: Container(
+                                    color: greyColor,
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                           );
                         },
                       );

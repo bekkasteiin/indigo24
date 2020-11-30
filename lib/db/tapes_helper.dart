@@ -10,7 +10,6 @@ class TapeDB {
   Future<Database> get _db async => await AppDatabase.instance.database;
 
   Future insertOne(MyTape tape) async {
-    final finder = Finder(filter: Filter.equals('id', tape.id));
     await _tapeFolder.add(await _db, tape.toJson());
   }
 

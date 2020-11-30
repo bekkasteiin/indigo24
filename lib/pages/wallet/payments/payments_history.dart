@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/models/payment_history_model.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts/payments_voucher.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -169,48 +171,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
               _paymentLogo(logo),
               _paymentInfo(title, account, date),
               _paymentAmount(amount, status),
-              SizedBox(width: 5),
-              Container(
-                width: 40,
-                child: InkWell(
-                  child: Container(
-                    padding: EdgeInsets.all(5),
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          child: Image.asset(
-                            'assets/images/repeat.png',
-                            width: 20,
-                            height: 20,
-                          ),
-                        ),
-                        FittedBox(
-                          child: Text(
-                            localization.repeat,
-                            style: TextStyle(
-                              color: Color(0xFF0543B8),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PaymentsServicePage(
-                          serviceID,
-                          logo,
-                          title,
-                          account: account,
-                          amount: amount,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
               SizedBox(width: 20),
             ],
           ),
@@ -256,7 +216,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 5),
-          paymentStatus(int.parse(status)),
+          paymentStatus(int.tryParse(status)),
         ],
       ),
     );
@@ -272,7 +232,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         break;
       case 1:
         text = localization.newPayment;
-        color = Colors.yellow;
+        color = Colors.yellow[700];
         break;
       case 2:
         text = localization.error;
@@ -284,18 +244,19 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
         break;
       case 4:
         text = localization.success;
-        color = Colors.green;
+        color = succesColor;
         break;
       default:
     }
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
         child: Text(
           text,
           style: TextStyle(
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w700,
+            color: whiteColor,
           ),
         ),
         color: color,
@@ -362,19 +323,19 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 20),
+          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: size.width * 0.8 - 20,
-                child: TextFormField(
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    hintText: 'YYYY-MM-DD / YYYY-MM-DD',
+                child: Text(
+                  _filterController.text.isEmpty
+                      ? 'YYYY-MM-DD / YYYY-MM-DD'
+                      : _filterController.text,
+                  style: TextStyle(
+                    color: primaryColor,
                   ),
-                  controller: _filterController,
-                  textAlign: TextAlign.center,
                 ),
               ),
               InkWell(
@@ -454,19 +415,56 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                               padding: const EdgeInsets.only(bottom: 10),
                               itemCount: snapshot != null ? snapshot.length : 0,
                               itemBuilder: (BuildContext context, int index) {
-                                return Container(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: _historyBuilder(
-                                    context,
-                                    "$_logoUrl${snapshot[index]['logo']}",
-                                    "${snapshot[index]['account']}",
-                                    "${snapshot[index]['amount']}",
-                                    "${snapshot[index]['title']}",
-                                    "${snapshot[index]['data']}",
-                                    "${snapshot[index]['status']}",
-                                    index,
-                                    "${snapshot[index]['pdf']}",
-                                    snapshot[index]['serviceID'],
+                                PaymentHistoryModel paymentHistoryModel =
+                                    PaymentHistoryModel.fromJson(
+                                  snapshot[index],
+                                );
+                                return InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      builder: (BuildContext context) {
+                                        return PaymentVoucher(
+                                          paymentHistoryModel:
+                                              paymentHistoryModel,
+                                          buttonCallBack: () {
+                                            Navigator.pop(context);
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PaymentsServicePage(
+                                                  paymentHistoryModel.serviceId,
+                                                  paymentHistoryModel.logo,
+                                                  paymentHistoryModel.title,
+                                                  account: paymentHistoryModel
+                                                      .account,
+                                                  amount: paymentHistoryModel
+                                                      .amount
+                                                      .toString(),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: _historyBuilder(
+                                      context,
+                                      "$_logoUrl${paymentHistoryModel.logo}",
+                                      "${paymentHistoryModel.account}",
+                                      "${paymentHistoryModel.amount}",
+                                      "${paymentHistoryModel.title}",
+                                      "${paymentHistoryModel.data}",
+                                      "${paymentHistoryModel.status}",
+                                      index,
+                                      "${snapshot[index]['pdf']}",
+                                      paymentHistoryModel.serviceId,
+                                    ),
                                   ),
                                 );
                               },

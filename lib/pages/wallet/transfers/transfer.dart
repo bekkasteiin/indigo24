@@ -13,24 +13,23 @@ import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/circle.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
-import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 
 class TransferPage extends StatefulWidget {
   final phone;
-  final amount;
   final transferChat;
-  const TransferPage({this.phone, this.transferChat, this.amount});
+  const TransferPage({
+    this.phone,
+    this.transferChat,
+  });
   @override
   _TransferPageState createState() => _TransferPageState();
 }
 
 class _TransferPageState extends State<TransferPage> {
   Api api = Api();
-
   showAlertDialog(BuildContext context, String type, String message) {
     showDialog(
       context: context,
@@ -58,9 +57,6 @@ class _TransferPageState extends State<TransferPage> {
     sumColor = blackColor;
     if (widget.phone != null) {
       receiverController.text = widget.phone;
-      if (widget.amount != null) {
-        sumController.text = widget.amount;
-      }
       setState(() {
         toName = '';
         toAvatar = '';
@@ -112,8 +108,8 @@ class _TransferPageState extends State<TransferPage> {
                           children: <Widget>[
                             Image.asset(
                               'assets/images/wallet_header.png',
-                                width: size.width,
-                          fit: BoxFit.fitWidth,
+                              width: size.width,
+                              fit: BoxFit.fitWidth,
                             ),
                             Positioned(
                               child: IndigoAppBarWidget(
@@ -391,12 +387,7 @@ class _TransferPageState extends State<TransferPage> {
   }
 
   _showLockScreen(BuildContext context, String title,
-      {bool withPin,
-      bool opaque,
-      CircleUIConfig circleUIConfig,
-      KeyboardUIConfig keyboardUIConfig,
-      Widget cancelButton,
-      List<String> digits}) {
+      {bool withPin, bool opaque, Widget cancelButton, List<String> digits}) {
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -516,7 +507,6 @@ class _TransferPageState extends State<TransferPage> {
                       child: TextField(
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(25),
                         ],
                         decoration: InputDecoration.collapsed(
@@ -623,9 +613,7 @@ class _TransferPageState extends State<TransferPage> {
                 child: Container(
                   child: TextFormField(
                     keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      WhitelistingTextInputFormatter.digitsOnly,
-                    ],
+                    inputFormatters: [],
                     controller: sumController,
                     decoration: InputDecoration.collapsed(
                       hintText: '${localization.amount}',

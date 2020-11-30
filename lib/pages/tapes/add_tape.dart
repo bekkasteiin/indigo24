@@ -10,6 +10,7 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_text_field.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
@@ -25,7 +26,6 @@ class AddTapePage extends StatefulWidget {
 }
 
 class _AddTapePageState extends State<AddTapePage> {
-  File _imageFile;
   File _videoFile;
   File _currentFile;
   dynamic _pickImageError;
@@ -137,33 +137,34 @@ class _AddTapePageState extends State<AddTapePage> {
                 children: [
                   Container(
                     margin: EdgeInsets.all(10),
-                    child: TextField(
-                        controller: _titleController,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(40),
-                        ],
-                        decoration: InputDecoration(
-                            labelText: '${localization.title}')),
+                    child: IndigoTextField(
+                      textEditingController: _titleController,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(40),
+                      ],
+                      hintText: localization.title,
+                    ),
                   ),
                   Container(
                     margin: EdgeInsets.all(10),
-                    child: TextField(
-                        minLines: 1,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(200),
-                        ],
-                        keyboardType: TextInputType.text,
-                        maxLines: 4,
-                        controller: _descriptionController,
-                        decoration: InputDecoration(
-                            labelText: '${localization.description}')),
+                    child: IndigoTextField(
+                      textEditingController: _descriptionController,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(200),
+                      ],
+                      hintText: localization.description,
+                      minLines: 1,
+                      maxLines: 4,
+                    ),
                   ),
                 ],
               ),
 
               _isNotPicked
                   ? Container()
-                  : _isVideo ? _previewVideo() : _previewImage(),
+                  : _isVideo
+                      ? _previewVideo()
+                      : _previewImage(),
 
               // Image(
               //   image: AssetDataImage(
@@ -297,7 +298,6 @@ class _AddTapePageState extends State<AddTapePage> {
         final pickedFile = await _picker.getImage(source: source);
         if (pickedFile != null) {
           setState(() {
-            _imageFile = File(pickedFile.path);
             _currentFile = File(pickedFile.path);
             _isNotPicked = false;
           });
@@ -376,9 +376,7 @@ class _AddTapePageState extends State<AddTapePage> {
         await _playVideo(File(response.file.path));
       } else {
         _isVideo = false;
-        setState(() {
-          _imageFile = File(response.file.path);
-        });
+        setState(() {});
       }
     } else {
       _retrieveDataError = response.exception.code;

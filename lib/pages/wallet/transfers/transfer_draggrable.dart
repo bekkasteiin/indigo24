@@ -4,6 +4,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/widgets/indigo_search_widget.dart';
 import '../../../tabs.dart';
 
 class TransferContactsDialogPage extends StatefulWidget {
@@ -83,19 +84,12 @@ class TransferContactsDialogPageState
                 Padding(
                   padding: EdgeInsets.only(
                       top: 10.0, left: 10.0, right: 10, bottom: 0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: blackPurpleColor,
-                      ),
-                      hintText: "${localization.search}",
-                      fillColor: blackPurpleColor,
-                    ),
-                    onChanged: (value) {
+                  child: IndigoSearchWidget(
+                    callback: null,
+                    searchController: _searchController,
+                    onChangeCallback: (value) {
                       search(value);
                     },
-                    controller: _searchController,
                   ),
                 ),
                 Flexible(
@@ -117,7 +111,7 @@ class TransferContactsDialogPageState
                           child: Container(
                             padding: EdgeInsets.symmetric(
                               vertical: 20,
-                              horizontal: 40,
+                              horizontal: 20,
                             ),
                             child: Row(
                               children: <Widget>[

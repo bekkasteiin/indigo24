@@ -12,8 +12,6 @@ import 'package:indigo24/services/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/circle.dart';
-import 'package:indigo24/widgets/keyboard.dart';
 import 'package:indigo24/widgets/pin_code.dart';
 import 'package:polygon_clipper/polygon_border.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -116,12 +114,7 @@ class _WalletTabState extends State<WalletTab> {
   }
 
   _showLockScreen(BuildContext context, String title,
-      {bool withPin,
-      bool opaque,
-      CircleUIConfig circleUIConfig,
-      KeyboardUIConfig keyboardUIConfig,
-      Widget cancelButton,
-      List<String> digits}) {
+      {bool withPin, bool opaque, Widget cancelButton, List<String> digits}) {
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -228,66 +221,76 @@ class _WalletTabState extends State<WalletTab> {
                   child: Container(
                     child: Stack(
                       children: <Widget>[
-                        Image.asset(
-                          'assets/images/wallet_header.png',
-                          width: size.width,
-                          fit: BoxFit.fitWidth,
-                        ),
-                        Container(
-                          child: Column(
-                            children: <Widget>[
-                              SizedBox(height: 10),
-                              Stack(
+                        // Image.asset(
+                        //   '',
+
+                        // ),
+                        Column(
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                      "assets/images/wallet_header.png"),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              child: Column(
                                 children: [
-                                  Container(
-                                    alignment: Alignment.topCenter,
-                                    child: Text(
-                                      '${localization.wallet}',
-                                      style: fS26(c: 'ffffff'),
-                                    ),
+                                  SizedBox(height: 10),
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.topCenter,
+                                        child: Text(
+                                          '${localization.wallet}',
+                                          style: fS26(c: 'ffffff'),
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  _devider(),
+                                  _balance(),
+                                  SizedBox(height: 10),
+                                  _balanceAmount(),
+                                  _exchangeButtons(),
+                                  _symbol == _tengeSymbol
+                                      ? Container(
+                                          width: size.width,
+                                          color: darkPrimaryColor,
+                                          alignment: Alignment.center,
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 5),
+                                          child: Text(
+                                            '',
+                                          ),
+                                        )
+                                      : _exchangeCurrency(size),
                                 ],
                               ),
-                              _devider(),
-                              _balance(),
-                              SizedBox(height: 10),
-                              _balanceAmount(),
-                              _exchangeButtons(),
-                              _symbol == _tengeSymbol
-                                  ? Container(
-                                      width: size.width,
-                                      color: darkPrimaryColor,
-                                      alignment: Alignment.center,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 5),
-                                      child: Text(
-                                        '',
-                                      ),
-                                    )
-                                  : _exchangeCurrency(size),
-                              _blockedBalance(size),
-                              Container(
-                                color: Colors.white,
-                                padding: EdgeInsets.only(
-                                  left: size.width * 0.05,
-                                  right: size.width * 0.05,
-                                  top: 20,
-                                ),
-                                child: Column(
-                                  children: <Widget>[
-                                    _payInOut(size),
-                                    SizedBox(height: 20),
-                                    _payments(size),
-                                    SizedBox(height: 20),
-                                    _transfer(size),
-                                    SizedBox(height: 20),
-                                    _historyBalance(size),
-                                    SizedBox(height: 20),
-                                  ],
-                                ),
+                            ),
+                            _blockedBalance(size),
+                            Container(
+                              color: Colors.white,
+                              padding: EdgeInsets.only(
+                                left: size.width * 0.05,
+                                right: size.width * 0.05,
+                                top: 20,
                               ),
-                            ],
-                          ),
+                              child: Column(
+                                children: <Widget>[
+                                  _payInOut(size),
+                                  SizedBox(height: 20),
+                                  _payments(size),
+                                  SizedBox(height: 20),
+                                  _transfer(size),
+                                  SizedBox(height: 20),
+                                  _historyBalance(size),
+                                  SizedBox(height: 20),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -431,7 +434,10 @@ class _WalletTabState extends State<WalletTab> {
                 ),
                 Text(
                   '${localization.transfers}',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
                 Container(width: 10),
               ],

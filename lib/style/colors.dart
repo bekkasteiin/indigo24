@@ -18,3 +18,4 @@ const Color darkGreyColor = Color(0xFF444444);
 const Color darkGreyColor2 = Color(0xFF5E5E5E);
 const Color greenColor = Color(0xFF00CC00);
 const Color redColor = Colors.red;
+const Color succesColor = Color(0xFF17AA9C);

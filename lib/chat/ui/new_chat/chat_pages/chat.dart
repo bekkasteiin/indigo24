@@ -73,7 +73,6 @@ class _NewChatPageState extends State<ChatPage> {
   Api _api;
   File _image;
   ImagePicker _picker = ImagePicker();
-  bool _isUploaded;
   bool _multiPick = false;
   String _path;
   Map<String, String> _paths;
@@ -92,7 +91,6 @@ class _NewChatPageState extends State<ChatPage> {
   void didChangeDependencies() {
     precacheImage(bgChat, context);
     precacheImage(bgChat2, context);
-
     super.didChangeDependencies();
   }
 
@@ -309,11 +307,6 @@ class _NewChatPageState extends State<ChatPage> {
         return '${localization.message}';
     }
   }
-
-  List<String> audios = [
-    'Cr40YlNezldbtLBHYcbvuEnmscTN3C4KB.mp3',
-    'Cr40YlNezldbtLBHYcbvuEnmscTN3C4KB.mp3',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -739,7 +732,10 @@ class _NewChatPageState extends State<ChatPage> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: <Widget>[
                                   IconButton(
-                                    icon: Icon(Icons.attach_file),
+                                    icon: Icon(
+                                      Icons.attach_file,
+                                      color: blackPurpleColor,
+                                    ),
                                     onPressed: () {
                                       FocusScopeNode currentFocus =
                                           FocusScope.of(context);
@@ -910,9 +906,8 @@ class _NewChatPageState extends State<ChatPage> {
                                           child: Container(
                                             height: 45,
                                             width: 45,
-                                            child: Icon(
-                                              Icons.mic,
-                                              size: 45,
+                                            child: Image.asset(
+                                              'assets/images/microphone.png',
                                             ),
                                           ),
                                         )
@@ -1044,7 +1039,9 @@ class _NewChatPageState extends State<ChatPage> {
               time: int.parse(data['time'].toString()),
               attachments: data['attachmentsNew'] != null
                   ? data['attachmentsNew']
-                  : data['attachments'] != null ? data['attachments'] : null,
+                  : data['attachments'] != null
+                      ? data['attachments']
+                      : null,
               reply_data: data['reply_dataNew'] != null
                   ? data['reply_dataNew']
                   : data['reply_data'] != null
@@ -1087,7 +1084,9 @@ class _NewChatPageState extends State<ChatPage> {
                   time: int.parse(message['time'].toString()),
                   attachments: message['attachmentsNew'] != null
                       ? message['attachmentsNew']
-                      : message['attachments'] != null ? att : null,
+                      : message['attachments'] != null
+                          ? att
+                          : null,
                   reply_data:
                       message['reply_dataNew'] ?? message['reply_data'] != null
                           ? message['reply_data']
@@ -1162,7 +1161,9 @@ class _NewChatPageState extends State<ChatPage> {
                 time: data['time'],
                 attachments: data['attachmentsNew'] != null
                     ? data['attachmentsNew']
-                    : data['attachments'] != null ? data['attachments'] : null,
+                    : data['attachments'] != null
+                        ? data['attachments']
+                        : null,
                 reply_data: data['reply_dataNew'] != null
                     ? data['reply_dataNew']
                     : data['reply_data'] != null
@@ -1606,7 +1607,6 @@ class _NewChatPageState extends State<ChatPage> {
           ),
         ),
       ).whenComplete(() {});
-
       if (popResult['cmd'] == "sending") {
         _api.uploadMedia(_image.path, 4).then((r) async {
           if (r["status"]) {
@@ -1644,7 +1644,9 @@ class _NewChatPageState extends State<ChatPage> {
     setState(() {
       _fileName = _path != null
           ? _path.split('/').last
-          : _paths != null ? _paths.keys.toString() : '...';
+          : _paths != null
+              ? _paths.keys.toString()
+              : '...';
     });
     if ('$_path' != 'null') {
       _api.uploadMedia(_path, 2).then((r) async {

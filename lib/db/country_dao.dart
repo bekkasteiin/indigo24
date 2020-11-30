@@ -11,7 +11,6 @@ class CountryDao {
   Future<Database> get _db async => await AppDatabase.instance.database;
 
   Future insertOne(Country country) async {
-    final finder = Finder(filter: Filter.equals('id', country.id));
     await _countryFolder.add(await _db, country.toJson());
   }
 

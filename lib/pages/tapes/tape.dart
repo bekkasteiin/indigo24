@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indigo24/chat/ui/new_chat/chat_pages/chat_info.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -123,40 +124,59 @@ class _TapePageState extends State<TapePage> {
                               ),
                               SizedBox(height: 10),
                               Container(
-                                height: 100,
+                                height: 75,
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemCount: _actualList.length,
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
-                                    return Column(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(25.0),
-                                          child: CachedNetworkImage(
-                                            height: 50,
-                                            width: 50,
-                                            imageUrl: avatarUrl +
-                                                _actualList[index]['avatar'],
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ChatProfileInfo(
+                                              chatType: 0,
+                                              chatName: _actualList[index]
+                                                  ['name'],
+                                              chatAvatar: _actualList[index]
+                                                  ['avatar'],
+                                              userId: _actualList[index]
+                                                  ['customerID'],
+                                            ),
                                           ),
-                                        ),
-                                        Container(
-                                          width: 70,
-                                          child: Center(
-                                            child: Text(
-                                              _actualList[index]['name']
-                                                  .toString(),
-                                              textAlign: TextAlign.center,
-                                              maxLines: 2,
-                                              style: TextStyle(
-                                                color: blackPurpleColor,
-                                                fontWeight: FontWeight.w500,
+                                        );
+                                      },
+                                      child: Column(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(25.0),
+                                            child: CachedNetworkImage(
+                                              height: 35,
+                                              width: 35,
+                                              imageUrl: avatarUrl +
+                                                  _actualList[index]['avatar'],
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 70,
+                                            child: Center(
+                                              child: Text(
+                                                _actualList[index]['name']
+                                                    .toString(),
+                                                textAlign: TextAlign.center,
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                  color: blackPurpleColor,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     );
                                   },
                                 ),
@@ -192,11 +212,36 @@ class _TapePageState extends State<TapePage> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: <Widget>[
-                                                CircleAvatar(
-                                                  radius: 15.0,
-                                                  backgroundImage: NetworkImage(
-                                                      '$avatarUrl${_comments[index]['avatar']}'),
-                                                  backgroundColor: Colors.grey,
+                                                InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ChatProfileInfo(
+                                                          chatType: 0,
+                                                          chatName:
+                                                              _comments[index]
+                                                                  ['name'],
+                                                          chatAvatar:
+                                                              _comments[index]
+                                                                  ['avatar'],
+                                                          userId: _comments[
+                                                                  index]
+                                                              ['customerID'],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: CircleAvatar(
+                                                    radius: 15.0,
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      '$avatarUrl${_comments[index]['avatar']}',
+                                                    ),
+                                                    backgroundColor:
+                                                        Colors.grey,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -213,10 +258,10 @@ class _TapePageState extends State<TapePage> {
                                                       text:
                                                           '${_comments[index]['name']} ',
                                                       style: TextStyle(
-                                                          color:
-                                                              blackPurpleColor,
-                                                          fontWeight:
-                                                              FontWeight.w600),
+                                                        color: blackPurpleColor,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
                                                       children: <TextSpan>[
                                                         TextSpan(
                                                           text:

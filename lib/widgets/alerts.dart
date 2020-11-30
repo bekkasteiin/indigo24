@@ -34,7 +34,6 @@ class CustomDialog extends StatelessWidget {
     return Stack(
       children: <Widget>[
         Container(
-          margin: EdgeInsets.only(top: avatarRadius),
           decoration: new BoxDecoration(
             color: Colors.white,
             shape: BoxShape.rectangle,
