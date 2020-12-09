@@ -231,7 +231,10 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                   child: ProgressButton(
                     defaultWidget: Text(
                       "${localization.next}",
-                      style: TextStyle(color: Colors.white, fontSize: 22),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                      ),
                     ),
                     progressWidget: CircularProgressIndicator(),
                     borderRadius: 10.0,

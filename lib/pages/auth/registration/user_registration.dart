@@ -30,6 +30,45 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
   bool _obscureText2 = true;
   bool _confirm = false;
   var password;
+
+  List<Map<String, dynamic>> passwordValidation = [
+    {
+      'title': 'Пароль должен содержать не менее 8 символов.',
+      'regExp': r'^.{8,}$',
+      'valid': false,
+      'value': true,
+    },
+    {
+      'title': 'Пароль должен содержать не более 20 символов.',
+      'regExp': r'^.{1,20}$',
+      'valid': false,
+      'value': true,
+    },
+    {
+      'title': 'Пароль должен содержать минимум 1 заглавную букву.',
+      'regExp': r'[A-Z]{1}',
+      'valid': false,
+      'value': true,
+    },
+    {
+      'title': 'Пароль должен содержать минимум 1 цифру.',
+      'regExp': r'[0-9]{1}',
+      'valid': false,
+      'value': true,
+    },
+    {
+      'title': 'Пароль должен содержать минимум 1 специальный символ.',
+      'regExp': r'[!@#$%^&*(),.?":{}~|<>;=_~+-]',
+      'valid': false,
+      'value': true,
+    },
+    {
+      'title': 'Пароль НЕ должен содержать пробел.',
+      'regExp': r'\s',
+      'valid': false,
+      'value': false,
+    },
+  ];
   @override
   void initState() {
     super.initState();
@@ -206,9 +245,10 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                           Text(
                             '$lastnameError',
                             style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10),
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -224,9 +264,13 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             children: <Widget>[
                               IndigoSquare(),
                               SizedBox(width: 10),
-                              Text("${localization.email}",
-                                  style: TextStyle(
-                                      color: primaryColor, fontSize: 16)),
+                              Text(
+                                "${localization.email}",
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontSize: 16,
+                                ),
+                              ),
                               SizedBox(
                                 width: 20,
                               ),
@@ -250,9 +294,10 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                           Text(
                             '$emailError',
                             style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10),
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -268,9 +313,13 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             children: <Widget>[
                               IndigoSquare(),
                               SizedBox(width: 10),
-                              Text("${localization.password}",
-                                  style: TextStyle(
-                                      color: primaryColor, fontSize: 16)),
+                              Text(
+                                "${localization.password}",
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontSize: 16,
+                                ),
+                              ),
                               SizedBox(
                                 width: 20,
                               ),
@@ -290,6 +339,32 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                           TextField(
                             controller: _passwordController,
                             obscureText: _obscureText,
+                            onChanged: (value) {
+                              for (var validation in passwordValidation) {
+                                RegExp reg = RegExp(validation['regExp']);
+                                if (validation['value']) {
+                                  if (reg.hasMatch(_passwordController.text)) {
+                                    setState(() {
+                                      validation['valid'] = true;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      validation['valid'] = false;
+                                    });
+                                  }
+                                } else {
+                                  if (!reg.hasMatch(_passwordController.text)) {
+                                    setState(() {
+                                      validation['valid'] = true;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      validation['valid'] = false;
+                                    });
+                                  }
+                                }
+                              }
+                            },
                             decoration: InputDecoration(
                               hintText: '•••••••',
                               suffixIcon: GestureDetector(
@@ -309,12 +384,23 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                               ),
                             ),
                           ),
+                          for (var validation in passwordValidation)
+                            if (validation['valid'] == false)
+                              Text(
+                                validation['title'],
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 10,
+                                ),
+                              ),
                           Text(
                             '$firstPasswordError',
                             style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10),
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -328,9 +414,15 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("${localization.password}",
-                                  style: TextStyle(
-                                      color: primaryColor, fontSize: 16)),
+                              IndigoSquare(),
+                              SizedBox(width: 10),
+                              Text(
+                                "${localization.password}",
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontSize: 16,
+                                ),
+                              ),
                               SizedBox(
                                 width: 20,
                               ),
@@ -372,9 +464,10 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                           Text(
                             '$secondPasswordError',
                             style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10),
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -464,49 +557,76 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                       firstPasswordError = '';
                                       emailError = '';
                                     });
-                                    await _api
-                                        .register(
-                                            "${widget.phone}",
-                                            "${_nameController.text + ' ' + _lastNameController.text}",
-                                            "$password",
-                                            "${_emailController.text}")
-                                        .then((registerResponse) {
-                                      if (registerResponse['success'] == true) {
-                                        Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        LoginPage()),
-                                                (r) => false);
-                                        setState(() {
-                                          firstPasswordError = '';
-                                          emailError = '';
-                                        });
-                                      } else if (registerResponse['message'] !=
-                                          null) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return CustomDialog(
-                                              description:
-                                                  "${registerResponse['message']}",
-                                              yesCallBack: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            );
-                                          },
-                                        );
+
+                                    bool ready = true;
+                                    for (var validation in passwordValidation) {
+                                      RegExp regExp =
+                                          RegExp(validation['regExp']);
+                                      if (validation['value']) {
+                                        if (regExp.hasMatch(
+                                            _passwordController.text)) {
+                                          validation['valid'] = true;
+                                        } else {
+                                          ready = false;
+                                        }
                                       } else {
-                                        setState(() {
-                                          firstPasswordError =
-                                              '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
-                                          secondPasswordError =
-                                              '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
-                                          emailError =
-                                              '${registerResponse['message']['email'] == null ? '' : registerResponse['message']['email']}';
-                                        });
+                                        if (!regExp.hasMatch(
+                                            _passwordController.text)) {
+                                        } else {
+                                          validation['valid'] = true;
+                                        }
                                       }
-                                    });
+                                    }
+
+                                    if (ready) {
+                                      await _api
+                                          .register(
+                                              "${widget.phone}",
+                                              "${_nameController.text + ' ' + _lastNameController.text}",
+                                              "$password",
+                                              "${_emailController.text}")
+                                          .then((registerResponse) {
+                                        if (registerResponse['success'] ==
+                                            true) {
+                                          Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                            MaterialPageRoute(
+                                              builder: (context) => LoginPage(),
+                                            ),
+                                            (r) => false,
+                                          );
+
+                                          setState(() {
+                                            firstPasswordError = '';
+                                            emailError = '';
+                                          });
+                                        } else if (registerResponse[
+                                                'message'] !=
+                                            null) {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return CustomDialog(
+                                                description:
+                                                    "${registerResponse['message']}",
+                                                yesCallBack: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              );
+                                            },
+                                          );
+                                        } else {
+                                          setState(() {
+                                            firstPasswordError =
+                                                '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                            secondPasswordError =
+                                                '${registerResponse['message']['password'] == null ? '' : registerResponse['message']['password']}';
+                                            emailError =
+                                                '${registerResponse['message']['email'] == null ? '' : registerResponse['message']['email']}';
+                                          });
+                                        }
+                                      });
+                                    } else {}
                                   } else {
                                     setState(() {
                                       firstPasswordError =
@@ -519,7 +639,6 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                   setState(() {
                                     globalError =
                                         '${localization.fillAllFields}';
-                                    // Заполните все нужные поля';
                                   });
                                 }
                               },

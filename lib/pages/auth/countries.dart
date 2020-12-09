@@ -5,7 +5,9 @@ import 'package:indigo24/widgets/indigo_appbar_widget.dart';
 
 class Countries extends StatelessWidget {
   final countries;
+
   Countries(this.countries);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +37,7 @@ class Countries extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        '${countries[index].title}',
+                        '${countries[index].myLike}',
                         style: TextStyle(
                           color: blackPurpleColor,
                           fontWeight: FontWeight.w400,

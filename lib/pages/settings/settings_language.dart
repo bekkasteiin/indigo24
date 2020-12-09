@@ -46,14 +46,18 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                     onTap: () {
                       localization
                           .setLanguage(localization.languages[index]['code']);
-                      setState(() {
-                        localization.currentLanguage =
-                            '${localization.languages[index]['title']}';
-                      });
+                      setState(
+                        () {
+                          localization.currentLanguage =
+                              '${localization.languages[index]['title']}';
+                        },
+                      );
                     },
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 5,
+                      ),
                       height: 40,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

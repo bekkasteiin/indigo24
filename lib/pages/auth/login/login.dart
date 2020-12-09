@@ -106,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       countries = list;
       country = countries[countryId];
+      _selectedCountry = country;
       length = country.length;
     });
   }
@@ -318,20 +319,29 @@ class _LoginPageState extends State<LoginPage> {
                               passwordError = '';
                             });
                           }
-                          if (loginController.text.isEmpty ||
-                              '$phonePrefix${loginController.text}'.length !=
-                                  length) {
-                            setState(() {
-                              loginError = '${localization.enterPhone}';
-                            });
-                          } else {
+                          int prefixLength =
+                              _selectedCountry.phonePrefix.length;
+
+                          int controllerLength = prefixLength +
+                              loginController.text.replaceAll(" ", '').length;
+
+                          int minLength = _selectedCountry.min;
+                          int maxLength = _selectedCountry.max;
+
+                          if (controllerLength >= minLength &&
+                              controllerLength <= maxLength) {
                             setState(() {
                               loginError = '';
                             });
+                          } else {
+                            print('else');
+                            setState(() {
+                              loginError = '${localization.enterPhone}';
+                            });
                           }
                           if (passwordController.text.isNotEmpty &&
-                              '$phonePrefix${loginController.text}'.length ==
-                                  length) {
+                              controllerLength >= minLength &&
+                              controllerLength <= maxLength) {
                             setState(() {
                               loginError = '';
                               passwordError = '';
@@ -373,7 +383,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  var _selectedCountry;
+  Country _selectedCountry;
 
   Future<void> changeCountry() async {
     _selectedCountry = await Navigator.push(

@@ -31,7 +31,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     userId: 1,
     avatar: '1',
     read: true,
-    username: ';hellol',
+    username: 'username',
     text: localization.hi,
     type: 1,
     time: 100,
@@ -48,7 +48,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     userId: 1,
     avatar: '1',
     read: true,
-    username: ';hellol',
+    username: 'username',
     text: localization.hello,
     type: 1,
     time: 100,
@@ -58,6 +58,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     edited: false,
     moneyData: null,
   );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

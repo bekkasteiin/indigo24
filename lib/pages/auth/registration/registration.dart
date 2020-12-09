@@ -30,7 +30,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   TextEditingController loginController;
   TextEditingController passwordController;
   var countryId = 0;
-  var country;
+  Country country;
   var countries = new List<Country>();
   var smsCode = 0;
   List<DropdownMenuItem<String>> dropDownMenuItems;
@@ -91,7 +91,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
               Container(
                   decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: introBackgroundProvider, fit: BoxFit.cover),
+                  image: introBackgroundProvider,
+                  fit: BoxFit.cover,
+                ),
               )),
               _buildForeground()
             ],
@@ -119,7 +121,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
     if (_selectedCountry != null)
       setState(() {
-        _currentCountry = _selectedCountry.title;
+        _currentCountry = _selectedCountry.myLike;
         _hintText = _selectedCountry.mask;
         loginFormatter = MaskTextInputFormatter(
             mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});
@@ -285,7 +287,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               var temp = loginController.text
                                   .replaceAll(' ', '')
                                   .replaceAll('+', '');
-                              if (temp.length == length) {
+                              if (temp.length >= _selectedCountry.min ||
+                                  temp.length < _selectedCountry.max) {
+                                setState(
+                                  () {
+                                    loginError = '';
+                                  },
+                                );
                                 await api
                                     .checkRegistration(temp)
                                     .then((checkPhoneResult) async {
@@ -318,31 +326,40 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                       }
                                     });
                                   } else {
-                                    setState(() {
-                                      loginError =
-                                          '${checkPhoneResult['message']}';
-                                    });
+                                    setState(
+                                      () {
+                                        loginError =
+                                            '${checkPhoneResult['message']}';
+                                      },
+                                    );
                                   }
                                 });
                               } else {
-                                setState(() {
-                                  loginError = '${localization.enterPhone}';
-                                });
+                                setState(
+                                  () {
+                                    loginError = '${localization.enterPhone}';
+                                  },
+                                );
                               }
                             } else {
-                              setState(() {
-                                loginError = '${localization.enterPhone}';
-                              });
+                              setState(
+                                () {
+                                  loginError = '${localization.enterPhone}';
+                                },
+                              );
                             }
                           } else {
-                            setState(() {
-                              if (timerColor == primaryColor) {
-                                timerColor = redColor;
-                                Future.delayed(const Duration(seconds: 2), () {
-                                  timerColor = primaryColor;
-                                });
-                              }
-                            });
+                            setState(
+                              () {
+                                if (timerColor == primaryColor) {
+                                  timerColor = redColor;
+                                  Future.delayed(const Duration(seconds: 2),
+                                      () {
+                                    timerColor = primaryColor;
+                                  });
+                                }
+                              },
+                            );
                           }
                         },
                       ),

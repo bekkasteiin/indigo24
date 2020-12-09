@@ -163,6 +163,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
                                     dynamic categoryId = category['ID'];
                                     dynamic locationType =
                                         category['location_type'];
+
                                     return Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: ServiceWidget(

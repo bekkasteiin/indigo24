@@ -15,13 +15,6 @@ class Api {
     receiveTimeout: 3000,
   );
 
-  jsonConcat(o1, o2) {
-    for (var key in o2) {
-      o1[key] = o2[key];
-    }
-    return o1;
-  }
-
   Dio _dio = Dio(_options);
   static const _sendSmsToken = '2MSldk_7!FUh3zB18XoEfIe#nY69@0tcP5Q4';
   static const _registrationToken = 'BGkA2as4#h_J@5txId3fEq6e!F80UMj197ZC';
@@ -41,6 +34,7 @@ class Api {
     Response response;
     try {
       response = await _dio.post(path, data: data);
+      print(response.data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -166,7 +160,6 @@ class Api {
     };
     return _postRequest('api/v2.1/get/profile', data);
   }
-
   // getNews() async {
   // }
 

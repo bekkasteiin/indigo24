@@ -28,6 +28,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
   var _selectedCountry;
 
   CountryDao _countryDao = CountryDao();
+
   _getCountries() async {
     var list = await _countryDao.getAll();
     setState(() {
@@ -71,7 +72,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
               ),
             ),
           ),
-          _buildForeground()
+          _buildForeground(),
         ],
       ),
     );
@@ -84,10 +85,12 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
     );
 
     if (_selectedCountry != null)
-      setState(() {
-        _currentCountry = _selectedCountry.title;
-        _phonePrefix = _selectedCountry.phonePrefix;
-      });
+      setState(
+        () {
+          _currentCountry = _selectedCountry.myLike;
+          _phonePrefix = _selectedCountry.phonePrefix;
+        },
+      );
   }
 
   Widget _buildForeground() {
@@ -100,15 +103,9 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
             Center(
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
-                // height: MediaQuery.of(context).size.height*0.4,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(5.0),
-                    topLeft: Radius.circular(5.0),
-                    bottomRight: Radius.circular(5.0),
-                    bottomLeft: Radius.circular(5.0),
-                  ),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: Column(
                   children: <Widget>[
@@ -122,10 +119,13 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
-                                  Text('$_currentCountry ',
-                                      style: TextStyle(
-                                          color: blackPurpleColor,
-                                          fontSize: 18)),
+                                  Text(
+                                    '$_currentCountry ',
+                                    style: TextStyle(
+                                      color: blackPurpleColor,
+                                      fontSize: 18,
+                                    ),
+                                  ),
                                   SizedBox(
                                     width: 10,
                                   ),
@@ -152,9 +152,13 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              Text("${localization.phoneNumber}",
-                                  style: TextStyle(
-                                      color: blackPurpleColor, fontSize: 16))
+                              Text(
+                                "${localization.phoneNumber}",
+                                style: TextStyle(
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
+                                ),
+                              )
                             ],
                           ),
                           Stack(
@@ -163,13 +167,17 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                               Text(
                                 '+$_phonePrefix',
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                ),
                               ),
                               TextField(
                                 controller: _loginController,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                ),
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
@@ -188,11 +196,14 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
-                        defaultWidget: Text("${localization.next}",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w300)),
+                        defaultWidget: Text(
+                          "${localization.next}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
                         progressWidget: CircularProgressIndicator(),
                         borderRadius: 10.0,
                         color: primaryColor,

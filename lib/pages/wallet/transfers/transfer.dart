@@ -492,13 +492,15 @@ class _TransferPageState extends State<TransferPage> {
   Container mainPaymentsDetailMobile() {
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: 170,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Expanded(
+                flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -544,62 +546,61 @@ class _TransferPageState extends State<TransferPage> {
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  InkWell(
-                    child: CircleAvatar(
-                      radius: 20,
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: toAvatar == ''
-                              ? "${avatarUrl}noAvatar.png"
-                              : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}',
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    InkWell(
+                      child: CircleAvatar(
+                        radius: 20,
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: toAvatar == ''
+                                ? "${avatarUrl}noAvatar.png"
+                                : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}',
+                          ),
                         ),
                       ),
+                      onTap: () async {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+                        if (!currentFocus.hasPrimaryFocus) {
+                          currentFocus.unfocus();
+                        }
+                        dynamic returnData = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransferContactsDialogPage(),
+                          ),
+                        );
+                        if (returnData != null) {
+                          api
+                              .checkPhoneForSendMoney('${returnData.phone}')
+                              .then((r) {
+                            if (r['success'].toString() == 'true') {
+                              setState(() {
+                                toName = r['name'];
+                                toAvatar = r['avatar'];
+                              });
+                            } else {
+                              setState(() {
+                                // toName = '${localization.userNotFound}';
+                                toName = '${r['message']}';
+                                toAvatar = '';
+                              });
+                            }
+                          });
+                          receiverController.text = returnData.phone;
+                        }
+                      },
                     ),
-                    onTap: () async {
-                      FocusScopeNode currentFocus = FocusScope.of(context);
-                      if (!currentFocus.hasPrimaryFocus) {
-                        currentFocus.unfocus();
-                      }
-                      dynamic returnData = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TransferContactsDialogPage(),
-                        ),
-                      );
-                      if (returnData != null) {
-                        api
-                            .checkPhoneForSendMoney('${returnData.phone}')
-                            .then((r) {
-                          if (r['success'].toString() == 'true') {
-                            setState(() {
-                              toName = r['name'];
-                              toAvatar = r['avatar'];
-                            });
-                          } else {
-                            setState(() {
-                              // toName = '${localization.userNotFound}';
-                              toName = '${r['message']}';
-                              toAvatar = '';
-                            });
-                          }
-                        });
-                        receiverController.text = returnData.phone;
-                      }
-                    },
-                  ),
-                  Container(
-                    width: size.width * 0.3,
-                    height: 20,
-                    alignment: Alignment.centerRight,
-                    child: Text(
+                    Text(
                       '$toName',
-                      maxLines: 4,
-                    ),
-                  )
-                ],
+                      textAlign: TextAlign.justify,
+                    )
+                  ],
+                ),
               ),
             ],
           ),

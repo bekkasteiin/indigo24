@@ -21,6 +21,7 @@ import 'widgets/alerts.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences _preferences = await SharedPreferences.getInstance();
+
   String _languageCode = _preferences.getString('languageCode');
   localization.setLanguage(_languageCode);
   String phone = _preferences.getString('phone');

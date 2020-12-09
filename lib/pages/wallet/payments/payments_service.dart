@@ -163,12 +163,16 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                         Container(
                                           height: 0.6,
                                           margin: EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                          color: Color(0xFFD1E1FF),
+                                            vertical: 10,
+                                            horizontal: 20,
+                                          ),
+                                          color: brightGreyColor,
                                         ),
                                         Container(
                                           margin: EdgeInsets.only(
-                                              left: 30, right: 10),
+                                            left: 30,
+                                            right: 10,
+                                          ),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -327,7 +331,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                   child: Text(
                                     '1 $_expectedCurrency = ${_exchangeRate.toStringAsFixed(2)} KZT',
                                     style: TextStyle(
-                                      color: Color(0xFF001D52),
+                                      color: blackPurpleColor,
                                     ),
                                   ),
                                 )
@@ -338,42 +342,26 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           Center(
                             child: Text(
                               '${localization.commission} ${_service['service']['commission']}%',
-                              style: TextStyle(
-                                color: Color(
-                                  0xFF001D52,
-                                ),
-                              ),
+                              style: TextStyle(color: blackPurpleColor),
                             ),
                           ),
                           Center(
                             child: Text(
                               '${localization.minAmount} ${_service['service']['min']} KZT',
-                              style: TextStyle(
-                                color: Color(
-                                  0xFF001D52,
-                                ),
-                              ),
+                              style: TextStyle(color: blackPurpleColor),
                             ),
                           ),
                           Center(
                             child: Text(
                               '${localization.maxAmount} ${_service['service']['max']} KZT',
-                              style: TextStyle(
-                                color: Color(
-                                  0xFF001D52,
-                                ),
-                              ),
+                              style: TextStyle(color: blackPurpleColor),
                             ),
                           ),
                           _service['service']['commission'].toString() != '0'
                               ? Center(
                                   child: Text(
                                     '${localization.commission} ${_service['service']['commission'] * _amount} KZT',
-                                    style: TextStyle(
-                                      color: Color(
-                                        0xFF001D52,
-                                      ),
-                                    ),
+                                    style: TextStyle(color: blackPurpleColor),
                                   ),
                                 )
                               : SizedBox(
@@ -615,8 +603,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               ),
             ),
           ),
-          color: Color(0xFFFFFFFF),
-          textColor: Color(0xFF001D52),
+          color: whiteColor,
+          textColor: blackPurpleColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               10.0,
@@ -646,7 +634,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                       '${widget.title}',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF001D52),
+                        color: blackPurpleColor,
                       ),
                     ),
                   ),

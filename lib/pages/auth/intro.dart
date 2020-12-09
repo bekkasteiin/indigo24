@@ -387,6 +387,8 @@ class _IntroPageState extends State<IntroPage> {
           Country country = Country(
             element['ID'],
             element['length'],
+            element['min'],
+            element['max'],
             element['title'],
             element['prefix'],
             element['code'],

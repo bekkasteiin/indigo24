@@ -130,7 +130,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
       ),
       trailing: Wrap(
         direction: Axis.vertical,
-        crossAxisAlignment: WrapCrossAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.end,
         alignment: WrapAlignment.center,
         children: <Widget>[
           Text(
@@ -143,12 +143,17 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           chat.unreadCount == 0
               ? Container()
               : Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  height: 20,
                   decoration: BoxDecoration(
-                      color: brightGreyColor4,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Text(
-                    "${chat.unreadCount}",
-                    style: TextStyle(color: Colors.white),
+                    color: brightGreyColor4,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "${chat.unreadCount}",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 )
         ],
@@ -174,7 +179,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
         if (messageDate.minute.toString().length == 1)
           minutes = '0${messageDate.minute}';
         if (diff.inDays == 0) {
-          return '${localization.today}\n$hours:$minutes';
+          return '$hours:$minutes';
         } else if (diff.inDays < 7) {
           int weekDay = messageUnixDate.weekday;
           return newIdentifyDay(weekDay) + '\n$hours:$minutes';

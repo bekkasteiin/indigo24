@@ -24,7 +24,6 @@ class _PaymentsRegionState extends State<PaymentsRegion> {
   @override
   void initState() {
     super.initState();
-
     _api = Api();
     _api.getCategory(widget.categoryId, widget.locationType).then((categories) {
       if (categories['message'] == 'Not authenticated' &&

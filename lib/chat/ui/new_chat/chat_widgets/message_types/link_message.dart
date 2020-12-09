@@ -64,7 +64,7 @@ class _LinkMessageWidgetState extends State<LinkMessageWidget> {
                 )),
           ),
           json != null
-              ? Text(json.title != null ? json.title : "",
+              ? Text(json.myLike != null ? json.myLike : "",
                   style: TextStyle(fontWeight: FontWeight.bold))
               : Container(),
           json != null

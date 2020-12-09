@@ -110,6 +110,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     final pickedFile = await picker.getImage(
       source: imageSource,
     );
+
     final dir = await getTemporaryDirectory();
 
     final targetPath = dir.absolute.path + "/temp.jpg";
@@ -119,38 +120,42 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         pickedFile.path,
         targetPath,
       );
+
       setState(() {
         _image = compressedImage;
       });
+
       if (_image != null) {
-        uploadAvatar(_image.path).then((r) async {
-          if (r['message'] == 'Not authenticated' &&
-              r['success'].toString() == 'false') {
-            logOut(context);
-            return r;
-          } else {
-            if (r["success"]) {
-              await SharedPreferencesHelper.setString(
-                  'avatar', '${r["fileName"]}');
-              setState(() {
-                user.avatar = r["fileName"];
-              });
+        uploadAvatar(_image.path).then(
+          (r) async {
+            if (r['message'] == 'Not authenticated' &&
+                r['success'].toString() == 'false') {
+              logOut(context);
+              return r;
             } else {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return CustomDialog(
-                    description: "${r["message"]}",
-                    yesCallBack: () {
-                      Navigator.of(context).pop();
-                    },
-                  );
-                },
-              );
+              if (r["success"]) {
+                await SharedPreferencesHelper.setString(
+                    'avatar', '${r["fileName"]}');
+                setState(() {
+                  user.avatar = r["fileName"];
+                });
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return CustomDialog(
+                      description: "${r["message"]}",
+                      yesCallBack: () {
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  },
+                );
+              }
+              return r;
             }
-            return r;
-          }
-        });
+          },
+        );
       }
     }
   }
@@ -195,6 +200,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       if (result['success'].toString() == 'true') {
                         user.name = _nameController.text;
                         user.city = _cityController.text;
+
                         SharedPreferencesHelper.setString(
                           'name',
                           _nameController.text,
@@ -342,16 +348,18 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                           center: Text(
                             percent,
                             style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 20.0),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20.0,
+                            ),
                           ),
                           footer: Text(
                             "Загрузка",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 17.0),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 17.0,
+                            ),
                           ),
                           circularStrokeCap: CircularStrokeCap.round,
                         ),

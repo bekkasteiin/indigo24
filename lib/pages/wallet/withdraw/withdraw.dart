@@ -111,7 +111,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                       height: 0.6,
                                       margin: EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
-                                      color: Color(0xFFD1E1FF),
+                                      color: brightGreyColor,
                                     ),
                                     Container(
                                       margin:
@@ -334,8 +334,8 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                 ),
                               ),
                             ),
-                            color: Color(0xFFFFFFFF),
-                            textColor: Color(0xFF001D52),
+                            color: whiteColor,
+                            textColor: blackPurpleColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 10.0,

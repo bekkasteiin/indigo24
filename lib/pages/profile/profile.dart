@@ -421,10 +421,10 @@ class _UserProfilePageState extends State<UserProfilePage>
     Size screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        body: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Column(
+        body: SingleChildScrollView(
+          child: Stack(
+            children: <Widget>[
+              Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Column(
@@ -474,10 +474,11 @@ class _UserProfilePageState extends State<UserProfilePage>
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 10.0,
-                                  spreadRadius: -2,
-                                  offset: Offset(0.0, 0.0))
+                                color: Colors.black26,
+                                blurRadius: 10.0,
+                                spreadRadius: -2,
+                                offset: Offset(0.0, 0.0),
+                              )
                             ],
                           ),
                           child: ButtonTheme(
@@ -606,144 +607,147 @@ class _UserProfilePageState extends State<UserProfilePage>
                   ),
                 ],
               ),
-            ),
-            Container(
-              height: 120,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/cover.png'),
-                  fit: BoxFit.cover,
+              Container(
+                height: 120,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/cover.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            Column(
-              children: <Widget>[
-                SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                          onTap: () async {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SettingsMainPage(),
-                              ),
-                            ).whenComplete(
-                              () => setState(() {}),
-                            );
-                          },
-                          child: Ink(
-                            child: Image.asset(
-                              "assets/images/settings.png",
-                              width: 35,
-                            ),
-                          )),
-                    ),
-                    SizedBox(width: 15),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(width: 10),
-                          _buildProfileImage(),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.only(top: 15),
-                                  child: _buildFullName(),
+              Column(
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                            onTap: () async {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SettingsMainPage(),
                                 ),
-                                SizedBox(height: 5),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Text(
-                                    "${user.identified ? localization.identified : localization.notIdentified}",
-                                    style: TextStyle(
-                                      color: whiteColor,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: GestureDetector(
+                              ).whenComplete(
+                                () => setState(() {}),
+                              );
+                            },
+                            child: Ink(
                               child: Image.asset(
-                                'assets/images/pencil.png',
-                                width: 20,
-                                height: 20,
+                                "assets/images/settings.png",
+                                width: 35,
                               ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileSettingsPage(),
+                            )),
+                      ),
+                      SizedBox(width: 15),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            SizedBox(width: 10),
+                            _buildProfileImage(),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 15),
+                                    child: _buildFullName(),
                                   ),
-                                ).whenComplete(() {
-                                  setState(() {});
-                                });
-                              },
+                                  SizedBox(height: 5),
+                                  InkWell(
+                                    onTap: () {},
+                                    child: Text(
+                                      "${user.identified ? localization.identified : localization.notIdentified}",
+                                      style: TextStyle(
+                                        color: whiteColor,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: GestureDetector(
+                                child: Image.asset(
+                                  'assets/images/pencil.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProfileSettingsPage(),
+                                    ),
+                                  ).whenComplete(() {
+                                    setState(() {});
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              isUploading
+                  ? Container(
+                      width: screenSize.width,
+                      height: screenSize.height,
+                      color: darkGreyColor3.withOpacity(0.6),
+                      child: Center(
+                        child: CircularPercentIndicator(
+                          radius: 120.0,
+                          lineWidth: 13.0,
+                          animation: false,
+                          percent: uploadPercent,
+                          progressColor: whiteColor,
+                          backgroundColor: whiteColor,
+                          center: Text(
+                            percent,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20.0,
                             ),
                           ),
-                          SizedBox(height: 20),
-                        ],
+                          footer: Text(
+                            "Загрузка",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 17.0,
+                            ),
+                          ),
+                          circularStrokeCap: CircularStrokeCap.round,
+                        ),
                       ),
                     )
-                  ],
-                ),
-              ],
-            ),
-            isUploading
-                ? Container(
-                    width: screenSize.width,
-                    height: screenSize.height,
-                    color: darkGreyColor3.withOpacity(0.6),
-                    child: Center(
-                      child: CircularPercentIndicator(
-                        radius: 120.0,
-                        lineWidth: 13.0,
-                        animation: false,
-                        percent: uploadPercent,
-                        progressColor: whiteColor,
-                        backgroundColor: whiteColor,
-                        center: Text(
-                          percent,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 20.0),
-                        ),
-                        footer: Text(
-                          "Загрузка",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 17.0),
-                        ),
-                        circularStrokeCap: CircularStrokeCap.round,
-                      ),
-                    ),
-                  )
-                : Container()
-          ],
+                  : Container()
+            ],
+          ),
         ),
       ),
     );
