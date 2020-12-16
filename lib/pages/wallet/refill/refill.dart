@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:indigo24/pages/wallet/refill/refill_web.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
-import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/services/user.dart' as user;
 
 class RefillPage extends StatefulWidget {
@@ -47,7 +47,6 @@ class _RefillPageState extends State<RefillPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -65,87 +64,89 @@ class _RefillPageState extends State<RefillPage> {
                 SingleChildScrollView(
                   child: Column(
                     children: [
-                      Stack(
-                        children: <Widget>[
-                          Image.asset(
-                            'assets/images/wallet_header.png',
-                            width: size.width,
-                            fit: BoxFit.fitWidth,
+                      Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image:
+                                AssetImage("assets/images/wallet_header.png"),
+                            fit: BoxFit.cover,
                           ),
-                          Column(
-                            children: <Widget>[
-                              IndigoAppBarWidget(
-                                centerTitle: true,
-                                title: Text(
-                                  localization.refill,
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                leading: IconButton(
-                                  icon: Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/backWhite.png',
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                backgroundColor: Colors.transparent,
-                                elevation: 0,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(left: 0, right: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Container(
-                                      height: 0.6,
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      color: brightGreyColor,
-                                    ),
-                                    Container(
-                                      margin:
-                                          EdgeInsets.only(left: 30, right: 10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          SizedBox(height: 15),
-                                          Text(
-                                            '${localization.walletBalance}',
-                                            style: fS14(c: 'FFFFFF'),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '${user.balance}',
-                                                style: fS18(c: 'FFFFFF'),
-                                              ),
-                                              Image(
-                                                image: AssetImage(
-                                                    "assets/images/tenge.png"),
-                                                height: 12,
-                                                width: 12,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            IndigoAppBarWidget(
+                              centerTitle: true,
+                              title: Text(
+                                localization.refill,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
+                              leading: IconButton(
+                                icon: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Image(
+                                    image: AssetImage(
+                                      'assets/images/backWhite.png',
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(left: 0, right: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    height: 0.6,
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    color: brightGreyColor,
+                                  ),
+                                  Container(
+                                    margin:
+                                        EdgeInsets.only(left: 30, right: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        SizedBox(height: 15),
+                                        Text(
+                                          '${localization.walletBalance}',
+                                          style: fS14(c: 'FFFFFF'),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '${user.balance}',
+                                              style: fS18(c: 'FFFFFF'),
+                                            ),
+                                            Image(
+                                              image: AssetImage(
+                                                "assets/images/tenge.png",
+                                              ),
+                                              height: 12,
+                                              width: 12,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 15),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Container(
                         color: Colors.white,
@@ -285,7 +286,7 @@ class _RefillPageState extends State<RefillPage> {
                                 child: Text(
                                   '${localization.refill}',
                                   style: TextStyle(
-                                      color: Color(0xFF0543B8),
+                                      color: primaryColor,
                                       fontWeight: FontWeight.w800),
                                 ),
                               ),

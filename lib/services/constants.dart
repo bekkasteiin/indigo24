@@ -1,5 +1,5 @@
-//  String domen = 'com';
-String domen = 'xyz';
+String domen = 'com';
+// String domen = 'xyz';
 
 String avatarUrl = domen == 'com'
     ? 'https://media.indigo24.com/avatars/'

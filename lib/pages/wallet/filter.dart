@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
 class HistoryFiletPage extends StatefulWidget {
   @override
@@ -30,8 +30,16 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.all(16),
-            child: Text('${localization.showOperations}'),
+            margin: EdgeInsets.symmetric(
+              vertical: 6,
+              horizontal: 16,
+            ),
+            child: Text(
+              '${localization.showOperations}',
+              style: TextStyle(
+                color: greyColor,
+              ),
+            ),
           ),
           Flexible(
             child: ListView.separated(
@@ -44,7 +52,12 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
                 return Container(
                   color: whiteColor,
                   child: ListTile(
-                    title: Text(localization.filters[index]['text']),
+                    title: Text(
+                      localization.filters[index]['text'],
+                      style: TextStyle(
+                        color: greyColor,
+                      ),
+                    ),
                     selected: _selectedIndex == index,
                     trailing: Container(
                       height: 25,
@@ -75,7 +88,7 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
                 );
               },
               separatorBuilder: (BuildContext context, int index) => Container(
-                height: 1,
+                height: 0.3,
                 color: blackPurpleColor,
               ),
             ),

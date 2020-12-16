@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/widgets/indigo_search_widget.dart';
-import '../../../tabs.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
+import 'package:indigo24/pages/tabs/tabs.dart';
 
 class TransferContactsDialogPage extends StatefulWidget {
   @override

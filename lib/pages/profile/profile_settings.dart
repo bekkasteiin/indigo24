@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -49,60 +49,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   Response response;
   ProgressBar sendingMsgProgressBar;
-  BaseOptions options = BaseOptions(
-    baseUrl: "$baseUrl",
-    connectTimeout: 5000,
-    receiveTimeout: 3000,
-  );
 
-  Dio dio;
-  var percent = "0 %";
   double uploadPercent = 0.0;
   bool isUploading = false;
-
-  uploadAvatar(_path) async {
-    sendingMsgProgressBar = ProgressBar();
-    dio = new Dio(options);
-
-    try {
-      FormData formData = FormData.fromMap({
-        "customerID": "${user.id}",
-        "unique": "${user.unique}",
-        "file": await MultipartFile.fromFile(_path),
-      });
-
-      response = await dio.post(
-        "api/v2.1/avatar/upload",
-        data: formData,
-        onSendProgress: (int sent, int total) {
-          String p = (sent / total * 100).toStringAsFixed(2);
-
-          setState(() {
-            isUploading = true;
-            uploadPercent = sent / total;
-            percent = "$p %";
-          });
-        },
-        onReceiveProgress: (count, total) {
-          setState(() {
-            isUploading = false;
-            uploadPercent = 0.0;
-            percent = "0 %";
-          });
-        },
-      );
-      print("Getting response from avatar upload ${response.data}");
-      return response.data;
-    } on DioError catch (e) {
-      if (e.response != null) {
-        print(e.response);
-        print(e.response.statusCode);
-      } else {
-        print(e.request);
-        print(e.message);
-      }
-    }
-  }
 
   File _image;
 
@@ -126,7 +75,21 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       });
 
       if (_image != null) {
-        uploadAvatar(_image.path).then(
+        _api.uploadAvatar(
+          _image.path,
+          (int sent, int total) {
+            setState(() {
+              isUploading = true;
+              uploadPercent = sent / total;
+            });
+          },
+          (count, total) {
+            setState(() {
+              isUploading = false;
+              uploadPercent = 0.0;
+            });
+          },
+        ).then(
           (r) async {
             if (r['message'] == 'Not authenticated' &&
                 r['success'].toString() == 'false') {
@@ -282,7 +245,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           width: 30),
                                       SizedBox(width: 10),
                                       Text(
-                                          '${localization.photo} ${localization.camera.toLowerCase()}'),
+                                        '${localization.photo} ${localization.camera.toLowerCase()}',
+                                        style: TextStyle(
+                                          color: blackPurpleColor,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -302,7 +269,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                       ),
                                       SizedBox(width: 10),
                                       Text(
-                                          '${localization.photo} ${localization.gallery.toLowerCase()}'),
+                                        '${localization.photo} ${localization.gallery.toLowerCase()}',
+                                        style: TextStyle(
+                                          color: blackPurpleColor,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -346,7 +317,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                           progressColor: whiteColor,
                           backgroundColor: whiteColor,
                           center: Text(
-                            percent,
+                            (uploadPercent * 100).toStringAsFixed(2),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -389,14 +360,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(55),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 6,
-                    spreadRadius: -5,
-                    offset: Offset(0.0, 6.0),
-                  )
-                ],
+                boxShadow: [],
               ),
               child: TextFormField(
                 readOnly: readyOnly,
@@ -410,22 +374,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   LengthLimitingTextInputFormatter(100),
                 ],
                 decoration: InputDecoration(
-                  isDense: true,
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: const BorderRadius.all(
-                      const Radius.circular(20.0),
-                    ),
-                  ),
                   contentPadding: EdgeInsets.only(
-                    left: 15,
                     bottom: 10,
                     top: 10,
                     right: 15,
                   ),
                   labelText: text,
-                  labelStyle: TextStyle(fontSize: 18, color: blackPurpleColor),
+                  labelStyle: TextStyle(fontSize: 18, color: greyColor),
                   hintStyle: TextStyle(
                     color: darkPrimaryColor,
                   ),

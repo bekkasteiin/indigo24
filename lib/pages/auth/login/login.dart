@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:hive/hive.dart';
-import 'package:indigo24/chat/ui/new_chat/chat_models/chat_model.dart';
-import 'package:indigo24/chat/ui/new_chat/chat_models/hive_names.dart';
-import 'package:indigo24/chat/ui/new_chat/chat_models/messages_model.dart';
 import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/pages/auth/restore_password.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
+import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
+import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
-import 'package:indigo24/widgets/indigo_square.dart';
-import '../../../tabs.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_auth_title.dart';
+import 'package:indigo24/pages/tabs/tabs.dart';
 import '../countries.dart';
 
 class LoginPage extends StatefulWidget {
@@ -144,14 +144,14 @@ class _LoginPageState extends State<LoginPage> {
                                   Text(
                                     '$_currentCountry',
                                     style: TextStyle(
-                                      color: blackPurpleColor,
-                                      fontSize: 18,
+                                      color: greyColor,
+                                      fontSize: 16,
                                     ),
                                   ),
                                   Container(
                                     child: Icon(
                                       Icons.navigate_next,
-                                      color: blackPurpleColor,
+                                      color: greyColor,
                                     ),
                                   ),
                                 ],
@@ -167,26 +167,16 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              IndigoSquare(),
-                              SizedBox(width: 10),
-                              Text(
-                                "${localization.phoneNumber}",
-                                style: TextStyle(
-                                  color: blackPurpleColor,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ],
-                          ),
+                          IndigoAuthTitle(title: localization.phoneNumber),
                           Stack(
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
                               Text(
                                 '+$phonePrefix',
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
+                                ),
                               ),
                               TextField(
                                 controller: loginController,
@@ -201,8 +191,8 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
                                 ),
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,
@@ -225,24 +215,20 @@ class _LoginPageState extends State<LoginPage> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           _space(30),
-                          Row(
-                            children: <Widget>[
-                              IndigoSquare(),
-                              SizedBox(width: 10),
-                              Text(
-                                "${localization.password}",
-                                style: TextStyle(
-                                  color: blackPurpleColor,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ],
-                          ),
+                          IndigoAuthTitle(title: localization.password),
                           TextField(
                             controller: passwordController,
                             obscureText: _obscureText,
+                            style: TextStyle(
+                              color: blackPurpleColor,
+                              fontSize: 16,
+                            ),
                             decoration: InputDecoration(
-                              hintText: '•••••••',
+                              hintText: '********',
+                              hintStyle: TextStyle(
+                                color: blackPurpleColor,
+                                fontSize: 16,
+                              ),
                               suffixIcon: GestureDetector(
                                 onTap: () {
                                   setState(() {
@@ -279,10 +265,11 @@ class _LoginPageState extends State<LoginPage> {
                     _space(15),
                     FlatButton(
                       child: Text(
-                        '${localization.forgotPassword}',
+                        '${localization.forgotPassword}?',
                         style: TextStyle(
-                          color: darkGreyColor,
+                          color: greyColor,
                           decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.w300,
                         ),
                       ),
                       onPressed: () {

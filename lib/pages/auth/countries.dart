@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
 class Countries extends StatelessWidget {
-  final countries;
+  final List<Country> countries;
 
   Countries(this.countries);
 
@@ -37,7 +38,7 @@ class Countries extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        '${countries[index].myLike}',
+                        '${countries[index].code}'.toUpperCase(),
                         style: TextStyle(
                           color: blackPurpleColor,
                           fontWeight: FontWeight.w400,

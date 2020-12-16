@@ -6,16 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer_draggrable.dart';
-import 'package:indigo24/services/api.dart';
-import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/services/api/http/api.dart';
+import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
-import 'package:indigo24/widgets/alerts.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
-import 'package:indigo24/widgets/pin_code.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/pin/pin_code.dart';
 
 class TransferPage extends StatefulWidget {
   final phone;
@@ -51,6 +51,7 @@ class _TransferPageState extends State<TransferPage> {
   bool boolForPreloader = false;
   Color phoneColor;
   Color sumColor;
+
   @override
   void initState() {
     phoneColor = blackColor;
@@ -104,15 +105,18 @@ class _TransferPageState extends State<TransferPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        Stack(
-                          children: <Widget>[
-                            Image.asset(
-                              'assets/images/wallet_header.png',
-                              width: size.width,
+                        Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image:
+                                  AssetImage('assets/images/wallet_header.png'),
                               fit: BoxFit.fitWidth,
                             ),
-                            Positioned(
-                              child: IndigoAppBarWidget(
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              IndigoAppBarWidget(
                                 title: Text(
                                   localization.toIndigo24Client,
                                   textAlign: TextAlign.center,
@@ -133,58 +137,57 @@ class _TransferPageState extends State<TransferPage> {
                                 elevation: 0,
                                 backgroundColor: Colors.transparent,
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                top: 45,
-                                left: 0,
-                                right: 20,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Container(
-                                    height: 0.6,
-                                    margin: EdgeInsets.symmetric(
-                                      vertical: 10,
-                                      horizontal: 20,
+                              Container(
+                                margin: EdgeInsets.only(left: 0, right: 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      height: 0.6,
+                                      margin: EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 20,
+                                      ),
+                                      color: brightGreyColor,
                                     ),
-                                    color: brightGreyColor,
-                                  ),
-                                  Container(
-                                    margin:
-                                        EdgeInsets.only(left: 30, right: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        SizedBox(height: 15),
-                                        Text(
-                                          '${localization.walletBalance}',
-                                          style: fS14(c: 'FFFFFF'),
-                                        ),
-                                        SizedBox(height: 5),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '${user.balance}',
-                                              style: fS18(c: 'FFFFFF'),
-                                            ),
-                                            Image(
-                                              image: AssetImage(
-                                                  "assets/images/tenge.png"),
-                                              height: 12,
-                                              width: 12,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                    Container(
+                                      margin:
+                                          EdgeInsets.only(left: 30, right: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          SizedBox(height: 15),
+                                          Text(
+                                            '${localization.walletBalance}',
+                                            style: fS14(c: 'FFFFFF'),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '${user.balance}',
+                                                style: fS18(c: 'FFFFFF'),
+                                              ),
+                                              Image(
+                                                image: AssetImage(
+                                                    "assets/images/tenge.png"),
+                                                height: 12,
+                                                width: 12,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    Container(
+                                      height: 15,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         mainPaymentsDetailMobile(),
                         Container(
@@ -386,26 +389,17 @@ class _TransferPageState extends State<TransferPage> {
     Navigator.pop(context);
   }
 
-  _showLockScreen(BuildContext context, String title,
-      {bool withPin, bool opaque, Widget cancelButton, List<String> digits}) {
+  _showLockScreen(BuildContext context, String title, {bool withPin}) {
     Navigator.push(
       context,
       PageRouteBuilder(
-        opaque: opaque,
         pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
           title: '$title',
           withPin: withPin,
           passwordEnteredCallback: _onPasscodeEntered,
-          cancelButton: cancelButton,
-          deleteButton: Text(
-            '${localization.delete}',
-            style: const TextStyle(fontSize: 16, color: whiteColor),
-            semanticsLabel: '${localization.delete}',
-          ),
           shouldTriggerVerification: _verificationNotifier.stream,
           backgroundColor: milkWhiteColor,
           cancelCallback: _onPasscodeCancelled,
-          digits: digits,
         ),
       ),
     );
@@ -446,12 +440,6 @@ class _TransferPageState extends State<TransferPage> {
                 _showLockScreen(
                   context,
                   '${localization.enterPin}',
-                  opaque: false,
-                  cancelButton: Text(
-                    'Cancel',
-                    style: const TextStyle(fontSize: 16, color: whiteColor),
-                    semanticsLabel: 'Cancel',
-                  ),
                 );
               } else {
                 setState(() {

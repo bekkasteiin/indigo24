@@ -5,10 +5,10 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/alerts.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 
 import 'countries.dart';
@@ -87,7 +87,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
     if (_selectedCountry != null)
       setState(
         () {
-          _currentCountry = _selectedCountry.myLike;
+          _currentCountry = _selectedCountry.title;
           _phonePrefix = _selectedCountry.phonePrefix;
         },
       );
@@ -109,7 +109,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                 ),
                 child: Column(
                   children: <Widget>[
-                    _space(30),
+                    _space(10),
                     Padding(
                       padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
                       child: Row(
@@ -117,25 +117,18 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                           InkWell(
                             child: Ink(
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    '$_currentCountry ',
+                                    '$_currentCountry',
                                     style: TextStyle(
-                                      color: blackPurpleColor,
-                                      fontSize: 18,
+                                      color: greyColor,
+                                      fontSize: 16,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
                                   Container(
-                                    child: Image(
-                                      width: 15,
-                                      height: 15,
-                                      image: AssetImage(
-                                        'assets/images/dropDown.png',
-                                      ),
+                                    child: Icon(
+                                      Icons.navigate_next,
+                                      color: greyColor,
                                     ),
                                   ),
                                 ],
@@ -167,16 +160,16 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                               Text(
                                 '+$_phonePrefix',
                                 style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
                                 ),
                               ),
                               TextField(
                                 controller: _loginController,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
                                 ),
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,

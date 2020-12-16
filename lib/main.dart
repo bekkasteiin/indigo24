@@ -5,18 +5,18 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:indigo24/pages/auth/intro.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:indigo24/tabs.dart';
+import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'chat/ui/new_chat/chat_models/chat_model.dart';
-import 'chat/ui/new_chat/chat_models/hive_names.dart';
-import 'chat/ui/new_chat/chat_models/messages.g_model.dart';
-import 'chat/ui/new_chat/chat_models/messages_model.dart';
-import 'services/socket.dart';
+import 'pages/chat/chat_models/chat_model.dart';
+import 'pages/chat/chat_models/hive_names.dart';
+import 'pages/chat/chat_models/messages.g_model.dart';
+import 'pages/chat/chat_models/messages_model.dart';
+import 'services/api/socket/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
-import 'widgets/alerts.dart';
+import 'widgets/alerts/indigo_alert.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

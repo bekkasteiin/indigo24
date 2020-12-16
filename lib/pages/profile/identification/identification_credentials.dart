@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
 class CredentialsPage extends StatefulWidget {
   @override
@@ -11,8 +11,12 @@ class _CredentialsPageState extends State<CredentialsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: IndigoAppBarWidget(),
-      body: Center(child: FlatButton(child: Text('123'), onPressed: () {
-       },),),
+      body: Center(
+        child: FlatButton(
+          child: Text('123'),
+          onPressed: () {},
+        ),
+      ),
     );
   }
 }

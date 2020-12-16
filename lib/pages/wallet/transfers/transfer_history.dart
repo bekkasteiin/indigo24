@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/models/transfer_model.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/voucher.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import '../filter.dart';
@@ -84,7 +84,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            color: whiteColor,
             child: Row(
               children: [
                 Container(

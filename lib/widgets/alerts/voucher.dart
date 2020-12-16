@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -26,267 +27,271 @@ class Voucher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(padding),
-      ),
-      elevation: 0.0,
-      backgroundColor: Colors.transparent,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Screenshot(
-              controller: _screenshotController,
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(
-                      top: padding,
-                      left: padding,
-                      right: padding,
-                    ),
-                    decoration: BoxDecoration(
-                      color: whiteColor,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(padding),
-                        topRight: Radius.circular(padding),
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(padding),
+        ),
+        elevation: 0.0,
+        backgroundColor: Colors.transparent,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Screenshot(
+                controller: _screenshotController,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(
+                        top: padding,
+                        left: padding,
+                        right: padding,
                       ),
-                    ),
-                    child: Container(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(right: 10),
-                                alignment: Alignment.topCenter,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: CachedNetworkImage(
-                                    imageUrl: avatarUrl +
-                                        transferModel.avatar
-                                            .replaceAll('AxB', '200x200'),
-                                    width: 50,
-                                    height: 50,
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(padding),
+                          topRight: Radius.circular(padding),
+                        ),
+                      ),
+                      child: Container(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(right: 10),
+                                  alignment: Alignment.topCenter,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(25),
+                                    child: CachedNetworkImage(
+                                      imageUrl: avatarUrl +
+                                          transferModel.avatar
+                                              .replaceAll('AxB', '200x200'),
+                                      width: 50,
+                                      height: 50,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  localization.transfer +
-                                      ' ' +
-                                      localization.toIndigo24Client,
-                                  style: TextStyle(color: blackPurpleColor),
-                                ),
-                              )
-                            ],
-                          ),
-                          Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    localization.amount,
-                                    style: TextStyle(color: greyColor),
-                                  ),
-                                  Text(
-                                    transferModel.amount.toString() +
+                                Expanded(
+                                  child: Text(
+                                    localization.transfer +
                                         ' ' +
-                                        'KZT',
-                                    style: TextStyle(
-                                      color: blackPurpleColor,
-                                      fontWeight: FontWeight.w500,
+                                        localization.toIndigo24Client,
+                                    style: TextStyle(color: blackPurpleColor),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      localization.amount,
+                                      style: TextStyle(color: greyColor),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    localization.commission,
-                                    style: TextStyle(color: greyColor),
-                                  ),
-                                  Text(
-                                    0.toString() + ' ' + 'KZT',
-                                    style: TextStyle(
-                                      color: blackPurpleColor,
-                                      fontWeight: FontWeight.w500,
+                                    Text(
+                                      transferModel.amount.toString() +
+                                          ' ' +
+                                          'KZT',
+                                      style: TextStyle(
+                                        color: blackPurpleColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(),
-                          _vouchetTitle(
-                            title: localization.youReceived,
-                            content: transferModel.name,
-                          ),
-                          if (transferModel.comment?.isNotEmpty != null)
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      localization.commission,
+                                      style: TextStyle(color: greyColor),
+                                    ),
+                                    Text(
+                                      0.toString() + ' ' + 'KZT',
+                                      style: TextStyle(
+                                        color: blackPurpleColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Divider(),
                             _vouchetTitle(
-                              title: localization.comments,
-                              content: transferModel.comment,
+                              title: localization.youReceived,
+                              content: transferModel.name,
                             ),
-                          _voucherInfo(
-                            leftWidget: localization.date,
-                            rigthWidget: transferModel.data,
-                          ),
-                          _voucherInfo(
-                            leftWidget: localization.name,
-                            rigthWidget: transferModel.from,
-                          ),
-                          _voucherInfo(
-                            leftWidget: localization.payFrom,
-                            rigthWidget: transferModel.type == 'in'
-                                ? '+' + transferModel.phone
-                                : user.phone,
-                          ),
-                          _voucherInfo(
-                            leftWidget: localization.destination,
-                            rigthWidget: transferModel.type == 'out'
-                                ? '+' + transferModel.phone
-                                : user.phone,
-                          ),
-                        ],
+                            if (transferModel.comment?.isNotEmpty != null)
+                              _vouchetTitle(
+                                title: localization.comments,
+                                content: transferModel.comment,
+                              ),
+                            _voucherInfo(
+                              leftWidget: localization.date,
+                              rigthWidget: transferModel.data,
+                            ),
+                            _voucherInfo(
+                              leftWidget: localization.name,
+                              rigthWidget: transferModel.from,
+                            ),
+                            _voucherInfo(
+                              leftWidget: localization.payFrom,
+                              rigthWidget: transferModel.type == 'in'
+                                  ? '+' + transferModel.phone
+                                  : user.phone,
+                            ),
+                            _voucherInfo(
+                              leftWidget: localization.destination,
+                              rigthWidget: transferModel.type == 'out'
+                                  ? '+' + transferModel.phone
+                                  : user.phone,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: succesColor,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(padding),
-                        bottomRight: Radius.circular(padding),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: succesColor,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(padding),
+                          bottomRight: Radius.circular(padding),
+                        ),
                       ),
-                    ),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: padding,
-                        vertical: padding / 2,
-                      ),
-                      child: Center(
-                        child: Text(
-                          localization.success,
-                          style: TextStyle(
-                            color: whiteColor,
-                            fontWeight: FontWeight.w600,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: padding,
+                          vertical: padding / 2,
+                        ),
+                        child: Center(
+                          child: Text(
+                            localization.success,
+                            style: TextStyle(
+                              color: whiteColor,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                vertical: padding,
-                horizontal: padding * 3,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: whiteColor,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Container(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  child: Image.asset(
-                                    '${transferModel.type}' == 'in'
-                                        ? 'assets/images/replyTransfer.png'
-                                        : 'assets/images/repeat.png',
-                                    width: 20,
-                                    height: 20,
+              Container(
+                margin: EdgeInsets.symmetric(
+                  vertical: padding,
+                  horizontal: padding * 3,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: whiteColor,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Container(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: Image.asset(
+                                      '${transferModel.type}' == 'in'
+                                          ? 'assets/images/replyTransfer.png'
+                                          : 'assets/images/repeat.png',
+                                      width: 20,
+                                      height: 20,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                            ),
+                            onPressed: buttonCallBack,
+                          ),
+                        ),
+                        FittedBox(
+                          child: Text(
+                            '${transferModel.type == 'in' ? localization.reply : localization.repeat}',
+                            style: TextStyle(
+                              color: whiteColor,
                             ),
                           ),
-                          onPressed: buttonCallBack,
-                        ),
-                      ),
-                      FittedBox(
-                        child: Text(
-                          '${transferModel.type == 'in' ? localization.reply : localization.repeat}',
-                          style: TextStyle(
-                            color: whiteColor,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: whiteColor,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Container(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  child: Image.asset(
-                                    'assets/images/share.png',
-                                    width: 20,
-                                    height: 20,
+                        )
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: whiteColor,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Container(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: Image.asset(
+                                      'assets/images/share.png',
+                                      width: 20,
+                                      height: 20,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                            ),
+                            onPressed: () {
+                              _screenshotController
+                                  .capture()
+                                  .then((File image) async {
+                                final documentDirectory =
+                                    (await getExternalStorageDirectory()).path;
+                                File imgFile =
+                                    new File('$documentDirectory/flutter.png');
+                                image.copy(imgFile.path);
+                                final RenderBox box =
+                                    context.findRenderObject();
+                                print(documentDirectory);
+                                Share.shareFiles(
+                                    ['$documentDirectory/flutter.png'],
+                                    sharePositionOrigin:
+                                        box.localToGlobal(Offset.zero) &
+                                            box.size);
+                              }).catchError((onError) {
+                                print(onError);
+                              });
+                            },
+                          ),
+                        ),
+                        FittedBox(
+                          child: Text(
+                            localization.share,
+                            style: TextStyle(
+                              color: whiteColor,
                             ),
                           ),
-                          onPressed: () {
-                            _screenshotController
-                                .capture()
-                                .then((File image) async {
-                              final documentDirectory =
-                                  (await getExternalStorageDirectory()).path;
-                              File imgFile =
-                                  new File('$documentDirectory/flutter.png');
-                              image.copy(imgFile.path);
-                              final RenderBox box = context.findRenderObject();
-                              print(documentDirectory);
-                              Share.shareFiles(
-                                  ['$documentDirectory/flutter.png'],
-                                  sharePositionOrigin:
-                                      box.localToGlobal(Offset.zero) &
-                                          box.size);
-                            }).catchError((onError) {
-                              print(onError);
-                            });
-                          },
-                        ),
-                      ),
-                      FittedBox(
-                        child: Text(
-                          localization.share,
-                          style: TextStyle(
-                            color: whiteColor,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
-import 'package:indigo24/widgets/indigo_text_field.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_text_field_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 

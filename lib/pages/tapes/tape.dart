@@ -1,15 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/chat/ui/new_chat/chat_pages/chat_info.dart';
+import 'package:indigo24/pages/chat/chat_pages/chat_info.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
-import 'package:indigo24/widgets/indigo_search_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 
 class TapePage extends StatefulWidget {
   final tape;

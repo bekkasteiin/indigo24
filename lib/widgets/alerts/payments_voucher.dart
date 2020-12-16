@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -26,256 +27,261 @@ class PaymentVoucher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(padding),
-      ),
-      elevation: 0.0,
-      backgroundColor: Colors.transparent,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Screenshot(
-              controller: _screenshotController,
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(
-                      top: padding,
-                      left: padding,
-                      right: padding,
-                    ),
-                    decoration: BoxDecoration(
-                      color: whiteColor,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(padding),
-                        topRight: Radius.circular(padding),
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(padding),
+        ),
+        elevation: 0.0,
+        backgroundColor: Colors.transparent,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Screenshot(
+                controller: _screenshotController,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(
+                        top: padding,
+                        left: padding,
+                        right: padding,
                       ),
-                    ),
-                    child: Container(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(right: 10),
-                                alignment: Alignment.topCenter,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: CachedNetworkImage(
-                                    imageUrl: logos + paymentHistoryModel.logo,
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  localization.service,
-                                  style: TextStyle(color: blackPurpleColor),
-                                ),
-                              )
-                            ],
-                          ),
-                          Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    localization.amount,
-                                    style: TextStyle(color: greyColor),
-                                  ),
-                                  Text(
-                                    paymentHistoryModel.amount
-                                            .toStringAsFixed(2) +
-                                        ' ' +
-                                        'KZT',
-                                    style: TextStyle(
-                                      color: blackPurpleColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    localization.commission,
-                                    style: TextStyle(color: greyColor),
-                                  ),
-                                  Text(
-                                    0.toString() + ' ' + 'KZT',
-                                    style: TextStyle(
-                                      color: blackPurpleColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(),
-                          _vouchetTitle(
-                            title: localization.service,
-                            content: paymentHistoryModel.title,
-                          ),
-                          _voucherInfo(
-                            leftWidget: localization.date,
-                            rigthWidget: paymentHistoryModel.data,
-                          ),
-                          _voucherInfo(
-                            leftWidget: localization.name,
-                            rigthWidget: user.name,
-                          ),
-                          _voucherInfo(
-                            leftWidget: localization.payFrom,
-                            rigthWidget: user.phone,
-                          ),
-                          _voucherInfo(
-                              leftWidget: localization.destination,
-                              rigthWidget: paymentHistoryModel.account),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: identifyColor(
-                          int.tryParse(paymentHistoryModel.status)),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(padding),
-                        bottomRight: Radius.circular(padding),
-                      ),
-                    ),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: padding,
-                        vertical: padding / 2,
-                      ),
-                      child: Center(
-                        child: Text(
-                          identifyStatus(
-                              int.tryParse(paymentHistoryModel.status)),
-                          style: TextStyle(
-                            color: whiteColor,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(padding),
+                          topRight: Radius.circular(padding),
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                vertical: padding,
-                horizontal: padding * 3,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Column(
-                  //   children: [
-                  //     CircleAvatar(
-                  //       radius: 30,
-                  //       backgroundColor: whiteColor,
-                  //       child: IconButton(
-                  //         padding: EdgeInsets.zero,
-                  //         icon: Container(
-                  //           child: Column(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             children: <Widget>[
-                  //               Container(
-                  //                 child: Image.asset(
-                  //                   'assets/images/repeat.png',
-                  //                   width: 20,
-                  //                   height: 20,
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         onPressed: buttonCallBack,
-                  //       ),
-                  //     ),
-                  //     FittedBox(
-                  //       child: Text(
-                  //         localization.repeat,
-                  //         style: TextStyle(
-                  //           color: whiteColor,
-                  //         ),
-                  //       ),
-                  //     )
-                  //   ],
-                  // ),
-                  Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: whiteColor,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Container(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
+                      child: Container(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
                                 Container(
-                                  child: Image.asset(
-                                    'assets/images/share.png',
-                                    width: 20,
-                                    height: 20,
+                                  margin: EdgeInsets.only(right: 10),
+                                  alignment: Alignment.topCenter,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(25),
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          logos + paymentHistoryModel.logo,
+                                      width: 50,
+                                      height: 50,
+                                    ),
                                   ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    localization.service,
+                                    style: TextStyle(color: blackPurpleColor),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      localization.amount,
+                                      style: TextStyle(color: greyColor),
+                                    ),
+                                    Text(
+                                      paymentHistoryModel.amount
+                                              .toStringAsFixed(2) +
+                                          ' ' +
+                                          'KZT',
+                                      style: TextStyle(
+                                        color: blackPurpleColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      localization.commission,
+                                      style: TextStyle(color: greyColor),
+                                    ),
+                                    Text(
+                                      0.toString() + ' ' + 'KZT',
+                                      style: TextStyle(
+                                        color: blackPurpleColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ),
-                          onPressed: () {
-                            _screenshotController
-                                .capture()
-                                .then((File image) async {
-                              //Capture Done
-
-                              final documentDirectory =
-                                  (await getExternalStorageDirectory()).path;
-                              File imgFile =
-                                  new File('$documentDirectory/flutter.png');
-                              image.copy(imgFile.path);
-                              final RenderBox box = context.findRenderObject();
-                              print(documentDirectory);
-                              Share.shareFiles(
-                                  ['$documentDirectory/flutter.png'],
-                                  sharePositionOrigin:
-                                      box.localToGlobal(Offset.zero) &
-                                          box.size);
-                            }).catchError((onError) {
-                              print(onError);
-                            });
-                          },
+                            Divider(),
+                            _vouchetTitle(
+                              title: localization.service,
+                              content: paymentHistoryModel.title,
+                            ),
+                            _voucherInfo(
+                              leftWidget: localization.date,
+                              rigthWidget: paymentHistoryModel.data,
+                            ),
+                            _voucherInfo(
+                              leftWidget: localization.name,
+                              rigthWidget: user.name,
+                            ),
+                            _voucherInfo(
+                              leftWidget: localization.payFrom,
+                              rigthWidget: user.phone,
+                            ),
+                            _voucherInfo(
+                                leftWidget: localization.destination,
+                                rigthWidget: paymentHistoryModel.account),
+                          ],
                         ),
                       ),
-                      FittedBox(
-                        child: Text(
-                          localization.share,
-                          style: TextStyle(
-                            color: whiteColor,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: identifyColor(
+                            int.tryParse(paymentHistoryModel.status)),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(padding),
+                          bottomRight: Radius.circular(padding),
+                        ),
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: padding,
+                          vertical: padding / 2,
+                        ),
+                        child: Center(
+                          child: Text(
+                            identifyStatus(
+                                int.tryParse(paymentHistoryModel.status)),
+                            style: TextStyle(
+                              color: whiteColor,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Container(
+                margin: EdgeInsets.symmetric(
+                  vertical: padding,
+                  horizontal: padding * 3,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Column(
+                    //   children: [
+                    //     CircleAvatar(
+                    //       radius: 30,
+                    //       backgroundColor: whiteColor,
+                    //       child: IconButton(
+                    //         padding: EdgeInsets.zero,
+                    //         icon: Container(
+                    //           child: Column(
+                    //             mainAxisAlignment: MainAxisAlignment.center,
+                    //             children: <Widget>[
+                    //               Container(
+                    //                 child: Image.asset(
+                    //                   'assets/images/repeat.png',
+                    //                   width: 20,
+                    //                   height: 20,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //         onPressed: buttonCallBack,
+                    //       ),
+                    //     ),
+                    //     FittedBox(
+                    //       child: Text(
+                    //         localization.repeat,
+                    //         style: TextStyle(
+                    //           color: whiteColor,
+                    //         ),
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                    Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: whiteColor,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Container(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: Image.asset(
+                                      'assets/images/share.png',
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            onPressed: () {
+                              _screenshotController
+                                  .capture()
+                                  .then((File image) async {
+                                //Capture Done
+
+                                final documentDirectory =
+                                    (await getExternalStorageDirectory()).path;
+                                File imgFile =
+                                    new File('$documentDirectory/flutter.png');
+                                image.copy(imgFile.path);
+                                final RenderBox box =
+                                    context.findRenderObject();
+                                print(documentDirectory);
+                                Share.shareFiles(
+                                    ['$documentDirectory/flutter.png'],
+                                    sharePositionOrigin:
+                                        box.localToGlobal(Offset.zero) &
+                                            box.size);
+                              }).catchError((onError) {
+                                print(onError);
+                              });
+                            },
+                          ),
+                        ),
+                        FittedBox(
+                          child: Text(
+                            localization.share,
+                            style: TextStyle(
+                              color: whiteColor,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -184,7 +184,8 @@ String withdrawTerm =
 String destination = 'Адрес платежа';
 String payFrom = 'Оплачено с этого аккаунта';
 String date = 'Дата';
-
+String iAgree = "iAgree";
+String paymentsHistory = 'Payments history';
 List filters = [
   {'text': 'За неделю', 'code': 'week'},
   {'text': 'За месяц', 'code': 'month'},

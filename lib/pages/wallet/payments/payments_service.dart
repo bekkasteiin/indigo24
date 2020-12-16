@@ -4,14 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
-import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
-import 'package:indigo24/widgets/pin_code.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/pin/pin_code.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../main.dart';
@@ -111,7 +111,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -126,86 +125,87 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
-                          Stack(
-                            children: <Widget>[
-                              Image.asset(
-                                'assets/images/wallet_header.png',
-                                width: size.width,
-                                fit: BoxFit.fitWidth,
+                          Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    "assets/images/wallet_header.png"),
+                                fit: BoxFit.cover,
                               ),
-                              Column(
-                                children: <Widget>[
-                                  IndigoAppBarWidget(
-                                    centerTitle: true,
-                                    title: Text(localization.payments),
-                                    leading: IconButton(
-                                      icon: Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Image(
-                                          image: AssetImage(
-                                            'assets/images/backWhite.png',
-                                          ),
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                IndigoAppBarWidget(
+                                  centerTitle: true,
+                                  title: Text(widget.title),
+                                  leading: IconButton(
+                                    icon: Container(
+                                      padding: EdgeInsets.all(10),
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/images/backWhite.png',
                                         ),
                                       ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
                                     ),
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
                                   ),
-                                  Container(
-                                    margin: EdgeInsets.only(left: 0, right: 20),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Container(
-                                          height: 0.6,
-                                          margin: EdgeInsets.symmetric(
-                                            vertical: 10,
-                                            horizontal: 20,
-                                          ),
-                                          color: brightGreyColor,
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 0,
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 0, right: 20),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        height: 0.6,
+                                        margin: EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 20,
                                         ),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                            left: 30,
-                                            right: 10,
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              SizedBox(height: 15),
-                                              Text(
-                                                '${localization.walletBalance}',
-                                                style: fS14(c: 'FFFFFF'),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    '${user.balance}',
-                                                    style: fS18(c: 'FFFFFF'),
-                                                  ),
-                                                  Image(
-                                                    image: AssetImage(
-                                                        "assets/images/tenge.png"),
-                                                    height: 12,
-                                                    width: 12,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                        color: brightGreyColor,
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(
+                                          left: 30,
+                                          right: 10,
                                         ),
-                                      ],
-                                    ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            SizedBox(height: 15),
+                                            Text(
+                                              '${localization.walletBalance}',
+                                              style: fS14(c: 'FFFFFF'),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  '${user.balance}',
+                                                  style: fS18(c: 'FFFFFF'),
+                                                ),
+                                                Image(
+                                                  image: AssetImage(
+                                                      "assets/images/tenge.png"),
+                                                  height: 12,
+                                                  width: 12,
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 15),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                           isCalculated
                               ? Container(
@@ -381,26 +381,17 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     );
   }
 
-  _showLockScreen(BuildContext context, String title,
-      {bool withPin, bool opaque, Widget cancelButton, List<String> digits}) {
+  _showLockScreen(BuildContext context, String title, {bool withPin}) {
     Navigator.push(
       context,
       PageRouteBuilder(
-        opaque: opaque,
         pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
           withPin: withPin,
           title: '$title',
           passwordEnteredCallback: _onPasscodeEntered,
-          cancelButton: cancelButton,
-          deleteButton: Text(
-            '${localization.delete}',
-            style: const TextStyle(fontSize: 16, color: whiteColor),
-            semanticsLabel: '${localization.delete}',
-          ),
           shouldTriggerVerification: _verificationNotifier.stream,
-          backgroundColor: Color(0xFFF7F7F7),
+          backgroundColor: milkWhiteColor,
           cancelCallback: _onPasscodeCancelled,
-          digits: digits,
         ),
       ),
     );
@@ -505,11 +496,6 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   await _showLockScreen(
                     context,
                     '${localization.enterPin}',
-                    opaque: false,
-                    cancelButton: Text(
-                      localization.cancel,
-                      style: const TextStyle(fontSize: 16, color: whiteColor),
-                    ),
                   );
                 } else {
                   showDialog(
@@ -598,8 +584,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             child: Center(
               child: Text(
                 '${isCalculated == false && widget.isConvertable == 1 ? localization.calculate : localization.pay}',
-                style: TextStyle(
-                    color: Color(0xFF0543B8), fontWeight: FontWeight.w800),
+                style:
+                    TextStyle(color: primaryColor, fontWeight: FontWeight.w800),
               ),
             ),
           ),

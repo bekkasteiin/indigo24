@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'transfer.dart';
 import 'transfer_history.dart';
 import 'package:indigo24/services/localization.dart' as localization;

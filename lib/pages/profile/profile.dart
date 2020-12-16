@@ -1,27 +1,25 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indigo24/chat/ui/new_chat/chat_models/chat_model.dart';
-import 'package:indigo24/chat/ui/new_chat/chat_models/hive_names.dart';
-import 'package:indigo24/chat/ui/new_chat/chat_models/messages_model.dart';
+import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
+import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
+import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/auth/intro.dart';
-import 'package:indigo24/pages/settings/settings_main.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/pages/profile/settings/settings_main.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/socket.dart';
+import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/widgets/alerts.dart';
-import 'package:indigo24/widgets/photo.dart';
-import 'package:indigo24/widgets/progress_bar.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/photo/photo.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -42,6 +40,12 @@ bool needToAskCity = true;
 class _UserProfilePageState extends State<UserProfilePage>
     with AutomaticKeepAliveClientMixin {
   Api _api;
+
+  dynamic response;
+
+  double uploadPercent = 0.0;
+  bool isUploading = false;
+
   @override
   void dispose() {
     super.dispose();
@@ -189,7 +193,21 @@ class _UserProfilePageState extends State<UserProfilePage>
         _image = compressedImage;
       });
       if (_image != null) {
-        uploadAvatar(_image.path).then((r) async {
+        _api.uploadAvatar(
+          _image.path,
+          (int sent, int total) {
+            setState(() {
+              isUploading = true;
+              uploadPercent = sent / total;
+            });
+          },
+          (count, total) {
+            setState(() {
+              isUploading = false;
+              uploadPercent = 0.0;
+            });
+          },
+        ).then((r) async {
           if (r['message'] == 'Not authenticated' &&
               r['success'].toString() == 'false') {
             logOut(context);
@@ -217,63 +235,6 @@ class _UserProfilePageState extends State<UserProfilePage>
             return r;
           }
         });
-      }
-    }
-  }
-
-  Response response;
-  ProgressBar sendingMsgProgressBar;
-  BaseOptions options = new BaseOptions(
-    baseUrl: "$baseUrl",
-    connectTimeout: 5000,
-    receiveTimeout: 3000,
-  );
-
-  Dio dio;
-  var percent = "0 %";
-  double uploadPercent = 0.0;
-  bool isUploading = false;
-
-  uploadAvatar(_path) async {
-    sendingMsgProgressBar = ProgressBar();
-    dio = new Dio(options);
-
-    try {
-      FormData formData = FormData.fromMap({
-        "customerID": "${user.id}",
-        "unique": "${user.unique}",
-        "file": await MultipartFile.fromFile(_path),
-      });
-
-      response = await dio.post(
-        "api/v2.1/avatar/upload",
-        data: formData,
-        onSendProgress: (int sent, int total) {
-          String p = (sent / total * 100).toStringAsFixed(2);
-
-          setState(() {
-            isUploading = true;
-            uploadPercent = sent / total;
-            percent = "$p %";
-          });
-        },
-        onReceiveProgress: (count, total) {
-          setState(() {
-            isUploading = false;
-            uploadPercent = 0.0;
-            percent = "0 %";
-          });
-        },
-      );
-      print("Getting response from avatar upload ${response.data}");
-      return response.data;
-    } on DioError catch (e) {
-      if (e.response != null) {
-        print(e.response);
-        print(e.response.statusCode);
-      } else {
-        print(e.request);
-        print(e.message);
       }
     }
   }
@@ -418,6 +379,7 @@ class _UserProfilePageState extends State<UserProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Size screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
@@ -726,7 +688,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                           progressColor: whiteColor,
                           backgroundColor: whiteColor,
                           center: Text(
-                            percent,
+                            (uploadPercent * 100).toStringAsFixed(2),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,

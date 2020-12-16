@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
-import 'package:indigo24/widgets/indigo_square.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_auth_title.dart';
 import 'registration.dart';
 import 'user_registration.dart';
 import 'package:indigo24/services/localization.dart' as localization;
@@ -132,23 +132,18 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          IndigoSquare(),
-                          SizedBox(width: 10),
-                          Text(
-                            "${localization.keyFromSms}",
-                            style: TextStyle(
-                              color: blackPurpleColor,
-                              fontSize: 16,
-                            ),
-                          )
-                        ],
-                      ),
+                      IndigoAuthTitle(title: localization.keyFromSms),
                       TextField(
                         controller: _smsController,
+                        style: TextStyle(
+                          color: blackPurpleColor,
+                          fontSize: 16,
+                        ),
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(hintText: ""),
+                        decoration: InputDecoration(
+                          hintText: "",
+                          hintStyle: TextStyle(color: greyColor),
+                        ),
                       ),
                       Text(
                         '$smsError',
@@ -234,6 +229,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 22,
+                        fontWeight: FontWeight.w300,
                       ),
                     ),
                     progressWidget: CircularProgressIndicator(),

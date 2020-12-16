@@ -6,11 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
-import 'package:indigo24/services/api.dart';
+import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
-import 'package:indigo24/widgets/indigo_square.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_auth_title.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../countries.dart';
 import 'phone_confirm.dart';
@@ -121,7 +121,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
     if (_selectedCountry != null)
       setState(() {
-        _currentCountry = _selectedCountry.myLike;
+        _currentCountry = _selectedCountry.title;
         _hintText = _selectedCountry.mask;
         loginFormatter = MaskTextInputFormatter(
             mask: '${_selectedCountry.mask}', filter: {"*": RegExp(r'[0-9]')});
@@ -175,7 +175,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 child: Column(
                   children: <Widget>[
-                    _space(30),
+                    _space(10),
                     Padding(
                       padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
                       child: Row(
@@ -186,16 +186,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    '$_currentCountry ',
+                                    '$_currentCountry',
                                     style: TextStyle(
-                                      color: blackPurpleColor,
-                                      fontSize: 18,
+                                      color: greyColor,
+                                      fontSize: 16,
                                     ),
                                   ),
                                   Container(
                                     child: Icon(
                                       Icons.navigate_next,
-                                      color: blackPurpleColor,
+                                      color: greyColor,
                                     ),
                                   ),
                                 ],
@@ -211,19 +211,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              IndigoSquare(),
-                              SizedBox(width: 10),
-                              Text(
-                                "${localization.phoneNumber}",
-                                style: TextStyle(
-                                  color: blackPurpleColor,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ],
-                          ),
+                          IndigoAuthTitle(title: localization.phoneNumber),
                           Stack(
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
@@ -231,12 +219,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 controller: loginController,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
+                                  color: blackPurpleColor,
+                                  fontSize: 16,
+                                ),
                                 inputFormatters: [
                                   loginFormatter,
                                 ],
                                 decoration: InputDecoration(
                                   hintText: '$_hintText',
+                                  hintStyle: TextStyle(
+                                    color: blackPurpleColor,
+                                    fontSize: 16,
+                                  ),
                                   focusColor: Colors.black,
                                   fillColor: Colors.black,
                                   hoverColor: Colors.black,
