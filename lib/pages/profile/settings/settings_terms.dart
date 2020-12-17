@@ -65,8 +65,11 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                       children: [
                         Image.asset(
                           "assets/images/pdf.png",
-                          width: 50,
-                          height: 50,
+                          width: 40,
+                          height: 40,
+                        ),
+                        SizedBox(
+                          width: 10,
                         ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,

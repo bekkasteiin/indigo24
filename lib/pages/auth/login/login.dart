@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         preferredSize: Size.fromHeight(0.0),
         child: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.white,
+          backgroundColor: whiteColor,
           brightness: Brightness.light,
         ),
       ),
@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: whiteColor,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(5.0),
                     topLeft: Radius.circular(5.0),
@@ -195,12 +195,12 @@ class _LoginPageState extends State<LoginPage> {
                                   fontSize: 16,
                                 ),
                                 decoration: InputDecoration(
-                                  focusColor: Colors.black,
-                                  fillColor: Colors.black,
-                                  hoverColor: Colors.black,
+                                  focusColor: blackColor,
+                                  fillColor: blackColor,
+                                  hoverColor: blackColor,
                                   prefixText: '1$phonePrefix ',
                                   prefixStyle:
-                                      TextStyle(color: Colors.transparent),
+                                      TextStyle(color: transparentColor),
                                 ),
                               ),
                             ],
@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                           Text(
                             '$loginError',
                             style: TextStyle(
-                              color: Colors.red,
+                              color: redColor,
                               fontWeight: FontWeight.w500,
                               fontSize: 12,
                             ),
@@ -254,7 +254,7 @@ class _LoginPageState extends State<LoginPage> {
                           Text(
                             '$passwordError',
                             style: TextStyle(
-                                color: Colors.red,
+                                color: redColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12),
                             overflow: TextOverflow.ellipsis,
@@ -288,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
                         defaultWidget: Text(
                           "${localization.next}",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: whiteColor,
                             fontSize: 22,
                             fontWeight: FontWeight.w300,
                           ),

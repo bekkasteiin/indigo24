@@ -29,9 +29,9 @@ class IndigoTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(55),
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 6,
-            spreadRadius: -5,
+            spreadRadius: -6,
             offset: Offset(0.0, 6.0),
           )
         ],

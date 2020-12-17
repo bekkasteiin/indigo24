@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:indigo24/style/colors.dart';
 
 class LinkMessageWidget extends StatefulWidget {
   final url;
@@ -18,7 +19,6 @@ class _LinkMessageWidgetState extends State<LinkMessageWidget> {
   void initState() {
     super.initState();
     data = extract(widget.url);
-    // dataAsMap = data.toMap();
     data.then((val) {
       setState(() {
         json = val;
@@ -30,13 +30,12 @@ class _LinkMessageWidgetState extends State<LinkMessageWidget> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.5,
-      // height: MediaQuery.of(context).size.width*0.3,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Material(
-            color: Colors.transparent,
+            color: transparentColor,
             child: InkWell(
                 onTap: () async {
                   if (await canLaunch('${widget.url}')) {
@@ -56,7 +55,7 @@ class _LinkMessageWidgetState extends State<LinkMessageWidget> {
                   child: Container(
                     child: Text("${widget.url}",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: blackColor,
                           fontWeight: FontWeight.w400,
                           decoration: TextDecoration.underline,
                         )),

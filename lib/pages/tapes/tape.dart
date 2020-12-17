@@ -239,8 +239,7 @@ class _TapePageState extends State<TapePage> {
                                                         NetworkImage(
                                                       '$avatarUrl${_comments[index]['avatar']}',
                                                     ),
-                                                    backgroundColor:
-                                                        Colors.grey,
+                                                    backgroundColor: greyColor,
                                                   ),
                                                 ),
                                               ],
@@ -320,7 +319,7 @@ class _TapePageState extends State<TapePage> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: SafeArea(
           child: Container(
-            color: Colors.white,
+            color: whiteColor,
             padding: keyboardIsOpened == false
                 ? EdgeInsets.only(bottom: 20, right: 10, left: 10, top: 10)
                 : EdgeInsets.only(bottom: 100, right: 10, left: 10, top: 10),
@@ -333,11 +332,11 @@ class _TapePageState extends State<TapePage> {
                   CircleAvatar(
                     radius: 20.0,
                     backgroundImage: NetworkImage('$avatarUrl${user.avatar}'),
-                    backgroundColor: Colors.grey,
+                    backgroundColor: greyColor,
                   ),
                   Expanded(
                     child: Container(
-                      color: Colors.white,
+                      color: whiteColor,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: TextField(

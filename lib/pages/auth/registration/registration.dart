@@ -75,7 +75,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           preferredSize: Size.fromHeight(0.0),
           child: AppBar(
             centerTitle: true,
-            backgroundColor: Colors.white,
+            backgroundColor: whiteColor,
             brightness: Brightness.light,
           ),
         ),
@@ -165,7 +165,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: whiteColor,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(5.0),
                     topLeft: Radius.circular(5.0),
@@ -231,10 +231,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     color: blackPurpleColor,
                                     fontSize: 16,
                                   ),
-                                  focusColor: Colors.black,
-                                  fillColor: Colors.black,
-                                  hoverColor: Colors.black,
-                                  prefixStyle: TextStyle(color: Colors.black),
+                                  focusColor: blackColor,
+                                  fillColor: blackColor,
+                                  hoverColor: blackColor,
+                                  prefixStyle: TextStyle(color: blackColor),
                                 ),
                               ),
                             ],
@@ -242,7 +242,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           Text(
                             '$loginError',
                             style: TextStyle(
-                              color: Colors.red,
+                              color: redColor,
                               fontWeight: FontWeight.w500,
                               fontSize: 10,
                             ),
@@ -267,7 +267,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         defaultWidget: Text(
                           "${localization.next}",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: whiteColor,
                             fontSize: 22,
                             fontWeight: FontWeight.w300,
                           ),

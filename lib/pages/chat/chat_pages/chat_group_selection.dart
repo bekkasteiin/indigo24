@@ -207,7 +207,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                       child: Text(
                                         '${_selectedsList[index]['name'][0].toUpperCase()}',
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: whiteColor,
                                           fontSize: 16.0,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -235,7 +235,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                   right: 20,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: whiteColor,
                                       border: Border.all(
                                         color: primaryColor,
                                       ),
@@ -345,7 +345,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                 ),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
-                                  color: Colors.white,
+                                  color: whiteColor,
                                 ),
                                 margin: EdgeInsets.symmetric(horizontal: 10),
                               ),

@@ -96,7 +96,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
         preferredSize: Size.fromHeight(0.0),
         child: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.white,
+          backgroundColor: whiteColor,
           brightness: Brightness.light,
         ),
       ),
@@ -141,7 +141,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.9,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: whiteColor,
                     borderRadius: BorderRadius.only(
                       topRight: Radius.circular(5.0),
                       topLeft: Radius.circular(5.0),
@@ -160,7 +160,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             Text(
                               '$globalError',
                               style: TextStyle(
-                                color: Colors.red,
+                                color: redColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 13,
                               ),
@@ -181,7 +181,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             Text(
                               '$nameError',
                               style: TextStyle(
-                                  color: Colors.red,
+                                  color: redColor,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 10),
                               overflow: TextOverflow.ellipsis,
@@ -210,7 +210,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             Text(
                               '$lastnameError',
                               style: TextStyle(
-                                color: Colors.red,
+                                color: redColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 10,
                               ),
@@ -240,7 +240,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             Text(
                               '$emailError',
                               style: TextStyle(
-                                color: Colors.red,
+                                color: redColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 10,
                               ),
@@ -317,7 +317,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                                   Text(
                                     validation['title'],
                                     style: TextStyle(
-                                      color: Colors.red,
+                                      color: redColor,
                                       fontWeight: FontWeight.w500,
                                       fontSize: 10,
                                     ),
@@ -325,7 +325,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             Text(
                               '$firstPasswordError',
                               style: TextStyle(
-                                color: Colors.red,
+                                color: redColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 10,
                               ),
@@ -368,7 +368,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             Text(
                               '$secondPasswordError',
                               style: TextStyle(
-                                color: Colors.red,
+                                color: redColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 10,
                               ),
@@ -404,17 +404,19 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                             });
                           },
                           child: Container(
-                            color: Colors.transparent,
+                            color: transparentColor,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Flexible(
-                                  child: Text(
-                                    "${localization.iAgree}",
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      color: primaryColor,
+                                  child: FittedBox(
+                                    child: Text(
+                                      "${localization.iAgree}",
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        color: primaryColor,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -435,30 +437,39 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              _confirm = !_confirm;
-                            });
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return CustomDialog(
+                                  description:
+                                      "${localization.confidentionalAgreement}",
+                                  yesCallBack: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                );
+                              },
+                            );
                           },
                           child: Container(
-                            color: Colors.transparent,
+                            color: transparentColor,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.help,
-                                      color: primaryColor,
-                                    ),
-                                    Text(
-                                      "${localization.iAgree}",
+                                Icon(
+                                  Icons.help,
+                                  color: primaryColor,
+                                ),
+                                SizedBox(width: 5),
+                                Flexible(
+                                  child: FittedBox(
+                                    child: Text(
+                                      "${localization.infoAboutConfidentional}",
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: TextStyle(
                                         color: primaryColor,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -481,7 +492,7 @@ class _UserRegistrationPageState extends State<UserRegistrationPage> {
                           defaultWidget: Text(
                             "${localization.next}",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: whiteColor,
                               fontSize: 22,
                               fontWeight: FontWeight.w300,
                             ),

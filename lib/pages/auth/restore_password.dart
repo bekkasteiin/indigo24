@@ -58,7 +58,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
         preferredSize: Size.fromHeight(0.0),
         child: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.white,
+          backgroundColor: whiteColor,
           brightness: Brightness.light,
         ),
       ),
@@ -104,7 +104,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: whiteColor,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Column(
@@ -172,12 +172,12 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                                   fontSize: 16,
                                 ),
                                 decoration: InputDecoration(
-                                  focusColor: Colors.black,
-                                  fillColor: Colors.black,
-                                  hoverColor: Colors.black,
+                                  focusColor: blackColor,
+                                  fillColor: blackColor,
+                                  hoverColor: blackColor,
                                   prefixText: '1$_phonePrefix ',
                                   prefixStyle:
-                                      TextStyle(color: Colors.transparent),
+                                      TextStyle(color: transparentColor),
                                 ),
                               ),
                             ],
@@ -192,7 +192,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                         defaultWidget: Text(
                           "${localization.next}",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: whiteColor,
                             fontSize: 22,
                             fontWeight: FontWeight.w300,
                           ),

@@ -58,20 +58,24 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                         horizontal: 20,
                         vertical: 5,
                       ),
-                      height: 40,
+                      height: 50,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
                             '${localization.languages[index]['title']}',
                             style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: blackPurpleColor),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: blackPurpleColor,
+                            ),
                           ),
                           localization.currentLanguage ==
                                   '${localization.languages[index]['title']}'
-                              ? Icon(Icons.done)
+                              ? Icon(
+                                  Icons.done,
+                                  color: darkPrimaryColor,
+                                )
                               : Center()
                         ],
                       ),
@@ -79,9 +83,11 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(left: 20),
-                  height: 0.5,
-                  color: greyColor,
+                  padding: EdgeInsets.only(left: 20),
+                  child: Divider(
+                    color: darkPrimaryColor,
+                    height: 1,
+                  ),
                 ),
               ],
             );

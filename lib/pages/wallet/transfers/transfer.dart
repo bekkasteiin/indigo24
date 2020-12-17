@@ -86,7 +86,7 @@ class _TransferPageState extends State<TransferPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      color: Colors.white,
+      color: whiteColor,
       child: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -135,7 +135,7 @@ class _TransferPageState extends State<TransferPage> {
                                   },
                                 ),
                                 elevation: 0,
-                                backgroundColor: Colors.transparent,
+                                backgroundColor: transparentColor,
                               ),
                               Container(
                                 margin: EdgeInsets.only(left: 0, right: 0),
@@ -152,7 +152,7 @@ class _TransferPageState extends State<TransferPage> {
                                     ),
                                     Container(
                                       margin:
-                                          EdgeInsets.only(left: 30, right: 10),
+                                          EdgeInsets.only(left: 20, right: 10),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -195,15 +195,17 @@ class _TransferPageState extends State<TransferPage> {
                             horizontal: 20,
                             vertical: 10,
                           ),
-                          color: Colors.white,
+                          color: whiteColor,
                           child: TextField(
+                            style: TextStyle(color: greyColor),
                             decoration: InputDecoration(
+                              hintStyle: TextStyle(color: greyColor),
                               hintText: localization.enterMessage,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide: BorderSide(),
                               ),
-                              fillColor: Colors.green,
+                              fillColor: greyColor,
                             ),
                             controller: _commentController,
                           ),
@@ -254,7 +256,7 @@ class _TransferPageState extends State<TransferPage> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 10.0,
             spreadRadius: -10,
           ),
@@ -272,7 +274,7 @@ class _TransferPageState extends State<TransferPage> {
             child: Text(
               '$comment',
               style: TextStyle(
-                color: blackColor,
+                color: blackPurpleColor,
               ),
             ),
           ),
@@ -411,9 +413,9 @@ class _TransferPageState extends State<TransferPage> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 10.0,
-            spreadRadius: -2,
+            spreadRadius: -10,
             offset: Offset(
               0.0,
               0.0,
@@ -481,163 +483,202 @@ class _TransferPageState extends State<TransferPage> {
     Size size = MediaQuery.of(context).size;
     return Container(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                flex: 3,
-                child: Column(
+        children: [
+          Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              '${localization.reveicerPhone}',
+                              style: TextStyle(
+                                color: greyColor2,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Container(
+                            child: TextFormField(
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(25),
+                              ],
+                              decoration: InputDecoration.collapsed(
+                                hintText: '${localization.phoneNumber}',
+                                hintStyle: TextStyle(
+                                  color: greyColor2,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              controller: receiverController,
+                              style: TextStyle(fontSize: 18),
+                              onChanged: (value) {
+                                setState(() {
+                                  toName = '';
+                                  toAvatar = '';
+                                });
+                                if (receiverController.text.length > 10) {
+                                  api
+                                      .checkPhoneForSendMoney('$value')
+                                      .then((r) {
+                                    if (r['success'].toString() == 'true') {
+                                      setState(() {
+                                        toName = r['name'];
+                                        toAvatar = r['avatar'];
+                                      });
+                                    } else {
+                                      setState(() {
+                                        toName = '${localization.userNotFound}';
+                                        toAvatar = '';
+                                      });
+                                    }
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          InkWell(
+                            child: CircleAvatar(
+                              radius: 20,
+                              child: ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: toAvatar == ''
+                                      ? "${avatarUrl}noAvatar.png"
+                                      : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}',
+                                ),
+                              ),
+                            ),
+                            onTap: () async {
+                              FocusScopeNode currentFocus =
+                                  FocusScope.of(context);
+                              if (!currentFocus.hasPrimaryFocus) {
+                                currentFocus.unfocus();
+                              }
+                              dynamic returnData = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TransferContactsDialogPage(),
+                                ),
+                              );
+                              if (returnData != null) {
+                                api
+                                    .checkPhoneForSendMoney(
+                                        '${returnData.phone}')
+                                    .then((r) {
+                                  if (r['success'].toString() == 'true') {
+                                    setState(() {
+                                      toName = r['name'];
+                                      toAvatar = r['avatar'];
+                                    });
+                                  } else {
+                                    setState(() {
+                                      // toName = '${localization.userNotFound}';
+                                      toName = '${r['message']}';
+                                      toAvatar = '';
+                                    });
+                                  }
+                                });
+                                receiverController.text = returnData.phone;
+                              }
+                            },
+                          ),
+                          Text(
+                            '$toName',
+                            textAlign: TextAlign.justify,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Container(
+                  height: 1.0,
+                  color: brightGreyColor,
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    SizedBox(
+                      height: 5,
+                    ),
                     Container(
-                      child: TextField(
+                      child: Text(
+                        '${localization.transferAmount}',
+                        style: TextStyle(
+                          color: greyColor2,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Container(
+                      child: TextFormField(
                         keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(25),
-                        ],
+                        inputFormatters: [],
+                        controller: sumController,
                         decoration: InputDecoration.collapsed(
-                          hintText: '${localization.phoneNumber}',
+                          hintText: '${localization.amount}',
                           hintStyle: TextStyle(
-                            color: phoneColor,
-                            fontWeight: FontWeight.w500,
+                            color: greyColor2,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                        controller: receiverController,
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(fontSize: 18),
                         onChanged: (value) {
-                          setState(() {
-                            toName = '';
-                            toAvatar = '';
-                          });
-                          if (receiverController.text.length > 10) {
-                            api.checkPhoneForSendMoney('$value').then((r) {
-                              if (r['success'].toString() == 'true') {
-                                setState(() {
-                                  toName = r['name'];
-                                  toAvatar = r['avatar'];
-                                });
-                              } else {
-                                setState(() {
-                                  toName = '${localization.userNotFound}';
-                                  toAvatar = '';
-                                });
-                              }
-                            });
+                          if (sumController.text[0] == '0') {
+                            sumController.clear();
                           }
                         },
                       ),
                     ),
+                    SizedBox(
+                      height: 15,
+                    ),
                   ],
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    InkWell(
-                      child: CircleAvatar(
-                        radius: 20,
-                        child: ClipOval(
-                          child: CachedNetworkImage(
-                            imageUrl: toAvatar == ''
-                                ? "${avatarUrl}noAvatar.png"
-                                : '$avatarUrl${toAvatar.replaceAll('AxB', '200x200')}',
-                          ),
-                        ),
-                      ),
-                      onTap: () async {
-                        FocusScopeNode currentFocus = FocusScope.of(context);
-                        if (!currentFocus.hasPrimaryFocus) {
-                          currentFocus.unfocus();
-                        }
-                        dynamic returnData = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TransferContactsDialogPage(),
-                          ),
-                        );
-                        if (returnData != null) {
-                          api
-                              .checkPhoneForSendMoney('${returnData.phone}')
-                              .then((r) {
-                            if (r['success'].toString() == 'true') {
-                              setState(() {
-                                toName = r['name'];
-                                toAvatar = r['avatar'];
-                              });
-                            } else {
-                              setState(() {
-                                // toName = '${localization.userNotFound}';
-                                toName = '${r['message']}';
-                                toAvatar = '';
-                              });
-                            }
-                          });
-                          receiverController.text = returnData.phone;
-                        }
-                      },
-                    ),
-                    Text(
-                      '$toName',
-                      textAlign: TextAlign.justify,
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Container(
-            height: 1.0,
-            color: Colors.grey,
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [],
-                    controller: sumController,
-                    decoration: InputDecoration.collapsed(
-                      hintText: '${localization.amount}',
-                      hintStyle: TextStyle(
-                        color: sumColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    style: TextStyle(fontSize: 20),
-                    onChanged: (value) {
-                      if (sumController.text[0] == '0') {
-                        sumController.clear();
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            height: 20,
-            alignment: Alignment.centerRight,
-            child: Text(
-              '',
-              maxLines: 4,
+              ],
             ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: whiteColor,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 20),
           ),
-          Container(
-            height: 1.0,
-            color: Colors.grey,
-          ),
-          Container(
+          SizedBox(
             height: 10,
           ),
           Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -647,16 +688,8 @@ class _TransferPageState extends State<TransferPage> {
               ],
             ),
           ),
-          Container(
-            height: 10,
-          ),
         ],
       ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 20),
     );
   }
 

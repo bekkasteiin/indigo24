@@ -29,22 +29,24 @@ class FullScreenWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: whiteColor,
       child: Scaffold(
         appBar: IndigoAppBarWidget(
-          title: Text('${localization.photo}',
-              style: TextStyle(
-                color: blackPurpleColor,
-                fontWeight: FontWeight.w400,
-                fontSize: 22,
-              ),
-              textAlign: TextAlign.center),
+          title: Text(
+            '${localization.photo}',
+            style: TextStyle(
+              color: blackPurpleColor,
+              fontWeight: FontWeight.w400,
+              fontSize: 22,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
         body: SafeArea(
           bottom: false,
           child: ClipRect(
             child: Container(
-              color: Colors.white,
+              color: whiteColor,
               constraints: BoxConstraints.expand(
                 height: MediaQuery.of(context).size.height,
               ),

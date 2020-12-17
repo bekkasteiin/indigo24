@@ -1,5 +1,6 @@
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:video_player/video_player.dart';
 
@@ -42,14 +43,14 @@ class _DefaultPlayerState extends State<DefaultPlayer> {
         child: FlickVideoPlayer(
           flickManager: flickManager,
           flickVideoWithControls: FlickVideoWithControls(
-            backgroundColor: Colors.black,
+            backgroundColor: blackColor,
             videoFit: BoxFit.contain,
             controls: FlickPortraitControls(
               progressBarSettings: FlickProgressBarSettings(),
             ),
           ),
           flickVideoWithControlsFullscreen: FlickVideoWithControls(
-            backgroundColor: Colors.transparent,
+            backgroundColor: transparentColor,
             videoFit: BoxFit.contain,
             controls: FlickLandscapeControls(),
           ),

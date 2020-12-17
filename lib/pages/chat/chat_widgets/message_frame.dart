@@ -31,7 +31,7 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: widget.message.type == 14 ? Colors.transparent : whiteColor,
+        color: widget.message.type == 14 ? transparentColor : whiteColor,
         borderRadius: identifyBorderRadius(widget.messageCategory),
       ),
       child: Column(
@@ -95,12 +95,12 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
               ? Icon(
                   Icons.done_all,
                   size: 16,
-                  color: Colors.blue,
+                  color: blueColor,
                 )
               : Icon(
                   Icons.done,
                   size: 16,
-                  color: Colors.grey[500],
+                  color: greyColor,
                 )
         ],
       );

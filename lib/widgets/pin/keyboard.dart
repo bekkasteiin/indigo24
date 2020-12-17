@@ -21,7 +21,7 @@ class KeyboardUIConfig {
     this.keyboardRowMargin = const EdgeInsets.only(top: 15, left: 4, right: 4),
     this.digitInnerMargin = const EdgeInsets.all(24),
     this.primaryColor = whiteColor,
-    this.digitFillColor = Colors.transparent,
+    this.digitFillColor = transparentColor,
     this.digitTextStyle = const TextStyle(fontSize: 30, color: whiteColor),
     this.deleteButtonTextStyle =
         const TextStyle(fontSize: 16, color: whiteColor),
@@ -71,7 +71,7 @@ class Keyboard extends StatelessWidget {
       margin: EdgeInsets.all(4),
       child: ClipOval(
         child: Material(
-          color: Colors.blue.withOpacity(0.2),
+          color: blueColor.withOpacity(0.2),
           child: InkWell(
             splashColor: keyboardUIConfig.primaryColor.withOpacity(0.4),
             onTap: () {

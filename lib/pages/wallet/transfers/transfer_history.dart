@@ -71,7 +71,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          localization.transfers,
+          localization.transfersHistory,
           style: TextStyle(
             color: blackPurpleColor,
             fontSize: 22,
@@ -190,47 +190,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     );
   }
 
-  Widget paymentStatus(int status) {
-    String text = '';
-    Color color = greyColor;
-    switch (status) {
-      case 0:
-        text = localization.newPayment;
-        color = Colors.yellow;
-        break;
-      case 1:
-        text = localization.newPayment;
-        color = Colors.yellow;
-        break;
-      case 2:
-        text = localization.error;
-        color = Colors.red;
-        break;
-      case 3:
-        text = localization.pending;
-        color = Colors.orange;
-        break;
-      case 4:
-        text = localization.success;
-        color = Colors.green;
-        break;
-      default:
-    }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(25),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        color: color,
-      ),
-    );
-  }
-
   Container _transferLogo(String logo) {
     return Container(
       margin: EdgeInsets.only(right: 10),
@@ -270,7 +229,6 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                       ? Image.asset('assets/images/in.png')
                       : Image.asset('assets/images/out.png'),
                 ),
-
                 if (comment != null)
                   SizedBox(
                     height: 5,
@@ -280,9 +238,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5.0,
-                          spreadRadius: -2,
+                          color: blackColor,
+                          blurRadius: 10.0,
+                          spreadRadius: -10,
                           offset: Offset(
                             0.0,
                             0.0,
@@ -304,59 +262,9 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                       maxLines: 3,
                     ),
                   ),
-
-                // Container(
-                //   child: ClipRRect(
-                //     borderRadius: BorderRadius.circular(25),
-                //     child: Container(
-                //       height: 15,
-                //       width: 15,
-                //       color: type == 'in' ? Colors.green : Colors.red,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
-          // SizedBox(width: 5),
-          // InkWell(
-          //   child: Container(
-          //     width: 40,
-          //     padding: EdgeInsets.all(5),
-          //     child: Column(
-          //       children: <Widget>[
-          //         Container(
-          //           child: Image.asset(
-          //             '$type' == 'in'
-          //                 ? 'assets/images/replyTransfer.png'
-          //                 : 'assets/images/repeat.png',
-          //             width: 20,
-          //             height: 20,
-          //           ),
-          //         ),
-          //         FittedBox(
-          //           child: Text(
-          //             '${type == 'in' ? localization.reply : localization.repeat}',
-          //             style: TextStyle(
-          //               color: Color(0xFF0543B8),
-          //             ),
-          //           ),
-          //         )
-          //       ],
-          //     ),
-          //   ),
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => TransferPage(
-          //           phone: phone,
-          //           amount: '0',
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // ),
         ],
       ),
     );

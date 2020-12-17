@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:indigo24/style/colors.dart';
 
 class TapePhoto extends StatelessWidget {
   const TapePhoto({
@@ -21,7 +22,7 @@ class TapePhoto extends StatelessWidget {
           imageProvider: CachedNetworkImageProvider(
             '$uploadTapes${_result['media']}',
           ),
-          backgroundDecoration: BoxDecoration(color: Colors.transparent),
+          backgroundDecoration: BoxDecoration(color: transparentColor),
           minScale: PhotoViewComputedScale.contained,
           maxScale: PhotoViewComputedScale.contained,
           enableRotation: false,

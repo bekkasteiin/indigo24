@@ -55,7 +55,7 @@ class _RefillPageState extends State<RefillPage> {
         }
       },
       child: Container(
-        color: Colors.white,
+        color: whiteColor,
         child: SafeArea(
           child: Scaffold(
             backgroundColor: milkWhiteColor,
@@ -96,7 +96,7 @@ class _RefillPageState extends State<RefillPage> {
                                   Navigator.pop(context);
                                 },
                               ),
-                              backgroundColor: Colors.transparent,
+                              backgroundColor: transparentColor,
                               elevation: 0,
                             ),
                             Container(
@@ -112,7 +112,7 @@ class _RefillPageState extends State<RefillPage> {
                                   ),
                                   Container(
                                     margin:
-                                        EdgeInsets.only(left: 30, right: 10),
+                                        EdgeInsets.only(left: 20, right: 10),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -149,7 +149,7 @@ class _RefillPageState extends State<RefillPage> {
                         ),
                       ),
                       Container(
-                        color: Colors.white,
+                        color: whiteColor,
                         padding: EdgeInsets.symmetric(vertical: 20),
                         child: TextFormField(
                           textAlign: TextAlign.center,
@@ -229,9 +229,9 @@ class _RefillPageState extends State<RefillPage> {
                         margin: EdgeInsets.only(left: 20, right: 20, top: 20),
                         decoration: BoxDecoration(boxShadow: [
                           BoxShadow(
-                              color: Colors.black26,
+                              color: blackColor,
                               blurRadius: 10.0,
-                              spreadRadius: -2,
+                              spreadRadius: -10,
                               offset: Offset(0.0, 0.0))
                         ]),
                         child: ButtonTheme(

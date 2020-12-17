@@ -160,7 +160,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                         child: Text(
                                           '${_saved[index]['name'][0].toUpperCase()}',
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: whiteColor,
                                             fontSize: 16.0,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -188,7 +188,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                                     right: 20,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: whiteColor,
                                         border: Border.all(
                                           color: primaryColor,
                                         ),
@@ -275,7 +275,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
+                              color: whiteColor,
                             ),
                             margin: EdgeInsets.only(left: 10, right: 10),
                           ),

@@ -63,7 +63,7 @@ class _SettingsNotificationsMainPageState
                 ),
               ),
               Container(
-                color: Colors.white,
+                color: whiteColor,
                 child: Column(
                   children: <Widget>[
                     Container(

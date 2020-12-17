@@ -262,7 +262,7 @@ class _TapesPageState extends State<TapesPage>
           ],
         ),
         body: Container(
-          color: Colors.white,
+          color: whiteColor,
           child: SafeArea(
             child: FutureBuilder(
               future: _listFuture,

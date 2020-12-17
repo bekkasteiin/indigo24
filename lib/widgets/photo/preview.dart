@@ -40,13 +40,13 @@ class _PreviewMediaState extends State<PreviewMedia> {
               image: previewBackgoundProvider, fit: BoxFit.fitWidth)),
       child: ClipRect(
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+          backgroundColor: transparentColor,
           appBar: AppBar(
-            backgroundColor: Colors.white.withOpacity(0.2),
+            backgroundColor: whiteColor.withOpacity(0.2),
             elevation: 0,
           ),
           body: Container(
-            color: Colors.transparent,
+            color: transparentColor,
             child: Column(
               children: [
                 Expanded(
@@ -58,14 +58,14 @@ class _PreviewMediaState extends State<PreviewMedia> {
                             minScale: PhotoViewComputedScale.contained,
                             maxScale: PhotoViewComputedScale.contained * 3,
                             backgroundDecoration:
-                                BoxDecoration(color: Colors.transparent),
+                                BoxDecoration(color: transparentColor),
                           )),
                 Expanded(
                   flex: 1,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: 40,
-                    color: Colors.white.withOpacity(0.2),
+                    color: whiteColor.withOpacity(0.2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -101,7 +101,7 @@ class _PreviewMediaState extends State<PreviewMedia> {
                 child: FittedBox(
                   child: FloatingActionButton(
                     heroTag: "btn1",
-                    backgroundColor: Colors.white,
+                    backgroundColor: whiteColor,
                     child: Image.asset(
                       'assets/images/send.png',
                       width: 30,

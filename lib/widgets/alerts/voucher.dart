@@ -34,7 +34,7 @@ class Voucher extends StatelessWidget {
           borderRadius: BorderRadius.circular(padding),
         ),
         elevation: 0.0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: transparentColor,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +129,7 @@ class Voucher extends StatelessWidget {
                             ),
                             Divider(),
                             _vouchetTitle(
-                              title: localization.youReceived,
+                              title: localization.receiver,
                               content: transferModel.name,
                             ),
                             if (transferModel.comment?.isNotEmpty != null)

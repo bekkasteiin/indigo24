@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/api/http/api.dart';
 
+import 'package:indigo24/style/colors.dart';
 import '../tape.dart';
 
 class TapeSocial extends StatefulWidget {
@@ -86,7 +87,7 @@ class _TapeSocialState extends State<TapeSocial> {
           child: Text(
             '${widget._result['created'].toString().replaceAll(".2020", "")}',
             style: TextStyle(
-              color: Colors.grey,
+              color: greyColor,
               fontWeight: FontWeight.w400,
             ),
           ),

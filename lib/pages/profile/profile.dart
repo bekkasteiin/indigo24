@@ -258,7 +258,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                         minScale: PhotoViewComputedScale.contained,
                         maxScale: PhotoViewComputedScale.contained * 3,
                         backgroundDecoration:
-                            BoxDecoration(color: Colors.transparent),
+                            BoxDecoration(color: transparentColor),
                       ),
                     ),
                   );
@@ -348,11 +348,11 @@ class _UserProfilePageState extends State<UserProfilePage>
       children: [
         SizedBox(height: 10),
         Container(
-          width: screenSize.width / 1.3,
+          width: screenSize.width / 1.2,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(header),
+              Text(header.toUpperCase()),
               SizedBox(height: 5),
               Text(
                 text,
@@ -368,9 +368,9 @@ class _UserProfilePageState extends State<UserProfilePage>
           ),
         ),
         Container(
-          width: screenSize.width / 1.3,
+          width: screenSize.width / 1.2,
           height: 0.5,
-          color: Colors.black54,
+          color: blackColor,
           margin: EdgeInsets.only(top: 4.0),
         ),
       ],
@@ -425,7 +425,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                       Text(
                         '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
                         style: TextStyle(
-                          color: Colors.grey,
+                          color: greyColor,
                         ),
                       ),
                       SizedBox(height: 15),
@@ -436,9 +436,9 @@ class _UserProfilePageState extends State<UserProfilePage>
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
+                                color: blackColor,
                                 blurRadius: 10.0,
-                                spreadRadius: -2,
+                                spreadRadius: -10,
                                 offset: Offset(0.0, 0.0),
                               )
                             ],
@@ -493,9 +493,9 @@ class _UserProfilePageState extends State<UserProfilePage>
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
+                                color: blackColor,
                                 blurRadius: 10.0,
-                                spreadRadius: -2,
+                                spreadRadius: -10,
                                 offset: Offset(0.0, 0.0),
                               )
                             ],
@@ -585,7 +585,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       Material(
-                        color: Colors.transparent,
+                        color: transparentColor,
                         child: InkWell(
                             onTap: () async {
                               Navigator.push(
@@ -691,7 +691,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                             (uploadPercent * 100).toStringAsFixed(2),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: whiteColor,
                               fontSize: 20.0,
                             ),
                           ),
@@ -699,7 +699,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                             "Загрузка",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: whiteColor,
                               fontSize: 17.0,
                             ),
                           ),

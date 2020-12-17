@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/photo/full_photo.dart';
+import 'package:indigo24/style/colors.dart';
 
 class ImageMessageWidget extends StatefulWidget {
   final String text;
@@ -22,12 +23,12 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.7,
         height: MediaQuery.of(context).size.width * 0.7,
-        color: Colors.grey.withOpacity(0.5),
+        color: greyColor.withOpacity(0.5),
       ),
       width: MediaQuery.of(context).size.width * 0.7,
       height: MediaQuery.of(context).size.width * 0.7,
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: transparentColor,
         borderRadius: BorderRadius.all(
           Radius.circular(8.0),
         ),
@@ -43,11 +44,11 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           FlatButton(
-            splashColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
+            splashColor: transparentColor,
+            hoverColor: transparentColor,
+            highlightColor: transparentColor,
             child: Material(
-              color: Colors.transparent,
+              color: transparentColor,
               child: CachedNetworkImage(
                 placeholder: (context, url) => placeholder(context),
                 errorWidget: (context, url, error) => Material(

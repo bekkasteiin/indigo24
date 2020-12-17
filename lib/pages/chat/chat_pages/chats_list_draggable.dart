@@ -125,19 +125,19 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                       margin: EdgeInsets.all(5),
                       child: Container(
                         decoration: BoxDecoration(
-                            shape: BoxShape.circle, color: Colors.blue),
+                            shape: BoxShape.circle, color: blueColor),
                         child: Padding(
                           padding: EdgeInsets.all(5),
                           child: _selectedChats.contains(_chats[i])
                               ? Icon(
                                   Icons.check,
                                   size: 15,
-                                  color: Colors.white,
+                                  color: whiteColor,
                                 )
                               : Icon(
                                   Icons.check_box_outline_blank,
                                   size: 15,
-                                  color: Colors.blue,
+                                  color: blueColor,
                                 ),
                         ),
                       ),
@@ -205,7 +205,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                             ),
                             child: Text(
                               " ${_chats[i]['unread_messages']} ",
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: whiteColor),
                             ),
                           )
                   ],

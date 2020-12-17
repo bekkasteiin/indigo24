@@ -183,7 +183,7 @@ class _WalletTabState extends State<WalletTab> {
           });
         },
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: whiteColor,
           extendBodyBehindAppBar: true,
           appBar: PreferredSize(
             child: AppBar(
@@ -250,7 +250,7 @@ class _WalletTabState extends State<WalletTab> {
                                 )),
                             _blockedBalance(size),
                             Container(
-                              color: Colors.white,
+                              color: whiteColor,
                               padding: EdgeInsets.only(
                                 left: size.width * 0.05,
                                 right: size.width * 0.05,
@@ -303,7 +303,7 @@ class _WalletTabState extends State<WalletTab> {
             tempSymbol == '\$'
                 ? '$tempSymbol 1 = $tempExchangeRate '
                 : '1 $tempSymbol = $tempExchangeRate ',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
+            style: TextStyle(color: whiteColor, fontWeight: FontWeight.w300),
           ),
           Image(
             image: AssetImage("assets/images/tenge.png"),
@@ -320,9 +320,9 @@ class _WalletTabState extends State<WalletTab> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 10.0,
-            spreadRadius: -2,
+            spreadRadius: -10,
             offset: Offset(0.0, 0.0),
           )
         ],
@@ -380,9 +380,9 @@ class _WalletTabState extends State<WalletTab> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 10.0,
-            spreadRadius: -2,
+            spreadRadius: -10,
             offset: Offset(0.0, 0.0),
           )
         ],
@@ -439,9 +439,9 @@ class _WalletTabState extends State<WalletTab> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 10.0,
-            spreadRadius: -2,
+            spreadRadius: -10,
             offset: Offset(0.0, 0.0),
           )
         ],
@@ -622,9 +622,9 @@ class _WalletTabState extends State<WalletTab> {
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.black26,
+                color: blackColor,
                 blurRadius: 10.0,
-                spreadRadius: -2,
+                spreadRadius: -10,
                 offset: Offset(0.0, 0.0),
               )
             ],
@@ -669,9 +669,9 @@ class _WalletTabState extends State<WalletTab> {
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.black26,
+                color: blackColor,
                 blurRadius: 10.0,
-                spreadRadius: -2,
+                spreadRadius: -10,
                 offset: Offset(0.0, 0.0),
               )
             ],

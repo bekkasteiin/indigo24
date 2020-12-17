@@ -32,7 +32,7 @@ class _PDFViewerState extends State<PDFViewer> {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        theme: ThemeData(primaryColor: Colors.white),
+        theme: ThemeData(primaryColor: whiteColor),
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(

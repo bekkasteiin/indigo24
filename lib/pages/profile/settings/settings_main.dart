@@ -50,7 +50,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  color: Colors.white,
+                  color: whiteColor,
                   child: Column(
                     children: <Widget>[
                       _settingsRow(
@@ -155,50 +155,62 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
     @required String title,
     String subtext,
   }) {
-    return Material(
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: blackPurpleColor,
-                ),
-              ),
-              Row(
-                children: [
-                  if (subtext != null)
-                    Text(
-                      subtext,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: blackPurpleColor,
-                      ),
-                    ),
-                  Container(
-                    margin: EdgeInsets.only(right: 10),
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/forward.png',
-                      ),
-                      width: 15,
-                      height: 15,
+    return Column(
+      children: [
+        Material(
+          color: whiteColor,
+          child: InkWell(
+            onTap: onTap,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: blackPurpleColor,
                     ),
                   ),
+                  Row(
+                    children: [
+                      if (subtext != null)
+                        Text(
+                          subtext,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: blackPurpleColor,
+                          ),
+                        ),
+                      Container(
+                        margin: EdgeInsets.only(right: 10),
+                        child: Image(
+                          image: AssetImage(
+                            'assets/images/forward.png',
+                          ),
+                          width: 15,
+                          height: 15,
+                        ),
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
+              ),
+            ),
           ),
         ),
-      ),
+        Container(
+          padding: EdgeInsets.only(left: 20),
+          child: Divider(
+            color: darkPrimaryColor,
+            height: 1,
+          ),
+        ),
+      ],
     );
   }
 }

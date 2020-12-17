@@ -185,7 +185,7 @@ class _AddTapePageState extends State<AddTapePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: FloatingActionButton(
-                backgroundColor: Colors.white,
+                backgroundColor: whiteColor,
                 onPressed: () {
                   _isVideo = false;
                   _action();
@@ -197,7 +197,7 @@ class _AddTapePageState extends State<AddTapePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: FloatingActionButton(
-                backgroundColor: Colors.white,
+                backgroundColor: whiteColor,
                 onPressed: () {
                   _isVideo = true;
                   _action();

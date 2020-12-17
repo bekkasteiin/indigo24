@@ -48,7 +48,7 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                color: Colors.white,
+                color: whiteColor,
                 child: Column(
                   children: <Widget>[
                     ListView.separated(
@@ -59,25 +59,56 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                       shrinkWrap: true,
                       itemCount: sounds.length,
                       itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(
-                            '${localization.sound} $index',
-                          ),
-                          trailing: user.sound == sounds[index]
-                              ? Icon(Icons.done)
-                              : Icon(
-                                  Icons.done,
-                                  color: Colors.transparent,
+                        return Column(
+                          children: <Widget>[
+                            Material(
+                              child: InkWell(
+                                onTap: () async {
+                                  final SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setString('sound', sounds[index]);
+                                  setState(() {
+                                    user.sound = sounds[index];
+                                  });
+                                  ChatRoom.shared.inSound();
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 5,
+                                  ),
+                                  height: 50,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        '${localization.sound} $index',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: blackPurpleColor,
+                                        ),
+                                      ),
+                                      user.sound == sounds[index]
+                                          ? Icon(
+                                              Icons.done,
+                                              color: darkPrimaryColor,
+                                            )
+                                          : Center()
+                                    ],
+                                  ),
                                 ),
-                          onTap: () async {
-                            final SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            prefs.setString('sound', sounds[index]);
-                            setState(() {
-                              user.sound = sounds[index];
-                            });
-                            ChatRoom.shared.inSound();
-                          },
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 20),
+                              child: Divider(
+                                color: darkPrimaryColor,
+                                height: 1,
+                              ),
+                            ),
+                          ],
                         );
                       },
                     ),

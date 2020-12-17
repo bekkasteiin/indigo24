@@ -104,9 +104,9 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 10.0,
-            spreadRadius: -2,
+            spreadRadius: -10,
             offset: Offset(
               0.0,
               0.0,

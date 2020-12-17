@@ -1,4 +1,3 @@
-// Color palette for the unthemed pages
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,8 +17,8 @@ class Palette {
   static Color errorGradientEndColor = Color(0xff9b0000);
 
   static Color primaryTextColorLight = whiteColor;
-  static Color secondaryTextColorLight = Colors.white70;
-  static Color hintTextColorLight = Colors.white70;
+  static Color secondaryTextColorLight = whiteColor;
+  static Color hintTextColorLight = whiteColor;
 
   static Color selfMessageBackgroundColor = Color(0xff4fc3f7);
   static Color otherMessageBackgroundColor = whiteColor;
@@ -27,7 +26,7 @@ class Palette {
   static Color selfMessageColor = whiteColor;
   static Color otherMessageColor = Color(0xff3f3f3f);
 
-  static Color greyColor = Colors.grey;
+  static Color greyColor = greyColor;
 }
 
 class GradientFab extends StatelessWidget {
@@ -58,7 +57,7 @@ class GradientFab extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.center,
               end: Alignment.bottomRight,
-              colors: [Colors.white],
+              colors: [whiteColor],
             )),
         child: child,
       ),
@@ -116,7 +115,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.transparent,
+        color: transparentColor,
         width: MediaQuery.of(context).size.width * 0.7,
         height: MediaQuery.of(context).size.width * 0.7,
         child: Column(

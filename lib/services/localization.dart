@@ -116,7 +116,7 @@ String selectFile = 'Выберите файл';
 String userNotFound = 'Пользователь не найден';
 String history = 'История';
 String youSended = 'Вы отправили';
-String youReceived = 'Вы получили';
+String receiver = 'Получатель';
 String online = 'онлайн';
 String enterValidAccount = 'Введите корректный номер аккаунта';
 String enterBelowMax = 'Введите сумму ниже максимальной отметки';
@@ -184,8 +184,18 @@ String withdrawTerm =
 String destination = 'Адрес платежа';
 String payFrom = 'Оплачено с этого аккаунта';
 String date = 'Дата';
-String iAgree = "iAgree";
+String iAgree = "Принимаю пользовательское соглашение";
 String paymentsHistory = 'Payments history';
+String transfersHistory = 'Transfers history';
+
+String reveicerPhone = 'Receiver phone';
+
+String transferAmount = 'Transfer amount';
+
+String infoAboutConfidentional = 'Информация о конфиденциальности';
+
+String confidentionalAgreement =
+    "Клиент обязуется самостоятельно принимать все необходимые меры по сохранению конфиденциальности, предотвращению несанкционированного использования и защите своих аутентификационных данных от несанкционированного доступа со стороны третьих лиц. Клиент обязуется не сообщать свои аутентификационные данные: логин, пароль, PIN-код третьим лицам, т.е. не передавать свои аутентификационные данные и подтверждает, что самостоятельно несет ответственность за сохранность конфиденциальной информации и за распространение данных, а также за возможные финансовые убытки в результате передачи аутентификационых данных";
 List filters = [
   {'text': 'За неделю', 'code': 'week'},
   {'text': 'За месяц', 'code': 'month'},
@@ -321,7 +331,7 @@ setLanguage(code) {
       userNotFound = 'User not found';
       history = 'History';
       youSended = 'You have sended';
-      youReceived = 'You have received';
+      receiver = 'Receiver';
       online = 'online';
       enterValidAccount = 'Enter the correct account number';
       enterBelowMax = 'Enter the amount below the maximum mark';
@@ -389,6 +399,18 @@ setLanguage(code) {
       payFrom = 'Paid from';
       date = 'Date';
       destination = 'Payment address';
+      iAgree = "I accept the user agreement";
+      paymentsHistory = 'Payments history';
+      transfersHistory = 'Transfers history';
+
+      reveicerPhone = 'Receiver phone';
+
+      transferAmount = 'Transfer amount';
+
+      infoAboutConfidentional = 'Privacy Information';
+
+      confidentionalAgreement =
+          "The client undertakes to independently take all necessary measures to preserve confidentiality, prevent unauthorized use and protect his authentication data from unauthorized access by third parties. The client undertakes not to disclose his authentication data: login, password, PIN to third parties, ie. not to transfer his authentication data and confirms that he is independently responsible for the safety of confidential information and for the dissemination of data, as well as for possible financial losses as a result of the transfer of authentication data ";
       break;
     case 'ru':
       registration = 'Регистрация';
@@ -507,7 +529,7 @@ setLanguage(code) {
       userNotFound = 'Пользователь не найден';
       history = 'История';
       youSended = 'Вы отправили';
-      youReceived = 'Вы получили';
+      receiver = 'Получатель';
       online = 'онлайн';
       enterValidAccount = 'Введите корректный номер аккаунта';
       enterBelowMax = 'Введите сумму ниже максимальной отметки';
@@ -575,6 +597,19 @@ setLanguage(code) {
       date = 'Дата';
       payFrom = 'Оплачено с этого аккаунта';
       destination = 'Адрес платежа';
+
+      iAgree = "Принимаю пользовательское соглашение";
+      paymentsHistory = 'Payments history';
+      transfersHistory = 'Transfers history';
+
+      reveicerPhone = 'Receiver phone';
+
+      transferAmount = 'Transfer amount';
+
+      infoAboutConfidentional = 'Информация о конфиденциальности';
+
+      confidentionalAgreement =
+          "Клиент обязуется самостоятельно принимать все необходимые меры по сохранению конфиденциальности, предотвращению несанкционированного использования и защите своих аутентификационных данных от несанкционированного доступа со стороны третьих лиц. Клиент обязуется не сообщать свои аутентификационные данные: логин, пароль, PIN-код третьим лицам, т.е. не передавать свои аутентификационные данные и подтверждает, что самостоятельно несет ответственность за сохранность конфиденциальной информации и за распространение данных, а также за возможные финансовые убытки в результате передачи аутентификационых данных";
 
       break;
     case 'kz':
@@ -694,7 +729,7 @@ setLanguage(code) {
       userNotFound = 'Пайдаланушы табылмады';
       history = 'Төлемдер тарихы';
       youSended = 'Сіз жібердіңіз';
-      youReceived = 'Сіз алдыңыз';
+      receiver = 'Қабылдаушы';
       online = 'онлайн';
       enterValidAccount = 'Дұрыс тіркелгі нөмірін енгізіңіз';
       enterBelowMax = 'Ең жоғарғы белгіден төмен соманы енгізіңіз';
@@ -763,6 +798,18 @@ setLanguage(code) {
       date = 'Күні';
       destination = 'Төлем мекен-жайы';
 
+      iAgree = 'Мен пайдаланушы келісімін қабылдаймын';
+      paymentsHistory = 'Төлемдер тарихы';
+      transfersHistory = 'Аударымдар тарихы';
+
+      reveicerPhone = 'Қабылдағыш телефон';
+
+      transferAmount = 'Аударым сомасы';
+
+      infoAboutConfidentional = 'Құпиялылық туралы ақпарат';
+
+      confidentionalAgreement =
+          'Клиент құпиялылықты сақтау, санкцияланбаған пайдалануды болдырмау және оның аутентификациялық деректерін бөгде адамдардың рұқсатсыз кіруінен қорғау бойынша барлық қажетті шараларды өз бетінше қабылдауға міндеттенеді. Клиент өзінің аутентификациясы туралы мәліметтерді жарияламауға міндеттенеді: логин, пароль, PIN код үшінші тұлғаларға, яғни. өзінің түпнұсқалық растамалық деректерін бермеуге және құпия ақпараттың сақталуы мен деректердің таралуы үшін, сондай-ақ аутентификация деректерін беру нәтижесінде болуы мүмкін қаржылық шығындар үшін дербес жауап беретіндігін растайды';
       break;
     case 'uz':
       registration = 'Рўйхатдан ўтиш';
@@ -881,7 +928,7 @@ setLanguage(code) {
       userNotFound = 'Фойдаланувчи топилмади';
       history = 'Тарих';
       youSended = 'Сиз юбордингиз';
-      youReceived = 'Сиз олдингиз';
+      receiver = 'Қабул қилувчи';
       online = 'Тармоқда';
       enterValidAccount = 'Тўғри аккаунт рақамини киритинг';
       enterBelowMax = 'Максимал белгидан паст суммани киритинг';
@@ -947,6 +994,15 @@ setLanguage(code) {
       payFrom = 'Ушбу ҳисоб билан тўланган';
       date = 'Сана';
       destination = 'Тўлов манзили';
+      paymentsHistory = 'Тўловлар тарихи';
+      iAgree = "Фойдаланувчи шартномасини қабул қиламан";
+      transfersHistory = 'Трансферлар тарихи';
+      reveicerPhone = 'Қабул қилувчи telefon';
+      transferAmount = 'Ўтказма миқдори ъ';
+      infoAboutConfidentional = 'Махфийлик тўғрисидаги маълумотлар';
+      confidentionalAgreement =
+          'Мижоз махфийликни сақлаш, рухсациз фойдаланишни олдини олиш ва унинг аутентификация маълумотларини учинчи шахсларнинг рухсациз киришидан ҳимоя қилиш учун мустақил равишда барча зарур чораларни кўришга мажбурдир. Мижоз ўзининг аутентификация маълумотларини ошкор қилмасликни ўз зиммасига олади: login, парол, ПИН-код учинчи шахсларга, яъни. аутентификация маълумотларини ўтказмаслик ва махфий маълумотларнинг хавфсизлиги ва маълумотларнинг тарқалиши учун, шунингдек аутентификация маълумотларини узатиш натижасида юзага келиши мумкин бўлган молиявий зарарлар учун мустақил равишда жавобгар еканлигини тасдиқлайди';
+
       break;
     case 'uzb':
       registration = 'Ro\'yxatdan o\'tish';
@@ -1065,7 +1121,7 @@ setLanguage(code) {
       userNotFound = 'Foydalanuvchi topilmadi';
       history = 'Tarix';
       youSended = 'Siz yuborgan';
-      youReceived = 'Siz bor';
+      receiver = 'Oluvchi';
       online = 'onlayn';
       enterValidAccount = 'To\'g\'ri hisob raqamini kiriting';
       enterBelowMax = 'Maksimal belgidan past miqdorni kiriting';
@@ -1132,7 +1188,14 @@ setLanguage(code) {
       payFrom = 'Ushbu hisob bilan to\'langan';
       date = 'Sana';
       destination = 'To\'lov manzili';
+      iAgree = "Foydalanuvchi shartnomasini qabul qilaman";
 
+      transfersHistory = 'Transferlar tarixi';
+      reveicerPhone = 'Qabul qiluvchi telefon';
+      transferAmount = 'O\'tkazma miqdori';
+      infoAboutConfidentional = 'Maxfiylik to\'g\'risidagi ma\'lumotlar';
+      confidentionalAgreement =
+          'Mijoz maxfiylikni saqlash, ruxsasiz foydalanishni oldini olish va uning autentifikasiya ma\'lumotlarini uchinchi shaxslarning ruxsasiz kirishidan himoya qilish uchun mustaqil ravishda barcha zarur choralarni ko\'rishga majburdir. Mijoz o\'zining autentifikasiya ma\'lumotlarini oshkor qilmaslikni o\'z zimmasiga oladi: login, parol, PIN-kod uchinchi shaxslarga, ya\'ni. autentifikasiya ma\'lumotlarini o\'tkazmaslik va maxfiy ma\'lumotlarning xavfsizligi va ma\'lumotlarning tarqalishi uchun, shuningdek autentifikasiya ma\'lumotlarini uzatish natijasida yuzaga kelishi mumkin bo\'lgan moliyaviy zararlar uchun mustaqil ravishda javobgar ekanligini tasdiqlaydi';
       break;
     default:
   }

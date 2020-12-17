@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/style/colors.dart';
 
 String downloadPercent = "0 %";
 
@@ -27,7 +28,7 @@ class ProgressBar {
             body: Stack(
               children: <Widget>[
                 Container(
-                  color: Colors.lightBlue.withOpacity(0.3),
+                  color: blueColor,
                 ),
                 Center(
                   child: LinearProgressIndicator(),

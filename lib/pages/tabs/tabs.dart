@@ -487,7 +487,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               title: Container(
                 padding: EdgeInsets.all(10),
                 child: Material(
-                  color: Colors.transparent,
+                  color: transparentColor,
                   child: Row(
                     children: [
                       _sharedFiles == null
@@ -512,7 +512,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               ),
               message: Container(
                 height: MediaQuery.of(context).size.height * 0.5,
-                color: Colors.transparent,
+                color: transparentColor,
                 child: Stack(
                   children: [
                     isUploading
@@ -532,14 +532,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                                       percent,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                                          color: blackColor,
                                           fontSize: 20.0),
                                     ),
                                     footer: Text(
                                       "Загрузка",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                          color: whiteColor,
                                           fontSize: 17.0),
                                     ),
                                     circularStrokeCap: CircularStrokeCap.round,
@@ -549,7 +549,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                             ),
                           )
                         : Material(
-                            color: Colors.transparent,
+                            color: transparentColor,
                             child: ListView.builder(
                               itemCount: myContacts.length,
                               itemBuilder: (BuildContext context, int i) {

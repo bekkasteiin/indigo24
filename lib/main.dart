@@ -16,6 +16,7 @@ import 'pages/chat/chat_models/messages_model.dart';
 import 'services/api/socket/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
 
+import 'package:indigo24/style/colors.dart';
 import 'widgets/alerts/indigo_alert.dart';
 
 Future<void> main() async {
@@ -69,7 +70,7 @@ class MyApp extends StatelessWidget {
           );
         },
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: blueColor,
         ),
         home: '$phone' == 'null' ? IntroPage() : Tabs(),
       ),

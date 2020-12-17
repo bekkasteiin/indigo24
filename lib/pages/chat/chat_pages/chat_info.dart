@@ -479,7 +479,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                   //     children: <Widget>[
                   //       Flexible(
                   //         child: Container(
-                  //           color: Colors.white,
+                  //           color:whiteColor,
                   //         ),
                   //       ),
                   //       GridView.count(
@@ -575,7 +575,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     return Container(
-      color: Colors.white,
+      color: whiteColor,
       child: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -605,7 +605,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                   ),
                                 ),
                               ),
-                              color: Colors.white,
+                              color: whiteColor,
                               onPressed: () {
                                 Navigator.pop(context, _membersCount);
                               },
@@ -644,7 +644,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                               ),
                                             ),
                                           ),
-                                          Icon(Icons.edit, color: Colors.white)
+                                          Icon(Icons.edit, color: whiteColor)
                                         ],
                                       )
                                     : FittedBox(
@@ -662,8 +662,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                             IconButton(
                               icon: Icon(Icons.more_vert),
                               color: widget.chatType == 1
-                                  ? Colors.white
-                                  : Colors.transparent,
+                                  ? whiteColor
+                                  : transparentColor,
                               onPressed: () {
                                 widget.chatType == 1
                                     ? _addMembers(widget.chatId)
@@ -834,9 +834,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                                                           [
                                                                           'online'] ==
                                                                       'online'
-                                                                  ? Colors.white
-                                                                  : Colors
-                                                                      .transparent),
+                                                                  ? whiteColor
+                                                                  : transparentColor),
                                                           child: Container(
                                                             decoration: BoxDecoration(
                                                                 borderRadius:
@@ -848,8 +847,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                                                             'online'] ==
                                                                         'online'
                                                                     ? greenColor
-                                                                    : Colors
-                                                                        .transparent),
+                                                                    : transparentColor),
                                                             height: 15,
                                                             width: 15,
                                                           ),

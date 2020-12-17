@@ -66,7 +66,7 @@ class Countries extends StatelessWidget {
               return Container(
                 margin: EdgeInsets.only(left: 20),
                 height: 0.2,
-                color: Colors.black,
+                color: blackColor,
               );
             },
           ),

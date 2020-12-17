@@ -32,7 +32,7 @@ class _ReplyMessageWidgetState extends State<ReplyMessageWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              color: Colors.blue,
+              color: blueColor,
               child: Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,

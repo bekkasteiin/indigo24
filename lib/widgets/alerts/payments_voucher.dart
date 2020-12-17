@@ -34,7 +34,7 @@ class PaymentVoucher extends StatelessWidget {
           borderRadius: BorderRadius.circular(padding),
         ),
         elevation: 0.0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: transparentColor,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -78,7 +78,7 @@ class PaymentVoucher extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    localization.service,
+                                    paymentHistoryModel.title,
                                     style: TextStyle(color: blackPurpleColor),
                                   ),
                                 )
@@ -143,8 +143,9 @@ class PaymentVoucher extends StatelessWidget {
                               rigthWidget: user.phone,
                             ),
                             _voucherInfo(
-                                leftWidget: localization.destination,
-                                rigthWidget: paymentHistoryModel.account),
+                              leftWidget: localization.destination,
+                              rigthWidget: paymentHistoryModel.account,
+                            ),
                           ],
                         ),
                       ),
@@ -312,16 +313,16 @@ class PaymentVoucher extends StatelessWidget {
   Color identifyColor(int status) {
     switch (status) {
       case 0:
-        return Colors.yellow;
+        return pendingColor;
         break;
       case 1:
-        return Colors.yellow[700];
+        return pendingColor;
         break;
       case 2:
-        return redColor;
+        return errorColor;
         break;
       case 3:
-        return Colors.orange;
+        return pendingColor;
         break;
       case 4:
         return succesColor;

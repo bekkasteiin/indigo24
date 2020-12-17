@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import './flick_multi_manager.dart';
 import 'package:flick_video_player/flick_video_player.dart';
+import 'package:indigo24/style/colors.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
@@ -52,11 +53,11 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
         }
       },
       child: Container(
-        color: Colors.transparent,
+        color: transparentColor,
         child: FlickVideoPlayer(
           flickManager: flickManager,
           flickVideoWithControls: FlickVideoWithControls(
-            backgroundColor: Colors.transparent,
+            backgroundColor: transparentColor,
             playerLoadingFallback: Positioned.fill(
               child: Stack(
                 children: <Widget>[
@@ -75,11 +76,11 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
                     right: 10,
                     top: 10,
                     child: Container(
-                      color: Colors.transparent,
+                      color: transparentColor,
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                        backgroundColor: Colors.white,
+                        backgroundColor: whiteColor,
                         strokeWidth: 4,
                       ),
                     ),
@@ -101,9 +102,9 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
             controls: FlickLandscapeControls(),
             iconThemeData: IconThemeData(
               size: 40,
-              color: Colors.white,
+              color: whiteColor,
             ),
-            textStyle: TextStyle(fontSize: 16, color: Colors.white),
+            textStyle: TextStyle(fontSize: 16, color: whiteColor),
           ),
         ),
       ),
@@ -124,7 +125,7 @@ class FeedPlayerPortraitControls extends StatelessWidget {
     FlickDisplayManager displayManager =
         Provider.of<FlickDisplayManager>(context);
     return Container(
-      color: Colors.transparent,
+      color: transparentColor,
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -136,7 +137,7 @@ class FeedPlayerPortraitControls extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.black38,
+                  color: blackColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: FlickLeftDuration(),
@@ -163,12 +164,12 @@ class FeedPlayerPortraitControls extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Colors.black38,
+                    color: blackColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: FlickSoundToggle(
                     toggleMute: () => flickMultiManager.toggleMute(),
-                    color: Colors.white,
+                    color: whiteColor,
                   ),
                 ),
                 // FlickFullScreenToggle(),

@@ -152,7 +152,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                   child: Center(
                     child: Text(
                       "${chat.unreadCount}",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: whiteColor),
                     ),
                   ),
                 )
@@ -329,7 +329,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                               IconSlideAction(
                                 caption:
                                     '${numbers.elementAt(i).isMuted == true ? localization.unmute : localization.mute}',
-                                color: Colors.transparent,
+                                color: transparentColor,
                                 foregroundColor: blackPurpleColor,
                                 iconWidget: numbers.elementAt(i).isMuted == true
                                     ? Container(
@@ -354,7 +354,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                               ),
                               IconSlideAction(
                                 caption: '${localization.delete}',
-                                color: Colors.transparent,
+                                color: transparentColor,
                                 foregroundColor: blackPurpleColor,
                                 iconWidget: Container(
                                   child: Center(

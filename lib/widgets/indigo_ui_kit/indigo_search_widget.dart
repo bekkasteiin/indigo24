@@ -17,29 +17,21 @@ class IndigoSearchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(55),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 6,
-            spreadRadius: -5,
-            offset: Offset(0.0, 6.0),
-          )
-        ],
-      ),
-      child: IndigoTextField(
-        onChangeCallback: onChangeCallback,
-        textEditingController: _searchController,
-        suffixIcon: GestureDetector(
-          child: Icon(
-            Icons.search,
-            size: 26,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Container(
+        child: IndigoTextField(
+          onChangeCallback: onChangeCallback,
+          textEditingController: _searchController,
+          suffixIcon: GestureDetector(
+            child: Icon(
+              Icons.search,
+              size: 26,
+            ),
+            onTap: callback,
           ),
-          onTap: callback,
+          hintText: localization.search,
         ),
-        hintText: localization.search,
       ),
     );
   }

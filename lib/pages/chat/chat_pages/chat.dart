@@ -411,7 +411,7 @@ class _NewChatPageState extends State<ChatPage> {
                   : Text(
                       '',
                       style: TextStyle(
-                        color: Colors.transparent,
+                        color: transparentColor,
                         fontSize: 12,
                       ),
                     )
@@ -490,7 +490,7 @@ class _NewChatPageState extends State<ChatPage> {
                                         child: Container(
                                           decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              color: Colors.blue),
+                                              color: blueColor),
                                           child: Padding(
                                             padding: EdgeInsets.all(5),
                                             child: toForwardMessages
@@ -498,13 +498,13 @@ class _NewChatPageState extends State<ChatPage> {
                                                 ? Icon(
                                                     Icons.check,
                                                     size: 15,
-                                                    color: Colors.white,
+                                                    color: whiteColor,
                                                   )
                                                 : Icon(
                                                     Icons
                                                         .check_box_outline_blank,
                                                     size: 15,
-                                                    color: Colors.blue,
+                                                    color: blueColor,
                                                   ),
                                           ),
                                         ),
@@ -550,7 +550,7 @@ class _NewChatPageState extends State<ChatPage> {
                         ? Container(
                             height: 50,
                             width: MediaQuery.of(context).size.width,
-                            color: Colors.white,
+                            color: whiteColor,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -623,7 +623,7 @@ class _NewChatPageState extends State<ChatPage> {
                         ? Container(
                             height: 50,
                             width: MediaQuery.of(context).size.width,
-                            color: Colors.white,
+                            color: whiteColor,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -1297,14 +1297,14 @@ class _NewChatPageState extends State<ChatPage> {
 
   _showAttachmentBottomSheet(context) {
     showModalBottomSheet(
-      barrierColor: Colors.white.withOpacity(0),
+      barrierColor: whiteColor.withOpacity(0),
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: transparentColor,
       builder: (BuildContext bc) {
         return Theme(
           data: ThemeData(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
+            splashColor: transparentColor,
+            highlightColor: transparentColor,
           ),
           child: InkWell(
             onTap: () {
@@ -1325,7 +1325,7 @@ class _NewChatPageState extends State<ChatPage> {
                     topRight: Radius.circular(15),
                   ),
                   child: Container(
-                    color: Colors.white.withOpacity(0.9),
+                    color: whiteColor.withOpacity(0.9),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[

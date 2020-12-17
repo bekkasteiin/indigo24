@@ -214,7 +214,7 @@ class _IntroPageState extends State<IntroPage> {
       color: whiteColor,
       child: SafeArea(
         child: Scaffold(
-            backgroundColor: Colors.transparent,
+            backgroundColor: transparentColor,
             body: Stack(
               children: <Widget>[
                 Container(
@@ -224,7 +224,7 @@ class _IntroPageState extends State<IntroPage> {
                   ),
                 ),
                 AppBar(
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: transparentColor,
                   elevation: 0,
                   centerTitle: true,
                   title: FittedBox(
@@ -285,7 +285,7 @@ class _IntroPageState extends State<IntroPage> {
                                   vertical: 0,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: whiteColor,
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(6.0),
                                   ),
@@ -306,7 +306,7 @@ class _IntroPageState extends State<IntroPage> {
                                           },
                                         ),
                                         child: Container(
-                                          color: Colors.transparent,
+                                          color: transparentColor,
                                           child: Row(
                                             children: [
                                               Transform.rotate(
@@ -354,7 +354,7 @@ class _IntroPageState extends State<IntroPage> {
                                                   child: Container(
                                                     height: 30,
                                                     width: 100,
-                                                    color: Colors.transparent,
+                                                    color: transparentColor,
                                                     child: Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment

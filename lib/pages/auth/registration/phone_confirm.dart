@@ -60,7 +60,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
         preferredSize: Size.fromHeight(0.0),
         child: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.white,
+          backgroundColor: whiteColor,
           brightness: Brightness.light,
         ),
       ),
@@ -121,7 +121,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.9,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: whiteColor,
               borderRadius: BorderRadius.circular(5),
             ),
             child: Column(
@@ -148,7 +148,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                       Text(
                         '$smsError',
                         style: TextStyle(
-                          color: Colors.red,
+                          color: redColor,
                           fontWeight: FontWeight.w500,
                           fontSize: 10,
                         ),
@@ -177,7 +177,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                 Container(
                   padding: EdgeInsets.only(bottom: 10),
                   child: Material(
-                    color: Colors.transparent,
+                    color: transparentColor,
                     child: RaisedButton(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
@@ -212,7 +212,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                           child: Text(
                             "${localization.repeat} SMS",
                             style: TextStyle(
-                              color: Colors.grey[700],
+                              color: greyColor,
                             ),
                           ),
                         ),
@@ -227,7 +227,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     defaultWidget: Text(
                       "${localization.next}",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: whiteColor,
                         fontSize: 22,
                         fontWeight: FontWeight.w300,
                       ),

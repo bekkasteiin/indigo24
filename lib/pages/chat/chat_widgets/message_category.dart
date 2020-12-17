@@ -6,6 +6,7 @@ import 'package:indigo24/pages/chat/chat_pages/chat_info.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/style/colors.dart';
 
 import 'message_categories/divider_message.dart';
 import 'message_categories/received_message.dart';
@@ -171,7 +172,7 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
               ),
               Container(
                 height: 50,
-                color: Colors.red,
+                color: redColor,
                 child: FittedBox(
                   child: Theme(
                     data: ThemeData(),
@@ -285,16 +286,16 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
 
   _showMessageAction(context, {List<Widget> actions}) {
     showModalBottomSheet(
-      barrierColor: Colors.black.withOpacity(0.2),
+      barrierColor: blackColor.withOpacity(0.2),
       context: context,
       enableDrag: false,
-      backgroundColor: Colors.transparent,
+      backgroundColor: transparentColor,
       isScrollControlled: true,
       builder: (BuildContext bc) {
         return Theme(
           data: ThemeData(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
+            splashColor: transparentColor,
+            highlightColor: transparentColor,
           ),
           child: InkWell(
             onTap: () {
@@ -308,7 +309,7 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
             child: SafeArea(
               child: Center(
                 child: Container(
-                  color: Colors.white.withOpacity(0.9),
+                  color: whiteColor.withOpacity(0.9),
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

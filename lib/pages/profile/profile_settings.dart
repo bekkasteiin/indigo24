@@ -206,7 +206,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                               height: size.width * 0.35,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(80.0),
-                                color: primaryColor,
+                                color: darkPrimaryColor,
                               ),
                             ),
                             Container(
@@ -221,7 +221,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                 ),
                                 borderRadius: BorderRadius.circular(80.0),
                                 border: Border.all(
-                                  color: primaryColor,
+                                  color: darkPrimaryColor,
                                   width: 5.0,
                                 ),
                               ),
@@ -231,53 +231,49 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         SizedBox(width: 20),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Row(
-                              children: [
-                                FlatButton(
-                                  onPressed: () {
-                                    getImage(ImageSource.camera);
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                          "assets/images/fromCamera.png",
-                                          width: 30),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        '${localization.photo} ${localization.camera.toLowerCase()}',
-                                        style: TextStyle(
-                                          color: blackPurpleColor,
-                                        ),
-                                      ),
-                                    ],
+                            FlatButton(
+                              onPressed: () {
+                                getImage(ImageSource.camera);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    "assets/images/fromCamera.png",
+                                    width: 30,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: 10),
+                                  Text(
+                                    '${localization.photo} ${localization.camera.toLowerCase()}',
+                                    style: TextStyle(
+                                      color: blackPurpleColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Row(
-                              children: [
-                                FlatButton(
-                                  onPressed: () {
-                                    getImage(ImageSource.gallery);
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        "assets/images/fromGallery.png",
-                                        width: 30,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        '${localization.photo} ${localization.gallery.toLowerCase()}',
-                                        style: TextStyle(
-                                          color: blackPurpleColor,
-                                        ),
-                                      ),
-                                    ],
+                            FlatButton(
+                              onPressed: () {
+                                getImage(ImageSource.gallery);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    "assets/images/fromGallery.png",
+                                    width: 30,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: 10),
+                                  Text(
+                                    '${localization.photo} ${localization.gallery.toLowerCase()}',
+                                    style: TextStyle(
+                                      color: blackPurpleColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -285,7 +281,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     ),
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 5,
                   ),
                   _buildEditor(
                     size,
@@ -320,7 +316,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             (uploadPercent * 100).toStringAsFixed(2),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: whiteColor,
                               fontSize: 20.0,
                             ),
                           ),
@@ -328,7 +324,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             "Загрузка",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: whiteColor,
                               fontSize: 17.0,
                             ),
                           ),
@@ -388,7 +384,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 15),
           ],
         ),
       ),

@@ -112,7 +112,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: whiteColor,
       child: SafeArea(
         child: Scaffold(
             body: _service != null
@@ -151,7 +151,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                       Navigator.pop(context);
                                     },
                                   ),
-                                  backgroundColor: Colors.transparent,
+                                  backgroundColor: transparentColor,
                                   elevation: 0,
                                 ),
                                 Container(
@@ -170,7 +170,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                       ),
                                       Container(
                                         margin: EdgeInsets.only(
-                                          left: 30,
+                                          left: 20,
                                           right: 10,
                                         ),
                                         child: Column(
@@ -342,19 +342,19 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           Center(
                             child: Text(
                               '${localization.commission} ${_service['service']['commission']}%',
-                              style: TextStyle(color: blackPurpleColor),
+                              style: TextStyle(color: greyColor2),
                             ),
                           ),
                           Center(
                             child: Text(
                               '${localization.minAmount} ${_service['service']['min']} KZT',
-                              style: TextStyle(color: blackPurpleColor),
+                              style: TextStyle(color: greyColor2),
                             ),
                           ),
                           Center(
                             child: Text(
                               '${localization.maxAmount} ${_service['service']['max']} KZT',
-                              style: TextStyle(color: blackPurpleColor),
+                              style: TextStyle(color: greyColor2),
                             ),
                           ),
                           _service['service']['commission'].toString() != '0'
@@ -468,9 +468,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(
-            color: Colors.black26,
+            color: blackColor,
             blurRadius: 10.0,
-            spreadRadius: -2,
+            spreadRadius: -10,
             offset: Offset(0.0, 0.0))
       ]),
       child: ButtonTheme(
@@ -615,12 +615,12 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
               children: [
                 Flexible(
                   child: Container(
-                    color: Colors.white,
+                    color: whiteColor,
                     child: Text(
                       '${widget.title}',
                       style: TextStyle(
                         fontSize: 16,
-                        color: blackPurpleColor,
+                        color: greyColor2,
                       ),
                     ),
                   ),
@@ -667,11 +667,15 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                   '${snapshot['result'][index]['placeholder']}',
                             ),
                             controller: controllers[index]['controller'],
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(fontSize: 20, color: greyColor2),
                           ),
                         ),
                         Text(
-                            '${((mask.isNotEmpty || example.isNotEmpty) ? "${localization.example}: " : '') + (example.isNotEmpty ? example : mask.isNotEmpty ? mask : '')}')
+                          '${((mask.isNotEmpty || example.isNotEmpty) ? "${localization.example}: " : '') + (example.isNotEmpty ? example : mask.isNotEmpty ? mask : '')}',
+                          style: TextStyle(
+                            color: greyColor,
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -683,8 +687,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 children: [
                   SizedBox(height: 10),
                   Container(
-                    height: 1.0,
-                    color: Colors.grey,
+                    height: 0.5,
+                    color: brightGreyColor5,
                   ),
                   Text(""),
                 ],
@@ -692,21 +696,11 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             },
             itemCount: snapshot['result'].length,
           ),
-          Column(
-            children: [
-              SizedBox(height: 10),
-              Container(
-                height: 1.0,
-                color: Colors.grey,
-              ),
-              Text(""),
-            ],
-          ),
         ],
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
+        color: whiteColor,
       ),
       padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
     );

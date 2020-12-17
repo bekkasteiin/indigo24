@@ -28,13 +28,13 @@ class FullPhoto extends StatelessWidget {
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: transparentColor,
         appBar: AppBar(
           brightness: Brightness.dark,
-          backgroundColor: Colors.white.withOpacity(0.2),
+          backgroundColor: whiteColor.withOpacity(0.2),
           centerTitle: true,
           iconTheme: IconThemeData(
-            color: Colors.white,
+            color: whiteColor,
           ),
           leading: IconButton(
             icon: Container(
@@ -118,7 +118,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
         Expanded(
             flex: 1,
             child: Container(
-              color: Colors.white.withOpacity(0.2),
+              color: whiteColor.withOpacity(0.2),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -127,7 +127,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                       children: [
                         Text(
                           "${localization.save} ",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: whiteColor),
                           maxLines: 1,
                           softWrap: false,
                           overflow: TextOverflow.ellipsis,
@@ -148,7 +148,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                       children: [
                         Text(
                           "${localization.share} ",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: whiteColor),
                           maxLines: 1,
                           softWrap: false,
                           overflow: TextOverflow.ellipsis,
@@ -185,7 +185,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                         minScale: PhotoViewComputedScale.contained,
                         maxScale: PhotoViewComputedScale.contained * 3,
                         backgroundDecoration:
-                            BoxDecoration(color: Colors.transparent),
+                            BoxDecoration(color: transparentColor),
                       ),
                     ),
                     Container(

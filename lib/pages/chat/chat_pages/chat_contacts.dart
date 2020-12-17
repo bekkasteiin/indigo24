@@ -257,7 +257,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                               borderRadius:
                                                   BorderRadius.circular(20.0),
                                               child: Container(
-                                                  color: Colors.blue[400],
+                                                  color: blueColor,
                                                   width: 35,
                                                   height: 35,
                                                   child: ClipOval(
@@ -274,7 +274,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style: TextStyle(
-                                                            color: Colors.white,
+                                                            color: whiteColor,
                                                             fontSize: 16.0,
                                                           ),
                                                         ),
@@ -335,7 +335,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                               ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
+                                color: whiteColor,
                               ),
                               margin: EdgeInsets.only(left: 10, right: 10),
                             ),

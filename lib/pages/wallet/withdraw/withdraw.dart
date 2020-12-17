@@ -58,7 +58,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
         }
       },
       child: Container(
-        color: Colors.white,
+        color: whiteColor,
         child: SafeArea(
           child: Scaffold(
             backgroundColor: milkWhiteColor,
@@ -99,7 +99,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                   Navigator.pop(context);
                                 },
                               ),
-                              backgroundColor: Colors.transparent,
+                              backgroundColor: transparentColor,
                               elevation: 0,
                             ),
                             Container(
@@ -115,7 +115,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                   ),
                                   Container(
                                     margin:
-                                        EdgeInsets.only(left: 30, right: 10),
+                                        EdgeInsets.only(left: 20, right: 10),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -151,7 +151,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         ),
                       ),
                       Container(
-                        color: Colors.white,
+                        color: whiteColor,
                         padding: EdgeInsets.symmetric(vertical: 20),
                         child: TextFormField(
                           textAlign: TextAlign.center,
@@ -258,9 +258,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         margin: EdgeInsets.only(left: 20, right: 20, top: 20),
                         decoration: BoxDecoration(boxShadow: [
                           BoxShadow(
-                              color: Colors.black26,
+                              color: blackColor,
                               blurRadius: 10.0,
-                              spreadRadius: -2,
+                              spreadRadius: -10,
                               offset: Offset(0.0, 0.0))
                         ]),
                         child: ButtonTheme(

@@ -13,6 +13,7 @@ import 'message_types/service_message.dart';
 import 'message_types/sticker_message.dart';
 import 'message_types/text_message.dart';
 import 'message_types/video_message.dart';
+import 'package:indigo24/style/colors.dart';
 
 class MessageWidget extends StatelessWidget {
   final int messageCategory;
@@ -34,7 +35,7 @@ class MessageWidget extends StatelessWidget {
               Text(
                 message.username,
                 style: TextStyle(
-                  color: Colors.orange,
+                  color: pendingColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
