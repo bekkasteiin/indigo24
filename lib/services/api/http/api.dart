@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:ext_storage/ext_storage.dart';
@@ -8,6 +9,7 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:package_info/package_info.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../helper.dart';
 
@@ -112,11 +114,12 @@ class Api {
     options,
     String type,
   }) async {
-    String path = await ExtStorage.getExternalStoragePublicDirectory(
-        ExtStorage.DIRECTORY_DOWNLOADS);
-
+   
+Directory appDocDir = await getApplicationDocumentsDirectory();
+    String path = appDocDir.path;
     DateTime now = DateTime.now();
     String fullPath = "$path/${now.millisecondsSinceEpoch}.$type";
+    print(fullPath);
     return {
       "data": await _getRequest(
         url,
