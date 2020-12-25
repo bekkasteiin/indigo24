@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
@@ -101,7 +101,7 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.addToGroup}",
+          "${Localization.language.addToGroup}",
           style: TextStyle(
             color: blackPurpleColor,
             fontWeight: FontWeight.w400,
@@ -134,7 +134,8 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.only(top: 10, left: 10),
-                    child: Text('${_saved.length} ${localization.contacts}'),
+                    child: Text(
+                        '${_saved.length} ${Localization.language.contacts}'),
                   ),
                   Container(
                     height: _saved.length == 0 ? 0 : 82,

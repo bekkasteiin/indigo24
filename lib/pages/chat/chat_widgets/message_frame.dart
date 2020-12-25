@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 
 class MessageFrameWidget extends StatefulWidget {
@@ -44,7 +44,7 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
             children: <Widget>[
               widget.message.edited
                   ? Text(
-                      '${localization.editedMessage} ',
+                      '${Localization.language.editedMessage} ',
                       style: TextStyle(
                         fontSize: 10,
                         color: blackColor.withOpacity(0.6),
@@ -95,12 +95,12 @@ class _MessageFrameWidgetState extends State<MessageFrameWidget> {
               ? Icon(
                   Icons.done_all,
                   size: 16,
-                  color: blueColor,
+                  color: brightBlueColor,
                 )
               : Icon(
                   Icons.done,
                   size: 16,
-                  color: greyColor,
+                  color: brightBlueColor,
                 )
         ],
       );

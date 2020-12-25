@@ -5,10 +5,11 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:indigo24/pages/wallet/refill/refill_web.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/services/user.dart' as user;
 
@@ -77,7 +78,7 @@ class _RefillPageState extends State<RefillPage> {
                             IndigoAppBarWidget(
                               centerTitle: true,
                               title: Text(
-                                localization.refill,
+                                Localization.language.refill,
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w400,
@@ -119,7 +120,7 @@ class _RefillPageState extends State<RefillPage> {
                                       children: <Widget>[
                                         SizedBox(height: 15),
                                         Text(
-                                          '${localization.walletBalance}',
+                                          '${Localization.language.walletBalance}',
                                           style: fS14(c: 'FFFFFF'),
                                         ),
                                         SizedBox(height: 5),
@@ -158,7 +159,7 @@ class _RefillPageState extends State<RefillPage> {
                           ],
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration.collapsed(
-                            hintText: '${localization.amount}',
+                            hintText: '${Localization.language.amount}',
                           ),
                           style: TextStyle(fontSize: 20),
                           controller: _amountController,
@@ -200,26 +201,26 @@ class _RefillPageState extends State<RefillPage> {
                       ),
                       Center(
                         child: Text(
-                          '${localization.commission} $refillCommission%',
-                        ),
-                      ),
-                      Center(
-                        child:
-                            Text('${localization.commission} $_commission KZT'),
-                      ),
-                      Center(
-                        child: Text(
-                          '${localization.minCommission} $refillMinCommission KZT',
+                          '${Localization.language.commission} $refillCommission%',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${localization.minAmount} $refillMin KZT',
+                            '${Localization.language.commission} $_commission KZT'),
+                      ),
+                      Center(
+                        child: Text(
+                          '${Localization.language.minCommission} $refillMinCommission KZT',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${localization.maxAmount} $refillMax KZT',
+                          '${Localization.language.minAmount} $refillMin KZT',
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          '${Localization.language.maxAmount} $refillMax KZT',
                         ),
                       ),
                       Padding(
@@ -264,17 +265,16 @@ class _RefillPageState extends State<RefillPage> {
                                       ),
                                     );
                                   } else {
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return CustomDialog(
-                                            description:
-                                                "${refillResult['message']}",
-                                            yesCallBack: () {
-                                              Navigator.pop(context);
-                                            },
-                                          );
-                                        });
+                                    showIndigoDialog(
+                                      context: context,
+                                      builder: CustomDialog(
+                                        description:
+                                            "${refillResult['message']}",
+                                        yesCallBack: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    );
                                   }
                                 });
                               }
@@ -284,7 +284,7 @@ class _RefillPageState extends State<RefillPage> {
                               width: 200,
                               child: Center(
                                 child: Text(
-                                  '${localization.refill}',
+                                  '${Localization.language.refill}',
                                   style: TextStyle(
                                       color: primaryColor,
                                       fontWeight: FontWeight.w800),

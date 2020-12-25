@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 
 class CustomDialog extends StatelessWidget {
@@ -29,7 +29,7 @@ class CustomDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(padding),
         ),
         elevation: 0.0,
-        backgroundColor: transparentColor,
+        backgroundColor: blackPurpleColor.withOpacity(0.2),
         child: dialogContent(context),
       ),
     );
@@ -96,7 +96,7 @@ class CustomDialog extends StatelessWidget {
                             height: 50,
                             child: Center(
                               child: Text(
-                                "OK".toUpperCase(),
+                                "${Localization.language.yes}".toUpperCase(),
                                 style: TextStyle(
                                   color: whiteColor,
                                   fontSize: 17,
@@ -119,7 +119,8 @@ class CustomDialog extends StatelessWidget {
                                   height: 50,
                                   child: Center(
                                     child: Text(
-                                      "${localization.no}".toUpperCase(),
+                                      "${Localization.language.no}"
+                                          .toUpperCase(),
                                       style: TextStyle(
                                         color: whiteColor,
                                         fontSize: 17,

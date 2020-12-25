@@ -7,7 +7,7 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_auth_title.dart';
@@ -211,7 +211,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          IndigoAuthTitle(title: localization.phoneNumber),
+                          IndigoAuthTitle(
+                              title: Localization.language.phoneNumber),
                           Stack(
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
@@ -265,7 +266,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
                         defaultWidget: Text(
-                          "${localization.next}",
+                          "${Localization.language.next}",
                           style: TextStyle(
                             color: whiteColor,
                             fontSize: 22,
@@ -331,14 +332,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               } else {
                                 setState(
                                   () {
-                                    loginError = '${localization.enterPhone}';
+                                    loginError =
+                                        '${Localization.language.enterPhone}';
                                   },
                                 );
                               }
                             } else {
                               setState(
                                 () {
-                                  loginError = '${localization.enterPhone}';
+                                  loginError =
+                                      '${Localization.language.enterPhone}';
                                 },
                               );
                             }

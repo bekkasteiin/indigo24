@@ -1,5 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/api/http/api.dart';
+import 'package:indigo24/services/localization/localization.dart';
+import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
+import 'package:indigo24/widgets/document/download_manager.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 
@@ -60,6 +65,58 @@ class _PDFViewerState extends State<PDFViewer> {
               maxLines: 2,
               textAlign: TextAlign.justify,
             ),
+            actions: [
+              IconButton(
+                icon: Container(
+                  height: 20,
+                  width: 20,
+                  child: Image.asset(
+                    "assets/images/download_black.png",
+                    width: 20,
+                  ),
+                ),
+                iconSize: 30,
+                color: blackPurpleColor,
+                onPressed: () async {
+                  Api _api = Api();
+
+                  final url = "https://indigo24.com/terms/ru.pdf";
+
+                  void showDownloadProgress(received, total) {
+                    if (total != -1) {
+                      print((received / total * 100).toStringAsFixed(0) + "%");
+                    }
+                  }
+
+                  DownloadManager downloadManager = DownloadManager(_api);
+                  bool downloaded = await downloadManager.fileNetwork(
+                    url: url,
+                    onReceiveProgress: showDownloadProgress,
+                    type: 'pdf',
+                  );
+
+                  downloaded
+                      ? showIndigoDialog(
+                          context: context,
+                          builder: CustomDialog(
+                            description: "${Localization.language.success}",
+                            yesCallBack: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        )
+                      : showIndigoDialog(
+                          context: context,
+                          builder: CustomDialog(
+                            description: "${Localization.language.error}",
+                            yesCallBack: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        );
+                },
+              )
+            ],
           ),
           body: Column(
             children: [

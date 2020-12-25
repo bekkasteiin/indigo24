@@ -4,7 +4,7 @@ import 'package:indigo24/pages/profile/settings/settings_language.dart';
 import 'package:indigo24/pages/profile/settings/settings_notifications_main.dart';
 import 'package:indigo24/pages/profile/settings/settings_sound.dart';
 import 'package:indigo24/pages/profile/settings/settings_terms.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
@@ -35,7 +35,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
     return Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.settings}",
+            "${Localization.language.settings}",
             style: TextStyle(
               color: blackPurpleColor,
               fontWeight: FontWeight.w400,
@@ -70,7 +70,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                             ),
                           );
                         },
-                        title: localization.notifications,
+                        title: Localization.language.notifications,
                       ),
                       _settingsRow(
                         onTap: () {
@@ -83,7 +83,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                             () => setState(() {}),
                           );
                         },
-                        title: localization.decor,
+                        title: Localization.language.decor,
                       ),
                       _settingsRow(
                         onTap: () {
@@ -96,8 +96,8 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                             () => setState(() {}),
                           );
                         },
-                        title: localization.language,
-                        subtext: localization.currentLanguage,
+                        title: Localization.language.language,
+                        subtext: Localization.language.currentLanguage,
                       ),
                       _settingsRow(
                         onTap: () {
@@ -110,7 +110,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                             () => setState(() {}),
                           );
                         },
-                        title: localization.terms,
+                        title: Localization.language.terms,
                       ),
                       _settingsRow(
                         onTap: () {
@@ -123,7 +123,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                             () => setState(() {}),
                           );
                         },
-                        title: localization.sound,
+                        title: Localization.language.sound,
                       ),
                     ],
                   ),
@@ -183,7 +183,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
-                            color: blackPurpleColor,
+                            color: greyColor,
                           ),
                         ),
                       Container(
@@ -207,7 +207,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
           padding: EdgeInsets.only(left: 20),
           child: Divider(
             color: darkPrimaryColor,
-            height: 1,
+            height: 0.56,
           ),
         ),
       ],

@@ -12,13 +12,80 @@ import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/pin/pin_code.dart';
 import 'package:polygon_clipper/polygon_border.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'withdraw/withdraw_list.dart';
+
+enum Symbol {
+  tenge,
+  ruble,
+  dollar,
+  euro,
+}
+
+abstract class SymbolInterface {
+  String symbolTitle;
+  double coef;
+  Symbol type;
+}
+
+class TengeSymbol implements SymbolInterface {
+  @override
+  String symbolTitle = "tenge";
+  @override
+  double coef;
+
+  TengeSymbol({
+    this.coef = 1,
+  });
+
+  @override
+  Symbol type = Symbol.tenge;
+}
+
+class EuroSymbol implements SymbolInterface {
+  @override
+  String symbolTitle = "euro";
+  @override
+  double coef;
+
+  EuroSymbol({
+    this.coef = 1,
+  });
+  @override
+  Symbol type = Symbol.euro;
+}
+
+class DollarSymbol implements SymbolInterface {
+  @override
+  String symbolTitle = "dollar";
+  @override
+  double coef;
+
+  DollarSymbol({
+    this.coef = 1,
+  });
+  @override
+  Symbol type = Symbol.dollar;
+}
+
+class RubleSymbol implements SymbolInterface {
+  @override
+  String symbolTitle = "ruble";
+  @override
+  double coef;
+
+  RubleSymbol({
+    this.coef = 1,
+  });
+  @override
+  Symbol type = Symbol.ruble;
+}
 
 class MyBehavior extends ScrollBehavior {
   @override
@@ -43,14 +110,12 @@ class _WalletTabState extends State<WalletTab> {
   double _blockedAmount = 0;
   double _realAmount = 0;
 
-  double _globalCoef = 1;
-  double _tengeCoef = 1;
-  double _euroCoef = 1;
-  double _rubleCoef = 1;
-  double _dollarCoef = 1;
+  SymbolInterface globalSymbol = TengeSymbol();
+  SymbolInterface euroSymbol = EuroSymbol();
+  SymbolInterface tengeSymbol = TengeSymbol();
+  SymbolInterface dollarSymbol = DollarSymbol();
+  SymbolInterface rubleSymbol = RubleSymbol();
 
-  String _symbol;
-  String _tengeSymbol = '₸';
   String _tempPasscode = '';
 
   Api _api = Api();
@@ -65,16 +130,15 @@ class _WalletTabState extends State<WalletTab> {
       _withPin == false
           ? _showLockScreen(
               context,
-              '${localization.createPin}',
+              '${Localization.language.createPin}',
               withPin: _withPin,
             )
           : _showLockScreen(
               context,
-              '${localization.enterPin}',
+              '${Localization.language.enterPin}',
             );
     });
 
-    _symbol = '₸';
     _realAmount = double.parse(user.balance);
     _blockedAmount = double.parse(user.balanceInBlock);
     _api.getExchangeRate().then((v) {
@@ -84,9 +148,10 @@ class _WalletTabState extends State<WalletTab> {
         return true;
       } else {
         var ex = v["exchangeRates"];
-        _euroCoef = double.parse(ex['EUR']);
-        _rubleCoef = double.parse(ex['RUB']);
-        _dollarCoef = double.parse(ex['USD']);
+        euroSymbol = EuroSymbol(coef: double.parse(ex['EUR']));
+        tengeSymbol = TengeSymbol(coef: 1.0);
+        dollarSymbol = DollarSymbol(coef: double.parse(ex['USD']));
+        rubleSymbol = RubleSymbol(coef: double.parse(ex['RUB']));
         return false;
       }
     });
@@ -124,16 +189,14 @@ class _WalletTabState extends State<WalletTab> {
     }
     if ('${user.pin}'.toString() == 'waiting' &&
         _tempPasscode != enteredPasscode) {
-      return showDialog(
+      return showIndigoDialog(
         context: context,
-        builder: (BuildContext context) {
-          return CustomDialog(
-            description: localization.incorrectPin,
-            yesCallBack: () {
-              Navigator.pop(context);
-            },
-          );
-        },
+        builder: CustomDialog(
+          description: Localization.language.incorrectPin,
+          yesCallBack: () {
+            Navigator.pop(context);
+          },
+        ),
       );
     }
     if ('${user.pin}' == 'false') {
@@ -164,7 +227,7 @@ class _WalletTabState extends State<WalletTab> {
 
   @override
   Widget build(BuildContext context) {
-    _amount = _realAmount / _globalCoef;
+    _amount = _realAmount / globalSymbol.coef;
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: RefreshIndicator(
@@ -197,82 +260,80 @@ class _WalletTabState extends State<WalletTab> {
               ScrollConfiguration(
                 behavior: MyBehavior(),
                 child: SingleChildScrollView(
-                  child: Container(
-                    child: Stack(
-                      children: <Widget>[
-                        // Image.asset(
-                        //   '',
-
-                        // ),
-                        Column(
-                          children: <Widget>[
-                            Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        "assets/images/wallet_header.png"),
-                                    fit: BoxFit.cover,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image:
+                                AssetImage("assets/images/wallet_header.png"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 10),
+                            Stack(
+                              children: [
+                                Container(
+                                  alignment: Alignment.topCenter,
+                                  child: Text(
+                                    '${Localization.language.wallet}',
+                                    style: fS26(c: 'ffffff'),
                                   ),
                                 ),
-                                child: Column(
-                                  children: [
-                                    SizedBox(height: 10),
-                                    Stack(
-                                      children: [
-                                        Container(
-                                          alignment: Alignment.topCenter,
-                                          child: Text(
-                                            '${localization.wallet}',
-                                            style: fS26(c: 'ffffff'),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    _devider(),
-                                    _balance(),
-                                    SizedBox(height: 10),
-                                    _balanceAmount(),
-                                    _exchangeButtons(),
-                                    SizedBox(height: 10),
-                                    _symbol == _tengeSymbol
-                                        ? Container(
-                                            width: size.width,
-                                            color: darkPrimaryColor,
-                                            alignment: Alignment.center,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Text(
-                                              '',
-                                            ),
-                                          )
-                                        : _exchangeCurrency(size),
-                                  ],
-                                )),
-                            _blockedBalance(size),
-                            Container(
-                              color: whiteColor,
-                              padding: EdgeInsets.only(
-                                left: size.width * 0.05,
-                                right: size.width * 0.05,
-                                top: 20,
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  _payInOut(size),
-                                  SizedBox(height: 20),
-                                  _payments(size),
-                                  SizedBox(height: 20),
-                                  _transfer(size),
-                                  SizedBox(height: 20),
-                                  _historyBalance(size),
-                                  SizedBox(height: 20),
-                                ],
-                              ),
+                              ],
                             ),
+                            Container(
+                              height: 0.6,
+                              margin: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              color: brightGreyColor,
+                            ),
+                            _balance(),
+                            SizedBox(height: 10),
+                            _balanceAmount(),
+                            _exchangeButtons(),
+                            SizedBox(height: 10),
+                            globalSymbol.type == Symbol.tenge
+                                ? Container(
+                                    width: size.width,
+                                    height: 30,
+                                    color: darkPrimaryColor,
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                    child: Text(
+                                      '',
+                                    ),
+                                  )
+                                : _exchangeCurrency(size),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      _blockedBalance(size),
+                      Container(
+                        color: whiteColor,
+                        padding: EdgeInsets.only(
+                          left: size.width * 0.05,
+                          right: size.width * 0.05,
+                          top: 20,
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            _payInOut(size),
+                            SizedBox(height: 20),
+                            _payments(size),
+                            SizedBox(height: 20),
+                            _transfer(size),
+                            SizedBox(height: 20),
+                            _historyBalance(size),
+                            SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -289,8 +350,7 @@ class _WalletTabState extends State<WalletTab> {
   }
 
   Container _exchangeCurrency(size) {
-    String tempSymbol = '$_symbol';
-    String tempExchangeRate = '$_globalCoef';
+    String tempExchangeRate = '${globalSymbol.coef}';
     return Container(
       width: size.width,
       color: darkPrimaryColor,
@@ -299,16 +359,51 @@ class _WalletTabState extends State<WalletTab> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
-            tempSymbol == '\$'
-                ? '$tempSymbol 1 = $tempExchangeRate '
-                : '1 $tempSymbol = $tempExchangeRate ',
-            style: TextStyle(color: whiteColor, fontWeight: FontWeight.w300),
+          Container(
+            height: 20,
+            child: FittedBox(
+              child: Text(
+                globalSymbol.type == Symbol.dollar ? ' ' : '1',
+                style:
+                    TextStyle(color: whiteColor, fontWeight: FontWeight.w300),
+              ),
+            ),
+          ),
+          Container(
+            height: 15,
+            child: FittedBox(
+              child: Image(
+                image:
+                    AssetImage("assets/images/${globalSymbol.symbolTitle}.png"),
+                height: 15,
+                width: 15,
+              ),
+            ),
+          ),
+          Container(
+            height: 20,
+            child: FittedBox(
+              child: Text(
+                globalSymbol.type == Symbol.dollar ? '1' : ' ',
+                style:
+                    TextStyle(color: whiteColor, fontWeight: FontWeight.w300),
+              ),
+            ),
+          ),
+          Container(
+            height: 20,
+            child: FittedBox(
+              child: Text(
+                '= $tempExchangeRate ',
+                style:
+                    TextStyle(color: whiteColor, fontWeight: FontWeight.w300),
+              ),
+            ),
           ),
           Image(
             image: AssetImage("assets/images/tenge.png"),
-            height: 12,
-            width: 12,
+            height: 15,
+            width: 15,
           ),
         ],
       ),
@@ -356,7 +451,7 @@ class _WalletTabState extends State<WalletTab> {
                   width: 40,
                 ),
                 Text(
-                  '${localization.historyBalance}',
+                  '${Localization.language.historyBalance}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
                 ),
                 Container(width: 10),
@@ -397,7 +492,6 @@ class _WalletTabState extends State<WalletTab> {
                 .whenComplete(() async {
               await _api.getBalance();
               setState(() {
-                // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
                 _blockedAmount = double.parse(user.balanceInBlock);
               });
@@ -412,7 +506,7 @@ class _WalletTabState extends State<WalletTab> {
                   height: 40,
                 ),
                 Text(
-                  '${localization.transfers}',
+                  '${Localization.language.transfers}',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w300,
@@ -473,7 +567,7 @@ class _WalletTabState extends State<WalletTab> {
                   height: 40,
                 ),
                 Text(
-                  '${localization.payments}',
+                  '${Localization.language.payments}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
                 ),
                 Container(width: 10),
@@ -492,88 +586,27 @@ class _WalletTabState extends State<WalletTab> {
     );
   }
 
-  Container _devider() {
-    return Container(
-      height: 0.6,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      color: brightGreyColor,
-    );
-  }
-
   Text _balance() {
     return Text(
-      '${localization.balance}',
+      '${Localization.language.balance}',
       style: fS18(c: 'ffffff'),
     );
   }
 
   Widget _balanceAmount() {
-    if (_symbol == '${String.fromCharCodes(Runes('\u0024'))}')
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Image(
-            image: AssetImage("assets/images/dollar.png"),
-            height: 25,
-            width: 25,
-          ),
-          Text(
-            '${_amount.toStringAsFixed(2)}',
-            style: fS26(c: 'ffffff'),
-          ),
-        ],
-      );
-
-    if (_symbol == '${String.fromCharCodes(Runes('\u20B8'))}')
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            '${_amount.toStringAsFixed(2)}',
-            style: fS26(c: 'ffffff'),
-          ),
-          Image(
-            image: AssetImage("assets/images/tenge.png"),
-            height: 25,
-            width: 25,
-          ),
-        ],
-      );
-
-    if (_symbol == '${String.fromCharCodes(Runes('\u20BD'))}')
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            '${_amount.toStringAsFixed(2)}',
-            style: fS26(c: 'ffffff'),
-          ),
-          Image(
-            image: AssetImage("assets/images/ruble.png"),
-            height: 25,
-            width: 25,
-          ),
-        ],
-      );
-
-    if (_symbol == '${String.fromCharCodes(Runes('\u20AC'))}')
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            '${_amount.toStringAsFixed(2)}',
-            style: fS26(c: 'ffffff'),
-          ),
-          Image(
-            image: AssetImage("assets/images/euro.png"),
-            height: 25,
-            width: 25,
-          ),
-        ],
-      );
-    return Text(
-      '${_amount.toStringAsFixed(2)} $_symbol',
-      style: fS26(c: 'ffffff'),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '${_amount.toStringAsFixed(2)}',
+          style: fS26(c: 'ffffff'),
+        ),
+        Image(
+          image: AssetImage("assets/images/${globalSymbol.symbolTitle}.png"),
+          height: 25,
+          width: 25,
+        ),
+      ],
     );
   }
 
@@ -591,7 +624,7 @@ class _WalletTabState extends State<WalletTab> {
       child: Column(
         children: <Widget>[
           Text(
-            '${localization.balanceInBlock}',
+            '${Localization.language.balanceInBlock}',
             style: fS18w200(c: 'ffffff'),
           ),
           Container(height: 5),
@@ -651,7 +684,7 @@ class _WalletTabState extends State<WalletTab> {
               child: FittedBox(
                 fit: BoxFit.fitWidth,
                 child: Text(
-                  '${localization.refill}'.toUpperCase(),
+                  '${Localization.language.refill}'.toUpperCase(),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -698,7 +731,7 @@ class _WalletTabState extends State<WalletTab> {
               child: FittedBox(
                 fit: BoxFit.fitWidth,
                 child: Text(
-                  '${localization.withdraw}'.toUpperCase(),
+                  '${Localization.language.withdraw}'.toUpperCase(),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -720,123 +753,41 @@ class _WalletTabState extends State<WalletTab> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        GestureDetector(
-          child: Container(
-            padding: EdgeInsets.all(15.0),
-            decoration: ShapeDecoration(
-              color: primaryColor2,
-              shape: PolygonBorder(
-                sides: 8,
-                borderRadius: 8.0,
-                border: BorderSide(
-                  color: brightBlue,
-                  width: 3,
-                ),
-              ),
-            ),
-            child: Image(
-              image: AssetImage("assets/images/tenge.png"),
-              height: 15,
-              width: 15,
-            ),
-          ),
-          onTap: () {
-            setState(() {
-              _amount = _realAmount / _tengeCoef;
-              _amount = num.parse(_amount.toStringAsFixed(2));
-              _symbol = '${String.fromCharCodes(Runes('\u20B8'))}';
-              _globalCoef = _tengeCoef;
-            });
-          },
-        ),
-        GestureDetector(
-          child: Container(
-            padding: EdgeInsets.all(15.0),
-            decoration: ShapeDecoration(
-              color: primaryColor2,
-              shape: PolygonBorder(
-                sides: 8,
-                borderRadius: 8.0,
-                border: BorderSide(
-                  color: brightBlue,
-                  width: 3,
-                ),
-              ),
-            ),
-            child: Image(
-              image: AssetImage("assets/images/ruble.png"),
-              height: 15,
-              width: 15,
-            ),
-          ),
-          onTap: () {
-            setState(() {
-              _amount = _realAmount / _rubleCoef;
-              _amount = num.parse(_amount.toStringAsFixed(2));
-              _symbol = '${String.fromCharCodes(Runes('\u20BD'))}';
-              _globalCoef = _rubleCoef;
-            });
-          },
-        ),
-        GestureDetector(
-          child: Container(
-            padding: EdgeInsets.all(15.0),
-            decoration: ShapeDecoration(
-              color: primaryColor2,
-              shape: PolygonBorder(
-                sides: 8,
-                borderRadius: 8.0,
-                border: BorderSide(
-                  color: brightBlue,
-                  width: 3,
-                ),
-              ),
-            ),
-            child: Image(
-              image: AssetImage("assets/images/dollar.png"),
-              height: 15,
-              width: 15,
-            ),
-          ),
-          onTap: () {
-            setState(() {
-              _amount = _realAmount / _dollarCoef;
-              _amount = num.parse(_amount.toStringAsFixed(2));
-              _symbol = '${String.fromCharCodes(Runes('\u0024'))}';
-              _globalCoef = _dollarCoef;
-            });
-          },
-        ),
-        GestureDetector(
-          child: Container(
-            padding: EdgeInsets.all(15.0),
-            decoration: ShapeDecoration(
-              color: primaryColor2,
-              shape: PolygonBorder(
-                sides: 8,
-                borderRadius: 8.0,
-                border: BorderSide(
-                  color: brightBlue,
-                  width: 3,
-                ),
-              ),
-            ),
-            child: Image(
-              image: AssetImage("assets/images/euro.png"),
-              height: 15,
-              width: 15,
-            ),
-          ),
-          onTap: () {
-            setState(() {
-              _amount = _realAmount / _euroCoef;
-              _amount = num.parse(_amount.toStringAsFixed(2));
-              _symbol = '${String.fromCharCodes(Runes('\u20AC'))}';
-              _globalCoef = _euroCoef;
-            });
-          },
-        ),
+        symbolBuilder(tengeSymbol),
+        symbolBuilder(rubleSymbol),
+        symbolBuilder(dollarSymbol),
+        symbolBuilder(euroSymbol),
       ],
+    );
+  }
+
+  symbolBuilder(SymbolInterface symbol) {
+    return GestureDetector(
+      child: Container(
+        padding: EdgeInsets.all(15.0),
+        decoration: ShapeDecoration(
+          color: primaryColor2,
+          shape: PolygonBorder(
+            sides: 8,
+            borderRadius: 8.0,
+            border: BorderSide(
+              color: brightBlue,
+              width: 3,
+            ),
+          ),
+        ),
+        child: Image(
+          image: AssetImage("assets/images/${symbol.symbolTitle}.png"),
+          height: 15,
+          width: 15,
+        ),
+      ),
+      onTap: () {
+        setState(() {
+          _amount = num.parse((_realAmount / symbol.coef).toStringAsFixed(2));
+          globalSymbol = symbol;
+        });
+      },
     );
   }
 }

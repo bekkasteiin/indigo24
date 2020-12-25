@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
+
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
@@ -18,7 +19,7 @@ class WithdrawWebView extends StatelessWidget {
       child: Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            '${localization.withdraw}',
+            '${Localization.language.withdraw}',
             style: TextStyle(
               color: blackPurpleColor,
               fontWeight: FontWeight.w400,

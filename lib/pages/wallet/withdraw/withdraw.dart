@@ -4,10 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/pages/wallet/withdraw/withdraw_web.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/services/user.dart' as user;
 
@@ -80,7 +81,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                             IndigoAppBarWidget(
                               centerTitle: true,
                               title: Text(
-                                localization.withdraw,
+                                Localization.language.withdraw,
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w400,
@@ -110,7 +111,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                   Container(
                                     height: 0.6,
                                     margin: EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
                                     color: brightGreyColor,
                                   ),
                                   Container(
@@ -122,7 +125,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                       children: <Widget>[
                                         SizedBox(height: 15),
                                         Text(
-                                          '${localization.walletBalance}',
+                                          '${Localization.language.walletBalance}',
                                           style: fS14(c: 'FFFFFF'),
                                         ),
                                         SizedBox(height: 5),
@@ -160,7 +163,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                           ],
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration.collapsed(
-                            hintText: localization.amount,
+                            hintText: Localization.language.amount,
                             hintStyle: TextStyle(
                               color: showHintError ? redColor : greyColor,
                             ),
@@ -206,27 +209,27 @@ class _WithdrawPageState extends State<WithdrawPage> {
                       ),
                       Center(
                         child: Text(
-                          '${localization.commission} ${widget.provider['commission']}%',
+                          '${Localization.language.commission} ${widget.provider['commission']}%',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${localization.commission} $_commission KZT',
+                          '${Localization.language.commission} $_commission KZT',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${localization.minCommission} ${widget.provider['min_commission']} KZT',
+                          '${Localization.language.minCommission} ${widget.provider['min_commission']} KZT',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${localization.minAmount} ${widget.provider['min']} KZT',
+                          '${Localization.language.minAmount} ${widget.provider['min']} KZT',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${localization.maxAmount} ${widget.provider['max']} KZT',
+                          '${Localization.language.maxAmount} ${widget.provider['max']} KZT',
                         ),
                       ),
                       SizedBox(height: 20),
@@ -239,7 +242,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                           ),
                           child: CheckboxListTile(
                             title: Text(
-                              localization.withdrawTerm,
+                              Localization.language.withdrawTerm,
                               style: TextStyle(
                                 fontSize: 10,
                                 color: showError ? redColor : primaryColor,
@@ -305,10 +308,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                         ),
                                       );
                                     } else {
-                                      showDialog(
+                                      showIndigoDialog(
                                         context: context,
-                                        builder: (BuildContext context) =>
-                                            CustomDialog(
+                                        builder: CustomDialog(
                                           description:
                                               '${withdrawResult['message']}',
                                           yesCallBack: () {
@@ -334,7 +336,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                               width: 200,
                               child: Center(
                                 child: Text(
-                                  '${localization.withdraw}',
+                                  '${Localization.language.withdraw}',
                                   style: TextStyle(
                                       color: primaryColor,
                                       fontWeight: FontWeight.w800),

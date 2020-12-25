@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -19,7 +19,6 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
   bool _isProccessing;
 
   int _balanceHistoryPage;
-
   String _text;
   String _emptyResponseString = '';
   List _historyBalanceList;
@@ -72,9 +71,8 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.historyBalance}",
+          "${Localization.language.historyBalance}",
           style: TextStyle(
-            color: blackPurpleColor,
             fontSize: 22,
             fontWeight: FontWeight.w400,
           ),
@@ -195,23 +193,23 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
     Color color = greyColor;
     switch (status) {
       case 0:
-        text = localization.newPayment;
+        text = Localization.language.newPayment;
         color = pendingColor;
         break;
       case 1:
-        text = localization.newPayment;
+        text = Localization.language.newPayment;
         color = pendingColor;
         break;
       case 2:
-        text = localization.error;
+        text = Localization.language.error;
         color = errorColor;
         break;
       case 3:
-        text = localization.pending;
+        text = Localization.language.pending;
         color = pendingColor;
         break;
       case 4:
-        text = localization.success;
+        text = Localization.language.success;
         color = succesColor;
         break;
       default:
@@ -411,7 +409,8 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                         )
                       : SafeArea(
                           child: Container(
-                            child: Center(child: Text('${localization.empty}')),
+                            child: Center(
+                                child: Text('${Localization.language.empty}')),
                           ),
                         )
                   : SafeArea(

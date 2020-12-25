@@ -11,9 +11,10 @@ import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -77,13 +78,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       if (_image != null) {
         _api.uploadAvatar(
           _image.path,
-          (int sent, int total) {
+          onSendProgress: (int sent, int total) {
             setState(() {
               isUploading = true;
               uploadPercent = sent / total;
             });
           },
-          (count, total) {
+          onReceiveProgress: (count, total) {
             setState(() {
               isUploading = false;
               uploadPercent = 0.0;
@@ -103,16 +104,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   user.avatar = r["fileName"];
                 });
               } else {
-                showDialog(
+                showIndigoDialog(
                   context: context,
-                  builder: (BuildContext context) {
-                    return CustomDialog(
-                      description: "${r["message"]}",
-                      yesCallBack: () {
-                        Navigator.of(context).pop();
-                      },
-                    );
-                  },
+                  builder: CustomDialog(
+                    description: "${r["message"]}",
+                    yesCallBack: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
                 );
               }
               return r;
@@ -137,7 +136,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         appBar: IndigoAppBarWidget(
           title: FittedBox(
             child: Text(
-              "${localization.edit} ${localization.profile.toLowerCase()}",
+              "${Localization.language.edit} ${Localization.language.profile.toLowerCase()}",
               style: TextStyle(
                 color: blackPurpleColor,
                 fontWeight: FontWeight.w400,
@@ -173,9 +172,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                           _cityController.text,
                         );
 
-                        showDialog(
+                        showIndigoDialog(
                           context: context,
-                          builder: (BuildContext context) => CustomDialog(
+                          builder: CustomDialog(
                             description: result['message'],
                             yesCallBack: () {
                               Navigator.pop(context);
@@ -242,11 +241,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                 children: [
                                   Image.asset(
                                     "assets/images/fromCamera.png",
-                                    width: 30,
+                                    width: 50,
                                   ),
                                   SizedBox(width: 10),
                                   Text(
-                                    '${localization.photo} ${localization.camera.toLowerCase()}',
+                                    '${Localization.language.photo} ${Localization.language.camera.toLowerCase()}',
                                     style: TextStyle(
                                       color: blackPurpleColor,
                                     ),
@@ -263,11 +262,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                 children: [
                                   Image.asset(
                                     "assets/images/fromGallery.png",
-                                    width: 30,
+                                    width: 50,
                                   ),
                                   SizedBox(width: 10),
                                   Text(
-                                    '${localization.photo} ${localization.gallery.toLowerCase()}',
+                                    '${Localization.language.photo} ${Localization.language.gallery.toLowerCase()}',
                                     style: TextStyle(
                                       color: blackPurpleColor,
                                     ),
@@ -285,14 +284,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
                   _buildEditor(
                     size,
-                    '${localization.name}',
+                    '${Localization.language.name}',
                     '${user.name}',
                     _nameController,
                     readyOnly: false,
                   ),
                   _buildEditor(
                     size,
-                    '${localization.city}',
+                    '${Localization.language.city}',
                     '${user.city}',
                     _cityController,
                     readyOnly: false,

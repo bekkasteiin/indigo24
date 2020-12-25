@@ -9,9 +9,10 @@ import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/video/flick_multi_manager.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/db/tapes_helper.dart';
@@ -140,25 +141,23 @@ class _TapesPageState extends State<TapesPage>
       RefreshController(initialRefresh: false);
 
   showAlertDialog(BuildContext context, String message) {
-    showDialog(
+    showIndigoDialog(
       context: context,
-      builder: (BuildContext context) {
-        return CustomDialog(
-          description: "$message",
-          yesCallBack: () {
-            Navigator.pop(context);
-          },
-        );
-      },
+      builder: CustomDialog(
+        description: "$message",
+        yesCallBack: () {
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
   _moreActions({dynamic data}) {
     final act = CupertinoActionSheet(
-        title: Text('${localization.selectOption}'),
+        title: Text('${Localization.language.selectOption}'),
         actions: <Widget>[
           CupertinoActionSheetAction(
-            child: Text('${localization.report}'),
+            child: Text('${Localization.language.report}'),
             onPressed: () {
               Navigator.pop(context);
               showAlertDialog(context, "Your complaint is being processed");
@@ -166,7 +165,7 @@ class _TapesPageState extends State<TapesPage>
           ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
-            child: Text('${localization.hide}'),
+            child: Text('${Localization.language.hide}'),
             onPressed: () async {
               Navigator.pop(context);
               MyTape tape = MyTape(
@@ -179,12 +178,13 @@ class _TapesPageState extends State<TapesPage>
               setState(() {
                 _tapesDatabaseData = _tapesDatabaseData;
               });
-              showAlertDialog(context, "${data['title']} ${localization.hide}");
+              showAlertDialog(
+                  context, "${data['title']} ${Localization.language.hide}");
             },
           ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
-            child: Text('${localization.block}'),
+            child: Text('${Localization.language.block}'),
             onPressed: () async {
               Navigator.pop(context);
               MyTape tape = MyTape(
@@ -199,12 +199,12 @@ class _TapesPageState extends State<TapesPage>
                 _tapesDatabaseData = _tapesDatabaseData;
               });
               showAlertDialog(
-                  context, "${data['title']} ${localization.block}");
+                  context, "${data['title']} ${Localization.language.block}");
             },
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
-          child: Text('${localization.back}'),
+          child: Text('${Localization.language.back}'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -225,7 +225,7 @@ class _TapesPageState extends State<TapesPage>
             width: 0,
           ),
           title: Text(
-            localization.tape,
+            Localization.language.tape,
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,
@@ -415,9 +415,13 @@ class _TapesPageState extends State<TapesPage>
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              18),
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            18,
+                                                                        color:
+                                                                            blackPurpleColor,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                   Container(

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -33,7 +33,7 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          localization.sound,
+          Localization.language.sound,
           style: TextStyle(
             color: blackPurpleColor,
             fontWeight: FontWeight.w400,
@@ -73,6 +73,7 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                                   ChatRoom.shared.inSound();
                                 },
                                 child: Container(
+                                  color: whiteColor,
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 20,
                                     vertical: 5,
@@ -83,7 +84,7 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Text(
-                                        '${localization.sound} $index',
+                                        '${Localization.language.sound} $index',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
@@ -105,7 +106,7 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                               padding: EdgeInsets.only(left: 20),
                               child: Divider(
                                 color: darkPrimaryColor,
-                                height: 1,
+                                height: 0.5,
                               ),
                             ),
                           ],

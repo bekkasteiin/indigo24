@@ -1,27 +1,27 @@
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 String newIdentifyDay(int day) {
   switch (day) {
     case 1:
-      return '${localization.monday}';
+      return '${Localization.language.monday}';
       break;
     case 2:
-      return '${localization.tuesday}';
+      return '${Localization.language.tuesday}';
       break;
     case 3:
-      return '${localization.wednesday}';
+      return '${Localization.language.wednesday}';
       break;
     case 4:
-      return '${localization.thursday}';
+      return '${Localization.language.thursday}';
       break;
     case 5:
-      return '${localization.friday}';
+      return '${Localization.language.friday}';
       break;
     case 6:
-      return '${localization.saturday}';
+      return '${Localization.language.saturday}';
       break;
     case 7:
-      return '${localization.sunday}';
+      return '${Localization.language.sunday}';
       break;
     default:
       return 'dayOfWeek';

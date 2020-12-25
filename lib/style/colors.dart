@@ -8,6 +8,7 @@ const Color darkPrimaryColor = Color(0xFF033083);
 const Color primaryColor2 = Color(0xFF1C4D9B);
 const Color brightBlue = Color(0xFF4E74B1);
 const Color brightBlue2 = Color(0xFF5674AB);
+const Color brightBlueColor = Color(0xFF44A1E4);
 const Color blueColor = Colors.blue;
 const Color brightBlue3 = Color(0xFF4D6FAC);
 const Color blackColor = Color(0xFF000000);

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
@@ -8,19 +7,17 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
 import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
-import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/services/localization.dart' as localization;
-import 'package:indigo24/services/extensions/string_extension.dart';
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 
-import 'chat.dart';
-import 'chat_contacts.dart';
-import 'chat_group_selection.dart';
+import '../chat_contacts.dart';
+import '../chat_group_selection.dart';
+import 'chats_element.dart';
 
 class TestChatsListPage extends StatefulWidget {
   @override
@@ -54,142 +51,6 @@ class _TestChatsListPageState extends State<TestChatsListPage>
       _isChatsLoading = true;
     });
     ChatRoom.shared.forceGetChat(page: _chatsPage);
-  }
-
-  ListTile _chatListTile(ChatModel chat) {
-    return ListTile(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatPage(
-              chatId: int.parse(chat.chatId.toString()),
-              chatName: chat.name,
-              chatType: int.parse(chat.chatType.toString()),
-              avatar: chat.avatar,
-            ),
-          ),
-        ).whenComplete(
-          () {
-            ChatRoom.shared.forceGetChat();
-          },
-        );
-      },
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(25.0),
-        child: Container(
-          height: 40,
-          width: 40,
-          color: greyColor,
-          child: CachedNetworkImage(
-            errorWidget: (context, url, error) => Material(
-              child: Image.network(
-                '${avatarUrl}noAvatar.png',
-                width: MediaQuery.of(context).size.width * 0.7,
-                height: MediaQuery.of(context).size.width * 0.7,
-              ),
-            ),
-            imageUrl: (chat.avatar == null || chat.avatar == '')
-                ? '${avatarUrl}noAvatar.png'
-                : '$avatarUrl${chat.avatar.toString().replaceAll("AxB", "200x200")}',
-            width: MediaQuery.of(context).size.width * 0.7,
-            height: MediaQuery.of(context).size.width * 0.7,
-          ),
-        ),
-      ),
-      title: Row(
-        children: [
-          Flexible(
-            child: Text(
-              chat.name.toString().capitalize(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  color: blackPurpleColor, fontWeight: FontWeight.w400),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(5),
-            child: Center(
-              child: chat.isMuted
-                  ? Image.asset(
-                      'assets/images/unmuteChat.png',
-                      width: 10,
-                      height: 10,
-                    )
-                  : null,
-            ),
-          ),
-        ],
-      ),
-      subtitle: Text(
-        chat.message == 'null' ? chat.messagePreview : chat.message,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-        style: TextStyle(color: darkGreyColor2),
-      ),
-      trailing: Wrap(
-        direction: Axis.vertical,
-        crossAxisAlignment: WrapCrossAlignment.end,
-        alignment: WrapAlignment.center,
-        children: <Widget>[
-          Text(
-            _time(chat.messageTime),
-            style: TextStyle(
-              color: blackPurpleColor,
-            ),
-            textAlign: TextAlign.right,
-          ),
-          chat.unreadCount == 0
-              ? Container()
-              : Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: brightGreyColor4,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "${chat.unreadCount}",
-                      style: TextStyle(color: whiteColor),
-                    ),
-                  ),
-                )
-        ],
-      ),
-    );
-  }
-
-  String _time(timestamp) {
-    if (timestamp != null) {
-      if (timestamp != '') {
-        var messageUnixDate = DateTime.fromMillisecondsSinceEpoch(
-          int.parse("$timestamp") * 1000,
-        );
-        TimeOfDay messageDate =
-            TimeOfDay.fromDateTime(DateTime.parse('$messageUnixDate'));
-        var hours;
-        var minutes;
-        hours = '${messageDate.hour}';
-        minutes = '${messageDate.minute}';
-        var diff = DateTime.now().difference(messageUnixDate);
-        if (messageDate.hour.toString().length == 1)
-          hours = '0${messageDate.hour}';
-        if (messageDate.minute.toString().length == 1)
-          minutes = '0${messageDate.minute}';
-        if (diff.inDays == 0) {
-          return '$hours:$minutes';
-        } else if (diff.inDays < 7) {
-          int weekDay = messageUnixDate.weekday;
-          return newIdentifyDay(weekDay) + '\n$hours:$minutes';
-        } else {
-          return '$messageUnixDate'.substring(0, 10).replaceAll('-', '.') +
-              '\n$hours:$minutes';
-        }
-      }
-    }
-    return '??:??';
   }
 
   @override
@@ -244,7 +105,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
             ),
           ),
           title: Text(
-            localization.chats,
+            Localization.language.chats,
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,
@@ -284,7 +145,11 @@ class _TestChatsListPageState extends State<TestChatsListPage>
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(
-                  top: 10.0, left: 10.0, right: 10, bottom: 0),
+                top: 10.0,
+                left: 10.0,
+                right: 10,
+                bottom: 0,
+              ),
               child: IndigoSearchWidget(
                 onChangeCallback: (value) {
                   setState(() {});
@@ -327,23 +192,19 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                             actionExtentRatio: 0.25,
                             secondaryActions: <Widget>[
                               IconSlideAction(
-                                caption:
-                                    '${numbers.elementAt(i).isMuted == true ? localization.unmute : localization.mute}',
                                 color: transparentColor,
                                 foregroundColor: blackPurpleColor,
-                                iconWidget: numbers.elementAt(i).isMuted == true
-                                    ? Container(
-                                        child: Center(
-                                          child: Image.asset(
-                                              'assets/images/muteChat.png'),
-                                        ),
-                                      )
-                                    : Container(
-                                        child: Center(
-                                          child: Image.asset(
-                                              'assets/images/unmuteChat.png'),
-                                        ),
-                                      ),
+                                iconWidget: Container(
+                                  child: Center(
+                                    child: Image.asset(
+                                      numbers.elementAt(i).isMuted == true
+                                          ? 'assets/images/muteChat.png'
+                                          : 'assets/images/unmuteChat.png',
+                                      width: 30,
+                                      height: 30,
+                                    ),
+                                  ),
+                                ),
                                 onTap: () {
                                   numbers.elementAt(i).isMuted == true
                                       ? ChatRoom.shared.muteChat(
@@ -353,47 +214,41 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                                 },
                               ),
                               IconSlideAction(
-                                caption: '${localization.delete}',
                                 color: transparentColor,
                                 foregroundColor: blackPurpleColor,
                                 iconWidget: Container(
                                   child: Center(
                                     child: Image.asset(
-                                        'assets/images/deleteChat.png'),
+                                      'assets/images/deleteChat.png',
+                                      width: 30,
+                                      height: 30,
+                                    ),
                                   ),
                                 ),
                                 onTap: () {
-                                  showDialog(
+                                  showIndigoDialog(
                                     context: context,
-                                    builder: (BuildContext context) {
-                                      return CustomDialog(
-                                        description:
-                                            '${localization.delete} ${localization.chat} ${numbers.elementAt(i).name}?',
-                                        yesCallBack: () {
-                                          ChatRoom.shared.deleteChat(
-                                            numbers.elementAt(i).chatId,
-                                          );
-                                          Navigator.pop(context);
-                                        },
-                                        noCallBack: () {
-                                          Navigator.pop(context);
-                                        },
-                                      );
-                                    },
+                                    builder: CustomDialog(
+                                      description:
+                                          '${Localization.language.delete} ${Localization.language.chat.toLowerCase()} "${numbers.elementAt(i).name}"?',
+                                      yesCallBack: () {
+                                        ChatRoom.shared.deleteChat(
+                                          numbers.elementAt(i).chatId,
+                                        );
+                                        Navigator.pop(context);
+                                      },
+                                      noCallBack: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
                                   );
                                 },
                               )
                             ],
                             child: Column(
                               children: [
-                                _chatListTile(numbers.elementAt(i)),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 65),
-                                  child: Container(
-                                    color: greyColor,
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 0.5,
-                                  ),
+                                ChatsElement(
+                                  chat: numbers.elementAt(i),
                                 ),
                               ],
                             ),
@@ -532,43 +387,43 @@ class _TestChatsListPageState extends State<TestChatsListPage>
   String identifyMessagePreview(int messageType) {
     switch (messageType) {
       case 0:
-        return localization.textMessage;
+        return Localization.language.textMessage;
         break;
       case 1:
-        return localization.photo;
+        return Localization.language.photo;
         break;
       case 2:
-        return localization.document;
+        return Localization.language.document;
         break;
       case 3:
-        return localization.voiceMessage;
+        return Localization.language.voiceMessage;
         break;
       case 4:
-        return localization.video;
+        return Localization.language.video;
         break;
       case 7:
-        return localization.systemMessage;
+        return Localization.language.systemMessage;
         break;
       // case 8:
       // return 'Дивайдер сообщение';
       // break;
       case 9:
-        return localization.location;
+        return Localization.language.location;
         break;
       case 10:
-        return localization.reply;
+        return Localization.language.reply;
         break;
       case 11:
-        return localization.money;
+        return Localization.language.money;
         break;
       case 12:
-        return localization.link;
+        return Localization.language.link;
         break;
       case 13:
-        return localization.forwardedMessage;
+        return Localization.language.forwardedMessage;
         break;
       default:
-        return localization.message;
+        return Localization.language.message;
     }
   }
 }

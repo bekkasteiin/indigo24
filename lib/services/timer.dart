@@ -39,30 +39,6 @@ class TimerPageState extends State<TimerPage> {
     });
   }
 
-  void rightButtonPressed() {
-    setState(() {
-      if (dependencies.stopwatch.isRunning) {
-        dependencies.stopwatch.stop();
-      } else {
-        dependencies.stopwatch.start();
-      }
-    });
-  }
-
-  Widget buildFloatingButton(String text, VoidCallback callback) {
-    return new GestureDetector(
-      child: new Text(text),
-      onLongPress: () {
-        setState(() {
-          dependencies.stopwatch.start();
-        });
-      },
-      onLongPressUp: () {
-        dependencies.stopwatch.stop();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/video_player_widget.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:photo_view/photo_view.dart';
 
 class PreviewMedia extends StatefulWidget {
@@ -88,7 +88,7 @@ class _PreviewMediaState extends State<PreviewMedia> {
                   controller: _messageController,
                   style: TextStyle(color: whiteColor),
                   decoration: InputDecoration(
-                    hintText: "${localization.enterMessage}",
+                    hintText: "${Localization.language.enterMessage}",
                     hintStyle: TextStyle(color: greyColor),
                   ),
                   textCapitalization: TextCapitalization.sentences,

@@ -4,7 +4,7 @@ import 'package:indigo24/pages/wallet/withdraw/withdraw.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
 class WithdrawListPage extends StatefulWidget {
@@ -16,6 +16,7 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
   Api _api;
   List _withdrawList;
   bool _isLoaded;
+
   @override
   void initState() {
     _isLoaded = false;
@@ -40,7 +41,7 @@ class _WithdrawListPageState extends State<WithdrawListPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.withdraw}",
+          "${Localization.language.withdraw}",
           style: TextStyle(
             color: blackPurpleColor,
             fontSize: 22,

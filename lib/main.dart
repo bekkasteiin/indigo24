@@ -7,6 +7,8 @@ import 'package:indigo24/pages/auth/intro.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/services/localization/localization.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/chat/chat_models/chat_model.dart';
@@ -14,7 +16,6 @@ import 'pages/chat/chat_models/hive_names.dart';
 import 'pages/chat/chat_models/messages.g_model.dart';
 import 'pages/chat/chat_models/messages_model.dart';
 import 'services/api/socket/socket.dart';
-import 'package:indigo24/services/localization.dart' as localization;
 
 import 'package:indigo24/style/colors.dart';
 import 'widgets/alerts/indigo_alert.dart';
@@ -24,7 +25,7 @@ Future<void> main() async {
   SharedPreferences _preferences = await SharedPreferences.getInstance();
 
   String _languageCode = _preferences.getString('languageCode');
-  localization.setLanguage(_languageCode);
+  Localization.setLanguage(_languageCode);
   String phone = _preferences.getString('phone');
   String domen2 = _preferences.getString('domen');
 
@@ -60,7 +61,7 @@ class MyApp extends StatelessWidget {
     ]);
     return OverlaySupport(
       child: MaterialApp(
-        themeMode: ThemeMode.dark,
+        themeMode: ThemeMode.light,
         debugShowCheckedModeBanner: domen == 'com' ? false : true,
         title: 'Indigo24',
         builder: (context, child) {
@@ -86,22 +87,20 @@ logOut(BuildContext context) async {
   Hive.box<MessageModel>(HiveBoxes.messages).clear();
   Hive.box<ChatModel>(HiveBoxes.chats).clear();
 
-  showDialog(
+  showIndigoDialog(
     barrierDismissible: false,
     context: context,
-    builder: (BuildContext context) {
-      return CustomDialog(
-        description: "${localization.sessionIsOver}",
-        yesCallBack: () {
-          Navigator.pop(context);
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => IntroPage(),
-            ),
-            (r) => false,
-          );
-        },
-      );
-    },
+    builder: CustomDialog(
+      description: "${Localization.language.sessionIsOver}",
+      yesCallBack: () {
+        Navigator.pop(context);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => IntroPage(),
+          ),
+          (r) => false,
+        );
+      },
+    ),
   );
 }

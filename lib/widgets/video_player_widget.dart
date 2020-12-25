@@ -53,12 +53,13 @@ class GradientFab extends StatelessWidget {
       child: Container(
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.center,
-              end: Alignment.bottomRight,
-              colors: [whiteColor],
-            )),
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.center,
+            end: Alignment.bottomRight,
+            colors: [whiteColor, whiteColor],
+          ),
+        ),
         child: child,
       ),
       onPressed: onPressed,

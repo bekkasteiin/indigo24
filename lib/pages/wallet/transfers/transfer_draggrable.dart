@@ -3,7 +3,7 @@ import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 
@@ -69,7 +69,7 @@ class TransferContactsDialogPageState
         child: Scaffold(
           appBar: IndigoAppBarWidget(
             title: Text(
-              '${localization.contacts}',
+              '${Localization.language.contacts}',
               style: TextStyle(
                 color: blackPurpleColor,
                 fontWeight: FontWeight.w400,
@@ -83,7 +83,11 @@ class TransferContactsDialogPageState
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
-                      top: 10.0, left: 10.0, right: 10, bottom: 0),
+                    top: 10.0,
+                    left: 10.0,
+                    right: 10,
+                    bottom: 0,
+                  ),
                   child: IndigoSearchWidget(
                     callback: null,
                     searchController: _searchController,

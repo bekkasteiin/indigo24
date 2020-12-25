@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/pin/pin_code.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -179,7 +180,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                           children: <Widget>[
                                             SizedBox(height: 15),
                                             Text(
-                                              '${localization.walletBalance}',
+                                              '${Localization.language.walletBalance}',
                                               style: fS14(c: 'FFFFFF'),
                                             ),
                                             SizedBox(height: 5),
@@ -223,7 +224,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text(
-                                            '${localization.account}',
+                                            '${Localization.language.account}',
                                             style: TextStyle(
                                               fontSize: 16,
                                               color: darkGreyColor2,
@@ -243,7 +244,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text(
-                                            '${localization.service}',
+                                            '${Localization.language.service}',
                                             style: TextStyle(
                                               fontSize: 16,
                                               color: darkGreyColor2,
@@ -284,7 +285,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text(
-                                            '${localization.toPay}',
+                                            '${Localization.language.toPay}',
                                             style: TextStyle(
                                               fontSize: 20,
                                               color: blackPurpleColor,
@@ -304,7 +305,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text(
-                                            '${localization.conversion}',
+                                            '${Localization.language.conversion}',
                                             style: TextStyle(
                                               fontSize: 20,
                                               color: blackPurpleColor,
@@ -341,26 +342,26 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           ),
                           Center(
                             child: Text(
-                              '${localization.commission} ${_service['service']['commission']}%',
+                              '${Localization.language.commission} ${_service['service']['commission']}%',
                               style: TextStyle(color: greyColor2),
                             ),
                           ),
                           Center(
                             child: Text(
-                              '${localization.minAmount} ${_service['service']['min']} KZT',
+                              '${Localization.language.minAmount} ${_service['service']['min']} KZT',
                               style: TextStyle(color: greyColor2),
                             ),
                           ),
                           Center(
                             child: Text(
-                              '${localization.maxAmount} ${_service['service']['max']} KZT',
+                              '${Localization.language.maxAmount} ${_service['service']['max']} KZT',
                               style: TextStyle(color: greyColor2),
                             ),
                           ),
                           _service['service']['commission'].toString() != '0'
                               ? Center(
                                   child: Text(
-                                    '${localization.commission} ${_service['service']['commission'] * _amount} KZT',
+                                    '${Localization.language.commission} ${_service['service']['commission'] * _amount} KZT',
                                     style: TextStyle(color: blackPurpleColor),
                                   ),
                                 )
@@ -429,9 +430,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             return services;
           } else {
             if (services['success'].toString() == 'false')
-              showDialog(
+              showIndigoDialog(
                 context: context,
-                builder: (BuildContext context) => CustomDialog(
+                builder: CustomDialog(
                   description: '${services['message']}',
                   yesCallBack: () {
                     Navigator.pop(context);
@@ -439,9 +440,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 ),
               );
             else {
-              showDialog(
+              showIndigoDialog(
                 context: context,
-                builder: (BuildContext context) => CustomDialog(
+                builder: CustomDialog(
                   description: '${services['message']}',
                   yesCallBack: () {
                     Navigator.pop(context);
@@ -495,13 +496,13 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                 if (int.parse(sum) <= _service['service']['max']) {
                   await _showLockScreen(
                     context,
-                    '${localization.enterPin}',
+                    '${Localization.language.enterPin}',
                   );
                 } else {
-                  showDialog(
+                  showIndigoDialog(
                     context: context,
-                    builder: (BuildContext context) => CustomDialog(
-                      description: '${localization.enterBelowMax}',
+                    builder: CustomDialog(
+                      description: '${Localization.language.enterBelowMax}',
                       yesCallBack: () {
                         Navigator.pop(context);
                       },
@@ -509,10 +510,10 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   );
                 }
               } else {
-                showDialog(
+                showIndigoDialog(
                   context: context,
-                  builder: (BuildContext context) => CustomDialog(
-                    description: '${localization.enterAboveMin}',
+                  builder: CustomDialog(
+                    description: '${Localization.language.enterAboveMin}',
                     yesCallBack: () {
                       Navigator.pop(context);
                     },
@@ -543,9 +544,9 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                         _expectedCurrency = result['ExpectedCurrency'];
                       });
                     } else {
-                      showDialog(
+                      showIndigoDialog(
                         context: context,
-                        builder: (BuildContext context) => CustomDialog(
+                        builder: CustomDialog(
                           description: '${result['message']}',
                           yesCallBack: () {
                             Navigator.pop(context);
@@ -555,10 +556,10 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                     }
                   });
                 } else {
-                  showDialog(
+                  showIndigoDialog(
                     context: context,
-                    builder: (BuildContext context) => CustomDialog(
-                      description: '${localization.enterBelowMax}',
+                    builder: CustomDialog(
+                      description: '${Localization.language.enterBelowMax}',
                       yesCallBack: () {
                         Navigator.pop(context);
                       },
@@ -566,10 +567,10 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                   );
                 }
               } else {
-                showDialog(
+                showIndigoDialog(
                   context: context,
-                  builder: (BuildContext context) => CustomDialog(
-                    description: '${localization.enterAboveMin}',
+                  builder: CustomDialog(
+                    description: '${Localization.language.enterAboveMin}',
                     yesCallBack: () {
                       Navigator.pop(context);
                     },
@@ -583,7 +584,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             width: 200,
             child: Center(
               child: Text(
-                '${isCalculated == false && widget.isConvertable == 1 ? localization.calculate : localization.pay}',
+                '${isCalculated == false && widget.isConvertable == 1 ? Localization.language.calculate : Localization.language.pay}',
                 style:
                     TextStyle(color: primaryColor, fontWeight: FontWeight.w800),
               ),
@@ -671,7 +672,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
                           ),
                         ),
                         Text(
-                          '${((mask.isNotEmpty || example.isNotEmpty) ? "${localization.example}: " : '') + (example.isNotEmpty ? example : mask.isNotEmpty ? mask : '')}',
+                          '${((mask.isNotEmpty || example.isNotEmpty) ? "${Localization.language.example}: " : '') + (example.isNotEmpty ? example : mask.isNotEmpty ? mask : '')}',
                           style: TextStyle(
                             color: greyColor,
                           ),

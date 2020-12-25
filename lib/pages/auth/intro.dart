@@ -7,7 +7,8 @@ import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/pages/auth/registration/registration.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/document/pdf_viewer.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
@@ -40,7 +41,7 @@ class _IntroPageState extends State<IntroPage> {
           children: <Widget>[
             Container(
               margin: EdgeInsets.all(10),
-              child: Text('${localization.selectOption}'),
+              child: Text('${Localization.language.selectOption}'),
             ),
             Container(
               height: 1,
@@ -51,21 +52,21 @@ class _IntroPageState extends State<IntroPage> {
               child: ListView.separated(
                 padding: EdgeInsets.all(0),
                 shrinkWrap: false,
-                itemCount: localization.languages.length,
+                itemCount: Localization.languages.length,
                 itemBuilder: (BuildContext context, int index) {
                   return FlatButton(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text('${localization.languages[index]['title']}'),
-                        Text('${localization.languages[index]['code']}'),
+                        Text('${Localization.languages[index]['title']}'),
+                        Text('${Localization.languages[index]['code']}'),
                       ],
                     ),
                     onPressed: () {
                       isLanguageSelected = true;
                       setState(() {
-                        localization
-                            .setLanguage(localization.languages[index]['code']);
+                        Localization.setLanguage(
+                            Localization.languages[index]['code']);
                       });
                       Navigator.pop(context);
                     },
@@ -83,12 +84,10 @@ class _IntroPageState extends State<IntroPage> {
         ),
       ),
     );
-    showDialog(
+    showIndigoDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return errorDialog;
-      },
+      builder: errorDialog,
     );
   }
 
@@ -105,7 +104,7 @@ class _IntroPageState extends State<IntroPage> {
   //         children: <Widget>[
   //           Container(
   //             margin: EdgeInsets.all(10),
-  //             child: Text('${localization.selectOption}'),
+  //             child: Text('${Localization.language.selectOption}'),
   //           ),
   //           Container(
   //             height: 1,
@@ -116,7 +115,7 @@ class _IntroPageState extends State<IntroPage> {
   //             child: ListView.separated(
   //               padding: EdgeInsets.all(0),
   //               shrinkWrap: false,
-  //               itemCount: localization.languages.length,
+  //               itemCount: Localization.languages.length,
   //               itemBuilder: (BuildContext context, int index) {
   //                 return FlatButton(
   //                   child: Row(
@@ -142,7 +141,7 @@ class _IntroPageState extends State<IntroPage> {
   //       ),
   //     ),
   //   );
-  //   showDialog(
+  //   showIndigoDialog(
   //     context: context,
   //     barrierDismissible: false,
   //     builder: (BuildContext context) {
@@ -220,7 +219,9 @@ class _IntroPageState extends State<IntroPage> {
                 Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: introBackgroundProvider, fit: BoxFit.cover),
+                      image: introBackgroundProvider,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 AppBar(
@@ -246,7 +247,7 @@ class _IntroPageState extends State<IntroPage> {
                         }
                       },
                       child: Text(
-                        '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                        '${Localization.language.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
                         style: TextStyle(
                           color: _domen3 == 'xyz' ? redColor : milkWhiteColor,
                           fontWeight: FontWeight.w400,
@@ -321,8 +322,9 @@ class _IntroPageState extends State<IntroPage> {
                                                 width: 20,
                                               ),
                                               Text(
-                                                "${localization.currentLanguage}",
+                                                "${Localization.language.currentLanguage}",
                                                 style: TextStyle(
+                                                  fontSize: 16,
                                                   color: blackPurpleColor,
                                                   fontWeight: FontWeight.w300,
                                                 ),
@@ -338,15 +340,15 @@ class _IntroPageState extends State<IntroPage> {
                                           child: Column(
                                             children: [
                                               for (var language
-                                                  in localization.languages)
+                                                  in Localization.languages)
                                                 GestureDetector(
                                                   onTap: () => setState(
                                                     () {
                                                       hided = !hided;
-                                                      localization.setLanguage(
+                                                      Localization.setLanguage(
                                                         language['code'],
                                                       );
-                                                      localization
+                                                      Localization.language
                                                               .currentLanguage =
                                                           '${language['title']}';
                                                     },
@@ -365,6 +367,7 @@ class _IntroPageState extends State<IntroPage> {
                                                           textAlign:
                                                               TextAlign.justify,
                                                           style: TextStyle(
+                                                            fontSize: 16,
                                                             color: primaryColor,
                                                             fontWeight:
                                                                 FontWeight.w300,
@@ -375,6 +378,7 @@ class _IntroPageState extends State<IntroPage> {
                                                           textAlign:
                                                               TextAlign.justify,
                                                           style: TextStyle(
+                                                            fontSize: 16,
                                                             color:
                                                                 blackPurpleColor,
                                                             fontWeight:
@@ -403,14 +407,14 @@ class _IntroPageState extends State<IntroPage> {
                               //       child: CustomDropdownButton(
                               //         isExpanded: false,
                               //         hint: Text(
-                              //           "${localization.currentLanguage}",
+                              //           "${Localization.language.currentLanguage}",
                               //           style: TextStyle(
                               //             color: blackPurpleColor,
                               //             fontWeight: FontWeight.w300,
                               //           ),
                               //         ),
                               //         items:
-                              //             localization.languages.map((value) {
+                              //             Localization.languages.map((value) {
                               //           return DropdownMenuItem(
                               //             child: Container(
                               //               height: 30,
@@ -442,11 +446,11 @@ class _IntroPageState extends State<IntroPage> {
                               //           );
                               //         }).toList(),
                               //         onChanged: (value) {
-                              //           localization.setLanguage(
+                              //           Localization.language.setLanguage(
                               //             value['code'],
                               //           );
                               //           setState(() {
-                              //             localization.currentLanguage =
+                              //             Localization.language.currentLanguage =
                               //                 '${value['title']}';
                               //           });
                               //         },
@@ -461,9 +465,10 @@ class _IntroPageState extends State<IntroPage> {
                           children: [
                             FlatButton(
                               child: Text(
-                                "${localization.terms}".toUpperCase(),
+                                "${Localization.language.terms}".toUpperCase(),
                                 style: TextStyle(
                                   color: brightGreyColor5,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w300,
                                   decoration: TextDecoration.underline,
                                 ),
@@ -474,7 +479,7 @@ class _IntroPageState extends State<IntroPage> {
                                   MaterialPageRoute(
                                     builder: (context) => PDFViewer(
                                       'assets/terms.pdf',
-                                      text: localization.terms,
+                                      text: Localization.language.terms,
                                     ),
                                   ),
                                 );
@@ -493,16 +498,14 @@ class _IntroPageState extends State<IntroPage> {
   }
 
   dioError(context) async {
-    showDialog(
+    showIndigoDialog(
       context: context,
-      builder: (BuildContext context) {
-        return CustomDialog(
-          description: "${localization.httpError}",
-          yesCallBack: () {
-            Navigator.pop(context);
-          },
-        );
-      },
+      builder: CustomDialog(
+        description: "${Localization.language.httpError}",
+        yesCallBack: () {
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
@@ -541,8 +544,8 @@ class _IntroPageState extends State<IntroPage> {
           );
         },
         child: Text(
-          '${localization.login}',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
+          '${Localization.language.login}',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300),
         ),
         color: whiteColor,
         textColor: blackPurpleColor,
@@ -569,8 +572,8 @@ class _IntroPageState extends State<IntroPage> {
           );
         },
         child: Text(
-          '${localization.registration}',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w300),
+          '${Localization.language.registration}',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300),
         ),
         color: whiteColor.withOpacity(0.35),
         textColor: whiteColor,

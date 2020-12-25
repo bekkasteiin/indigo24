@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/models/transfer_model.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -79,9 +79,9 @@ class Voucher extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    localization.transfer +
+                                    Localization.language.transfer +
                                         ' ' +
-                                        localization.toIndigo24Client,
+                                        Localization.language.toIndigo24Client,
                                     style: TextStyle(color: blackPurpleColor),
                                   ),
                                 )
@@ -95,7 +95,7 @@ class Voucher extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      localization.amount,
+                                      Localization.language.amount,
                                       style: TextStyle(color: greyColor),
                                     ),
                                     Text(
@@ -113,7 +113,7 @@ class Voucher extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      localization.commission,
+                                      Localization.language.commission,
                                       style: TextStyle(color: greyColor),
                                     ),
                                     Text(
@@ -129,30 +129,30 @@ class Voucher extends StatelessWidget {
                             ),
                             Divider(),
                             _vouchetTitle(
-                              title: localization.receiver,
+                              title: Localization.language.receiver,
                               content: transferModel.name,
                             ),
                             if (transferModel.comment?.isNotEmpty != null)
                               _vouchetTitle(
-                                title: localization.comments,
+                                title: Localization.language.comments,
                                 content: transferModel.comment,
                               ),
                             _voucherInfo(
-                              leftWidget: localization.date,
+                              leftWidget: Localization.language.date,
                               rigthWidget: transferModel.data,
                             ),
                             _voucherInfo(
-                              leftWidget: localization.name,
+                              leftWidget: Localization.language.name,
                               rigthWidget: transferModel.from,
                             ),
                             _voucherInfo(
-                              leftWidget: localization.payFrom,
+                              leftWidget: Localization.language.payFrom,
                               rigthWidget: transferModel.type == 'in'
                                   ? '+' + transferModel.phone
                                   : user.phone,
                             ),
                             _voucherInfo(
-                              leftWidget: localization.destination,
+                              leftWidget: Localization.language.destination,
                               rigthWidget: transferModel.type == 'out'
                                   ? '+' + transferModel.phone
                                   : user.phone,
@@ -177,7 +177,7 @@ class Voucher extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            localization.success,
+                            Localization.language.success,
                             style: TextStyle(
                               color: whiteColor,
                               fontWeight: FontWeight.w600,
@@ -225,7 +225,7 @@ class Voucher extends StatelessWidget {
                         ),
                         FittedBox(
                           child: Text(
-                            '${transferModel.type == 'in' ? localization.reply : localization.repeat}',
+                            '${transferModel.type == 'in' ? Localization.language.reply : Localization.language.repeat}',
                             style: TextStyle(
                               color: whiteColor,
                             ),
@@ -279,7 +279,7 @@ class Voucher extends StatelessWidget {
                         ),
                         FittedBox(
                           child: Text(
-                            localization.share,
+                            Localization.language.share,
                             style: TextStyle(
                               color: whiteColor,
                             ),

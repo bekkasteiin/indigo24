@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/models/payment_history_model.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -92,7 +92,7 @@ class PaymentVoucher extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      localization.amount,
+                                      Localization.language.amount,
                                       style: TextStyle(color: greyColor),
                                     ),
                                     Text(
@@ -111,7 +111,7 @@ class PaymentVoucher extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      localization.commission,
+                                      Localization.language.commission,
                                       style: TextStyle(color: greyColor),
                                     ),
                                     Text(
@@ -127,23 +127,23 @@ class PaymentVoucher extends StatelessWidget {
                             ),
                             Divider(),
                             _vouchetTitle(
-                              title: localization.service,
+                              title: Localization.language.service,
                               content: paymentHistoryModel.title,
                             ),
                             _voucherInfo(
-                              leftWidget: localization.date,
+                              leftWidget: Localization.language.date,
                               rigthWidget: paymentHistoryModel.data,
                             ),
                             _voucherInfo(
-                              leftWidget: localization.name,
+                              leftWidget: Localization.language.name,
                               rigthWidget: user.name,
                             ),
                             _voucherInfo(
-                              leftWidget: localization.payFrom,
+                              leftWidget: Localization.language.payFrom,
                               rigthWidget: user.phone,
                             ),
                             _voucherInfo(
-                              leftWidget: localization.destination,
+                              leftWidget: Localization.language.destination,
                               rigthWidget: paymentHistoryModel.account,
                             ),
                           ],
@@ -214,7 +214,7 @@ class PaymentVoucher extends StatelessWidget {
                     //     ),
                     //     FittedBox(
                     //       child: Text(
-                    //         localization.repeat,
+                    //         Localization.language.repeat,
                     //         style: TextStyle(
                     //           color: whiteColor,
                     //         ),
@@ -270,7 +270,7 @@ class PaymentVoucher extends StatelessWidget {
                         ),
                         FittedBox(
                           child: Text(
-                            localization.share,
+                            Localization.language.share,
                             style: TextStyle(
                               color: whiteColor,
                             ),
@@ -291,22 +291,22 @@ class PaymentVoucher extends StatelessWidget {
   String identifyStatus(int status) {
     switch (status) {
       case 0:
-        return localization.newPayment;
+        return Localization.language.newPayment;
         break;
       case 1:
-        return localization.newPayment;
+        return Localization.language.newPayment;
         break;
       case 2:
-        return localization.error;
+        return Localization.language.error;
         break;
       case 3:
-        return localization.pending;
+        return Localization.language.pending;
         break;
       case 4:
-        return localization.success;
+        return Localization.language.success;
         break;
       default:
-        return localization.httpError;
+        return Localization.language.httpError;
     }
   }
 

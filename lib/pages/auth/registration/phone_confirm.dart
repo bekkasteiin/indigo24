@@ -10,7 +10,7 @@ import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_auth_title.dart';
 import 'registration.dart';
 import 'user_registration.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 class PhoneConfirmPage extends StatefulWidget {
   final smsCode;
@@ -132,7 +132,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      IndigoAuthTitle(title: localization.keyFromSms),
+                      IndigoAuthTitle(title: Localization.language.keyFromSms),
                       TextField(
                         controller: _smsController,
                         style: TextStyle(
@@ -161,7 +161,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
                   child: Text(
-                    '${localization.weSentToEmail}',
+                    '${Localization.language.weSentToEmail}',
                     style: TextStyle(
                       color: darkGreyColor3,
                       fontSize: 12,
@@ -210,7 +210,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         child: Container(
                           padding: EdgeInsets.all(5),
                           child: Text(
-                            "${localization.repeat} SMS",
+                            "${Localization.language.repeat} SMS",
                             style: TextStyle(
                               color: greyColor,
                             ),
@@ -225,7 +225,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: ProgressButton(
                     defaultWidget: Text(
-                      "${localization.next}",
+                      "${Localization.language.next}",
                       style: TextStyle(
                         color: whiteColor,
                         fontSize: 22,
@@ -271,7 +271,7 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                         });
                       } else {
                         setState(() {
-                          smsError = '${localization.enterSmsCode}';
+                          smsError = '${Localization.language.enterSmsCode}';
                         });
                       }
                     },

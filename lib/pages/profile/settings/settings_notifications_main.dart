@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
@@ -38,7 +38,7 @@ class _SettingsNotificationsMainPageState
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          '${localization.notifications}',
+          '${Localization.language.notifications}',
           style: TextStyle(
             color: blackPurpleColor,
             fontWeight: FontWeight.w400,
@@ -55,7 +55,7 @@ class _SettingsNotificationsMainPageState
               Container(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
                 child: Text(
-                  '${localization.chatNotifications.toUpperCase()}',
+                  '${Localization.language.chatNotifications.toUpperCase()}',
                   style: TextStyle(
                     color: brightGreyColor2,
                     fontWeight: FontWeight.w500,
@@ -77,7 +77,7 @@ class _SettingsNotificationsMainPageState
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            '${localization.hideNotifications}',
+                            '${Localization.language.hideNotifications}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,

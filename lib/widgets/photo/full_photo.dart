@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share/share.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 import '../alerts/indigo_alert.dart';
 
@@ -126,7 +127,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                     child: Row(
                       children: [
                         Text(
-                          "${localization.save} ",
+                          "${Localization.language.save} ",
                           style: TextStyle(color: whiteColor),
                           maxLines: 1,
                           softWrap: false,
@@ -147,7 +148,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                     child: Row(
                       children: [
                         Text(
-                          "${localization.share} ",
+                          "${Localization.language.share} ",
                           style: TextStyle(color: whiteColor),
                           maxLines: 1,
                           softWrap: false,
@@ -160,9 +161,10 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                       ],
                     ),
                     onPressed: () {
-                      Share.share(url, subject: '${localization.photo}');
+                      Share.share(url,
+                          subject: '${Localization.language.photo}');
                       // Share.share(currentIndex == null ? url : url1,
-                      //                       subject: '${localization.photo}');
+                      //                       subject: '${Localization.language.photo}');
                     },
                   ),
                 ],
@@ -261,25 +263,24 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
       setState(() {});
       if (success)
         setState(() {
-          showAlertDialog(
-              context, "${localization.success}", "${localization.uploaded}");
+          showAlertDialog(context, "${Localization.language.success}",
+              "${Localization.language.uploaded}");
         });
       else
-        showAlertDialog(context, "${localization.error}",
-            "${localization.somethingWentWrong}");
+        showAlertDialog(context, "${Localization.language.error}",
+            "${Localization.language.somethingWentWrong}");
     });
   }
 
   showAlertDialog(BuildContext context, String title, String message) {
-    showDialog(
+    showIndigoDialog(
       context: context,
-      builder: (BuildContext context) {
-        return CustomDialog(
-            description: "$message",
-            yesCallBack: () {
-              Navigator.pop(context);
-            });
-      },
+      builder: CustomDialog(
+        description: "$message",
+        yesCallBack: () {
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 }

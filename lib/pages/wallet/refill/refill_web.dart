@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 class RefillWebView extends StatelessWidget {
   final String url;
@@ -17,7 +17,7 @@ class RefillWebView extends StatelessWidget {
       },
       child: Scaffold(
         appBar: IndigoAppBarWidget(
-          title: Text(localization.refill,
+          title: Text(Localization.language.refill,
               style: TextStyle(
                 color: blackPurpleColor,
                 fontSize: 22,

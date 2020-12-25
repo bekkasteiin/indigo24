@@ -9,10 +9,11 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_text_field_widget.dart';
 import 'package:video_player/video_player.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 import 'aspect_ratio_video.dart';
 
@@ -73,7 +74,7 @@ class _AddTapePageState extends State<AddTapePage> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.newTape}",
+            "${Localization.language.newTape}",
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,
@@ -103,20 +104,20 @@ class _AddTapePageState extends State<AddTapePage> {
                 // }
                 if (_descriptionController.text == '' ||
                     _titleController.text == '') {
-                  showDialog(
+                  showIndigoDialog(
                     context: context,
-                    builder: (BuildContext context) => CustomDialog(
-                      description: localization.fillAllFields,
+                    builder: CustomDialog(
+                      description: Localization.language.fillAllFields,
                       yesCallBack: () {
                         Navigator.pop(context);
                       },
                     ),
                   );
                 } else if (_currentFile == null) {
-                  showDialog(
+                  showIndigoDialog(
                     context: context,
-                    builder: (BuildContext context) => CustomDialog(
-                      description: localization.selectFile,
+                    builder: CustomDialog(
+                      description: Localization.language.selectFile,
                       yesCallBack: () {
                         Navigator.pop(context);
                       },
@@ -142,7 +143,7 @@ class _AddTapePageState extends State<AddTapePage> {
                       inputFormatters: [
                         LengthLimitingTextInputFormatter(40),
                       ],
-                      hintText: localization.title,
+                      hintText: Localization.language.title,
                     ),
                   ),
                   Container(
@@ -152,7 +153,7 @@ class _AddTapePageState extends State<AddTapePage> {
                       inputFormatters: [
                         LengthLimitingTextInputFormatter(200),
                       ],
-                      hintText: localization.description,
+                      hintText: Localization.language.description,
                       minLines: 1,
                       maxLines: 4,
                     ),
@@ -240,17 +241,17 @@ class _AddTapePageState extends State<AddTapePage> {
       currentFocus.unfocus();
     }
     final act = CupertinoActionSheet(
-        title: Text('${localization.selectOption}'),
+        title: Text('${Localization.language.selectOption}'),
         actions: <Widget>[
           CupertinoActionSheetAction(
-            child: Text('${localization.camera}'),
+            child: Text('${Localization.language.camera}'),
             onPressed: () {
               _onImageButtonPressed(ImageSource.camera);
               Navigator.pop(context);
             },
           ),
           CupertinoActionSheetAction(
-            child: Text('${localization.gallery}'),
+            child: Text('${Localization.language.gallery}'),
             onPressed: () {
               _onImageButtonPressed(ImageSource.gallery);
               Navigator.pop(context);
@@ -258,7 +259,7 @@ class _AddTapePageState extends State<AddTapePage> {
           )
         ],
         cancelButton: CupertinoActionSheetAction(
-          child: Text('${localization.back}'),
+          child: Text('${Localization.language.back}'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -310,16 +311,14 @@ class _AddTapePageState extends State<AddTapePage> {
   }
 
   showAlertDialog(BuildContext context, String message) {
-    showDialog(
+    showIndigoDialog(
       context: context,
-      builder: (BuildContext context) {
-        return CustomDialog(
-          description: "$message",
-          yesCallBack: () {
-            Navigator.of(context).pop();
-          },
-        );
-      },
+      builder: CustomDialog(
+        description: "$message",
+        yesCallBack: () {
+          Navigator.of(context).pop();
+        },
+      ),
     );
   }
 
@@ -360,7 +359,7 @@ class _AddTapePageState extends State<AddTapePage> {
       );
     } else {
       return Container(
-        child: Text("${localization.error}"),
+        child: Text("${Localization.language.error}"),
       );
     }
   }

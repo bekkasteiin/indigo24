@@ -6,9 +6,10 @@ import 'package:indigo24/db/country_dao.dart';
 import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 
 import 'countries.dart';
@@ -146,7 +147,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                           Row(
                             children: <Widget>[
                               Text(
-                                "${localization.phoneNumber}",
+                                "${Localization.language.phoneNumber}",
                                 style: TextStyle(
                                   color: blackPurpleColor,
                                   fontSize: 16,
@@ -190,7 +191,7 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
                         defaultWidget: Text(
-                          "${localization.next}",
+                          "${Localization.language.next}",
                           style: TextStyle(
                             color: whiteColor,
                             fontSize: 22,
@@ -207,37 +208,32 @@ class _RestorePasswordPageState extends State<RestorePasswordPage> {
                               .then(
                             (restorePasswordResponse) async {
                               if (restorePasswordResponse['success'] == true) {
-                                showDialog(
+                                showIndigoDialog(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return CustomDialog(
-                                      description:
-                                          "${restorePasswordResponse['message']}",
-                                      yesCallBack: () {
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                            builder: (context) => LoginPage(),
-                                          ),
-                                          (r) => false,
-                                        );
-                                      },
-                                    );
-                                  },
+                                  builder: CustomDialog(
+                                    description:
+                                        "${restorePasswordResponse['message']}",
+                                    yesCallBack: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                          builder: (context) => LoginPage(),
+                                        ),
+                                        (r) => false,
+                                      );
+                                    },
+                                  ),
                                 );
                               } else {
-                                showDialog(
+                                showIndigoDialog(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return CustomDialog(
-                                      description:
-                                          "${restorePasswordResponse['message']}",
-                                      yesCallBack: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    );
-                                  },
+                                  builder: CustomDialog(
+                                    description:
+                                        "${restorePasswordResponse['message']}",
+                                    yesCallBack: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
                                 );
                               }
                             },

@@ -3,9 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/models/payment_history_model.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/alerts/payments_voucher.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -83,7 +84,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     return Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            localization.paymentsHistory,
+            Localization.language.paymentsHistory,
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,
@@ -227,23 +228,23 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
     Color color = greyColor;
     switch (status) {
       case 0:
-        text = localization.newPayment;
+        text = Localization.language.newPayment;
         color = pendingColor;
         break;
       case 1:
-        text = localization.newPayment;
+        text = Localization.language.newPayment;
         color = pendingColor;
         break;
       case 2:
-        text = localization.error;
+        text = Localization.language.error;
         color = errorColor;
         break;
       case 3:
-        text = localization.pending;
+        text = Localization.language.pending;
         color = pendingColor;
         break;
       case 4:
-        text = localization.success;
+        text = Localization.language.success;
         color = succesColor;
         break;
       default:
@@ -422,35 +423,33 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                                 );
                                 return InkWell(
                                   onTap: () {
-                                    showDialog(
+                                    showIndigoDialog(
                                       context: context,
                                       barrierDismissible: true,
-                                      builder: (BuildContext context) {
-                                        return PaymentVoucher(
-                                          paymentHistoryModel:
-                                              paymentHistoryModel,
-                                          buttonCallBack: () {
-                                            Navigator.pop(context);
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PaymentsServicePage(
-                                                  paymentHistoryModel.serviceId,
-                                                  paymentHistoryModel.logo,
-                                                  paymentHistoryModel.title,
-                                                  account: paymentHistoryModel
-                                                      .account,
-                                                  amount: paymentHistoryModel
-                                                      .amount
-                                                      .toString(),
-                                                  providerId: null,
-                                                ),
+                                      builder: PaymentVoucher(
+                                        paymentHistoryModel:
+                                            paymentHistoryModel,
+                                        buttonCallBack: () {
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PaymentsServicePage(
+                                                paymentHistoryModel.serviceId,
+                                                paymentHistoryModel.logo,
+                                                paymentHistoryModel.title,
+                                                account:
+                                                    paymentHistoryModel.account,
+                                                amount: paymentHistoryModel
+                                                    .amount
+                                                    .toString(),
+                                                providerId: null,
                                               ),
-                                            );
-                                          },
-                                        );
-                                      },
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     );
                                   },
                                   child: Container(
@@ -481,7 +480,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                       )
                 : SafeArea(
                     child: Container(
-                      child: Center(child: Text('${localization.empty}')),
+                      child:
+                          Center(child: Text('${Localization.language.empty}')),
                     ),
                   )
             : Center(

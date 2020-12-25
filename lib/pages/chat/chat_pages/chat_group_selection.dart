@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_text_field_widget.dart';
@@ -112,7 +115,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
       child: Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.createGroup}",
+            "${Localization.language.createGroup}",
             style: TextStyle(
               color: blackPurpleColor,
               fontWeight: FontWeight.w400,
@@ -143,10 +146,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       _selectedsList.add(ownUser);
                     });
                   } else {
-                    showDialog(
+                    showIndigoDialog(
                       context: context,
-                      builder: (BuildContext context) => CustomDialog(
-                        description: '${localization.noChatName}',
+                      builder: CustomDialog(
+                        description: '${Localization.language.noChatName}',
                         yesCallBack: () {
                           Navigator.pop(context);
                         },
@@ -154,10 +157,10 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                     );
                   }
                 } else {
-                  showDialog(
+                  showIndigoDialog(
                     context: context,
-                    builder: (BuildContext context) => CustomDialog(
-                      description: '${localization.minMembersCount}',
+                    builder: CustomDialog(
+                      description: '${Localization.language.minMembersCount}',
                       yesCallBack: () {
                         Navigator.pop(context);
                       },
@@ -178,7 +181,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                 Container(
                   padding: EdgeInsets.only(top: 10, left: 10),
                   child: Text(
-                    '${_selectedsList.length} ${localization.contacts}',
+                    '${_selectedsList.length} ${Localization.language.contacts}',
                   ),
                 ),
                 Container(
@@ -223,6 +226,9 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                                     '${_selectedsList[index]['name']}',
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
+                                    style: TextStyle(
+                                      color: blackPurpleColor,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -275,7 +281,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                       EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 0),
                   child: IndigoTextField(
                     textEditingController: _titleController,
-                    hintText: localization.chatName,
+                    hintText: Localization.language.chatName,
                     inputFormatters: [
                       LengthLimitingTextInputFormatter(40),
                     ],
@@ -307,54 +313,114 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                               return Container();
                             if ('${user.phone}' ==
                                 '+${_actualList[index].phone}') return Center();
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Container(
-                                child: CheckboxListTile(
-                                  title: Wrap(
-                                    children: <Widget>[
-                                      Text(
-                                        '${_actualList[index].name}',
-                                        style: TextStyle(fontSize: 16.0),
-                                        overflow: TextOverflow.ellipsis,
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Container(
+                                    child: CheckboxListTile(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Container(
+                                              color: blueColor,
+                                              width: 35,
+                                              height: 35,
+                                              child: ClipOval(
+                                                child: CachedNetworkImage(
+                                                  imageUrl:
+                                                      "$avatarUrl${_actualList[index].avatar}"
+                                                          .replaceAll(
+                                                              'AxB', '200x200'),
+                                                  placeholder: (context, url) =>
+                                                      Center(
+                                                    child: Text(
+                                                      '${_actualList[index].name.toString()[0]}',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: whiteColor,
+                                                        fontSize: 16.0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${_actualList[index].name}',
+                                                style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  color: blackPurpleColor,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                '${_actualList[index].phone}',
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  color: blackPurpleColor,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  subtitle: Text(
-                                    '${_actualList[index].phone}',
-                                    style: TextStyle(fontSize: 14.0),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  value: _value(index),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value == true) {
-                                        _selectedsList.add({
-                                          'phone': _actualList[index].phone,
-                                          'user_id': _actualList[index].id,
-                                          'name': _actualList[index].name,
+                                      value: _value(index),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          if (value == true) {
+                                            _selectedsList.add({
+                                              'phone': _actualList[index].phone,
+                                              'user_id': _actualList[index].id,
+                                              'name': _actualList[index].name,
+                                            });
+                                          } else {
+                                            _selectedsList.removeWhere((item) {
+                                              return '${item['phone']}' ==
+                                                  '${_actualList[index].phone}';
+                                            });
+                                          }
                                         });
-                                      } else {
-                                        _selectedsList.removeWhere((item) {
-                                          return '${item['phone']}' ==
-                                              '${_actualList[index].phone}';
-                                        });
-                                      }
-                                    });
-                                  },
+                                      },
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                  ),
                                 ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: whiteColor,
+                                Container(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 70),
+                                    child: Container(
+                                      color: brightGreyColor5,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 0.5,
+                                    ),
+                                  ),
                                 ),
-                                margin: EdgeInsets.symmetric(horizontal: 10),
-                              ),
+                              ],
                             );
                           },
                         ),
                       )
                     : Center(
-                        child: Text('${localization.emptyContacts}'),
+                        child: Text('${Localization.language.emptyContacts}'),
                       ),
               ],
             ),

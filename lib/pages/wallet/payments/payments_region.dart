@@ -5,7 +5,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/service_widget.dart';
 import 'payments_services.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 class PaymentsRegion extends StatefulWidget {
   final int categoryId;
@@ -20,7 +20,6 @@ class PaymentsRegion extends StatefulWidget {
 class _PaymentsRegionState extends State<PaymentsRegion> {
   Api _api;
   Map<String, dynamic> _categories;
-
   @override
   void initState() {
     super.initState();
@@ -54,7 +53,7 @@ class _PaymentsRegionState extends State<PaymentsRegion> {
       child: Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            localization.payments,
+            Localization.language.payments,
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,

@@ -4,7 +4,7 @@ import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
 import 'package:indigo24/pages/chat/chat_widgets/message_category.dart';
 import 'package:indigo24/pages/chat/chat_widgets/message_frame.dart';
 import 'package:indigo24/pages/chat/chat_widgets/message_types/text_message.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
@@ -32,7 +32,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     avatar: '1',
     read: true,
     username: 'username',
-    text: localization.hi,
+    text: Localization.language.hi,
     type: 1,
     time: 100,
     attachments: null,
@@ -49,7 +49,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     avatar: '1',
     read: true,
     username: 'username',
-    text: localization.hello,
+    text: Localization.language.hello,
     type: 1,
     time: 100,
     attachments: null,
@@ -64,7 +64,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.decor}",
+          "${Localization.language.decor}",
           style: TextStyle(
             color: blackPurpleColor,
             fontWeight: FontWeight.w400,
@@ -81,7 +81,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
               Container(
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
                 child: Text(
-                  '${localization.decorForChat.toUpperCase()}',
+                  '${Localization.language.decorForChat.toUpperCase()}',
                   style: TextStyle(
                     color: brightGreyColor2,
                     fontWeight: FontWeight.w500,

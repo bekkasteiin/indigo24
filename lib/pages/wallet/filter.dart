@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
@@ -16,7 +16,7 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.filter}",
+          "${Localization.language.filter}",
           style: TextStyle(
             color: blackPurpleColor,
             fontSize: 22,
@@ -35,7 +35,7 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
               horizontal: 16,
             ),
             child: Text(
-              '${localization.showOperations}',
+              '${Localization.language.showOperations}',
               style: TextStyle(
                 color: greyColor,
               ),
@@ -43,9 +43,9 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
           ),
           Flexible(
             child: ListView.separated(
-              itemCount: localization.filters.length,
+              itemCount: Localization.filters.length,
               itemBuilder: (BuildContext context, int index) {
-                if (index == localization.filters.length - 1)
+                if (index == Localization.filters.length - 1)
                   return Center(
                     child: _acceptButton(),
                   );
@@ -53,7 +53,7 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
                   color: whiteColor,
                   child: ListTile(
                     title: Text(
-                      localization.filters[index]['text'],
+                      Localization.filters[index]['text'],
                       style: TextStyle(
                         color: greyColor,
                       ),
@@ -118,7 +118,7 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
         height: 40,
         child: RaisedButton(
           onPressed: () async {
-            String code = localization.filters[_selectedIndex]['code'];
+            String code = Localization.filters[_selectedIndex]['code'];
             DateTime date = DateTime.now();
             var nowSplit = date.toString().split(' ');
             String nowFirst = nowSplit.first;
@@ -152,7 +152,7 @@ class _HistoryFiletPageState extends State<HistoryFiletPage> {
             width: 200,
             child: Center(
               child: Text(
-                '${localization.accept}',
+                '${Localization.language.accept}',
                 style: TextStyle(
                   color: primaryColor,
                   fontWeight: FontWeight.w800,

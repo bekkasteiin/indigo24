@@ -3,7 +3,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'transfer.dart';
 import 'transfer_history.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 class TransferListPage extends StatefulWidget {
   @override
@@ -26,7 +26,7 @@ class _TransferListPageState extends State<TransferListPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          localization.transfers,
+          Localization.language.transfers,
           style: TextStyle(
             color: blackPurpleColor,
             fontSize: 22,
@@ -126,7 +126,7 @@ class _TransferListPageState extends State<TransferListPage> {
                 Container(width: 10),
                 Expanded(
                   child: Text(
-                    '${localization.toIndigo24Client}',
+                    '${Localization.language.toIndigo24Client}',
                     style: TextStyle(fontSize: 14, color: blackPurpleColor),
                     overflow: TextOverflow.ellipsis,
                   ),

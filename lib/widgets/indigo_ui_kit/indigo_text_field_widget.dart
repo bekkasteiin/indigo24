@@ -32,7 +32,7 @@ class IndigoTextField extends StatelessWidget {
             color: blackColor,
             blurRadius: 6,
             spreadRadius: -6,
-            offset: Offset(0.0, 6.0),
+            offset: Offset(0.0, 4.0),
           )
         ],
       ),

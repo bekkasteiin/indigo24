@@ -5,7 +5,7 @@ import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helpers/day_helper.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
 import 'chat.dart';
@@ -13,7 +13,10 @@ import 'chat.dart';
 class ChatListDraggablePage extends StatefulWidget {
   final List messages;
 
-  const ChatListDraggablePage({Key key, this.messages}) : super(key: key);
+  const ChatListDraggablePage({
+    Key key,
+    this.messages,
+  }) : super(key: key);
   @override
   _ChatListDraggablePageState createState() => _ChatListDraggablePageState();
 }
@@ -48,7 +51,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
       appBar: IndigoAppBarWidget(
         elevation: 0.5,
         title: Text(
-          localization.chats,
+          Localization.language.chats,
           style: TextStyle(
             fontSize: 22.0,
             color: blackPurpleColor,
@@ -125,7 +128,9 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                       margin: EdgeInsets.all(5),
                       child: Container(
                         decoration: BoxDecoration(
-                            shape: BoxShape.circle, color: blueColor),
+                          shape: BoxShape.circle,
+                          color: blueColor,
+                        ),
                         child: Padding(
                           padding: EdgeInsets.all(5),
                           child: _selectedChats.contains(_chats[i])
@@ -141,6 +146,9 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
                                 ),
                         ),
                       ),
+                    ),
+                    SizedBox(
+                      width: 10,
                     ),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(25.0),
@@ -256,7 +264,7 @@ class _ChatListDraggablePageState extends State<ChatListDraggablePage> {
         if (messageDate.minute.toString().length == 1)
           minutes = '0${messageDate.minute}';
         if (diff.inDays == 0) {
-          return '${localization.today}\n$hours:$minutes';
+          return '${Localization.language.today}\n$hours:$minutes';
         } else if (diff.inDays < 7) {
           int weekDay = messageUnixDate.weekday;
           return newIdentifyDay(weekDay) + '\n$hours:$minutes';

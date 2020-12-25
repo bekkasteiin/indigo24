@@ -7,7 +7,7 @@ import 'package:indigo24/pages/wallet/transfers/transfer.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
@@ -45,7 +45,7 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.chats}",
+          "${Localization.language.chats}",
           style: TextStyle(
             color: blackPurpleColor,
             fontWeight: FontWeight.w400,
@@ -76,39 +76,56 @@ class _UsersListDraggableWidgetState extends State<UsersListDraggableWidget> {
                           height: 0,
                           width: 0,
                         );
-                      return ListTile(
-                        leading: Container(
-                          width: 35,
-                          height: 35,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25.0),
-                            child: CachedNetworkImage(
-                              errorWidget: (context, url, error) =>
-                                  Image.network(
-                                '${avatarUrl}noAvatar.png',
+                      return Column(
+                        children: [
+                          ListTile(
+                            leading: Container(
+                              width: 35,
+                              height: 35,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25.0),
+                                child: CachedNetworkImage(
+                                  errorWidget: (context, url, error) =>
+                                      Image.network(
+                                    '${avatarUrl}noAvatar.png',
+                                  ),
+                                  imageUrl:
+                                      '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                                ),
                               ),
-                              imageUrl:
-                                  '$avatarUrl${_users[i]['avatar'].toString().replaceAll("AxB", "200x200")}',
+                            ),
+                            title: Text(
+                              '${_users[i]['user_name']}',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: blackPurpleColor,
+                              ),
+                              maxLines: 1,
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TransferPage(
+                                    phone: _users[i]['phone'],
+                                    transferChat: '${widget.chatId}',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          Container(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 65),
+                              child: Container(
+                                color: brightGreyColor5,
+                                width: MediaQuery.of(context).size.width,
+                                height: 0.5,
+                              ),
                             ),
                           ),
-                        ),
-                        title: Text(
-                          '${_users[i]['user_name']}',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TransferPage(
-                                phone: _users[i]['phone'],
-                                transferChat: '${widget.chatId}',
-                              ),
-                            ),
-                          );
-                        },
+                        ],
                       );
                     },
                   ),

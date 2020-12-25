@@ -7,7 +7,7 @@ import 'package:vibration/vibration.dart';
 
 import 'circle.dart';
 import 'keyboard.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 typedef PasswordEnteredCallback = void Function(String text);
 typedef IsValidCallback = void Function();
@@ -74,8 +74,9 @@ class _PasscodeScreenState extends State<PasscodeScreen>
     animation = Tween(begin: 0.0, end: 10.0)
         .animate(CurvedAnimation(parent: controller, curve: Curves.bounceInOut)
           ..addStatusListener((status) {
-            passCodeError =
-                widget.withPin == null ? '${localization.incorrectPin}' : '';
+            passCodeError = widget.withPin == null
+                ? '${Localization.language.incorrectPin}'
+                : '';
             widget.withPin == null ?? Vibration.vibrate();
             if (status == AnimationStatus.completed) {
               setState(() {
@@ -213,8 +214,8 @@ class _PasscodeScreenState extends State<PasscodeScreen>
       if (enteredPasscode.length < widget.passwordDigits) {
         enteredPasscode += text;
         if (enteredPasscode.length == widget.passwordDigits) {
-          if (widget.title == '${localization.createPin}') {
-            widget.title = '${localization.repeatPin}';
+          if (widget.title == '${Localization.language.createPin}') {
+            widget.title = '${Localization.language.repeatPin}';
           }
           widget.passwordEnteredCallback(enteredPasscode);
         }
@@ -265,14 +266,14 @@ class _PasscodeScreenState extends State<PasscodeScreen>
           margin: widget.keyboardUIConfig.digitInnerMargin,
           child: enteredPasscode.length == 0
               ? Text(
-                  '${localization.cancel}',
+                  '${Localization.language.cancel}',
                   style: const TextStyle(fontSize: 16, color: whiteColor),
-                  semanticsLabel: '${localization.cancel}',
+                  semanticsLabel: '${Localization.language.cancel}',
                 )
               : Text(
-                  '${localization.delete}',
+                  '${Localization.language.delete}',
                   style: const TextStyle(fontSize: 16, color: whiteColor),
-                  semanticsLabel: '${localization.delete}',
+                  semanticsLabel: '${Localization.language.delete}',
                 ),
         ),
       ),

@@ -19,10 +19,11 @@ import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/services/timer.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/photo/full_photo.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/photo/preview.dart';
@@ -153,9 +154,9 @@ class _NewChatPageState extends State<ChatPage> {
           var dir = Directory(sdPath);
           dir.deleteSync(recursive: true);
         } else {
-          showDialog(
+          showIndigoDialog(
             context: context,
-            builder: (BuildContext context) => CustomDialog(
+            builder: CustomDialog(
               description: '${r["message"]}',
               yesCallBack: () {
                 Navigator.pop(context);
@@ -234,7 +235,8 @@ class _NewChatPageState extends State<ChatPage> {
             children: <Widget>[
               child,
               lastUnixDate.difference(DateTime.now()).inDays == 0
-                  ? DividerMessageWidget(child: Text('${localization.today}'))
+                  ? DividerMessageWidget(
+                      child: Text('${Localization.language.today}'))
                   : DividerMessageWidget(
                       child: Text(
                         '$lastUnixDate'.substring(0, 10).replaceAll('-', '.'),
@@ -266,43 +268,43 @@ class _NewChatPageState extends State<ChatPage> {
     // const FORWARD_MESSAGE_TYPE = 13;
     switch ('$type') {
       case '0':
-        return '${localization.textMessage}';
+        return '${Localization.language.textMessage}';
         break;
       case '1':
-        return '${localization.photo}';
+        return '${Localization.language.photo}';
         break;
       case '2':
-        return '${localization.document}';
+        return '${Localization.language.document}';
         break;
       case '3':
-        return '${localization.voiceMessage}';
+        return '${Localization.language.voiceMessage}';
         break;
       case '4':
-        return '${localization.video}';
+        return '${Localization.language.video}';
         break;
       case '7':
-        return '${localization.systemMessage}';
+        return '${Localization.language.systemMessage}';
         break;
       // case '8':
       // return 'Дивайдер сообщение';
       // break;
       case '9':
-        return '${localization.location}';
+        return '${Localization.language.location}';
         break;
       case '10':
-        return '${localization.reply}';
+        return '${Localization.language.reply}';
         break;
       case '11':
-        return '${localization.money}';
+        return '${Localization.language.money}';
         break;
       case '12':
-        return '${localization.link}';
+        return '${Localization.language.link}';
         break;
       case '13':
-        return '${localization.forwardedMessage}';
+        return '${Localization.language.forwardedMessage}';
         break;
       default:
-        return '${localization.message}';
+        return '${Localization.language.message}';
     }
   }
 
@@ -384,7 +386,7 @@ class _NewChatPageState extends State<ChatPage> {
                           ('$_onlineString' == 'online' ||
                                   '$_onlineString' == 'offline')
                               ? '$_onlineString'
-                              : '${localization.lastSeen} $_onlineString',
+                              : '${Localization.language.lastSeen} $_onlineString',
                           style: TextStyle(
                             color: blackPurpleColor,
                             fontSize: 14,
@@ -393,7 +395,7 @@ class _NewChatPageState extends State<ChatPage> {
                         )
                   : SizedBox(height: 0, width: 0),
               // Text(
-              //     '${localization.members} ${widget.memberCount}',
+              //     '${Localization.language.members} ${widget.memberCount}',
               //     style: TextStyle(
               //       color: blackPurpleColor,
               //       fontSize: 14,
@@ -519,7 +521,7 @@ class _NewChatPageState extends State<ChatPage> {
                                         Padding(
                                           padding: EdgeInsets.symmetric(
                                             vertical: 5,
-                                            horizontal: 5,
+                                            horizontal: 10,
                                           ),
                                           child: MessageWidget(
                                             messageCategory: identifyCategory(
@@ -1247,17 +1249,19 @@ class _NewChatPageState extends State<ChatPage> {
                 if (differenceInMinutes < 59)
                   _onlineString = differenceInMinutes.toString() +
                       ' ' +
-                      localization.minutes;
+                      Localization.language.minutes;
                 else if (differenceInHours < 23)
-                  _onlineString =
-                      differenceInHours.toString() + ' ' + localization.hours;
+                  _onlineString = differenceInHours.toString() +
+                      ' ' +
+                      Localization.language.hours;
                 else if (differenceInDays < 360)
-                  _onlineString =
-                      differenceInDays.toString() + ' ' + localization.days;
+                  _onlineString = differenceInDays.toString() +
+                      ' ' +
+                      Localization.language.days;
                 else
                   _onlineString = actualUnixDate.year.toString();
 
-                _onlineString += ' ' + localization.ago.toLowerCase();
+                _onlineString += ' ' + Localization.language.ago.toLowerCase();
               });
             else
               setState(() {
@@ -1352,7 +1356,7 @@ class _NewChatPageState extends State<ChatPage> {
                                   FittedBox(
                                     fit: BoxFit.fitWidth,
                                     child: Text(
-                                      '${localization.camera}',
+                                      '${Localization.language.camera}',
                                       style: TextStyle(
                                         color: blackPurpleColor,
                                         fontWeight: FontWeight.w500,
@@ -1392,7 +1396,7 @@ class _NewChatPageState extends State<ChatPage> {
                                   FittedBox(
                                     fit: BoxFit.fitWidth,
                                     child: Text(
-                                      '${localization.money}',
+                                      '${Localization.language.money}',
                                       style: TextStyle(
                                         color: blackPurpleColor,
                                         fontWeight: FontWeight.w500,
@@ -1441,7 +1445,7 @@ class _NewChatPageState extends State<ChatPage> {
                                   FittedBox(
                                     fit: BoxFit.fitWidth,
                                     child: Text(
-                                      '${localization.gallery}',
+                                      '${Localization.language.gallery}',
                                       style: TextStyle(
                                         color: blackPurpleColor,
                                         fontWeight: FontWeight.w500,
@@ -1481,7 +1485,7 @@ class _NewChatPageState extends State<ChatPage> {
                                   FittedBox(
                                     fit: BoxFit.fitWidth,
                                     child: Text(
-                                      '${localization.files}',
+                                      '${Localization.language.files}',
                                       style: TextStyle(
                                         color: blackPurpleColor,
                                         fontWeight: FontWeight.w500,
@@ -1511,10 +1515,10 @@ class _NewChatPageState extends State<ChatPage> {
 
   _cameraActions() {
     final act = CupertinoActionSheet(
-      title: Text('${localization.selectOption}'),
+      title: Text('${Localization.language.selectOption}'),
       actions: <Widget>[
         CupertinoActionSheetAction(
-          child: Text('${localization.photo}'),
+          child: Text('${Localization.language.photo}'),
           onPressed: () async {
             Navigator.pop(context);
             SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -1526,7 +1530,7 @@ class _NewChatPageState extends State<ChatPage> {
           },
         ),
         CupertinoActionSheetAction(
-          child: Text('${localization.video}'),
+          child: Text('${Localization.language.video}'),
           onPressed: () async {
             _getVideo(ImageSource.camera);
             Navigator.pop(context);
@@ -1534,7 +1538,7 @@ class _NewChatPageState extends State<ChatPage> {
         ),
       ],
       cancelButton: CupertinoActionSheetAction(
-        child: Text('${localization.back}'),
+        child: Text('${Localization.language.back}'),
         onPressed: () {
           Navigator.pop(context);
         },
@@ -1642,10 +1646,10 @@ class _NewChatPageState extends State<ChatPage> {
 
   _galleryActions() {
     final act = CupertinoActionSheet(
-      title: Text('${localization.selectOption}'),
+      title: Text('${Localization.language.selectOption}'),
       actions: <Widget>[
         CupertinoActionSheetAction(
-          child: Text('${localization.photo}'),
+          child: Text('${Localization.language.photo}'),
           onPressed: () async {
             SystemChannels.textInput.invokeMethod('TextInput.hide');
             FocusScopeNode currentFocus = FocusScope.of(context);
@@ -1657,7 +1661,7 @@ class _NewChatPageState extends State<ChatPage> {
           },
         ),
         CupertinoActionSheetAction(
-          child: Text('${localization.video}'),
+          child: Text('${Localization.language.video}'),
           onPressed: () async {
             _getVideo(ImageSource.gallery);
             Navigator.pop(context);
@@ -1665,7 +1669,7 @@ class _NewChatPageState extends State<ChatPage> {
         ),
       ],
       cancelButton: CupertinoActionSheetAction(
-        child: Text('${localization.back}'),
+        child: Text('${Localization.language.back}'),
         onPressed: () {
           Navigator.pop(context);
         },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 class ForwardMessageWidget extends StatefulWidget {
   final text;
@@ -24,7 +24,7 @@ class _ForwardMessageWidgetState extends State<ForwardMessageWidget> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '${localization.forwardFrom} ${widget.text.username}',
+            '${Localization.language.forwardFrom} ${widget.text.username}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
             ),

@@ -10,7 +10,7 @@ import 'payments_history.dart';
 import 'payments_region.dart';
 import 'payments_service.dart';
 import 'payments_services.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 class PaymentsCategoryPage extends StatefulWidget {
   @override
@@ -27,7 +27,6 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
   @override
   void initState() {
     super.initState();
-
     _logoUrl = '';
     _searchController = TextEditingController();
     _api = Api();
@@ -63,7 +62,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
       child: Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            localization.payments,
+            Localization.language.payments,
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,

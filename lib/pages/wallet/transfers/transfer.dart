@@ -9,11 +9,12 @@ import 'package:indigo24/pages/wallet/transfers/transfer_draggrable.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/pin/pin_code.dart';
 
@@ -31,17 +32,15 @@ class TransferPage extends StatefulWidget {
 class _TransferPageState extends State<TransferPage> {
   Api api = Api();
   showAlertDialog(BuildContext context, String type, String message) {
-    showDialog(
+    showIndigoDialog(
       context: context,
-      builder: (BuildContext context) {
-        return CustomDialog(
-          description: "$message",
-          yesCallBack: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-          },
-        );
-      },
+      builder: CustomDialog(
+        description: "$message",
+        yesCallBack: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
@@ -71,7 +70,7 @@ class _TransferPageState extends State<TransferPage> {
             });
           } else {
             setState(() {
-              toName = '${localization.userNotFound}';
+              toName = '${Localization.language.userNotFound}';
               toAvatar = '';
             });
           }
@@ -118,7 +117,7 @@ class _TransferPageState extends State<TransferPage> {
                             children: [
                               IndigoAppBarWidget(
                                 title: Text(
-                                  localization.toIndigo24Client,
+                                  Localization.language.toIndigo24Client,
                                   textAlign: TextAlign.center,
                                 ),
                                 leading: IconButton(
@@ -159,7 +158,7 @@ class _TransferPageState extends State<TransferPage> {
                                         children: <Widget>[
                                           SizedBox(height: 15),
                                           Text(
-                                            '${localization.walletBalance}',
+                                            '${Localization.language.walletBalance}',
                                             style: fS14(c: 'FFFFFF'),
                                           ),
                                           SizedBox(height: 5),
@@ -200,7 +199,7 @@ class _TransferPageState extends State<TransferPage> {
                             style: TextStyle(color: greyColor),
                             decoration: InputDecoration(
                               hintStyle: TextStyle(color: greyColor),
-                              hintText: localization.enterMessage,
+                              hintText: Localization.language.enterMessage,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide: BorderSide(),
@@ -215,11 +214,17 @@ class _TransferPageState extends State<TransferPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              _commentButton(size, localization.thankYou,
+                              _commentButton(
+                                  size,
+                                  Localization.language.thankYou,
                                   _commentController),
-                              _commentButton(size, localization.returning,
+                              _commentButton(
+                                  size,
+                                  Localization.language.returning,
                                   _commentController),
-                              _commentButton(size, localization.withLove,
+                              _commentButton(
+                                  size,
+                                  Localization.language.withLove,
                                   _commentController),
                             ],
                           ),
@@ -329,9 +334,9 @@ class _TransferPageState extends State<TransferPage> {
                     boolForPreloader = false;
                   });
                   if (res['success'].toString() == 'false')
-                    showDialog(
+                    showIndigoDialog(
                       context: context,
-                      builder: (BuildContext context) => CustomDialog(
+                      builder: CustomDialog(
                         description: '${res['message']}',
                         yesCallBack: () {
                           Navigator.pop(context);
@@ -339,9 +344,9 @@ class _TransferPageState extends State<TransferPage> {
                       ),
                     );
                   else {
-                    showDialog(
+                    showIndigoDialog(
                       context: context,
-                      builder: (BuildContext context) => CustomDialog(
+                      builder: CustomDialog(
                         description: '${res['message']}',
                         yesCallBack: () {
                           Navigator.pop(context);
@@ -358,9 +363,9 @@ class _TransferPageState extends State<TransferPage> {
                   }
                 });
               } else {
-                showDialog(
+                showIndigoDialog(
                   context: context,
-                  builder: (BuildContext context) => CustomDialog(
+                  builder: CustomDialog(
                     description: '${result['message']}',
                     yesCallBack: () {
                       Navigator.pop(context);
@@ -373,10 +378,10 @@ class _TransferPageState extends State<TransferPage> {
             }
           });
         } else {
-          showDialog(
+          showIndigoDialog(
             context: context,
-            builder: (BuildContext context) => CustomDialog(
-              description: '${localization.fillAllFields}',
+            builder: CustomDialog(
+              description: '${Localization.language.fillAllFields}',
               yesCallBack: () {
                 Navigator.pop(context);
               },
@@ -441,7 +446,7 @@ class _TransferPageState extends State<TransferPage> {
                 });
                 _showLockScreen(
                   context,
-                  '${localization.enterPin}',
+                  '${Localization.language.enterPin}',
                 );
               } else {
                 setState(() {
@@ -459,7 +464,7 @@ class _TransferPageState extends State<TransferPage> {
             width: 200,
             child: Center(
               child: Text(
-                '${localization.transfer}',
+                '${Localization.language.transfer}',
                 style:
                     TextStyle(color: primaryColor, fontWeight: FontWeight.w800),
               ),
@@ -500,14 +505,14 @@ class _TransferPageState extends State<TransferPage> {
                         children: <Widget>[
                           Container(
                             child: Text(
-                              '${localization.reveicerPhone}',
+                              '${Localization.language.reveicerPhone}',
                               style: TextStyle(
                                 color: greyColor2,
                               ),
                             ),
                           ),
                           SizedBox(
-                            height: 5,
+                            height: 10,
                           ),
                           Container(
                             child: TextFormField(
@@ -516,7 +521,8 @@ class _TransferPageState extends State<TransferPage> {
                                 LengthLimitingTextInputFormatter(25),
                               ],
                               decoration: InputDecoration.collapsed(
-                                hintText: '${localization.phoneNumber}',
+                                hintText:
+                                    '${Localization.language.phoneNumber}',
                                 hintStyle: TextStyle(
                                   color: greyColor2,
                                   fontWeight: FontWeight.w400,
@@ -540,7 +546,8 @@ class _TransferPageState extends State<TransferPage> {
                                       });
                                     } else {
                                       setState(() {
-                                        toName = '${localization.userNotFound}';
+                                        toName =
+                                            '${Localization.language.userNotFound}';
                                         toAvatar = '';
                                       });
                                     }
@@ -594,7 +601,7 @@ class _TransferPageState extends State<TransferPage> {
                                     });
                                   } else {
                                     setState(() {
-                                      // toName = '${localization.userNotFound}';
+                                      // toName = '${Localization.language.userNotFound}';
                                       toName = '${r['message']}';
                                       toAvatar = '';
                                     });
@@ -614,7 +621,7 @@ class _TransferPageState extends State<TransferPage> {
                   ],
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 Container(
                   height: 1.0,
@@ -628,18 +635,18 @@ class _TransferPageState extends State<TransferPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(
-                      height: 5,
+                      height: 10,
                     ),
                     Container(
                       child: Text(
-                        '${localization.transferAmount}',
+                        '${Localization.language.transferAmount}',
                         style: TextStyle(
                           color: greyColor2,
                         ),
                       ),
                     ),
                     SizedBox(
-                      height: 5,
+                      height: 10,
                     ),
                     Container(
                       child: TextFormField(
@@ -647,7 +654,7 @@ class _TransferPageState extends State<TransferPage> {
                         inputFormatters: [],
                         controller: sumController,
                         decoration: InputDecoration.collapsed(
-                          hintText: '${localization.amount}',
+                          hintText: '${Localization.language.amount}',
                           hintStyle: TextStyle(
                             color: greyColor2,
                             fontWeight: FontWeight.w400,
@@ -662,7 +669,7 @@ class _TransferPageState extends State<TransferPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 15,
+                      height: 20,
                     ),
                   ],
                 ),

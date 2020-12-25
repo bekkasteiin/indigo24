@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:indigo24/db/contacts_db.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 import 'chat.dart';
@@ -39,20 +40,18 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     getContacts(context).then((getContactsResult) {
       var result = getContactsResult is List ? false : !getContactsResult;
       if (result) {
-        showDialog(
+        showIndigoDialog(
           context: context,
-          builder: (BuildContext context) {
-            return CustomDialog(
-              description: localization.allowContacts,
-              yesCallBack: () {
-                Navigator.pop(context);
-                AppSettings.openAppSettings();
-              },
-              noCallBack: () {
-                Navigator.pop(context);
-              },
-            );
-          },
+          builder: CustomDialog(
+            description: Localization.language.allowContacts,
+            yesCallBack: () {
+              Navigator.pop(context);
+              AppSettings.openAppSettings();
+            },
+            noCallBack: () {
+              Navigator.pop(context);
+            },
+          ),
         );
       }
     });
@@ -183,7 +182,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
       child: Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.contacts}",
+            "${Localization.language.contacts}",
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,
@@ -241,109 +240,134 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                           if (_actualList[index].phone == null &&
                               _actualList[index].name == null)
                             return Container();
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Container(
-                              child: FlatButton(
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Container(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Row(
-                                          children: <Widget>[
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0),
-                                              child: Container(
-                                                  color: blueColor,
-                                                  width: 35,
-                                                  height: 35,
-                                                  child: ClipOval(
-                                                    child: CachedNetworkImage(
-                                                      imageUrl:
-                                                          "$avatarUrl${_actualList[index].avatar}"
-                                                              .replaceAll('AxB',
-                                                                  '200x200'),
-                                                      placeholder:
-                                                          (context, url) =>
-                                                              Center(
-                                                        child: Text(
-                                                          '${_actualList[index].name.toString()[0]}',
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                            color: whiteColor,
-                                                            fontSize: 16.0,
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Container(
+                                  child: FlatButton(
+                                    child: Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            child: Row(
+                                              children: <Widget>[
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20.0),
+                                                  child: Container(
+                                                    color: primaryColor,
+                                                    width: 35,
+                                                    height: 35,
+                                                    child: ClipOval(
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            "$avatarUrl${_actualList[index].avatar}"
+                                                                .replaceAll(
+                                                                    'AxB',
+                                                                    '200x200'),
+                                                        placeholder:
+                                                            (context, url) =>
+                                                                Center(
+                                                          child: Text(
+                                                            '${_actualList[index].name.toString()[0]}',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                              color: whiteColor,
+                                                              fontSize: 16.0,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
                                                     ),
-                                                  )),
-                                            ),
-                                            SizedBox(
-                                              width: 20,
-                                            ),
-                                            Container(
-                                              child: Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Text(
-                                                      index != 0
-                                                          ? _actualList[index]
-                                                                      .name ==
-                                                                  _actualList[
-                                                                          index -
-                                                                              1]
-                                                                      .name
-                                                              ? '${_actualList[index].name}'
-                                                              : '${_actualList[index].name}'
-                                                          : '${_actualList[index].name}',
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                          fontSize: 14),
-                                                      textAlign: TextAlign.left,
-                                                    ),
-                                                    Text(
-                                                      '${_actualList[index].phone}',
-                                                      style: TextStyle(
-                                                          fontSize: 10),
-                                                      textAlign: TextAlign.left,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines: 1,
-                                                    ),
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Container(
+                                                  child: Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Text(
+                                                          index != 0
+                                                              ? _actualList[index]
+                                                                          .name ==
+                                                                      _actualList[index -
+                                                                              1]
+                                                                          .name
+                                                                  ? '${_actualList[index].name}'
+                                                                  : '${_actualList[index].name}'
+                                                              : '${_actualList[index].name}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                blackPurpleColor,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                        Text(
+                                                          '${_actualList[index].phone}',
+                                                          style: TextStyle(
+                                                            fontSize: 10,
+                                                            color:
+                                                                blackPurpleColor,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
+                                    onPressed: () {
+                                      _boolForPrevenceUserCheck = true;
+                                      ChatRoom.shared
+                                          .userCheck(_actualList[index].phone);
+                                    },
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  margin: EdgeInsets.only(left: 10, right: 10),
                                 ),
-                                onPressed: () {
-                                  _boolForPrevenceUserCheck = true;
-                                  ChatRoom.shared
-                                      .userCheck(_actualList[index].phone);
-                                },
                               ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: whiteColor,
+                              Container(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 80),
+                                  child: Container(
+                                    color: brightGreyColor5,
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 0.5,
+                                  ),
+                                ),
                               ),
-                              margin: EdgeInsets.only(left: 10, right: 10),
-                            ),
+                            ],
                           );
                         },
                       )
                     : Center(
-                        child: Text('${localization.emptyContacts}'),
+                        child: Text('${Localization.language.emptyContacts}'),
                       ),
               ),
             ],

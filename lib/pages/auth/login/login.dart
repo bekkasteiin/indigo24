@@ -10,7 +10,7 @@ import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
 import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
 import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_auth_title.dart';
@@ -167,7 +167,8 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          IndigoAuthTitle(title: localization.phoneNumber),
+                          IndigoAuthTitle(
+                              title: Localization.language.phoneNumber),
                           Stack(
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
@@ -205,6 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+                          _space(10),
                           Text(
                             '$loginError',
                             style: TextStyle(
@@ -215,7 +217,8 @@ class _LoginPageState extends State<LoginPage> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           _space(30),
-                          IndigoAuthTitle(title: localization.password),
+                          IndigoAuthTitle(
+                              title: Localization.language.password),
                           TextField(
                             controller: passwordController,
                             obscureText: _obscureText,
@@ -265,7 +268,7 @@ class _LoginPageState extends State<LoginPage> {
                     _space(15),
                     FlatButton(
                       child: Text(
-                        '${localization.forgotPassword}?',
+                        '${Localization.language.forgotPassword}?',
                         style: TextStyle(
                           color: greyColor,
                           decoration: TextDecoration.underline,
@@ -286,7 +289,7 @@ class _LoginPageState extends State<LoginPage> {
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: ProgressButton(
                         defaultWidget: Text(
-                          "${localization.next}",
+                          "${Localization.language.next}",
                           style: TextStyle(
                             color: whiteColor,
                             fontSize: 22,
@@ -299,7 +302,8 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () async {
                           if (passwordController.text.isEmpty) {
                             setState(() {
-                              passwordError = '${localization.enterPassword}';
+                              passwordError =
+                                  '${Localization.language.enterPassword}';
                             });
                           } else {
                             setState(() {
@@ -323,7 +327,8 @@ class _LoginPageState extends State<LoginPage> {
                           } else {
                             print('else');
                             setState(() {
-                              loginError = '${localization.enterPhone}';
+                              loginError =
+                                  '${Localization.language.enterPhone}';
                             });
                           }
                           if (passwordController.text.isNotEmpty &&

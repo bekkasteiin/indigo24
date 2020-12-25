@@ -13,10 +13,11 @@ import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 import 'package:indigo24/widgets/photo/full_photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
@@ -380,16 +381,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
               ChatRoom.shared.setGroupAvatar(
                   int.parse(widget.chatId.toString()), r["file_name"]);
             } else {
-              showDialog(
+              showIndigoDialog(
                 context: context,
-                builder: (BuildContext context) {
-                  return CustomDialog(
-                    description: "${r["message"]}",
-                    yesCallBack: () {
-                      Navigator.pop(context);
-                    },
-                  );
-                },
+                builder: CustomDialog(
+                  description: "${r["message"]}",
+                  yesCallBack: () {
+                    Navigator.pop(context);
+                  },
+                ),
               );
             }
             return r;
@@ -401,10 +400,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
 
   buildProfileImageAction() {
     final act = CupertinoActionSheet(
-      title: Text('${localization.selectOption}'),
+      title: Text('${Localization.language.selectOption}'),
       actions: <Widget>[
         CupertinoActionSheetAction(
-          child: Text('${localization.watch}'),
+          child: Text('${Localization.language.watch}'),
           onPressed: () async {
             Navigator.pop(context);
 
@@ -419,14 +418,14 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
           },
         ),
         CupertinoActionSheetAction(
-          child: Text('${localization.camera}'),
+          child: Text('${Localization.language.camera}'),
           onPressed: () {
             getImage(ImageSource.camera);
             Navigator.pop(context);
           },
         ),
         CupertinoActionSheetAction(
-          child: Text('${localization.gallery}'),
+          child: Text('${Localization.language.gallery}'),
           onPressed: () {
             getImage(ImageSource.gallery);
             Navigator.pop(context);
@@ -434,7 +433,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
         ),
       ],
       cancelButton: CupertinoActionSheetAction(
-        child: Text('${localization.back}'),
+        child: Text('${Localization.language.back}'),
         onPressed: () {
           Navigator.pop(context);
         },
@@ -519,11 +518,11 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
 
   _addMembers(chatId) {
     final act = CupertinoActionSheet(
-        title: Text('${localization.selectOption}'),
+        title: Text('${Localization.language.selectOption}'),
         actions: <Widget>[
           _myPrivilege == '$ownerRole' || _myPrivilege == '$adminRole'
               ? CupertinoActionSheetAction(
-                  child: Text('${localization.addToGroup}'),
+                  child: Text('${Localization.language.addToGroup}'),
                   onPressed: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -540,29 +539,27 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
               : Container(),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
-            child: Text('${localization.exitGroup}'),
+            child: Text('${Localization.language.exitGroup}'),
             onPressed: () {
               Navigator.pop(context);
-              showDialog(
+              showIndigoDialog(
                 context: context,
-                builder: (BuildContext context) {
-                  return CustomDialog(
-                    description: "${localization.sureExitGroup}",
-                    yesCallBack: () {
-                      Navigator.pop(context);
-                      ChatRoom.shared.leaveChat(widget.chatId);
-                    },
-                    noCallBack: () {
-                      Navigator.pop(context);
-                    },
-                  );
-                },
+                builder: CustomDialog(
+                  description: "${Localization.language.sureExitGroup}",
+                  yesCallBack: () {
+                    Navigator.pop(context);
+                    ChatRoom.shared.leaveChat(widget.chatId);
+                  },
+                  noCallBack: () {
+                    Navigator.pop(context);
+                  },
+                ),
               );
             },
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
-          child: Text('${localization.back}'),
+          child: Text('${Localization.language.back}'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -707,7 +704,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                           //         alignment: Alignment.centerLeft,
                           //         margin: EdgeInsets.only(left: 20),
                           //         child: Text(
-                          //           '${localization.members} $_membersCount',
+                          //           '${Localization.language.members} $_membersCount',
                           //           style: TextStyle(
                           //             fontSize: 18,
                           //             fontWeight: FontWeight.w500,
@@ -720,7 +717,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                           //         alignment: Alignment.centerLeft,
                           //         margin: EdgeInsets.only(left: 20),
                           //         child: Text(
-                          //           '$_onlineCount ${localization.online}',
+                          //           '$_onlineCount ${Localization.language.online}',
                           //           style: TextStyle(
                           //             fontSize: 14,
                           //             fontWeight: FontWeight.w500,
@@ -734,7 +731,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.only(left: 20),
                                   child: Text(
-                                    '${localization.members}',
+                                    '${Localization.language.members}',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
@@ -747,7 +744,8 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                 ),
                           _actualMembersList.isEmpty
                               ? Center(
-                                  child: Text('${localization.emptyContacts}'))
+                                  child: Text(
+                                      '${Localization.language.emptyContacts}'))
                               : widget.chatType == 1
                                   ? Flexible(
                                       child: ScrollConfiguration(
@@ -773,94 +771,116 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                             itemCount:
                                                 _actualMembersList.length,
                                             itemBuilder: (context, i) {
-                                              return ListTile(
-                                                onTap: () {
-                                                  if (_actualMembersList[i]
-                                                              ['user_id']
-                                                          .toString() ==
-                                                      '${user.id}') {
-                                                    // ['user_id']
-                                                    // .toString() ==
-                                                    // '${user.id}');
-                                                    // memberAction(actualMembersList[i]);
-                                                  } else {
-                                                    newAction(
-                                                      myPrivilege: _myPrivilege,
-                                                      member:
-                                                          _actualMembersList[i],
-                                                      chatId: widget.chatId,
-                                                    );
-                                                  }
-                                                  // ChatRoom.shared.checkUserOnline(ids);
-                                                  // ChatRoom.shared
-                                                  //     .getMessages(actualMembersList[i]['id']);
-                                                },
-                                                leading: Container(
-                                                  height: 42,
-                                                  width: 42,
-                                                  child: Stack(
-                                                    children: <Widget>[
-                                                      CircleAvatar(
-                                                        backgroundImage: (_actualMembersList[
-                                                                            i][
-                                                                        "avatar"] ==
-                                                                    null ||
-                                                                _actualMembersList[
-                                                                            i][
-                                                                        "avatar"] ==
-                                                                    '' ||
-                                                                _actualMembersList[
-                                                                            i][
-                                                                        "avatar"] ==
-                                                                    false)
-                                                            ? CachedNetworkImageProvider(
-                                                                "${_actualMembersList[i]["avatar_url"]}noAvatar.png")
-                                                            : CachedNetworkImageProvider(
-                                                                '${_actualMembersList[i]["avatar_url"]}${_actualMembersList[i]["avatar"]}'),
-                                                      ),
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .bottomRight,
-                                                        child: Container(
-                                                          padding:
-                                                              EdgeInsets.all(2),
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              color: _actualMembersList[
-                                                                              i]
-                                                                          [
-                                                                          'online'] ==
-                                                                      'online'
-                                                                  ? whiteColor
-                                                                  : transparentColor),
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10),
-                                                                color: _actualMembersList[i]
+                                              return Column(
+                                                children: [
+                                                  ListTile(
+                                                    onTap: () {
+                                                      if (_actualMembersList[i]
+                                                                  ['user_id']
+                                                              .toString() ==
+                                                          '${user.id}') {
+                                                        // ['user_id']
+                                                        // .toString() ==
+                                                        // '${user.id}');
+                                                        // memberAction(actualMembersList[i]);
+                                                      } else {
+                                                        newAction(
+                                                          myPrivilege:
+                                                              _myPrivilege,
+                                                          member:
+                                                              _actualMembersList[
+                                                                  i],
+                                                          chatId: widget.chatId,
+                                                        );
+                                                      }
+                                                      // ChatRoom.shared.checkUserOnline(ids);
+                                                      // ChatRoom.shared
+                                                      //     .getMessages(actualMembersList[i]['id']);
+                                                    },
+                                                    leading: Container(
+                                                      height: 42,
+                                                      width: 42,
+                                                      child: Stack(
+                                                        children: <Widget>[
+                                                          CircleAvatar(
+                                                            backgroundImage: (_actualMembersList[i]
                                                                             [
-                                                                            'online'] ==
-                                                                        'online'
-                                                                    ? greenColor
-                                                                    : transparentColor),
-                                                            height: 15,
-                                                            width: 15,
+                                                                            "avatar"] ==
+                                                                        null ||
+                                                                    _actualMembersList[i]
+                                                                            [
+                                                                            "avatar"] ==
+                                                                        '' ||
+                                                                    _actualMembersList[i]
+                                                                            [
+                                                                            "avatar"] ==
+                                                                        false)
+                                                                ? CachedNetworkImageProvider(
+                                                                    "${_actualMembersList[i]["avatar_url"]}noAvatar.png")
+                                                                : CachedNetworkImageProvider(
+                                                                    '${_actualMembersList[i]["avatar_url"]}${_actualMembersList[i]["avatar"]}'),
                                                           ),
-                                                        ),
+                                                          Align(
+                                                            alignment: Alignment
+                                                                .bottomRight,
+                                                            child: Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(2),
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  color: _actualMembersList[i]
+                                                                              [
+                                                                              'online'] ==
+                                                                          'online'
+                                                                      ? whiteColor
+                                                                      : transparentColor),
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    color: _actualMembersList[i]['online'] ==
+                                                                            'online'
+                                                                        ? greenColor
+                                                                        : transparentColor),
+                                                                height: 15,
+                                                                width: 15,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
+                                                    ),
+                                                    title: Text(
+                                                      "${_actualMembersList[i]["user_name"]}",
+                                                      style: TextStyle(
+                                                        color: blackPurpleColor,
+                                                      ),
+                                                    ),
+                                                    subtitle: memberName(
+                                                      _actualMembersList[i],
+                                                    ),
                                                   ),
-                                                ),
-                                                title: Text(
-                                                    "${_actualMembersList[i]["user_name"]}"),
-                                                subtitle: memberName(
-                                                  _actualMembersList[i],
-                                                ),
+                                                  Container(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 70),
+                                                      child: Container(
+                                                        color: brightGreyColor5,
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        height: 0.5,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               );
                                             },
                                           ),
@@ -935,7 +955,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     print(member);
     List<Widget> actions = [
       CupertinoActionSheetAction(
-        child: Text('${localization.watch}'),
+        child: Text('${Localization.language.watch}'),
         onPressed: () {
           Navigator.pop(context);
 
@@ -951,7 +971,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
         },
       ),
       CupertinoActionSheetAction(
-        child: Text('${localization.goToChat}'),
+        child: Text('${Localization.language.goToChat}'),
         onPressed: () {
           loaderCheck = false;
           ChatRoom.shared.userCheckById(member['user_id']);
@@ -963,10 +983,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     List<Widget> ownerActions = [
       CupertinoActionSheetAction(
         child: member['role'] == '$memberRole'
-            ? Text('${localization.setAdmin}')
+            ? Text('${Localization.language.setAdmin}')
             : member['role'] == '$adminRole'
-                ? Text('${localization.makeMember}')
-                : Text('${localization.error}'),
+                ? Text('${Localization.language.makeMember}')
+                : Text('${Localization.language.error}'),
         onPressed: () {
           switch (member['role'].toString()) {
             case '$memberRole':
@@ -989,7 +1009,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
       ),
       CupertinoActionSheetAction(
         isDestructiveAction: true,
-        child: Text('${localization.delete}'),
+        child: Text('${Localization.language.delete}'),
         onPressed: () {
           setState(() {
             _membersCount -= 1;
@@ -1005,7 +1025,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
       member['role'] == '$memberRole'
           ? CupertinoActionSheetAction(
               isDestructiveAction: true,
-              child: Text('${localization.delete}'),
+              child: Text('${Localization.language.delete}'),
               onPressed: () {
                 setState(() {
                   _membersCount -= 1;
@@ -1030,10 +1050,10 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
     }
 
     final act = CupertinoActionSheet(
-      title: Text('${localization.selectOption}'),
+      title: Text('${Localization.language.selectOption}'),
       actions: actions,
       cancelButton: CupertinoActionSheetAction(
-        child: Text('${localization.back}'),
+        child: Text('${Localization.language.back}'),
         onPressed: () {
           Navigator.pop(context);
         },
@@ -1048,13 +1068,13 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
   Text memberName(member) {
     switch ('${member["role"]}') {
       case '100':
-        return Text('${localization.creator}');
+        return Text('${Localization.language.creator}');
         break;
       case '50':
-        return Text('${localization.admin}');
+        return Text('${Localization.language.admin}');
         break;
       case '2':
-        return Text('${localization.member}');
+        return Text('${Localization.language.member}');
         break;
       default:
         return Text('');

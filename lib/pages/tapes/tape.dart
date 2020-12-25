@@ -5,7 +5,7 @@ import 'package:indigo24/pages/chat/chat_pages/chat_info.dart';
 import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
@@ -78,7 +78,7 @@ class _TapePageState extends State<TapePage> {
       child: Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            "${localization.comments}",
+            "${Localization.language.comments}",
             style: TextStyle(
               color: blackPurpleColor,
               fontSize: 22,
@@ -117,7 +117,7 @@ class _TapePageState extends State<TapePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${localization.likes} : ${_likes.length}',
+                                '${Localization.language.likes} : ${_likes.length}',
                                 style: TextStyle(
                                     color: blackPurpleColor,
                                     fontWeight: FontWeight.w300),
@@ -182,7 +182,7 @@ class _TapePageState extends State<TapePage> {
                                 ),
                               ),
                               Text(
-                                '${localization.comments} : $_commentCount',
+                                '${Localization.language.comments} : $_commentCount',
                                 style: TextStyle(
                                     color: blackPurpleColor,
                                     fontWeight: FontWeight.w300),
@@ -417,7 +417,7 @@ class _TapePageState extends State<TapePage> {
                               },
                             ),
                             border: InputBorder.none,
-                            hintText: "${localization.enterMessage}",
+                            hintText: "${Localization.language.enterMessage}",
                           ),
                         ),
                       ),

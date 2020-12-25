@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 
 class Countries extends StatelessWidget {
@@ -14,7 +14,7 @@ class Countries extends StatelessWidget {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          "${localization.country}",
+          "${Localization.language.country}",
           style: TextStyle(
             color: blackPurpleColor,
             fontWeight: FontWeight.w400,
@@ -38,7 +38,7 @@ class Countries extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        '${countries[index].code}'.toUpperCase(),
+                        '${countries[index].title}',
                         style: TextStyle(
                           color: blackPurpleColor,
                           fontWeight: FontWeight.w400,

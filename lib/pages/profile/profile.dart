@@ -17,8 +17,10 @@ import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/helper.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/photo/photo.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,7 +29,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:indigo24/services/user.dart' as user;
-import 'package:indigo24/services/localization.dart' as localization;
+
 import 'profile_settings.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -118,7 +120,7 @@ class _UserProfilePageState extends State<UserProfilePage>
           children: <Widget>[
             Container(
               margin: EdgeInsets.all(10),
-              child: Text('${localization.selectOption}'),
+              child: Text('${Localization.language.selectOption}'),
             ),
             Container(height: 1, width: size.width, color: blackColor),
             Flexible(
@@ -136,16 +138,14 @@ class _UserProfilePageState extends State<UserProfilePage>
                             user.city = cities[index];
                           });
                           Navigator.of(context).pop();
-                          showDialog(
+                          showIndigoDialog(
                             context: context,
-                            builder: (BuildContext context) {
-                              return CustomDialog(
-                                description: "${result["message"]}",
-                                yesCallBack: () {
-                                  Navigator.of(context).pop();
-                                },
-                              );
-                            },
+                            builder: CustomDialog(
+                              description: "${result["message"]}",
+                              yesCallBack: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
                           );
                         }
                       });
@@ -164,11 +164,9 @@ class _UserProfilePageState extends State<UserProfilePage>
         ),
       ),
     );
-    showDialog(
+    showIndigoDialog(
       context: context,
-      builder: (BuildContext context) {
-        return errorDialog;
-      },
+      builder: errorDialog,
     );
   }
 
@@ -195,13 +193,13 @@ class _UserProfilePageState extends State<UserProfilePage>
       if (_image != null) {
         _api.uploadAvatar(
           _image.path,
-          (int sent, int total) {
+          onSendProgress: (int sent, int total) {
             setState(() {
               isUploading = true;
               uploadPercent = sent / total;
             });
           },
-          (count, total) {
+          onReceiveProgress: (count, total) {
             setState(() {
               isUploading = false;
               uploadPercent = 0.0;
@@ -220,16 +218,14 @@ class _UserProfilePageState extends State<UserProfilePage>
                 user.avatar = r["fileName"];
               });
             } else {
-              showDialog(
+              showIndigoDialog(
                 context: context,
-                builder: (BuildContext context) {
-                  return CustomDialog(
-                    description: "${r["message"]}",
-                    yesCallBack: () {
-                      Navigator.of(context).pop();
-                    },
-                  );
-                },
+                builder: CustomDialog(
+                  description: "${r["message"]}",
+                  yesCallBack: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
               );
             }
             return r;
@@ -243,10 +239,10 @@ class _UserProfilePageState extends State<UserProfilePage>
     return InkWell(
       onTap: () {
         final act = CupertinoActionSheet(
-            title: Text('${localization.selectOption}'),
+            title: Text('${Localization.language.selectOption}'),
             actions: <Widget>[
               CupertinoActionSheetAction(
-                child: Text('${localization.watch}'),
+                child: Text('${Localization.language.watch}'),
                 onPressed: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -265,14 +261,14 @@ class _UserProfilePageState extends State<UserProfilePage>
                 },
               ),
               CupertinoActionSheetAction(
-                child: Text('${localization.camera}'),
+                child: Text('${Localization.language.camera}'),
                 onPressed: () {
                   getImage(ImageSource.camera);
                   Navigator.pop(context);
                 },
               ),
               CupertinoActionSheetAction(
-                child: Text('${localization.gallery}'),
+                child: Text('${Localization.language.gallery}'),
                 onPressed: () {
                   getImage(ImageSource.gallery);
                   Navigator.pop(context);
@@ -280,7 +276,7 @@ class _UserProfilePageState extends State<UserProfilePage>
               )
             ],
             cancelButton: CupertinoActionSheetAction(
-              child: Text('${localization.back}'),
+              child: Text('${Localization.language.back}'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -330,7 +326,6 @@ class _UserProfilePageState extends State<UserProfilePage>
       color: whiteColor,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
-      decoration: TextDecoration.underline,
     );
 
     return GestureDetector(
@@ -370,7 +365,7 @@ class _UserProfilePageState extends State<UserProfilePage>
         Container(
           width: screenSize.width / 1.2,
           height: 0.5,
-          color: blackColor,
+          color: brightGreyColor5,
           margin: EdgeInsets.only(top: 4.0),
         ),
       ],
@@ -394,25 +389,25 @@ class _UserProfilePageState extends State<UserProfilePage>
                       SizedBox(height: 160),
                       _buildSection(
                         screenSize,
-                        localization.phoneNumber,
+                        Localization.language.phoneNumber,
                         user.phone,
                       ),
                       _buildSection(
                         screenSize,
-                        localization.email,
+                        Localization.language.email,
                         user.email,
                       ),
                       user.country != ''
                           ? _buildSection(
                               screenSize,
-                              localization.country,
+                              Localization.language.country,
                               user.country,
                             )
                           : Center(),
                       user.city != ''
                           ? _buildSection(
                               screenSize,
-                              localization.city,
+                              Localization.language.city,
                               user.city,
                             )
                           : Center(),
@@ -423,7 +418,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                     children: <Widget>[
                       SizedBox(height: 10),
                       Text(
-                        '${localization.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                        '${Localization.language.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
                         style: TextStyle(
                           color: greyColor,
                         ),
@@ -465,7 +460,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                               child: FittedBox(
                                 fit: BoxFit.fitWidth,
                                 child: Text(
-                                  "${localization.support}",
+                                  "${Localization.language.support}",
                                   style: TextStyle(
                                     color: primaryColor,
                                     fontWeight: FontWeight.bold,
@@ -505,11 +500,11 @@ class _UserProfilePageState extends State<UserProfilePage>
                             height: 50,
                             child: RaisedButton(
                               onPressed: () async {
-                                showDialog(
+                                showIndigoDialog(
                                   context: context,
-                                  builder: (BuildContext context) =>
-                                      CustomDialog(
-                                    description: "${localization.wantToExit}?",
+                                  builder: CustomDialog(
+                                    description:
+                                        "${Localization.language.wantToExit}?",
                                     yesCallBack: () async {
                                       var api = Api();
                                       var preferences =
@@ -549,7 +544,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                               child: FittedBox(
                                 fit: BoxFit.fitWidth,
                                 child: Text(
-                                  '${localization.exit}',
+                                  '${Localization.language.exit}',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -630,7 +625,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                                   InkWell(
                                     onTap: () {},
                                     child: Text(
-                                      "${user.identified ? localization.identified : localization.notIdentified}",
+                                      "${user.identified ? Localization.language.identified : Localization.language.notIdentified}",
                                       style: TextStyle(
                                         color: whiteColor,
                                       ),

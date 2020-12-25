@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'message_category.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'message_frame.dart';
 import 'message_types/audio_message.dart';
 import 'message_types/document_message.dart';
@@ -73,7 +73,8 @@ class MessageWidget extends StatelessWidget {
         break;
       case 2:
         return DocumentMessageWidget(
-          text: '${localization.document}: ${localization.error}',
+          text:
+              '${Localization.language.document}: ${Localization.language.error}',
         );
         break;
       case 3:

@@ -4,10 +4,11 @@ import 'package:indigo24/main.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/models/transfer_model.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/alerts/voucher.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import '../filter.dart';
 import 'transfer.dart';
 
@@ -71,7 +72,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     return Scaffold(
       appBar: IndigoAppBarWidget(
         title: Text(
-          localization.transfersHistory,
+          Localization.language.transfersHistory,
           style: TextStyle(
             color: blackPurpleColor,
             fontSize: 22,
@@ -104,7 +105,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                   //     hintText: 'YYYY-MM-DD / YYYY-MM-DD',
                   //   ),
                   //   textAlign: TextAlign.center,
-                  //   readOnly: true,
+                  //   readOnly: true
                   // ),
                 ),
                 InkWell(
@@ -182,7 +183,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                     )
               : SafeArea(
                   child: Container(
-                    child: Center(child: Text('${localization.empty}')),
+                    child:
+                        Center(child: Text('${Localization.language.empty}')),
                   ),
                 ),
         ],
@@ -360,11 +362,16 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
 
   Future _loadData() async {
     _api.getTransactions(_page).then((histories) {
-      List temp = histories['transactions'].toList();
-      setState(() {
-        _transferHistories.addAll(temp);
-      });
-      _page++;
+      if (histories['success'].toString() == 'true') {
+        List temp = histories['transactions'].toList();
+
+        if (temp.isNotEmpty) {
+          setState(() {
+            _transferHistories.addAll(temp);
+          });
+          _page++;
+        }
+      }
     });
   }
 
@@ -372,11 +379,15 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
     _api
         .getFilteredTransactions(_page, splittedDates[0], splittedDates[1])
         .then((histories) {
-      List temp = histories['transactions'].toList();
-      setState(() {
-        _transferHistories.addAll(temp);
-      });
-      _page++;
+      if (histories['success'].toString() == 'true') {
+        List temp = histories['transactions'].toList();
+        if (temp.isNotEmpty) {
+          setState(() {
+            _transferHistories.addAll(temp);
+          });
+          _page++;
+        }
+      }
     });
   }
 
@@ -409,28 +420,28 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                       TransferModel.fromJson(snapshot[index]);
                   return InkWell(
                     onTap: () {
-                      showDialog(
+                      showIndigoDialog(
                         context: context,
                         barrierDismissible: true,
-                        builder: (BuildContext context) {
-                          return Voucher(
-                            transferModel: transferModel,
-                            buttonCallBack: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TransferPage(
-                                    phone: transferModel.phone,
-                                  ),
+                        builder: Voucher(
+                          transferModel: transferModel,
+                          buttonCallBack: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TransferPage(
+                                  phone: transferModel.phone,
                                 ),
-                              );
-                            },
-                          );
-                        },
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
-                    child: Container(
+                    child:
+                        // Text(transferModel.name)
+                        Container(
                       padding: const EdgeInsets.only(top: 10),
                       child: _historyBuilder(
                         context,

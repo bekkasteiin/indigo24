@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,12 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat/chat_pages/chat_info.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 
 import 'message_categories/divider_message.dart';
 import 'message_categories/received_message.dart';
 import 'message_categories/sended_message.dart';
+import 'package:indigo24/services/user.dart' as user;
 
 class MessageCategoryWidget extends StatefulWidget {
   final int messageCategory;
@@ -42,6 +45,9 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
   void initState() {
     super.initState();
   }
+
+  final bgChat = AssetImage("assets/images/background_chat.png");
+  final bgChat2 = AssetImage("assets/images/background_chat_2.png");
 
   @override
   Widget build(BuildContext context) {
@@ -101,56 +107,41 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
                   _showMessageAction(
                     context,
                     actions: [
-                      widget.child,
                       Container(
-                        height: 50,
-                        child: Theme(
-                          data: ThemeData(),
-                          child: FlatButton(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Text(
-                                  '${localization.reply}',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                              ],
-                            ),
-                            onPressed: () {
-                              ChatRoom.shared.replyingMessage(widget.message);
-                              Navigator.pop(context);
-                            },
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                            bottomLeft: Radius.circular(0),
+                            bottomRight: Radius.circular(0),
+                          ),
+                          image: DecorationImage(
+                            image: user.chatBackground == 'ligth'
+                                ? bgChat
+                                : bgChat2,
+                            fit: BoxFit.cover,
                           ),
                         ),
+                        padding: const EdgeInsets.all(20.0),
+                        child: widget.child,
                       ),
-                      Container(
-                        height: 50,
-                        child: Theme(
-                          data: ThemeData(),
-                          child: FlatButton(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Text(
-                                  '${localization.forward}',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                Icon(CupertinoIcons.reply_all, size: 20)
-                              ],
-                            ),
-                            onPressed: () {
-                              ChatRoom.shared.localForwardMessage(
-                                widget.message.id,
-                              );
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
+                      MessageActionElement(
+                        callback: () {
+                          ChatRoom.shared.replyingMessage(widget.message);
+                          Navigator.pop(context);
+                        },
+                        title: '${Localization.language.reply}',
+                        icon: CupertinoIcons.reply_thick_solid,
+                      ),
+                      MessageActionElement(
+                        callback: () {
+                          ChatRoom.shared.localForwardMessage(
+                            widget.message.id,
+                          );
+                          Navigator.pop(context);
+                        },
+                        title: '${Localization.language.forward}',
+                        icon: CupertinoIcons.reply_all,
                       ),
                     ],
                   );
@@ -166,115 +157,64 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
       case 2:
         return GestureDetector(
           onLongPress: () {
-            _showMessageAction(context, actions: [
-              Container(
-                child: widget.child,
-              ),
-              Container(
-                height: 50,
-                color: redColor,
-                child: FittedBox(
-                  child: Theme(
-                    data: ThemeData(),
-                    child: FlatButton(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          Text(
-                            '${localization.delete}',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          Icon(CupertinoIcons.delete, size: 20)
-                        ],
+            _showMessageAction(
+              context,
+              actions: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(0),
+                      bottomRight: Radius.circular(0),
+                    ),
+                    image: DecorationImage(
+                      image: user.chatBackground == 'ligth' ? bgChat : bgChat2,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(20.0),
+                  child: widget.child,
+                ),
+                MessageActionElement(
+                  callback: () {
+                    ChatRoom.shared.replyingMessage(widget.message);
+                    Navigator.pop(context);
+                  },
+                  title: '${Localization.language.reply}',
+                  icon: CupertinoIcons.reply_thick_solid,
+                ),
+                MessageActionElement(
+                  callback: () {
+                    ChatRoom.shared.localForwardMessage(widget.messageId);
+                    Navigator.pop(context);
+                  },
+                  title: '${Localization.language.forward}',
+                  icon: CupertinoIcons.reply_all,
+                ),
+                widget.message.type == 11 && widget.message.forwardData != null
+                    ? SizedBox(height: 0, width: 0)
+                    : MessageActionElement(
+                        callback: () {
+                          ChatRoom.shared.editingMessage(widget.message);
+                          Navigator.pop(context);
+                        },
+                        title: '${Localization.language.edit}',
+                        icon: CupertinoIcons.pen,
                       ),
-                      onPressed: () {
-                        ChatRoom.shared.deleteFromAll(
-                          widget.chatId,
-                          widget.messageId,
-                        );
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
+                MessageActionElement(
+                  callback: () {
+                    ChatRoom.shared.deleteFromAll(
+                      widget.chatId,
+                      widget.messageId,
+                    );
+                    Navigator.pop(context);
+                  },
+                  title: '${Localization.language.delete}',
+                  icon: CupertinoIcons.delete,
                 ),
-              ),
-              widget.message.type == 11 && widget.message.forwardData != null
-                  ? SizedBox(height: 0, width: 0)
-                  : Container(
-                      height: 50,
-                      child: Theme(
-                        data: ThemeData(),
-                        child: FlatButton(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Text(
-                                '${localization.edit}  ',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              Icon(CupertinoIcons.pen, size: 20)
-                            ],
-                          ),
-                          onPressed: () {
-                            ChatRoom.shared.editingMessage(widget.message);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    ),
-              Container(
-                height: 50,
-                child: Theme(
-                  data: ThemeData(),
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          '${localization.reply}',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Icon(CupertinoIcons.reply_thick_solid, size: 20)
-                      ],
-                    ),
-                    onPressed: () {
-                      ChatRoom.shared.replyingMessage(widget.message);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                child: Theme(
-                  data: ThemeData(),
-                  child: FlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          '${localization.forward}',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Icon(CupertinoIcons.reply_all, size: 20)
-                      ],
-                    ),
-                    onPressed: () {
-                      ChatRoom.shared.localForwardMessage(widget.messageId);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
-            ]);
+              ],
+            );
           },
           child: SendedMessageWidget(child: widget.child),
         );
@@ -286,35 +226,41 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
 
   _showMessageAction(context, {List<Widget> actions}) {
     showModalBottomSheet(
-      barrierColor: blackColor.withOpacity(0.2),
+      barrierColor: blackPurpleColor.withOpacity(0.3),
       context: context,
       enableDrag: false,
       backgroundColor: transparentColor,
       isScrollControlled: true,
       builder: (BuildContext bc) {
-        return Theme(
-          data: ThemeData(
-            splashColor: transparentColor,
-            highlightColor: transparentColor,
-          ),
-          child: InkWell(
-            onTap: () {
-              SystemChannels.textInput.invokeMethod('TextInput.hide');
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus) {
-                currentFocus.unfocus();
-              }
-              Navigator.of(context).pop();
-            },
-            child: SafeArea(
-              child: Center(
-                child: Container(
-                  color: whiteColor.withOpacity(0.9),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: actions,
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+          child: Theme(
+            data: ThemeData(
+              splashColor: transparentColor,
+              highlightColor: transparentColor,
+            ),
+            child: InkWell(
+              onTap: () {
+                SystemChannels.textInput.invokeMethod('TextInput.hide');
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+                Navigator.of(context).pop();
+              },
+              child: SafeArea(
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: whiteColor.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: actions,
+                      ),
                     ),
                   ),
                 ),
@@ -323,6 +269,55 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
           ),
         );
       },
+    );
+  }
+}
+
+class MessageActionElement extends StatelessWidget {
+  const MessageActionElement({
+    Key key,
+    @required this.callback,
+    @required this.title,
+    @required this.icon,
+  }) : super(key: key);
+  final Function callback;
+  final String title;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
+      child: Theme(
+        data: ThemeData(),
+        child: FlatButton(
+          highlightColor: primaryColor.withOpacity(0.1),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                icon,
+                size: 20,
+                color: blackPurpleColor,
+              ),
+              Text('   '),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: blackPurpleColor,
+                ),
+              )
+            ],
+          ),
+          onPressed: callback,
+        ),
+      ),
     );
   }
 }

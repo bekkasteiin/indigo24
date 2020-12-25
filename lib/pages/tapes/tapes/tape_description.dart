@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
+import 'package:indigo24/style/colors.dart';
 
 class TapeDescription extends StatefulWidget {
   const TapeDescription({
@@ -28,6 +29,7 @@ class _TapeDescriptionState extends State<TapeDescription> {
               '${widget._result['description']}',
               style: TextStyle(
                 fontSize: 16,
+                color: blackPurpleColor,
               ),
               maxLines: widget._result['maxLines'],
             ),
@@ -55,10 +57,11 @@ class _TapeDescriptionState extends State<TapeDescription> {
           child: GestureDetector(
             child: Text(
               _result['maxLines'] == null
-                  ? '${localization.less}'
-                  : '${localization.more}',
+                  ? '${Localization.language.less}'
+                  : '${Localization.language.more}',
               style: TextStyle(
                 fontSize: 16,
+                color: blackPurpleColor,
               ),
             ),
             onTap: () {

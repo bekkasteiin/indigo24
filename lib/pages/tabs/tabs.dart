@@ -6,14 +6,18 @@ import 'package:app_settings/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:contacts_service/contacts_service.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
+import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
 import 'package:indigo24/pages/chat/chat_pages/chat.dart';
 import 'package:indigo24/pages/chat/chat_pages/chat_contacts.dart';
-import 'package:indigo24/pages/chat/chat_pages/chats.dart';
+import 'package:indigo24/pages/chat/chat_pages/chats/chats.dart';
+import 'package:indigo24/pages/chat/chat_pages/chats/chats_element.dart';
 import 'package:indigo24/pages/profile/profile.dart';
 import 'package:indigo24/pages/tapes/tapes/tapes.dart';
 import 'package:indigo24/pages/wallet/wallet.dart';
@@ -24,10 +28,11 @@ import 'package:indigo24/services/helpers/user_helper.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/pin/pin_code.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -65,20 +70,18 @@ getContactsTemplate(context) async {
     }
 
     if (result) {
-      showDialog(
+      showIndigoDialog(
         context: context,
-        builder: (BuildContext context) {
-          return CustomDialog(
-            description: localization.allowContacts,
-            yesCallBack: () {
-              Navigator.pop(context);
-              AppSettings.openAppSettings();
-            },
-            noCallBack: () {
-              Navigator.pop(context);
-            },
-          );
-        },
+        builder: CustomDialog(
+          description: Localization.language.allowContacts,
+          yesCallBack: () {
+            Navigator.pop(context);
+            AppSettings.openAppSettings();
+          },
+          noCallBack: () {
+            Navigator.pop(context);
+          },
+        ),
       );
     }
   });
@@ -209,16 +212,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
     if ('${user.pin}'.toString() == 'waiting' &&
         _tempPasscode != enteredPasscode) {
-      return showDialog(
+      return showIndigoDialog(
         context: context,
-        builder: (BuildContext context) {
-          return CustomDialog(
-            description: localization.incorrectPin,
-            yesCallBack: () {
-              Navigator.pop(context);
-            },
-          );
-        },
+        builder: CustomDialog(
+          description: Localization.language.incorrectPin,
+          yesCallBack: () {
+            Navigator.pop(context);
+          },
+        ),
       );
     }
     if ('${user.pin}'.toString() == 'false') {
@@ -311,7 +312,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       '${user.pin}' == 'false'
           ? _showLockScreen(
               context,
-              '${localization.createPin}',
+              '${Localization.language.createPin}',
               withPin: false,
             )
           : Text('');
@@ -372,44 +373,47 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           if (m['mute'].toString() == '1') {
           } else {
             ChatRoom.shared.inSound();
-            showOverlayNotification((context) {
-              MessageTypeHelper messageType = MessageTypeHelper();
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 5),
-                child: SafeArea(
-                  child: ListTile(
-                    onTap: () {
-                      OverlaySupportEntry.of(context).dismiss();
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => Tabs(),
-                        ),
-                        (r) => false,
-                      );
-                    },
-                    leading: SizedBox.fromSize(
-                      size: Size(40, 40),
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: "${avatarUrl}noAvatar.png",
+            showOverlayNotification(
+              (context) {
+                MessageTypeHelper messageType = MessageTypeHelper();
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  child: SafeArea(
+                    child: ListTile(
+                      onTap: () {
+                        OverlaySupportEntry.of(context).dismiss();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => Tabs(),
+                          ),
+                          (r) => false,
+                        );
+                      },
+                      leading: SizedBox.fromSize(
+                        size: Size(40, 40),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: "${avatarUrl}noAvatar.png",
+                          ),
                         ),
                       ),
+                      title: Text("${m['chat_name']}"),
+                      subtitle: Text(
+                        m['attachments'] == null
+                            ? "${m["text"]}"
+                            : messageType.identifyType(m['type']),
+                      ),
+                      trailing: IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            OverlaySupportEntry.of(context).dismiss();
+                          }),
                     ),
-                    title: Text("${m['chat_name']}"),
-                    subtitle: Text(
-                      m['attachments'] == null
-                          ? "${m["text"]}"
-                          : messageType.identifyType(m['type']),
-                    ),
-                    trailing: IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: () {
-                          OverlaySupportEntry.of(context).dismiss();
-                        }),
                   ),
-                ),
-              );
-            }, duration: Duration(seconds: 4));
+                );
+              },
+              duration: Duration(seconds: 4),
+            );
           }
         }
       }
@@ -481,125 +485,137 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         context: context,
         semanticsDismissible: false,
         builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return CupertinoActionSheet(
-              title: Container(
-                padding: EdgeInsets.all(10),
-                child: Material(
-                  color: transparentColor,
-                  child: Row(
-                    children: [
-                      _sharedFiles == null
-                          ? Container()
-                          : _sharedFiles == null || _sharedFiles.isEmpty
-                              ? Container()
-                              : Image.file(
-                                  File(_isSharedVideo
-                                      ? _sharedFiles[0].thumbnail
-                                      : _sharedFiles[0].path),
-                                  fit: BoxFit.cover,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.2,
-                                  height:
-                                      MediaQuery.of(context).size.width * 0.2,
-                                ),
-                      Container(width: 10),
-                      Flexible(child: TextField())
-                    ],
-                  ),
-                ),
-              ),
-              message: Container(
-                height: MediaQuery.of(context).size.height * 0.5,
+          return CupertinoActionSheet(
+            title: Container(
+              padding: EdgeInsets.all(10),
+              child: Material(
                 color: transparentColor,
-                child: Stack(
+                child: Row(
                   children: [
-                    isUploading
-                        ? Container(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Center(
-                                  child: CircularPercentIndicator(
-                                    radius: 120.0,
-                                    lineWidth: 13.0,
-                                    animation: false,
-                                    percent: uploadPercent,
-                                    progressColor: primaryColor,
-                                    backgroundColor: blackColor,
-                                    center: Text(
-                                      percent,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: blackColor,
-                                          fontSize: 20.0),
-                                    ),
-                                    footer: Text(
-                                      "Загрузка",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: whiteColor,
-                                          fontSize: 17.0),
-                                    ),
-                                    circularStrokeCap: CircularStrokeCap.round,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Material(
-                            color: transparentColor,
-                            child: ListView.builder(
-                              itemCount: myContacts.length,
-                              itemBuilder: (BuildContext context, int i) {
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundImage: CachedNetworkImageProvider(
-                                        "$avatarUrl${myContacts[i].avatar}"),
-                                  ),
-                                  title: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("${myContacts[i].name}"),
-                                      Text("${myContacts[i].phone}")
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    if (_sharedFiles != null &&
-                                        myContacts[i].chatId != null)
-                                      sendMedia(
-                                        _sharedFiles[0].path,
-                                        myContacts[i].chatId,
-                                        setState,
-                                      );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
+                    _sharedFiles == null
+                        ? Container()
+                        : _sharedFiles == null || _sharedFiles.isEmpty
+                            ? Container()
+                            : Image.file(
+                                File(_isSharedVideo
+                                    ? _sharedFiles[0].thumbnail
+                                    : _sharedFiles[0].path),
+                                fit: BoxFit.cover,
+                                width: MediaQuery.of(context).size.width * 0.2,
+                                height: MediaQuery.of(context).size.width * 0.2,
+                              ),
+                    Container(width: 10),
+                    Flexible(
+                      child: TextField(),
+                    )
                   ],
                 ),
               ),
-              cancelButton: CupertinoActionSheetAction(
-                isDefaultAction: true,
-                child: Text('${localization.cancel}'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _sharedFiles.clear();
-                  _isSharedVideo = false;
-                },
+            ),
+            message: Container(
+              height: MediaQuery.of(context).size.height * 0.5,
+              color: transparentColor,
+              child: Stack(
+                children: [
+                  isUploading
+                      ? Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Center(
+                                child: CircularPercentIndicator(
+                                  radius: 120.0,
+                                  lineWidth: 13.0,
+                                  animation: false,
+                                  percent: uploadPercent,
+                                  progressColor: primaryColor,
+                                  backgroundColor: blackColor,
+                                  center: Text(
+                                    percent,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: blackColor,
+                                        fontSize: 20.0),
+                                  ),
+                                  footer: Text(
+                                    "Загрузка",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: whiteColor,
+                                        fontSize: 17.0),
+                                  ),
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Material(
+                          color: transparentColor,
+                          child: ValueListenableBuilder(
+                            valueListenable:
+                                Hive.box<ChatModel>(HiveBoxes.chats)
+                                    .listenable(),
+                            builder: (context, Box box, widget) {
+                              return ListView.builder(
+                                itemCount: box.values.length,
+                                itemBuilder: (BuildContext context, int i) {
+                                  return ChatsElement(
+                                    chat: box.values.elementAt(i),
+                                    onTap: () {
+                                      if (_sharedFiles != null &&
+                                          box.values.elementAt(i).chatId !=
+                                              null)
+                                        sendMedia(
+                                          _sharedFiles[0].path,
+                                          box.values.elementAt(i).chatId,
+                                        );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                ],
               ),
-            );
-          });
+            ),
+            cancelButton: CupertinoActionSheetAction(
+              isDefaultAction: true,
+              child: Text('${Localization.language.cancel}'),
+              onPressed: () {
+                Navigator.pop(context);
+                _sharedFiles.clear();
+                _isSharedVideo = false;
+              },
+            ),
+          );
         });
   }
 
-  sendMedia(path, chatId, StateSetter setState) {
+  sendMedia(path, chatId) {
     var type = _isSharedVideo ? 4 : 1;
-    uploadMedia(path, type, setState).then((r) async {
+    api.uploadMedia(
+      path,
+      type,
+      requestURL: mediaChat,
+      onSendProgress: (int sent, int total) {
+        String p = (sent / total * 100).toStringAsFixed(2);
+
+        setState(() {
+          isUploading = true;
+          uploadPercent = sent / total;
+          percent = "$p %";
+        });
+      },
+      onReceiveProgress: (count, total) {
+        setState(() {
+          isUploading = false;
+          uploadPercent = 0.0;
+          percent = "0 %";
+        });
+      },
+    ).then((r) async {
       if (r["status"]) {
         var a = [
           _isSharedVideo
@@ -618,69 +634,20 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         _isSharedVideo = false;
         Navigator.pop(context);
       } else {
-        showDialog(
+        showIndigoDialog(
           context: context,
-          builder: (BuildContext context) {
-            return CustomDialog(
-              description: r["message"],
-              yesCallBack: () {
-                Navigator.pop(context);
-              },
-            );
-          },
+          builder: CustomDialog(
+            description: r["message"],
+            yesCallBack: () {
+              Navigator.pop(context);
+            },
+          ),
         );
       }
     });
   }
 
-  Response response;
-  BaseOptions options = BaseOptions(
-    baseUrl: "$baseUrl",
-    connectTimeout: 25000,
-    receiveTimeout: 3000,
-  );
-
-  Dio dio;
   var percent = "0 %";
   double uploadPercent = 0.0;
   bool isUploading = false;
-
-  uploadMedia(_path, type, StateSetter setState) async {
-    dio = new Dio(options);
-    try {
-      FormData formData = FormData.fromMap({
-        "user_id": "${user.id}",
-        "userToken": "${user.unique}",
-        "file": await MultipartFile.fromFile(_path),
-        "type": type
-      });
-
-      response = await dio.post(
-        "$mediaChat",
-        data: formData,
-        onSendProgress: (int sent, int total) {
-          String p = (sent / total * 100).toStringAsFixed(2);
-
-          setState(() {
-            isUploading = true;
-            uploadPercent = sent / total;
-            percent = "$p %";
-          });
-        },
-        onReceiveProgress: (count, total) {
-          setState(() {
-            isUploading = false;
-            uploadPercent = 0.0;
-            percent = "0 %";
-          });
-        },
-      );
-
-      return response.data;
-    } on DioError catch (e) {
-      if (e.response != null) {
-      } else {}
-      return e.response.data;
-    }
-  }
 }

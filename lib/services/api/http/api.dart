@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
@@ -31,8 +33,14 @@ class Api {
   var device = 'deviceName';
   // @TODO change device NAME;
 
-  _postRequest(String path, data, {onSendProgress, onReceiveProgress}) async {
+  _postRequest(
+    String path,
+    dynamic data, {
+    void Function(int, int) onSendProgress,
+    void Function(int, int) onReceiveProgress,
+  }) async {
     Response response;
+    data['lang'] = Localization.language.code;
     try {
       response = await _dio.post(
         path,
@@ -40,7 +48,9 @@ class Api {
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
+      print(_dio.options.baseUrl);
       print(response.data);
+      print(data);
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -60,12 +70,27 @@ class Api {
     }
   }
 
-  _getRequest(String path, queryParameters) async {
+  _getRequest(
+    String path,
+    dynamic queryParameters, {
+    void Function(int, int) onReceiveProgress,
+    Options options,
+  }) async {
     Response response;
+    if (queryParameters != null)
+      queryParameters['lang'] = Localization.language.code;
+
     try {
-      response = await _dio.get(path, queryParameters: queryParameters);
+      response = await _dio.get(
+        path,
+        queryParameters: queryParameters,
+        onReceiveProgress: onReceiveProgress,
+        options: options,
+      );
       print('this is get request $response');
-      return json.decode(response.data);
+      return response.data == String
+          ? jsonDecode(response.data)
+          : response.data;
     } on DioError catch (e) {
       if (e.response != null) {
         print(e.response.data);
@@ -79,6 +104,28 @@ class Api {
         print(e.request.method);
       }
     }
+  }
+
+  downloadFileNetworkawait({
+    String url,
+    onReceiveProgress,
+    options,
+    String type,
+  }) async {
+    String path = await ExtStorage.getExternalStoragePublicDirectory(
+        ExtStorage.DIRECTORY_DOWNLOADS);
+
+    DateTime now = DateTime.now();
+    String fullPath = "$path/${now.millisecondsSinceEpoch}.$type";
+    return {
+      "data": await _getRequest(
+        url,
+        null,
+        onReceiveProgress: onReceiveProgress,
+        options: options,
+      ),
+      "fileName": fullPath,
+    };
   }
 
   register(phone, name, password, email) async {
@@ -141,21 +188,12 @@ class Api {
 
   settingsSave({String name, String city}) async {
     dynamic data;
-    if (name != null) {
-      data = {
-        'customerID': '${user.id}',
-        'unique': '${user.unique}',
-        'name': name,
-      };
-    }
-
-    if (city != null) {
-      data = {
-        'customerID': '${user.id}',
-        'unique': '${user.unique}',
-        'city': city,
-      };
-    }
+    data = {
+      'customerID': '${user.id}',
+      'unique': '${user.unique}',
+      'city': city,
+      'name': name,
+    };
     return _postRequest('api/v2.1/settings/save', data);
   }
 
@@ -606,28 +644,35 @@ class Api {
   }
 
   uploadAvatar(
-    _path,
+    String imagePath, {
     onSendProgress,
     onReceiveProgress,
-  ) async {
+    String requestURL = 'api/v2.1/avatar/upload',
+  }) async {
     FormData data = FormData.fromMap({
       'customerID': '${user.id}',
       'unique': '${user.unique}',
-      'file': await MultipartFile.fromFile(_path),
+      'file': await MultipartFile.fromFile(imagePath),
     });
     return _postRequest(
-      'api/v2.1/avatar/upload',
+      requestURL,
       data,
       onSendProgress: onSendProgress,
       onReceiveProgress: onReceiveProgress,
     );
   }
 
-  uploadMedia(_path, type) async {
+  uploadMedia(
+    imagePath,
+    type, {
+    onSendProgress,
+    onReceiveProgress,
+    String requestURL = 'api/v2.1/avatar/upload',
+  }) async {
     FormData data = FormData.fromMap({
       'user_id': '${user.id}',
       'userToken': '${user.unique}',
-      'file': await MultipartFile.fromFile(_path),
+      'file': await MultipartFile.fromFile(imagePath),
       'type': type
     });
     return _postRequest('$mediaChat', data);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 import 'indigo_text_field_widget.dart';
 
 class IndigoSearchWidget extends StatelessWidget {
@@ -30,7 +30,7 @@ class IndigoSearchWidget extends StatelessWidget {
             ),
             onTap: callback,
           ),
-          hintText: localization.search,
+          hintText: Localization.language.search,
         ),
       ),
     );

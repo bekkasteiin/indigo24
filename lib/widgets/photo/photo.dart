@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:indigo24/services/localization.dart' as localization;
+import 'package:indigo24/services/localization/localization.dart';
 
 import '../indigo_ui_kit/indigo_appbar_widget.dart';
 
@@ -33,7 +33,7 @@ class FullScreenWrapper extends StatelessWidget {
       child: Scaffold(
         appBar: IndigoAppBarWidget(
           title: Text(
-            '${localization.photo}',
+            '${Localization.language.photo}',
             style: TextStyle(
               color: blackPurpleColor,
               fontWeight: FontWeight.w400,
