@@ -310,7 +310,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style: TextStyle(
-                                                            fontSize: 14,
+                                                            fontSize: 16.0,
                                                             color:
                                                                 blackPurpleColor,
                                                           ),
@@ -320,15 +320,12 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                                                         Text(
                                                           '${_actualList[index].phone}',
                                                           style: TextStyle(
-                                                            fontSize: 10,
+                                                            fontSize: 14.0,
                                                             color:
                                                                 blackPurpleColor,
                                                           ),
-                                                          textAlign:
-                                                              TextAlign.left,
                                                           overflow: TextOverflow
                                                               .ellipsis,
-                                                          maxLines: 1,
                                                         ),
                                                       ],
                                                     ),

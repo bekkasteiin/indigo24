@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:ext_storage/ext_storage.dart';
+import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:package_info/package_info.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../helper.dart';
 
@@ -33,7 +33,7 @@ class Api {
   ProgressBar _sendingMsgProgressBar;
 
   var device = 'deviceName';
-  // @TODO change device NAME;
+  // @TODO change device NAE;
 
   _postRequest(
     String path,
@@ -89,7 +89,7 @@ class Api {
         onReceiveProgress: onReceiveProgress,
         options: options,
       );
-      print('this is get request $response');
+      print('this is get request ${response.data}');
       return response.data == String
           ? jsonDecode(response.data)
           : response.data;
@@ -114,8 +114,17 @@ class Api {
     options,
     String type,
   }) async {
-   
-Directory appDocDir = await getApplicationDocumentsDirectory();
+    // store to app directory like files/kz/indigo24/files
+    // Directory appDocDir = await getApplicationDocumentsDirectory();
+
+    // store the download directory like files/downloads
+    Directory appDocDir;
+
+    try {
+      appDocDir = await DownloadsPathProvider.downloadsDirectory;
+    } on PlatformException {
+      print('Could not get the downloads directory');
+    }
     String path = appDocDir.path;
     DateTime now = DateTime.now();
     String fullPath = "$path/${now.millisecondsSinceEpoch}.$type";

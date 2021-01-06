@@ -133,6 +133,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: whiteColor,
         appBar: IndigoAppBarWidget(
           title: FittedBox(
             child: Text(

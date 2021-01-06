@@ -3,34 +3,53 @@ import 'default_lang.dart';
 class UZB implements DefaultLanguage {
   final String code = 'uzb';
 
-  String registration = 'Ro\'yxatdan o\'tish';
-  String login = 'Kirish';
-  String phoneNumber = 'Telefon raqami';
+  String signUp = 'Ro\'yxatdan o\'tish';
   String title = 'Nomi';
+  String signIn = 'Kirish';
+  String phoneNumber = 'Telefon raqami';
+
   String password = 'Maxfiy so\'z';
+
   String forgotPassword = 'Maxfiy so\'zni unutdingizmi?';
+
   String next = 'So\'ngra';
+
   String currentLanguage = 'Ўзбекча';
+
   String email = 'Elektron pochta';
+
   String exit = 'Chiqish';
+
   String support = 'QO\'LLAB-QUVVATLASH XIZMATI';
+
   String chats = 'Chatlar';
   String chat = 'Chat';
+
   String profile = 'Profil';
+
   String tape = 'Tasma';
+
   String wallet = 'Hamyon';
+
   String comments = 'Fikrlar';
   String withdraw = 'Chiqarish';
+
   String refill = 'To\'ldirish';
+
   String payments = 'To\'lovlar';
+
   String transfers = 'O\'tkazishlar';
   String balanceInBlock = 'Qayta ishlashdagi balans';
+
   String balance = 'Balans';
   String account = 'Akkaunt';
   String walletBalance = 'Hamyon balansi';
+
   String amount = 'Maksimal summa';
   String pay = 'To\'lov qilish';
+
   String minAmount = 'Minimal summa';
+
   String minCommission = 'Minimal komissiya';
   String maxAmount = 'Maksimal summa';
   String commission = 'Komissiya';
@@ -42,62 +61,91 @@ class UZB implements DefaultLanguage {
   String member = 'Ishtirokchi';
   String contacts = 'Aloqalar';
   String search = 'Izlash';
+
   String createGroup = 'Guruh yaratish';
-  String chatName = 'Chat nomi y\'q';
+  String chatName = 'Chat nomi yo\'q';
   String newTape = 'Yangi yozuv';
   String enterPin = 'PIN-kodni kiriting';
   String createPin = 'PIN-kodni o\'rnating';
-  String incorrectPin = 'PIN-kod noto‘g‘ri';
+  String incorrectPin = 'PIN-kod noto\'g\'ri';
   String chatNotifications = 'Chat xabarnomalari';
   String notifications = 'Xabarnomalar';
   String hideNotifications = 'Xabarnomalarni yashirish';
+
   String error = 'Xato';
+
   String messagePreview = 'Matnni ko\'rsatish';
   String sound = 'Ovoz';
   String language = 'Til';
   String settings = 'Sozlamalar';
+
   String enterPhone = 'Telefon raqamini kiriting';
   String enterSmsCode = 'SMS kodini kiriting';
   String enterPassword = 'Maxfiy so\'zni kiriting';
   String repeatPin = 'PIN-kodni takrorlang';
   String attention = 'Diqqat';
+
   String admin = 'Administrator';
   String lastSeen = 'Tarmoqda edi';
   String video = 'Video';
   String selectOption = 'Biror variantni tanlang';
   String gallery = 'Galereya';
   String wantToExit = 'Haqiqatan ham chiqmoqchimisiz';
-  String uploaded = 'Yuklab olingan';
-  String somethingWentWrong = 'Biror narsa noto\'g\'ri ketdi';
+  String uploaded = 'Yuklandi';
+
+  String somethingWentWrong = 'Хato yuz berdi';
+
   String save = 'Saqlash';
-  String share = 'Share';
+  String share = 'Bo\'lishish';
   String photo = 'Surat';
+
   String sessionIsOver = 'Hisobingizga boshqa qurilma orqali kirish mumkin';
-  String cancel = 'Cancel';
+
+  String cancel = 'Bekor qilish';
+
   String allowContacts = 'Kontaktlar ruxsat berish';
-  String openSettings = 'Ochiq Sozlamalar';
+
+  String openSettings = 'Sozlamalarni ochish';
+
   String document = 'Hujjat';
+
   String textMessage = 'Matnli xabar';
-  String voiceMessage = 'Ovozli xabar"';
+  String voiceMessage = 'Ovozli xabar';
   String location = 'Manzil';
-  String reply = 'Javob';
+  String reply = 'Javob berish';
+
   String money = 'Pul';
-  String link = 'Aloqa';
+  String link = 'Havola';
+
   String forwardedMessage = 'Qayta yo\'naltirilgan xabar';
+
   String message = 'Xabar';
-  String systemMessage = 'Tizim xabarlari';
+
+  String systemMessage = 'Tizim xabari';
+
   String back = 'Orqaga';
+
   String camera = 'Kamera';
+
   String watch = 'Qarang';
+
   String no = 'Yo\'q';
   String yes = 'Ha';
+
   String fillAllFields = 'Barcha maydonlarni to\'ldiring';
+
   String description = 'Tavsifi';
-  String goToChat = 'Suhbatga o\'tish';
+
+  String goToChat = 'Chatga o\'tish';
+
   String userNotInSystem = 'Bu foydalanuvchi tizimda yo\'q';
+
   String file = 'Fayl';
+
   String addToGroup = 'Guruhga qo\'shing';
+
   String clickToStart = 'Bosing suhbatni boshlash uchun';
+
   String setAdmin = 'Administrator sifatida tayinlash';
   String makeMember = 'A\'zo bo\'ling';
   String exitGroup = 'Guruhdan chiqish';
@@ -111,35 +159,52 @@ class UZB implements DefaultLanguage {
   String surname = 'Familiya';
   String passwordNotMatch = 'Maxfiy so\'z mos kelmayapti';
   String weSentToEmail =
-      '10 soniya ichida keladigan pochta xabaringizga SMS-kalitni yubordik';
+      'Biz sizning elektron pochtangizga 10 soniya ichida keladigan SMS-kalitni yubordik';
   String keyFromSms = 'SMS kodi';
   String country = 'Mamlakat';
   String status = 'Status';
   String selectFile = 'Faylni tanlang';
   String userNotFound = 'Foydalanuvchi topilmadi';
   String history = 'Tarix';
-  String youSended = 'Siz yuborgan';
+  String youSended = 'Siz yubordingiz';
   String receiver = 'Oluvchi';
   String online = 'onlayn';
   String enterValidAccount = 'To\'g\'ri hisob raqamini kiriting';
+
   String enterBelowMax = 'Maksimal belgidan past miqdorni kiriting';
+
   String enterAboveMin = 'Eng kam belgidan yuqori miqdorni kiriting';
+
   String appVersion = 'Mobil ilova versiyasi';
+
   String httpError = 'Ma\'lumotlarni yuklashda xatolik';
+
   String historyBalance = 'Balans tarixi';
+
   String emptyContacts = 'Hech qanday aloqa yo\'q';
+
   String empty = 'Bo\'sh';
+
   String noChats = 'Hech qanday suhbat yo\'q';
+
   String terms = "Foydalanish shartlari";
   String hide = 'Yashirish';
+
   String block = 'Bloklash';
+
   String repeat = 'Takrorlang';
+
   String calculate = 'Hisoblash';
+
   String service = 'Xizmat';
   String toPay = 'To\'lov uchun';
+
   String conversion = 'Konvertatsiya qilish';
+
   String open = 'Ochiq';
+
   String thankYou = 'Rahmat';
+
   String returning = 'Qaytib kelaman';
   String withLove = 'Sevgi bilan';
   String mute = 'Ovozni o\'chirish';
@@ -155,13 +220,18 @@ class UZB implements DefaultLanguage {
   String ago = 'Ilgari';
   String days = 'Kun';
   String day = 'Kun';
+
   String success = 'Muvaffaqiyatli';
-  String selectChat = ' Guruh chat tanlang';
+
+  String selectChat = 'Guruh chat tanlang';
+
   String report = 'Shikoyat';
   String forward = 'Yuborish';
   String forwardFrom = 'Dan yuboriladi xabar';
-  String filter = ' Filtr';
-  String showOperations = 'Операцияларни кўрсатиш';
+  String filter = 'Filtrlash';
+
+  String showOperations = 'Operatsiyalarni ko\'rsatish';
+
   String accept = 'Qo\'llash';
   String monday = 'Dushanba';
   String tuesday = 'Seshanba';
@@ -170,14 +240,20 @@ class UZB implements DefaultLanguage {
   String friday = 'Juma';
   String saturday = 'Shanba';
   String sunday = 'Yakshanba';
+
   String today = 'Bugungi kunda';
+
   String city = 'Shahar';
   String name = 'Ismi';
+
   String example = 'Misol';
+
   String more = 'Ko\'proq';
   String less = 'Kamroq';
+
   String newPayment = 'Yangi to\'lov';
   String pending = 'Kutilayotganlar';
+
   String hours = 'Soat';
   String minutes = 'Daqiqa';
   String likes = 'Kabi';
@@ -189,15 +265,15 @@ class UZB implements DefaultLanguage {
   String iAgree = "Foydalanuvchi shartnomasini qabul qilaman";
 
   String transfersHistory = 'Transferlar tarixi';
-  String reveicerPhone = 'Qabul qiluvchi telefon';
+
+  String reveiverPhone = 'Qabul qiluvchi telefon';
+
   String transferAmount = 'O\'tkazma miqdori';
   String infoAboutConfidentional = 'Maxfiylik to\'g\'risidagi ma\'lumotlar';
   String confidentionalAgreement =
       'Mijoz maxfiylikni saqlash, ruxsasiz foydalanishni oldini olish va uning autentifikasiya ma\'lumotlarini uchinchi shaxslarning ruxsasiz kirishidan himoya qilish uchun mustaqil ravishda barcha zarur choralarni ko\'rishga majburdir. Mijoz o\'zining autentifikasiya ma\'lumotlarini oshkor qilmaslikni o\'z zimmasiga oladi: login, parol, PIN-kod uchinchi shaxslarga, ya\'ni. autentifikasiya ma\'lumotlarini o\'tkazmaslik va maxfiy ma\'lumotlarning xavfsizligi va ma\'lumotlarning tarqalishi uchun, shuningdek autentifikasiya ma\'lumotlarini uzatish natijasida yuzaga kelishi mumkin bo\'lgan moliyaviy zararlar uchun mustaqil ravishda javobgar ekanligini tasdiqlaydi';
 
-  @override
-  String paymentsHistory;
+  String paymentsHistory = 'To\'lov tarixi';
 
-  @override
-  String privacyPolicy;
+  String privacyPolicy = 'Xavfsizlik siyosati';
 }

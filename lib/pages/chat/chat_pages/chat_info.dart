@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/wallet/wallet.dart';
+import 'package:indigo24/pages/wallet/wallet/wallet.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
@@ -18,6 +18,7 @@ import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_modal_action_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 import 'package:indigo24/widgets/photo/full_photo.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
@@ -399,12 +400,11 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
   }
 
   buildProfileImageAction() {
-    final act = CupertinoActionSheet(
-      title: Text('${Localization.language.selectOption}'),
-      actions: <Widget>[
-        CupertinoActionSheetAction(
-          child: Text('${Localization.language.watch}'),
-          onPressed: () async {
+    showIndigoBottomDialog(
+      context: context,
+      children: [
+        IndigoModalActionWidget(
+          onPressed: () {
             Navigator.pop(context);
 
             Navigator.push(
@@ -416,32 +416,23 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
               ),
             );
           },
+          title: Localization.language.watch,
         ),
-        CupertinoActionSheetAction(
-          child: Text('${Localization.language.camera}'),
+        IndigoModalActionWidget(
           onPressed: () {
             getImage(ImageSource.camera);
             Navigator.pop(context);
           },
+          title: Localization.language.camera,
         ),
-        CupertinoActionSheetAction(
-          child: Text('${Localization.language.gallery}'),
+        IndigoModalActionWidget(
           onPressed: () {
             getImage(ImageSource.gallery);
             Navigator.pop(context);
           },
+          title: Localization.language.gallery,
         ),
       ],
-      cancelButton: CupertinoActionSheetAction(
-        child: Text('${Localization.language.back}'),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act,
     );
   }
 
@@ -517,55 +508,47 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
   }
 
   _addMembers(chatId) {
-    final act = CupertinoActionSheet(
-        title: Text('${Localization.language.selectOption}'),
-        actions: <Widget>[
-          _myPrivilege == '$ownerRole' || _myPrivilege == '$adminRole'
-              ? CupertinoActionSheetAction(
-                  child: Text('${Localization.language.addToGroup}'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ChatMembersSelection(chatId, _membersList),
-                      ),
-                    ).whenComplete(() {
-                      ChatRoom.shared.chatMembers(widget.chatId);
-                    });
-                  },
-                )
-              : Container(),
-          CupertinoActionSheetAction(
-            isDestructiveAction: true,
-            child: Text('${Localization.language.exitGroup}'),
-            onPressed: () {
+    showIndigoBottomDialog(
+      context: context,
+      children: [
+        if (_myPrivilege == '$ownerRole' || _myPrivilege == '$adminRole')
+          IndigoModalActionWidget(
+            onPressed: () async {
               Navigator.pop(context);
-              showIndigoDialog(
-                context: context,
-                builder: CustomDialog(
-                  description: "${Localization.language.sureExitGroup}",
-                  yesCallBack: () {
-                    Navigator.pop(context);
-                    ChatRoom.shared.leaveChat(widget.chatId);
-                  },
-                  noCallBack: () {
-                    Navigator.pop(context);
-                  },
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ChatMembersSelection(chatId, _membersList),
                 ),
-              );
+              ).whenComplete(() {
+                ChatRoom.shared.chatMembers(widget.chatId);
+              });
             },
+            title: Localization.language.addToGroup,
           ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          child: Text('${Localization.language.back}'),
+        IndigoModalActionWidget(
           onPressed: () {
             Navigator.pop(context);
+            showIndigoDialog(
+              context: context,
+              builder: CustomDialog(
+                description: "${Localization.language.sureExitGroup}",
+                yesCallBack: () {
+                  Navigator.pop(context);
+                  ChatRoom.shared.leaveChat(widget.chatId);
+                },
+                noCallBack: () {
+                  Navigator.pop(context);
+                },
+              ),
+            );
           },
-        ));
-    showCupertinoModalPopup(
-        context: context, builder: (BuildContext context) => act);
+          title: Localization.language.exitGroup,
+          isDefault: false,
+        ),
+      ],
+    );
   }
 
   @override
@@ -745,7 +728,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                           _actualMembersList.isEmpty
                               ? Center(
                                   child: Text(
-                                      '${Localization.language.emptyContacts}'))
+                                    '${Localization.language.emptyContacts}',
+                                  ),
+                                )
                               : widget.chatType == 1
                                   ? Flexible(
                                       child: ScrollConfiguration(
@@ -954,11 +939,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
   newAction({String myPrivilege, dynamic member, dynamic chatId}) {
     print(member);
     List<Widget> actions = [
-      CupertinoActionSheetAction(
-        child: Text('${Localization.language.watch}'),
+      IndigoModalActionWidget(
         onPressed: () {
           Navigator.pop(context);
-
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -969,24 +952,20 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
             ),
           );
         },
+        title: Localization.language.watch,
       ),
-      CupertinoActionSheetAction(
-        child: Text('${Localization.language.goToChat}'),
+      IndigoModalActionWidget(
         onPressed: () {
           loaderCheck = false;
           ChatRoom.shared.userCheckById(member['user_id']);
           Navigator.pop(context);
         },
+        title: Localization.language.goToChat,
       ),
     ];
 
     List<Widget> ownerActions = [
-      CupertinoActionSheetAction(
-        child: member['role'] == '$memberRole'
-            ? Text('${Localization.language.setAdmin}')
-            : member['role'] == '$adminRole'
-                ? Text('${Localization.language.makeMember}')
-                : Text('${Localization.language.error}'),
+      IndigoModalActionWidget(
         onPressed: () {
           switch (member['role'].toString()) {
             case '$memberRole':
@@ -1003,13 +982,15 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
               break;
             default:
           }
-          // ChatRoom.shared.chatMembers(widget.chatId);
           Navigator.pop(context);
         },
+        title: member['role'] == '$memberRole'
+            ? '${Localization.language.setAdmin}'
+            : member['role'] == '$adminRole'
+                ? '${Localization.language.makeMember}'
+                : '${Localization.language.error}',
       ),
-      CupertinoActionSheetAction(
-        isDestructiveAction: true,
-        child: Text('${Localization.language.delete}'),
+      IndigoModalActionWidget(
         onPressed: () {
           setState(() {
             _membersCount -= 1;
@@ -1018,23 +999,24 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
           ChatRoom.shared.chatMembers(widget.chatId);
           Navigator.pop(context);
         },
-      )
+        title: Localization.language.delete,
+        isDefault: false,
+      ),
     ];
 
     List<Widget> adminActions = [
-      member['role'] == '$memberRole'
-          ? CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              child: Text('${Localization.language.delete}'),
-              onPressed: () {
-                setState(() {
-                  _membersCount -= 1;
-                });
-                ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
-                Navigator.pop(context);
-              },
-            )
-          : Center()
+      if (member['role'] == '$memberRole')
+        IndigoModalActionWidget(
+          onPressed: () {
+            setState(() {
+              _membersCount -= 1;
+            });
+            ChatRoom.shared.deleteChatMember(chatId, member['user_id']);
+            Navigator.pop(context);
+          },
+          title: Localization.language.delete,
+          isDefault: false,
+        )
     ];
 
     switch (myPrivilege) {
@@ -1049,19 +1031,9 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
       default:
     }
 
-    final act = CupertinoActionSheet(
-      title: Text('${Localization.language.selectOption}'),
-      actions: actions,
-      cancelButton: CupertinoActionSheetAction(
-        child: Text('${Localization.language.back}'),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-    showCupertinoModalPopup(
+    showIndigoBottomDialog(
       context: context,
-      builder: (BuildContext context) => act,
+      children: actions,
     );
   }
 

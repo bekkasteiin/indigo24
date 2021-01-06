@@ -12,9 +12,10 @@ class IndigoBottomTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tab(
+      iconMargin: EdgeInsets.only(bottom: 5),
       icon: Image(
         image: AssetImage(path),
-        width: 20,
+        width: 30,
       ),
       child: Text(
         text,

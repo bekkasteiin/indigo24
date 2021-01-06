@@ -72,31 +72,43 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
     _api = Api();
 
     _api.getService(widget.serviceID).then((getServiceResult) {
-      getServiceResult['result'].forEach((element) {
-        TextEditingController elementController = TextEditingController();
-
-        MaskTextInputFormatter elementFormatter;
-        if ('${element['mask']}' != 'null') {
-          elementFormatter = MaskTextInputFormatter(
-            mask: '${element['mask']}',
-            filter: {"*": anyRegExp},
-          );
-        } else {
-          elementFormatter = MaskTextInputFormatter(
-            filter: {"*": anyRegExp},
-            mask: '***************************************',
-          );
-        }
-        controllers.add({
-          'name': element['name'],
-          'controller': elementController,
-          'regex': element['regex'],
-          'formatter': elementFormatter,
+      if (getServiceResult['success'] == true) {
+        getServiceResult['result'].forEach((element) {
+          TextEditingController elementController = TextEditingController();
+          MaskTextInputFormatter elementFormatter;
+          if ('${element['mask']}' != 'null') {
+            elementFormatter = MaskTextInputFormatter(
+              mask: '${element['mask']}',
+              filter: {"*": anyRegExp},
+            );
+          } else {
+            elementFormatter = MaskTextInputFormatter(
+              filter: {"*": anyRegExp},
+              mask: '***************************************',
+            );
+          }
+          controllers.add({
+            'name': element['name'],
+            'controller': elementController,
+            'regex': element['regex'],
+            'formatter': elementFormatter,
+          });
         });
-      });
-      setState(() {
-        _service = getServiceResult;
-      });
+        setState(() {
+          _service = getServiceResult;
+        });
+      } else {
+        showIndigoDialog(
+          context: context,
+          builder: CustomDialog(
+            description: getServiceResult['message'],
+            yesCallBack: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+          ),
+        );
+      }
     });
 
     if (widget.account != null) {

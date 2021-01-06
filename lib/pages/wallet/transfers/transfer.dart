@@ -505,7 +505,7 @@ class _TransferPageState extends State<TransferPage> {
                         children: <Widget>[
                           Container(
                             child: Text(
-                              '${Localization.language.reveicerPhone}',
+                              '${Localization.language.reveiverPhone}',
                               style: TextStyle(
                                 color: greyColor2,
                               ),

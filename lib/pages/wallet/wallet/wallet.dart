@@ -8,6 +8,7 @@ import 'package:indigo24/pages/wallet/balance_history/balance_history.dart';
 import 'package:indigo24/pages/wallet/payments/payments_category.dart';
 import 'package:indigo24/pages/wallet/refill/refill.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer_list.dart';
+import 'package:indigo24/pages/wallet/wallet/symbol/symbol_interface.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
@@ -19,73 +20,12 @@ import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization/localization.dart';
 
 import 'package:indigo24/pages/tabs/tabs.dart';
-import 'withdraw/withdraw_list.dart';
-
-enum Symbol {
-  tenge,
-  ruble,
-  dollar,
-  euro,
-}
-
-abstract class SymbolInterface {
-  String symbolTitle;
-  double coef;
-  Symbol type;
-}
-
-class TengeSymbol implements SymbolInterface {
-  @override
-  String symbolTitle = "tenge";
-  @override
-  double coef;
-
-  TengeSymbol({
-    this.coef = 1,
-  });
-
-  @override
-  Symbol type = Symbol.tenge;
-}
-
-class EuroSymbol implements SymbolInterface {
-  @override
-  String symbolTitle = "euro";
-  @override
-  double coef;
-
-  EuroSymbol({
-    this.coef = 1,
-  });
-  @override
-  Symbol type = Symbol.euro;
-}
-
-class DollarSymbol implements SymbolInterface {
-  @override
-  String symbolTitle = "dollar";
-  @override
-  double coef;
-
-  DollarSymbol({
-    this.coef = 1,
-  });
-  @override
-  Symbol type = Symbol.dollar;
-}
-
-class RubleSymbol implements SymbolInterface {
-  @override
-  String symbolTitle = "ruble";
-  @override
-  double coef;
-
-  RubleSymbol({
-    this.coef = 1,
-  });
-  @override
-  Symbol type = Symbol.ruble;
-}
+import '../withdraw/withdraw_list.dart';
+import 'symbol_impl/dollar_symbol.dart';
+import 'symbol_impl/euro_symbol.dart';
+import 'symbol_impl/ruble_symbol.dart';
+import 'symbol_impl/tenge_symbol.dart';
+import 'package:indigo24/pages/wallet/wallet/symbol/symbol_enum.dart';
 
 class MyBehavior extends ScrollBehavior {
   @override

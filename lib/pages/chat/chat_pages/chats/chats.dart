@@ -80,29 +80,15 @@ class _TestChatsListPageState extends State<TestChatsListPage>
               );
             },
             icon: Container(
-              child: Row(
-                children: [
-                  Container(
-                    height: 10,
-                    width: 10,
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/add.png',
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 30,
-                    width: 20,
-                    child: Image(
-                      image: AssetImage(
-                        'assets/images/group.png',
-                      ),
-                    ),
-                  )
-                ],
+              height: 20,
+              width: 20,
+              child: Image(
+                image: AssetImage(
+                  'assets/images/group.png',
+                ),
               ),
             ),
+            iconSize: 30,
           ),
           title: Text(
             Localization.language.chats,
@@ -200,8 +186,8 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                                       numbers.elementAt(i).isMuted == true
                                           ? 'assets/images/muteChat.png'
                                           : 'assets/images/unmuteChat.png',
-                                      width: 30,
-                                      height: 30,
+                                      width: 20,
+                                      height: 20,
                                     ),
                                   ),
                                 ),
@@ -220,8 +206,8 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                                   child: Center(
                                     child: Image.asset(
                                       'assets/images/deleteChat.png',
-                                      width: 30,
-                                      height: 30,
+                                      width: 20,
+                                      height: 20,
                                     ),
                                   ),
                                 ),
@@ -270,6 +256,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
     subscription = ChatRoom.shared.chatsStream.listen((e) async {
       var cmd = e.json["cmd"];
       var data = e.json["data"];
+
       print('CHATS EVENT $cmd');
       switch (cmd) {
         case "chats:get":

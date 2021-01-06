@@ -17,6 +17,16 @@ class IndigoBottomNav extends StatelessWidget {
     return SafeArea(
       child: Container(
         height: 55,
+        decoration: BoxDecoration(
+          color: whiteColor,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.black,
+              offset: Offset(-10, 6),
+              blurRadius: 10,
+            ),
+          ],
+        ),
         child: TabBar(
           indicatorPadding: EdgeInsets.all(1),
           labelPadding: EdgeInsets.all(0),

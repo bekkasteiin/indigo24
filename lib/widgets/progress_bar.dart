@@ -24,18 +24,19 @@ class ProgressBar {
   }
 
   OverlayEntry _createdProgressEntry(BuildContext context) => OverlayEntry(
-      builder: (BuildContext context) => Scaffold(
-            body: Stack(
-              children: <Widget>[
-                Container(
-                  color: blueColor,
-                ),
-                Center(
-                  child: LinearProgressIndicator(),
-                )
-              ],
-            ),
-          ));
+        builder: (BuildContext context) => Scaffold(
+          body: Stack(
+            children: <Widget>[
+              Container(
+                color: blueColor,
+              ),
+              Center(
+                child: LinearProgressIndicator(),
+              )
+            ],
+          ),
+        ),
+      );
 
   double screenHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;

@@ -3,34 +3,44 @@ import 'default_lang.dart';
 class RU implements DefaultLanguage {
   final String code = 'ru';
 
-  String registration = 'Регистрация';
-  String login = 'Вход';
+  String signUp = 'Регистрация';
   String title = 'Название';
+  String signIn = 'Вход';
   String phoneNumber = 'Номер телефона';
   String password = 'Пароль';
   String forgotPassword = 'Забыли пароль?';
   String next = 'Далее';
   String currentLanguage = 'Русский';
-  String email = 'Почта';
+  String email = 'Электрон Почта';
   String exit = 'Выйти';
   String support = 'СЛУЖБА ПОДДЕРЖКИ';
   String chats = 'Чаты';
   String chat = 'Чат';
+
   String profile = 'Профиль';
+
   String tape = 'Лента';
   String wallet = 'Кошелек';
+
   String comments = 'Комментарии';
+
   String withdraw = 'Вывести';
+
   String refill = 'Пополнить';
+
   String payments = 'Платежи';
+
   String transfers = 'Переводы';
+
   String balanceInBlock = 'Баланс в обработке';
+
   String balance = 'Баланс';
   String account = 'Аккаунт';
   String walletBalance = 'Баланс кошелька';
   String amount = 'Сумма';
   String pay = 'Оплатить';
   String minAmount = 'Минимальная сумма';
+
   String minCommission = 'Минимальная комиссия';
   String maxAmount = 'Максимальная сумма';
   String commission = 'Комиссия';
@@ -189,12 +199,12 @@ class RU implements DefaultLanguage {
   String destination = 'Адрес платежа';
 
   String iAgree = "Принимаю пользовательское соглашение";
-  String paymentsHistory = 'Payments history';
-  String transfersHistory = 'Transfers history';
+  String paymentsHistory = 'История платежей';
+  String transfersHistory = 'История Переводов';
 
-  String reveicerPhone = 'Receiver phone';
+  String reveiverPhone = 'Телефон получателя'; // НЕТ ПЕРЕВОДА
 
-  String transferAmount = 'Transfer amount';
+  String transferAmount = 'Сумма перевода'; // НЕТ ПЕРЕВОДА
 
   String infoAboutConfidentional = 'Информация о конфиденциальности';
 

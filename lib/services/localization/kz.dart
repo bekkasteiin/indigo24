@@ -3,10 +3,10 @@ import 'package:indigo24/services/localization/default_lang.dart';
 class KZ implements DefaultLanguage {
   final String code = 'kz';
 
-  String registration = 'Тіркелу';
-  String login = 'Енгізу';
-  String phoneNumber = 'Телефон нөмірі';
+  String signUp = 'Тіркелу';
   String title = 'Атауы';
+  String signIn = 'Кіру';
+  String phoneNumber = 'Телефон нөмірі';
   String password = 'Құпия сөз';
   String forgotPassword = 'Құпия сөзіңізді ұмыттыңыз ба?';
   String next = 'Әрі қарай';
@@ -16,21 +16,31 @@ class KZ implements DefaultLanguage {
   String support = 'ҚОЛДАУ ҚЫЗМЕТІ';
   String chats = 'Чаттар';
   String chat = 'Чат';
+
   String profile = 'Профиль';
+
   String tape = 'Таспа';
   String wallet = 'Әмиян';
+
   String comments = 'Пікірлер';
+
   String withdraw = 'Шығару';
+
   String refill = 'Толтыру';
+
   String payments = 'Төлемдер';
+
   String transfers = 'Аударымдар';
+
   String balanceInBlock = 'Өңдеудегі баланс';
+
   String balance = 'Баланс';
   String account = 'Аккаунт';
   String walletBalance = 'Әмиян балансы';
   String amount = 'Сома';
   String pay = 'Төлем жасау';
   String minAmount = 'Минималды сома';
+
   String minCommission = 'Минималды комиссия';
   String maxAmount = 'Максималды сома';
   String commission = 'Комиссия';
@@ -192,7 +202,7 @@ class KZ implements DefaultLanguage {
   String paymentsHistory = 'Төлемдер тарихы';
   String transfersHistory = 'Аударымдар тарихы';
 
-  String reveicerPhone = 'Қабылдағыш телефон';
+  String reveiverPhone = 'Қабылдағыш телефон';
 
   String transferAmount = 'Аударым сомасы';
 

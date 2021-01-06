@@ -96,7 +96,8 @@ class ChatsElement extends StatelessWidget {
               chat.message == 'null' ? chat.messagePreview : chat.message,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              style: TextStyle(color: darkGreyColor2),
+              style:
+                  TextStyle(color: darkGreyColor2, fontWeight: FontWeight.w300),
             ),
           ),
           trailing: Wrap(

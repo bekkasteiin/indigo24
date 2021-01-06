@@ -3,9 +3,9 @@ import 'default_lang.dart';
 class EN implements DefaultLanguage {
   final String code = 'en';
 
-  String registration = 'Registration';
+  String signUp = 'Registration';
   String title = 'Title';
-  String login = 'Login';
+  String signIn = 'Sign In';
   String phoneNumber = 'Phone number';
   String password = 'Password';
   String forgotPassword = 'Forgot password';
@@ -13,18 +13,27 @@ class EN implements DefaultLanguage {
   String currentLanguage = 'English';
   String email = 'Email';
   String exit = 'Exit';
+  String support = 'SUPPORT SERVICE';
   String chats = 'Chats';
   String chat = 'Chat';
+
   String profile = 'Profile';
+
   String tape = 'Tapes';
   String wallet = 'Wallet';
+
   String comments = 'Comments';
+
   String withdraw = 'Withdraw';
+
   String refill = 'Refill';
-  String support = 'SUPPORT SERVICE';
+
   String payments = 'Payments';
+
   String transfers = 'Transfers';
+
   String balanceInBlock = 'Balance in processing';
+
   String balance = 'Balance';
   String account = 'Account';
   String walletBalance = 'Wallet balance';
@@ -191,7 +200,7 @@ class EN implements DefaultLanguage {
   String paymentsHistory = 'Payments history';
   String transfersHistory = 'Transfers history';
 
-  String reveicerPhone = 'Receiver phone';
+  String reveiverPhone = 'Receiver phone';
 
   String transferAmount = 'Transfer amount';
 

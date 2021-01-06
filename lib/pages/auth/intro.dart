@@ -544,7 +544,7 @@ class _IntroPageState extends State<IntroPage> {
           );
         },
         child: Text(
-          '${Localization.language.login}',
+          '${Localization.language.signIn}',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300),
         ),
         color: whiteColor,
@@ -572,7 +572,7 @@ class _IntroPageState extends State<IntroPage> {
           );
         },
         child: Text(
-          '${Localization.language.registration}',
+          '${Localization.language.signUp}',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300),
         ),
         color: whiteColor.withOpacity(0.35),

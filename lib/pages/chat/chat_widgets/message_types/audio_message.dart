@@ -22,9 +22,10 @@ class _AudioMessageWidgetState extends State<AudioMessageWidget> {
       width: MediaQuery.of(context).size.width * 0.7,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           PlayerWidget(url: "$voiceUrl${widget.media}"),
-          widget.text.toString() != 'null' ? Text('${widget.text}') : Center(),
+          if (widget.text.toString() != 'null') Text('${widget.text}'),
         ],
       ),
     );

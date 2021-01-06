@@ -125,7 +125,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
           ),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.group_add),
+              icon: Icon(Icons.done),
               iconSize: 30,
               color: blackPurpleColor,
               onPressed: () {

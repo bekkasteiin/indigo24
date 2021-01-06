@@ -21,6 +21,7 @@ import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_modal_action_widget.dart';
 import 'package:indigo24/widgets/photo/photo.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
@@ -238,52 +239,43 @@ class _UserProfilePageState extends State<UserProfilePage>
   Widget _buildProfileImage() {
     return InkWell(
       onTap: () {
-        final act = CupertinoActionSheet(
-            title: Text('${Localization.language.selectOption}'),
-            actions: <Widget>[
-              CupertinoActionSheetAction(
-                child: Text('${Localization.language.watch}'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => FullScreenWrapper(
-                        imageProvider: CachedNetworkImageProvider(
-                            "${user.avatarUrl}${user.avatar}"),
-                        minScale: PhotoViewComputedScale.contained,
-                        maxScale: PhotoViewComputedScale.contained * 3,
-                        backgroundDecoration:
-                            BoxDecoration(color: transparentColor),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              CupertinoActionSheetAction(
-                child: Text('${Localization.language.camera}'),
-                onPressed: () {
-                  getImage(ImageSource.camera);
-                  Navigator.pop(context);
-                },
-              ),
-              CupertinoActionSheetAction(
-                child: Text('${Localization.language.gallery}'),
-                onPressed: () {
-                  getImage(ImageSource.gallery);
-                  Navigator.pop(context);
-                },
-              )
-            ],
-            cancelButton: CupertinoActionSheetAction(
-              child: Text('${Localization.language.back}'),
+        showIndigoBottomDialog(
+          context: context,
+          children: [
+            IndigoModalActionWidget(
               onPressed: () {
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FullScreenWrapper(
+                      imageProvider: CachedNetworkImageProvider(
+                          "${user.avatarUrl}${user.avatar}"),
+                      minScale: PhotoViewComputedScale.contained,
+                      maxScale: PhotoViewComputedScale.contained * 3,
+                      backgroundDecoration:
+                          BoxDecoration(color: transparentColor),
+                    ),
+                  ),
+                );
               },
-            ));
-        showCupertinoModalPopup(
-          context: context,
-          builder: (BuildContext context) => act,
+              title: Localization.language.watch,
+            ),
+            IndigoModalActionWidget(
+              onPressed: () {
+                getImage(ImageSource.camera);
+                Navigator.pop(context);
+              },
+              title: Localization.language.camera,
+            ),
+            IndigoModalActionWidget(
+              onPressed: () {
+                getImage(ImageSource.gallery);
+                Navigator.pop(context);
+              },
+              title: Localization.language.gallery,
+            ),
+          ],
         );
       },
       child: Center(
@@ -378,10 +370,10 @@ class _UserProfilePageState extends State<UserProfilePage>
     Size screenSize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(
-            children: <Widget>[
-              Column(
+        body: Stack(
+          children: <Widget>[
+            SingleChildScrollView(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Column(
@@ -564,147 +556,146 @@ class _UserProfilePageState extends State<UserProfilePage>
                   ),
                 ],
               ),
-              Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/cover.png'),
-                    fit: BoxFit.cover,
-                  ),
+            ),
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/cover.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
-              Column(
-                children: <Widget>[
-                  SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Material(
-                        color: transparentColor,
-                        child: InkWell(
-                            onTap: () async {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SettingsMainPage(),
-                                ),
-                              ).whenComplete(
-                                () => setState(() {}),
-                              );
-                            },
-                            child: Ink(
-                              child: Image.asset(
-                                "assets/images/settings.png",
-                                width: 35,
+            ),
+            Column(
+              children: <Widget>[
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Material(
+                      color: transparentColor,
+                      child: InkWell(
+                          onTap: () async {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SettingsMainPage(),
                               ),
-                            )),
-                      ),
-                      SizedBox(width: 15),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(width: 10),
-                            _buildProfileImage(),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 15),
-                                    child: _buildFullName(),
+                            ).whenComplete(
+                              () => setState(() {}),
+                            );
+                          },
+                          child: Ink(
+                            child: Image.asset(
+                              "assets/images/settings.png",
+                              width: 35,
+                            ),
+                          )),
+                    ),
+                    SizedBox(width: 15),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(width: 10),
+                          _buildProfileImage(),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(top: 15),
+                                  child: _buildFullName(),
+                                ),
+                                SizedBox(height: 5),
+                                InkWell(
+                                  onTap: () {},
+                                  child: Text(
+                                    "${user.identified ? Localization.language.identified : Localization.language.notIdentified}",
+                                    style: TextStyle(
+                                      color: whiteColor,
+                                    ),
                                   ),
-                                  SizedBox(height: 5),
-                                  InkWell(
-                                    onTap: () {},
-                                    child: Text(
-                                      "${user.identified ? Localization.language.identified : Localization.language.notIdentified}",
-                                      style: TextStyle(
-                                        color: whiteColor,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
+                                )
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Container(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: GestureDetector(
-                                child: Image.asset(
-                                  'assets/images/pencil.png',
-                                  width: 20,
-                                  height: 20,
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProfileSettingsPage(),
-                                    ),
-                                  ).whenComplete(() {
-                                    setState(() {});
-                                  });
-                                },
+                    ),
+                    Container(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: GestureDetector(
+                              child: Image.asset(
+                                'assets/images/pencil.png',
+                                width: 20,
+                                height: 20,
                               ),
-                            ),
-                            SizedBox(height: 20),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-              isUploading
-                  ? Container(
-                      width: screenSize.width,
-                      height: screenSize.height,
-                      color: darkGreyColor3.withOpacity(0.6),
-                      child: Center(
-                        child: CircularPercentIndicator(
-                          radius: 120.0,
-                          lineWidth: 13.0,
-                          animation: false,
-                          percent: uploadPercent,
-                          progressColor: whiteColor,
-                          backgroundColor: whiteColor,
-                          center: Text(
-                            (uploadPercent * 100).toStringAsFixed(2),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: whiteColor,
-                              fontSize: 20.0,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfileSettingsPage(),
+                                  ),
+                                ).whenComplete(() {
+                                  setState(() {});
+                                });
+                              },
                             ),
                           ),
-                          footer: Text(
-                            "Загрузка",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: whiteColor,
-                              fontSize: 17.0,
-                            ),
-                          ),
-                          circularStrokeCap: CircularStrokeCap.round,
-                        ),
+                          SizedBox(height: 20),
+                        ],
                       ),
                     )
-                  : Container()
-            ],
-          ),
+                  ],
+                ),
+              ],
+            ),
+            isUploading
+                ? Container(
+                    width: screenSize.width,
+                    height: screenSize.height,
+                    color: darkGreyColor3.withOpacity(0.6),
+                    child: Center(
+                      child: CircularPercentIndicator(
+                        radius: 120.0,
+                        lineWidth: 13.0,
+                        animation: false,
+                        percent: uploadPercent,
+                        progressColor: whiteColor,
+                        backgroundColor: whiteColor,
+                        center: Text(
+                          (uploadPercent * 100).toStringAsFixed(2),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: whiteColor,
+                            fontSize: 20.0,
+                          ),
+                        ),
+                        footer: Text(
+                          "Загрузка",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: whiteColor,
+                            fontSize: 17.0,
+                          ),
+                        ),
+                        circularStrokeCap: CircularStrokeCap.round,
+                      ),
+                    ),
+                  )
+                : Container()
+          ],
         ),
       ),
     );

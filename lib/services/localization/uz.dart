@@ -3,9 +3,9 @@ import 'default_lang.dart';
 class UZ implements DefaultLanguage {
   final String code = 'uz';
 
-  String registration = 'Рўйхатдан ўтиш';
-  String login = 'Кириш';
+  String signUp = 'Рўйхатдан ўтиш';
   String title = 'Номи';
+  String signIn = 'Кириш';
   String phoneNumber = 'Телефон рақами';
   String password = 'Махфий сўз';
   String forgotPassword = 'Махфий сўзни унутдингизми?';
@@ -16,22 +16,38 @@ class UZ implements DefaultLanguage {
   String support = 'ҚЎЛЛАБ-ҚУВВАТЛАШ ХИЗМАТИ';
   String chats = 'Чатлар';
   String chat = 'Чат';
+
   String profile = 'Профиль';
+
   String tape = 'Тасма';
   String wallet = 'Ҳамён';
+
   String comments = 'Фикрлар';
+
   String withdraw = 'Чиқариш';
+
   String refill = 'Тўлдириш';
-  String payments = 'Бошқа тўловлар';
+
+  String payments = 'Тўловлар';
+
   String transfers = 'Ўтказмалар';
+
   String balanceInBlock = 'Қайта ишлашдаги баланс';
+
   String balance = 'Баланс';
+
   String account = 'Аккаунт';
+
   String walletBalance = 'Ҳамён баланси';
+
   String amount = 'Сумма';
+
   String pay = 'Тўлов қилиш';
+
   String minAmount = 'Минимал сумма';
+
   String minCommission = 'Минимал комиссия';
+
   String maxAmount = 'Максимал сумма';
   String commission = 'Комиссия';
   String toIndigo24Client = 'Indigo24 мижозига';
@@ -68,14 +84,19 @@ class UZ implements DefaultLanguage {
   String gallery = 'Галерея';
   String wantToExit = 'Ҳақиқатан ҳам чиқмоқчимисиз';
   String uploaded = 'Юкланди';
+
   String somethingWentWrong = 'Хато юз берди';
+
   String save = 'Сақлаш';
   String share = 'Бўлишиш';
+
   String photo = 'Сурат';
   String sessionIsOver = 'Сизнинг ҳисоб бошқа қурилма орқали кирган';
   String cancel = 'Бекор қилиш';
+
   String allowContacts = 'Контактларга рухсат бериш';
   String openSettings = 'Созламаларни очиш';
+
   String document = 'Ҳужжат';
   String textMessage = 'Матнли хабар';
   String voiceMessage = 'Овозли хабар';
@@ -83,6 +104,7 @@ class UZ implements DefaultLanguage {
   String reply = 'Жавоб бериш';
   String money = 'Пул';
   String link = 'Ҳавола';
+
   String forwardedMessage = 'Қайта йўналтирилган хабар';
   String message = 'Хабар';
   String systemMessage = 'Тизим хабари';
@@ -133,7 +155,7 @@ class UZ implements DefaultLanguage {
   String hide = 'Яшириш';
   String block = 'Блоклаш';
   String repeat = 'Такрорлаш';
-  String calculate = 'Деб биламан';
+  String calculate = 'Ҳисоблаш';
   String service = 'Хизмат';
   String toPay = 'Тўлов учун';
   String conversion = 'Конверсия';
@@ -155,13 +177,15 @@ class UZ implements DefaultLanguage {
   String days = 'Кун';
   String day = 'Кун';
   String success = 'Муваффақиятли';
-  String selectChat = ' Чат гуруҳини танланг';
+  String selectChat = 'Чат гуруҳини танланг';
   String report = 'Даъво';
   String forward = 'Юбориш';
   String forwardFrom = 'Дан юборилади хабар';
-  String filter = ' Филтрлаш';
-  String showOperations = 'Operatsiyalarni ko\'rsatish ';
-  String accept = 'Qo\'llash';
+  String filter = 'Филтрлаш';
+
+  String showOperations = 'Операцияларни кўрсатиш';
+
+  String accept = 'Qo\'llash'; // ???
   String monday = 'Душанба';
   String tuesday = 'Сешанба куни';
   String wednesday = 'Чоршанба';
@@ -171,11 +195,16 @@ class UZ implements DefaultLanguage {
   String sunday = 'Якшанбалик';
   String today = 'Бугун-ниг';
   String city = 'Шаҳар';
-  String name = 'Шикаят.ном';
-  String example = 'бр Мисол';
+  String name = 'Исм';
+
+  String example = 'Мисол';
+
   String more = 'Кўпроқ';
+
   String less = 'Камроқ';
+
   String newPayment = 'Янги тўлов';
+
   String pending = 'Кутилаётганлар';
   String hours = 'Соат';
   String minutes = 'Дақиқа';
@@ -188,15 +217,13 @@ class UZ implements DefaultLanguage {
   String paymentsHistory = 'Тўловлар тарихи';
   String iAgree = "Фойдаланувчи шартномасини қабул қиламан";
   String transfersHistory = 'Трансферлар тарихи';
-  String reveicerPhone = 'Қабул қилувчи telefon';
+  String reveiverPhone = 'Қабул қилувчи telefon';
   String transferAmount = 'Ўтказма миқдори ъ';
   String infoAboutConfidentional = 'Махфийлик тўғрисидаги маълумотлар';
   String confidentionalAgreement =
       'Мижоз махфийликни сақлаш, рухсациз фойдаланишни олдини олиш ва унинг аутентификация маълумотларини учинчи шахсларнинг рухсациз киришидан ҳимоя қилиш учун мустақил равишда барча зарур чораларни кўришга мажбурдир. Мижоз ўзининг аутентификация маълумотларини ошкор қилмасликни ўз зиммасига олади: login, парол, ПИН-код учинчи шахсларга, яъни. аутентификация маълумотларини ўтказмаслик ва махфий маълумотларнинг хавфсизлиги ва маълумотларнинг тарқалиши учун, шунингдек аутентификация маълумотларини узатиш натижасида юзага келиши мумкин бўлган молиявий зарарлар учун мустақил равишда жавобгар еканлигини тасдиқлайди';
 
-  @override
-  String privacyPolicy;
+  String privacyPolicy = 'Хавфсизлик Сиёсати';
 
-  @override
-  String terms;
+  String terms = 'Фойдаланиш шартлари';
 }

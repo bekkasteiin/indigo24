@@ -11,6 +11,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_modal_action_widget.dart';
 import 'package:indigo24/widgets/video/flick_multi_manager.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -153,65 +154,54 @@ class _TapesPageState extends State<TapesPage>
   }
 
   _moreActions({dynamic data}) {
-    final act = CupertinoActionSheet(
-        title: Text('${Localization.language.selectOption}'),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: Text('${Localization.language.report}'),
-            onPressed: () {
-              Navigator.pop(context);
-              showAlertDialog(context, "Your complaint is being processed");
-            },
-          ),
-          CupertinoActionSheetAction(
-            isDestructiveAction: true,
-            child: Text('${Localization.language.hide}'),
-            onPressed: () async {
-              Navigator.pop(context);
-              MyTape tape = MyTape(
-                id: data['id'],
-              );
-
-              await _tapeDb.updateOrInsert(tape);
-
-              _tapesDatabaseData = await _tapeDb.getAll();
-              setState(() {
-                _tapesDatabaseData = _tapesDatabaseData;
-              });
-              showAlertDialog(
-                  context, "${data['title']} ${Localization.language.hide}");
-            },
-          ),
-          CupertinoActionSheetAction(
-            isDestructiveAction: true,
-            child: Text('${Localization.language.block}'),
-            onPressed: () async {
-              Navigator.pop(context);
-              MyTape tape = MyTape(
-                id: data['id'],
-                isBlocked: true,
-              );
-
-              await _tapeDb.updateOrInsert(tape);
-              _api.blockUser(data['customerId']);
-              _tapesDatabaseData = await _tapeDb.getAll();
-              setState(() {
-                _tapesDatabaseData = _tapesDatabaseData;
-              });
-              showAlertDialog(
-                  context, "${data['title']} ${Localization.language.block}");
-            },
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          child: Text('${Localization.language.back}'),
+    showIndigoBottomDialog(
+      context: context,
+      children: [
+        IndigoModalActionWidget(
           onPressed: () {
             Navigator.pop(context);
+            showAlertDialog(context, "Your complaint is being processed");
           },
-        ));
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act,
+          title: Localization.language.report,
+          isDefault: false,
+        ),
+        IndigoModalActionWidget(
+          onPressed: () async {
+            Navigator.pop(context);
+            MyTape tape = MyTape(
+              id: data['id'],
+            );
+            await _tapeDb.updateOrInsert(tape);
+            _tapesDatabaseData = await _tapeDb.getAll();
+            setState(() {
+              _tapesDatabaseData = _tapesDatabaseData;
+            });
+            showAlertDialog(
+                context, "${data['title']} ${Localization.language.hide}");
+          },
+          title: Localization.language.hide,
+        ),
+        IndigoModalActionWidget(
+          onPressed: () async {
+            Navigator.pop(context);
+            MyTape tape = MyTape(
+              id: data['id'],
+              isBlocked: true,
+            );
+
+            await _tapeDb.updateOrInsert(tape);
+            _api.blockUser(data['customerId']);
+            _tapesDatabaseData = await _tapeDb.getAll();
+            setState(() {
+              _tapesDatabaseData = _tapesDatabaseData;
+            });
+            showAlertDialog(
+                context, "${data['title']} ${Localization.language.block}");
+          },
+          title: Localization.language.block,
+          isDefault: false,
+        ),
+      ],
     );
   }
 

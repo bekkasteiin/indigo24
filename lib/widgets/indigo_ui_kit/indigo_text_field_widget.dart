@@ -31,7 +31,7 @@ class IndigoTextField extends StatelessWidget {
           BoxShadow(
             color: blackColor,
             blurRadius: 6,
-            spreadRadius: -6,
+            spreadRadius: -8,
             offset: Offset(0.0, 4.0),
           )
         ],
@@ -60,6 +60,9 @@ class IndigoTextField extends StatelessWidget {
             color: darkPrimaryColor,
           ),
           fillColor: whiteColor,
+        ),
+        style: TextStyle(
+          color: darkPrimaryColor,
         ),
         inputFormatters: inputFormatters,
         onChanged: onChangeCallback,

@@ -20,7 +20,7 @@ import 'package:indigo24/pages/chat/chat_pages/chats/chats.dart';
 import 'package:indigo24/pages/chat/chat_pages/chats/chats_element.dart';
 import 'package:indigo24/pages/profile/profile.dart';
 import 'package:indigo24/pages/tapes/tapes/tapes.dart';
-import 'package:indigo24/pages/wallet/wallet.dart';
+import 'package:indigo24/pages/wallet/wallet/wallet.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/helpers/message_type_helper.dart';
@@ -294,7 +294,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    api.getConfig();
     permissions();
     pushPermission();
     share();
@@ -332,6 +331,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     UserHelper userHelper = UserHelper();
     userHelper.setUser().then((result) async {
       _init();
+      api.getConfig();
+
       _connectivity.initialise();
       _connectivity.myStream.listen((source) {
         switch (source.keys.toList()[0]) {

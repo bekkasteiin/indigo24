@@ -5,10 +5,8 @@ import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:path/path.dart';
 
-class AppDatabase{
-
+class AppDatabase {
   static final AppDatabase _singleton = AppDatabase._();
-
 
   static AppDatabase get instance => _singleton;
 
@@ -40,7 +38,6 @@ class AppDatabase{
     final dbPath = join(appDocumentDir.path, 'StudentsDB.db');
 
     final database = await databaseFactoryIo.openDatabase(dbPath);
-
 
     // Any code awaiting the Completer's future will now start executing
     _dbOpenCompleter.complete(database);

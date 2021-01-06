@@ -73,10 +73,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             _isPlaying
                 ? InkWell(
@@ -95,19 +95,23 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                       height: 30,
                     ),
                   ),
-            Slider(
-              activeColor: primaryColor,
-              inactiveColor: greyColor,
-              onChanged: (v) {
-                final p = v * _duration.inMilliseconds;
-                _audioPlayer.seek(Duration(milliseconds: p.round()));
-              },
-              value: (_position != null &&
-                      _duration != null &&
-                      _position.inMilliseconds > 0 &&
-                      _position.inMilliseconds < _duration.inMilliseconds)
-                  ? _position.inMilliseconds / _duration.inMilliseconds
-                  : 0.0,
+            Expanded(
+              child: Container(
+                child: Slider(
+                  activeColor: primaryColor,
+                  inactiveColor: greyColor,
+                  onChanged: (v) {
+                    final p = v * _duration.inMilliseconds;
+                    _audioPlayer.seek(Duration(milliseconds: p.round()));
+                  },
+                  value: (_position != null &&
+                          _duration != null &&
+                          _position.inMilliseconds > 0 &&
+                          _position.inMilliseconds < _duration.inMilliseconds)
+                      ? _position.inMilliseconds / _duration.inMilliseconds
+                      : 0.0,
+                ),
+              ),
             ),
           ],
         ),
@@ -235,5 +239,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   void _onComplete() {
     setState(() => _playerState = PlayerState.stopped);
+  }
+}
+
+class CustomTrackShape extends RoundedRectSliderTrackShape {
+  Rect getPreferredRect({
+    @required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    @required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final double trackHeight = sliderTheme.trackHeight;
+    final double trackLeft = offset.dx;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final double trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }

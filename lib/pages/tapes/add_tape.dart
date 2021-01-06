@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_modal_action_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_text_field_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:indigo24/services/localization/localization.dart';
@@ -240,32 +242,26 @@ class _AddTapePageState extends State<AddTapePage> {
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
     }
-    final act = CupertinoActionSheet(
-        title: Text('${Localization.language.selectOption}'),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: Text('${Localization.language.camera}'),
-            onPressed: () {
-              _onImageButtonPressed(ImageSource.camera);
-              Navigator.pop(context);
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: Text('${Localization.language.gallery}'),
-            onPressed: () {
-              _onImageButtonPressed(ImageSource.gallery);
-              Navigator.pop(context);
-            },
-          )
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          child: Text('${Localization.language.back}'),
+
+    showIndigoBottomDialog(
+      context: context,
+      children: [
+        IndigoModalActionWidget(
           onPressed: () {
+            _onImageButtonPressed(ImageSource.camera);
             Navigator.pop(context);
           },
-        ));
-    showCupertinoModalPopup(
-        context: context, builder: (BuildContext context) => act);
+          title: Localization.language.camera,
+        ),
+        IndigoModalActionWidget(
+          onPressed: () {
+            _onImageButtonPressed(ImageSource.gallery);
+            Navigator.pop(context);
+          },
+          title: Localization.language.gallery,
+        ),
+      ],
+    );
   }
 
   void _onImageButtonPressed(ImageSource source) async {

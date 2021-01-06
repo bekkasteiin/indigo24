@@ -63,7 +63,7 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
             children: <Widget>[
               widget.chatType == 1
                   ? Container(
-                      padding: EdgeInsets.only(right: 5),
+                      padding: EdgeInsets.only(right: 2),
                       child: GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -291,32 +291,29 @@ class MessageActionElement extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         horizontal: 10,
       ),
-      child: Theme(
-        data: ThemeData(),
-        child: FlatButton(
-          highlightColor: primaryColor.withOpacity(0.1),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                icon,
-                size: 20,
+      child: FlatButton(
+        highlightColor: primaryColor.withOpacity(0.1),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              icon,
+              size: 20,
+              color: blackPurpleColor,
+            ),
+            Text('   '),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
                 color: blackPurpleColor,
               ),
-              Text('   '),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: blackPurpleColor,
-                ),
-              )
-            ],
-          ),
-          onPressed: callback,
+            )
+          ],
         ),
+        onPressed: callback,
       ),
     );
   }

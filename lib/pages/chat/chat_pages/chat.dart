@@ -12,7 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
 import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
 import 'package:indigo24/pages/chat/chat_widgets/message.dart';
-import 'package:indigo24/pages/chat/chat_widgets/message_categories/divider_message.dart';
+import 'package:indigo24/pages/chat/chat_widgets/message_types/date_message.dart';
 import 'package:indigo24/services/extensions/string_extension.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
@@ -24,6 +24,7 @@ import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
+import 'package:indigo24/widgets/indigo_ui_kit/indigo_modal_action_widget.dart';
 import 'package:indigo24/widgets/photo/full_photo.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/photo/preview.dart';
@@ -235,12 +236,10 @@ class _NewChatPageState extends State<ChatPage> {
             children: <Widget>[
               child,
               lastUnixDate.difference(DateTime.now()).inDays == 0
-                  ? DividerMessageWidget(
-                      child: Text('${Localization.language.today}'))
-                  : DividerMessageWidget(
-                      child: Text(
-                        '$lastUnixDate'.substring(0, 10).replaceAll('-', '.'),
-                      ),
+                  ? DateMessageWidget(text: Localization.language.today)
+                  : DateMessageWidget(
+                      text:
+                          '$lastUnixDate'.substring(0, 10).replaceAll('-', '.'),
                     ),
             ],
           );
@@ -761,6 +760,11 @@ class _NewChatPageState extends State<ChatPage> {
                                                       _messageController,
                                                   focusNode: myFocusNode,
                                                   decoration: InputDecoration(
+                                                    hintText: Localization
+                                                        .language.enterMessage,
+                                                    hintStyle: TextStyle(
+                                                      color: greyColor2,
+                                                    ),
                                                     border: InputBorder.none,
                                                     focusedBorder:
                                                         InputBorder.none,
@@ -1514,11 +1518,10 @@ class _NewChatPageState extends State<ChatPage> {
   }
 
   _cameraActions() {
-    final act = CupertinoActionSheet(
-      title: Text('${Localization.language.selectOption}'),
-      actions: <Widget>[
-        CupertinoActionSheetAction(
-          child: Text('${Localization.language.photo}'),
+    showIndigoBottomDialog(
+      context: context,
+      children: [
+        IndigoModalActionWidget(
           onPressed: () async {
             Navigator.pop(context);
             SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -1528,25 +1531,16 @@ class _NewChatPageState extends State<ChatPage> {
             }
             _getImage(ImageSource.camera);
           },
+          title: Localization.language.photo,
         ),
-        CupertinoActionSheetAction(
-          child: Text('${Localization.language.video}'),
-          onPressed: () async {
+        IndigoModalActionWidget(
+          onPressed: () {
             _getVideo(ImageSource.camera);
             Navigator.pop(context);
           },
+          title: Localization.language.video,
         ),
       ],
-      cancelButton: CupertinoActionSheetAction(
-        child: Text('${Localization.language.back}'),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act,
     );
   }
 
@@ -1645,11 +1639,10 @@ class _NewChatPageState extends State<ChatPage> {
   }
 
   _galleryActions() {
-    final act = CupertinoActionSheet(
-      title: Text('${Localization.language.selectOption}'),
-      actions: <Widget>[
-        CupertinoActionSheetAction(
-          child: Text('${Localization.language.photo}'),
+    showIndigoBottomDialog(
+      context: context,
+      children: [
+        IndigoModalActionWidget(
           onPressed: () async {
             SystemChannels.textInput.invokeMethod('TextInput.hide');
             FocusScopeNode currentFocus = FocusScope.of(context);
@@ -1659,25 +1652,16 @@ class _NewChatPageState extends State<ChatPage> {
             Navigator.pop(context);
             _getImage(ImageSource.gallery);
           },
+          title: Localization.language.photo,
         ),
-        CupertinoActionSheetAction(
-          child: Text('${Localization.language.video}'),
-          onPressed: () async {
+        IndigoModalActionWidget(
+          onPressed: () {
             _getVideo(ImageSource.gallery);
             Navigator.pop(context);
           },
+          title: Localization.language.video,
         ),
       ],
-      cancelButton: CupertinoActionSheetAction(
-        child: Text('${Localization.language.back}'),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-    );
-    showCupertinoModalPopup(
-      context: context,
-      builder: (BuildContext context) => act,
     );
   }
 }
