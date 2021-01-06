@@ -18,14 +18,7 @@ class IndigoBottomNav extends StatelessWidget {
       child: Container(
         height: 55,
         decoration: BoxDecoration(
-          color: whiteColor,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: Colors.black,
-              offset: Offset(-10, 6),
-              blurRadius: 10,
-            ),
-          ],
+          color:whiteColor,
         ),
         child: TabBar(
           indicatorPadding: EdgeInsets.all(1),

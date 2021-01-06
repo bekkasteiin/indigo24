@@ -74,6 +74,8 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
           "${Localization.language.historyBalance}",
           style: TextStyle(
             fontSize: 22,
+                        color: blackPurpleColor,
+
             fontWeight: FontWeight.w400,
           ),
           textAlign: TextAlign.center,
