@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/main.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -575,6 +575,10 @@ class ChatRoom {
             case "message:create":
               mainS.add(SocketEvent(json));
               if (chatS != null) chatS.add(SocketEvent(json));
+              if (chatsS != null && !chatsS.isClosed) {
+                chatsS.add(SocketEvent(json));
+              }
+
               break;
             case "chat:message:by:type":
               if (infoS != null) {

@@ -6,6 +6,7 @@ import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/document/download_manager.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 
 class PDFViewer extends StatefulWidget {
@@ -46,7 +47,7 @@ class _PDFViewerState extends State<PDFViewer> {
                 padding: EdgeInsets.all(10),
                 child: Image(
                   image: AssetImage(
-                    'assets/images/back.png',
+                    '${assetsPath}back.png',
                   ),
                 ),
               ),
@@ -71,7 +72,7 @@ class _PDFViewerState extends State<PDFViewer> {
                   height: 20,
                   width: 20,
                   child: Image.asset(
-                    "assets/images/download_black.png",
+                    "${assetsPath}download_black.png",
                     width: 20,
                   ),
                 ),

@@ -3,20 +3,18 @@ import 'package:app_settings/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/db/contacts_db.dart';
+import 'package:indigo24/services/db/contact/contacts_repo.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
+import 'package:indigo24/services/helpers/contacts.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 import 'chat.dart';
-
-var contacts = [];
 
 class ChatContactsPage extends StatefulWidget {
   @override
@@ -37,7 +35,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
     super.initState();
     _actualList.addAll(myContacts);
     _listen();
-    getContacts(context).then((getContactsResult) {
+    IndigoContacts.getContacts().then((getContactsResult) {
       var result = getContactsResult is List ? false : !getContactsResult;
       if (result) {
         showIndigoDialog(
@@ -142,29 +140,13 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
 
   _search(String query) {
     if (query.isNotEmpty) {
-      List<dynamic> matches = List<dynamic>();
-      myContacts.forEach((item) {
-        if (item.name != null && item.phone != null) {
-          if (item.name
-                  .toString()
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              item.phone
-                  .toString()
-                  .toLowerCase()
-                  .contains(query.toLowerCase())) {
-            matches.add(item);
-          }
-        }
-      });
       setState(() {
-        _actualList = [];
-        _actualList.addAll(matches);
+        _actualList.clear();
+        _actualList.addAll(IndigoContacts.search(query));
       });
-      return;
     } else {
       setState(() {
-        _actualList = [];
+        _actualList.clear();
         _actualList.addAll(myContacts);
       });
     }
@@ -197,7 +179,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
                 width: 20,
                 child: Image(
                   image: AssetImage(
-                    'assets/images/refresh.png',
+                    '${assetsPath}refresh.png',
                   ),
                 ),
               ),
@@ -205,7 +187,7 @@ class _ChatContactsPageState extends State<ChatContactsPage> {
               color: blackPurpleColor,
               onPressed: () async {
                 _boolForPrevenceUserCheck = false;
-                await getContactsTemplate(context);
+                await IndigoContacts.getContactsTemplate(context);
                 await _contactsDB.getAll().then((value) {
                   myContacts = value;
                   setState(() {

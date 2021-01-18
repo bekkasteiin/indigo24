@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/models/transfer_model.dart';
+import 'package:indigo24/pages/wallet/transfers/transfer_model.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -211,8 +211,8 @@ class Voucher extends StatelessWidget {
                                   Container(
                                     child: Image.asset(
                                       '${transferModel.type}' == 'in'
-                                          ? 'assets/images/replyTransfer.png'
-                                          : 'assets/images/repeat.png',
+                                          ? '${assetsPath}replyTransfer.png'
+                                          : '${assetsPath}repeat.png',
                                       width: 20,
                                       height: 20,
                                     ),
@@ -246,7 +246,7 @@ class Voucher extends StatelessWidget {
                                 children: <Widget>[
                                   Container(
                                     child: Image.asset(
-                                      'assets/images/share.png',
+                                      '${assetsPath}share.png',
                                       width: 20,
                                       height: 20,
                                     ),

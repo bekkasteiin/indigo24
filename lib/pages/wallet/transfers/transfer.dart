@@ -4,8 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/main.dart';
-import 'package:indigo24/pages/wallet/transfers/transfer_draggrable.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
+import 'package:indigo24/pages/wallet/transfers/transfer_contacts.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -108,7 +108,7 @@ class _TransferPageState extends State<TransferPage> {
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image:
-                                  AssetImage('assets/images/wallet_header.png'),
+                                  AssetImage('${assetsPath}wallet_header.png'),
                               fit: BoxFit.fitWidth,
                             ),
                           ),
@@ -125,7 +125,7 @@ class _TransferPageState extends State<TransferPage> {
                                     padding: EdgeInsets.all(10),
                                     child: Image(
                                       image: AssetImage(
-                                        'assets/images/backWhite.png',
+                                        '${assetsPath}backWhite.png',
                                       ),
                                     ),
                                   ),
@@ -170,7 +170,7 @@ class _TransferPageState extends State<TransferPage> {
                                               ),
                                               Image(
                                                 image: AssetImage(
-                                                    "assets/images/tenge.png"),
+                                                    "${assetsPath}tenge.png"),
                                                 height: 12,
                                                 width: 12,
                                               ),
@@ -196,7 +196,7 @@ class _TransferPageState extends State<TransferPage> {
                           ),
                           color: whiteColor,
                           child: TextField(
-                            style: TextStyle(color: greyColor),
+                            style: TextStyle(color: blackPurpleColor),
                             decoration: InputDecoration(
                               hintStyle: TextStyle(color: greyColor),
                               hintText: Localization.language.enterMessage,
@@ -496,6 +496,7 @@ class _TransferPageState extends State<TransferPage> {
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Expanded(
                       flex: 3,
@@ -503,6 +504,9 @@ class _TransferPageState extends State<TransferPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
+                          SizedBox(
+                            height: 10,
+                          ),
                           Container(
                             child: Text(
                               '${Localization.language.reveiverPhone}',
@@ -511,6 +515,14 @@ class _TransferPageState extends State<TransferPage> {
                               ),
                             ),
                           ),
+                          if (toName != "")
+                            Text(
+                              '$toName',
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(
+                                color: greyColor,
+                              ),
+                            ),
                           SizedBox(
                             height: 10,
                           ),
@@ -529,7 +541,10 @@ class _TransferPageState extends State<TransferPage> {
                                 ),
                               ),
                               controller: receiverController,
-                              style: TextStyle(fontSize: 18),
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: blackPurpleColor,
+                              ),
                               onChanged: (value) {
                                 setState(() {
                                   toName = '';
@@ -555,6 +570,9 @@ class _TransferPageState extends State<TransferPage> {
                                 }
                               },
                             ),
+                          ),
+                          SizedBox(
+                            height: 10,
                           ),
                         ],
                       ),
@@ -585,8 +603,7 @@ class _TransferPageState extends State<TransferPage> {
                               dynamic returnData = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      TransferContactsDialogPage(),
+                                  builder: (context) => TransferContacts(),
                                 ),
                               );
                               if (returnData != null) {
@@ -611,17 +628,10 @@ class _TransferPageState extends State<TransferPage> {
                               }
                             },
                           ),
-                          Text(
-                            '$toName',
-                            textAlign: TextAlign.justify,
-                          )
                         ],
                       ),
                     ),
                   ],
-                ),
-                SizedBox(
-                  height: 10,
                 ),
                 Container(
                   height: 1.0,
@@ -660,7 +670,10 @@ class _TransferPageState extends State<TransferPage> {
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: blackPurpleColor,
+                        ),
                         onChanged: (value) {
                           if (sumController.text[0] == '0') {
                             sumController.clear();

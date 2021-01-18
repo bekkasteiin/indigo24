@@ -5,6 +5,7 @@ import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/document/download_manager.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/document/pdf_viewer.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
@@ -44,7 +45,7 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
               height: 20,
               width: 20,
               child: Image.asset(
-                "assets/images/download_black.png",
+                "${assetsPath}download_black.png",
                 width: 20,
               ),
             ),
@@ -120,7 +121,7 @@ class _SettingsTermsPageState extends State<SettingsTermsPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Image.asset(
-                          "assets/images/pdf.png",
+                          "${assetsPath}pdf.png",
                           width: 40,
                           height: 40,
                         ),

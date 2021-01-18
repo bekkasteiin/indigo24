@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/services/helpers/contacts.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
@@ -58,8 +58,6 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
           if (e.json["data"]["status"].toString() == "true") {
             var name = e.json["data"]["chat_name"];
             var chatID = e.json["data"]["chat_id"];
-            // ChatRoom.shared.setChatStream();
-            // ChatRoom.shared.getMessages(chatID);
             Navigator.pop(context);
             Navigator.push(
               context,
@@ -72,7 +70,7 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
                   chatType: e.json['data']['type'],
                 ),
               ),
-            ).whenComplete(() {});
+            );
           } else {}
           break;
 
@@ -83,17 +81,9 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
 
   void _search(String query) {
     if (query.isNotEmpty) {
-      List<dynamic> matches = List<dynamic>();
-      myContacts.forEach((item) {
-        if (item.name.toLowerCase().contains(query.toLowerCase()) ||
-            item.phone.toLowerCase().contains(query.toLowerCase())) {
-          matches.add(item);
-        }
-      });
-
       setState(() {
         _actualList.clear();
-        _actualList.addAll(matches);
+        _actualList.addAll(IndigoContacts.search(query));
       });
     } else {
       setState(() {
@@ -135,12 +125,19 @@ class _ChatGroupSelectionState extends State<ChatGroupSelection> {
 
                     var ownUser = _selectedsList[0];
                     _selectedsList.removeAt(0);
+
                     _selectedsList.forEach((element) {
                       userIds += '${element['user_id']}' + ',';
                     });
+
                     userIds = userIds.substring(0, userIds.length - 1);
-                    ChatRoom.shared.cabinetCreate(userIds, 1,
-                        title: _titleController.text);
+
+                    ChatRoom.shared.cabinetCreate(
+                      userIds,
+                      1,
+                      title: _titleController.text,
+                    );
+
                     setState(() {
                       _selectedsList.clear();
                       _selectedsList.add(ownUser);

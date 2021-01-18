@@ -9,7 +9,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/services/shared_preference/helper.dart';
+import 'package:indigo24/services/shared_preference/shared_strings.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
@@ -20,7 +21,7 @@ import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-import '../../main.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   @override
@@ -99,7 +100,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             } else {
               if (r["success"]) {
                 await SharedPreferencesHelper.setString(
-                    'avatar', '${r["fileName"]}');
+                    SharedStrings.avatar, '${r["fileName"]}');
                 setState(() {
                   user.avatar = r["fileName"];
                 });
@@ -165,11 +166,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         user.city = _cityController.text;
 
                         SharedPreferencesHelper.setString(
-                          'name',
+                          SharedStrings.name,
                           _nameController.text,
                         );
                         SharedPreferencesHelper.setString(
-                          'city',
+                          SharedStrings.city,
                           _cityController.text,
                         );
 
@@ -241,7 +242,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Image.asset(
-                                    "assets/images/fromCamera.png",
+                                    "${assetsPath}fromCamera.png",
                                     width: 50,
                                   ),
                                   SizedBox(width: 10),
@@ -262,7 +263,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Image.asset(
-                                    "assets/images/fromGallery.png",
+                                    "${assetsPath}fromGallery.png",
                                     width: 50,
                                   ),
                                   SizedBox(width: 10),

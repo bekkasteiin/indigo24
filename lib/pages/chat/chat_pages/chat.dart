@@ -84,8 +84,8 @@ class _NewChatPageState extends State<ChatPage> {
   List toForwardMessages;
   String _onlineString;
   ItemScrollController _itemScrollController = ItemScrollController();
-  final bgChat = AssetImage("assets/images/background_chat.png");
-  final bgChat2 = AssetImage("assets/images/background_chat_2.png");
+  final bgChat = AssetImage("${assetsPath}background_chat.png");
+  final bgChat2 = AssetImage("${assetsPath}background_chat_2.png");
 
   @override
   void didChangeDependencies() {
@@ -121,7 +121,6 @@ class _NewChatPageState extends State<ChatPage> {
       _recordFilePath = await _getAudioFilePath();
       _isRecording = true;
 
-      print("RECORD FILE PATH $_recordFilePath");
       _dependencies.stopwatch.start();
 
       RecordMp3.instance.start(_recordFilePath, (type) {
@@ -912,7 +911,7 @@ class _NewChatPageState extends State<ChatPage> {
                                             height: 45,
                                             width: 45,
                                             child: Image.asset(
-                                              'assets/images/microphone.png',
+                                              '${assetsPath}microphone.png',
                                             ),
                                           ),
                                         )
@@ -1350,7 +1349,7 @@ class _NewChatPageState extends State<ChatPage> {
                                     height: 40,
                                     child: Image(
                                       image: AssetImage(
-                                        'assets/images/cameraPurple.png',
+                                        '${assetsPath}cameraPurple.png',
                                       ),
                                     ),
                                   ),
@@ -1390,7 +1389,7 @@ class _NewChatPageState extends State<ChatPage> {
                                     height: 40,
                                     child: Image(
                                       image: AssetImage(
-                                        'assets/images/money.png',
+                                        '${assetsPath}money.png',
                                       ),
                                     ),
                                   ),
@@ -1439,7 +1438,7 @@ class _NewChatPageState extends State<ChatPage> {
                                     height: 40,
                                     child: Image(
                                       image: AssetImage(
-                                        'assets/images/gallery.png',
+                                        '${assetsPath}gallery.png',
                                       ),
                                     ),
                                   ),
@@ -1479,7 +1478,7 @@ class _NewChatPageState extends State<ChatPage> {
                                     height: 40,
                                     child: Image(
                                       image: AssetImage(
-                                        'assets/images/files.png',
+                                        '${assetsPath}files.png',
                                       ),
                                     ),
                                   ),

@@ -4,6 +4,7 @@ import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
 import 'package:indigo24/pages/chat/chat_widgets/message_category.dart';
 import 'package:indigo24/pages/chat/chat_widgets/message_frame.dart';
 import 'package:indigo24/pages/chat/chat_widgets/message_types/text_message.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
@@ -94,8 +95,8 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                     fit: BoxFit.fitWidth,
                     image: AssetImage(
                       user.chatBackground == 'ligth'
-                          ? "assets/images/background_chat.png"
-                          : "assets/images/background_chat_2.png",
+                          ? "${assetsPath}background_chat.png"
+                          : "${assetsPath}background_chat_2.png",
                     ),
                   ),
                 ),
@@ -154,7 +155,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                           image: DecorationImage(
                             fit: BoxFit.fitWidth,
                             image: AssetImage(
-                              "assets/images/background_chat.png",
+                              "${assetsPath}background_chat.png",
                             ),
                           ),
                         ),
@@ -180,7 +181,7 @@ class _SettingsDecorPageState extends State<SettingsDecorPage> {
                           image: DecorationImage(
                             fit: BoxFit.fitWidth,
                             image: AssetImage(
-                              "assets/images/background_chat_2.png",
+                              "${assetsPath}background_chat_2.png",
                             ),
                           ),
                         ),

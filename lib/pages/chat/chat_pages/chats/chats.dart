@@ -8,6 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
 import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
@@ -84,7 +85,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
               width: 20,
               child: Image(
                 image: AssetImage(
-                  'assets/images/group.png',
+                  '${assetsPath}group.png',
                 ),
               ),
             ),
@@ -105,7 +106,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                 width: 20,
                 child: Image(
                   image: AssetImage(
-                    'assets/images/contacts.png',
+                    '${assetsPath}contacts.png',
                   ),
                 ),
               ),
@@ -184,8 +185,8 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                                   child: Center(
                                     child: Image.asset(
                                       numbers.elementAt(i).isMuted == true
-                                          ? 'assets/images/muteChat.png'
-                                          : 'assets/images/unmuteChat.png',
+                                          ? '${assetsPath}muteChat.png'
+                                          : '${assetsPath}unmuteChat.png',
                                       width: 20,
                                       height: 20,
                                     ),
@@ -205,7 +206,7 @@ class _TestChatsListPageState extends State<TestChatsListPage>
                                 iconWidget: Container(
                                   child: Center(
                                     child: Image.asset(
-                                      'assets/images/deleteChat.png',
+                                      '${assetsPath}deleteChat.png',
                                       width: 20,
                                       height: 20,
                                     ),
@@ -363,7 +364,9 @@ class _TestChatsListPageState extends State<TestChatsListPage>
               int.parse(data['chat_id'].toString()), updatedChatValue);
 
           break;
-
+        case "message:create":
+          ChatRoom.shared.forceGetChat();
+          break;
         default:
           print("default in chats list ${e.json}");
           break;

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
+import 'package:indigo24/services/helpers/contacts.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/style/colors.dart';
-import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_search_widget.dart';
 
@@ -77,16 +77,9 @@ class _ChatMembersSelectionState extends State<ChatMembersSelection> {
 
   void _search(String query) {
     if (query.isNotEmpty) {
-      List<dynamic> matches = List<dynamic>();
-      myContacts.forEach((item) {
-        if (item.name.toLowerCase().contains(query.toLowerCase()) ||
-            item.phone.toLowerCase().contains(query.toLowerCase())) {
-          matches.add(item);
-        }
-      });
       setState(() {
         _actualList.clear();
-        _actualList.addAll(matches);
+        _actualList.addAll(IndigoContacts.search(query));
       });
     } else {
       setState(() {

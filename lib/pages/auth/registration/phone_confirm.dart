@@ -235,7 +235,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                     borderRadius: 10.0,
                     color: primaryColor,
                     onPressed: () async {
-                      //@TODO REMOVE CONDITION
                       if (_smsController.text.isNotEmpty) {
                         await _api
                             .checkSms(widget.phone, _smsController.text)
@@ -256,17 +255,6 @@ class _PhoneConfirmPageState extends State<PhoneConfirmPage> {
                               smsError = checkSmsResponse['message'];
                             });
                           }
-                          // if (r != true) {
-                          //   Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) =>
-                          //           UserRegistrationPage(widget.phone),
-                          //     ),
-                          //   );
-                          // } else {
-                          //   _showError(context, '$r');
-                          // }
                         });
                       } else {
                         setState(() {

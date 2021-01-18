@@ -1,11 +1,11 @@
+import 'package:indigo24/services/constants.dart';
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indigo24/main.dart';
 import 'package:indigo24/pages/wallet/balance_history/balance_history.dart';
-import 'package:indigo24/pages/wallet/payments/payments_category.dart';
+import 'package:indigo24/pages/wallet/payments/paymnets_category/payments_category.dart';
 import 'package:indigo24/pages/wallet/refill/refill.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer_list.dart';
 import 'package:indigo24/pages/wallet/wallet/symbol/symbol_interface.dart';
@@ -13,6 +13,7 @@ import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/style/fonts.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/pin/pin_code.dart';
 import 'package:polygon_clipper/polygon_border.dart';
@@ -98,7 +99,6 @@ class _WalletTabState extends State<WalletTab> {
     super.initState();
   }
 
-  @override
   void dispose() {
     _api.getBalance();
     _verificationNotifier.close();
@@ -205,8 +205,7 @@ class _WalletTabState extends State<WalletTab> {
                       Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image:
-                                AssetImage("assets/images/wallet_header.png"),
+                            image: AssetImage("${assetsPath}wallet_header.png"),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -313,8 +312,7 @@ class _WalletTabState extends State<WalletTab> {
             height: 15,
             child: FittedBox(
               child: Image(
-                image:
-                    AssetImage("assets/images/${globalSymbol.symbolTitle}.png"),
+                image: AssetImage("$assetsPath${globalSymbol.symbolTitle}.png"),
                 height: 15,
                 width: 15,
               ),
@@ -341,7 +339,7 @@ class _WalletTabState extends State<WalletTab> {
             ),
           ),
           Image(
-            image: AssetImage("assets/images/tenge.png"),
+            image: AssetImage("${assetsPath}tenge.png"),
             height: 15,
             width: 15,
           ),
@@ -386,7 +384,7 @@ class _WalletTabState extends State<WalletTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Image(
-                  image: AssetImage("assets/images/balanceHistory.png"),
+                  image: AssetImage("${assetsPath}balanceHistory.png"),
                   height: 40,
                   width: 40,
                 ),
@@ -442,7 +440,7 @@ class _WalletTabState extends State<WalletTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Image(
-                  image: AssetImage("assets/images/transfers.png"),
+                  image: AssetImage("${assetsPath}transfers.png"),
                   height: 40,
                 ),
                 Text(
@@ -503,7 +501,7 @@ class _WalletTabState extends State<WalletTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Image(
-                  image: AssetImage("assets/images/payments.png"),
+                  image: AssetImage("${assetsPath}payments.png"),
                   height: 40,
                 ),
                 Text(
@@ -542,7 +540,7 @@ class _WalletTabState extends State<WalletTab> {
           style: fS26(c: 'ffffff'),
         ),
         Image(
-          image: AssetImage("assets/images/${globalSymbol.symbolTitle}.png"),
+          image: AssetImage("$assetsPath${globalSymbol.symbolTitle}.png"),
           height: 25,
           width: 25,
         ),
@@ -576,7 +574,7 @@ class _WalletTabState extends State<WalletTab> {
                 style: fS26w200(c: 'ffffff'),
               ),
               Image(
-                image: AssetImage("assets/images/tenge.png"),
+                image: AssetImage("${assetsPath}tenge.png"),
                 height: 24,
                 width: 24,
               ),
@@ -717,7 +715,7 @@ class _WalletTabState extends State<WalletTab> {
           ),
         ),
         child: Image(
-          image: AssetImage("assets/images/${symbol.symbolTitle}.png"),
+          image: AssetImage("$assetsPath${symbol.symbolTitle}.png"),
           height: 15,
           width: 15,
         ),

@@ -4,6 +4,7 @@ import 'package:indigo24/pages/profile/settings/settings_language.dart';
 import 'package:indigo24/pages/profile/settings/settings_notifications_main.dart';
 import 'package:indigo24/pages/profile/settings/settings_sound.dart';
 import 'package:indigo24/pages/profile/settings/settings_terms.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
@@ -125,6 +126,19 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                         },
                         title: Localization.language.sound,
                       ),
+                      // _settingsRow(
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => SettingsCachePage(),
+                      //       ),
+                      //     ).whenComplete(
+                      //       () => setState(() {}),
+                      //     );
+                      //   },
+                      //   title: "КЭШ",
+                      // ),
                     ],
                   ),
                 ),
@@ -190,7 +204,7 @@ class _SettingsMainPageState extends State<SettingsMainPage> {
                         margin: EdgeInsets.only(right: 10),
                         child: Image(
                           image: AssetImage(
-                            'assets/images/forward.png',
+                            '${assetsPath}forward.png',
                           ),
                           width: 15,
                           height: 15,

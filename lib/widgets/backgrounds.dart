@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/constants.dart';
 
-//
-const ImageProvider previewBackgoundProvider =
-    AssetImage("assets/images/preview_background.png");
+ImageProvider previewBackgoundProvider =
+    AssetImage("${assetsPath}preview_background.png");
 
-const ImageProvider introBackgroundProvider =
-    AssetImage("assets/images/background_login.png");
+ImageProvider introBackgroundProvider =
+    AssetImage("${assetsPath}background_login.png");

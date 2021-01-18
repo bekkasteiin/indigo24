@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'transfer.dart';
 import 'transfer_history.dart';
@@ -40,7 +41,7 @@ class _TransferListPageState extends State<TransferListPage> {
               padding: EdgeInsets.all(5),
               child: Image(
                 image: AssetImage(
-                  'assets/images/history.png',
+                  '${assetsPath}history.png',
                 ),
               ),
             ),
@@ -117,7 +118,7 @@ class _TransferListPageState extends State<TransferListPage> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: Image.asset(
-                      'assets/images/indigo24Logo.png',
+                      '${assetsPath}indigo24Logo.png',
                       width: 30.0,
                       height: 30,
                     ),

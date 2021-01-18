@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/widgets/video_player_widget.dart';
+import 'package:indigo24/widgets/video/video_player_widget.dart';
 
 class VideoMessageWidget extends StatefulWidget {
   final String text;

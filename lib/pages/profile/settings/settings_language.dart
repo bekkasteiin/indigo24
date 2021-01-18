@@ -46,11 +46,11 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                     child: InkWell(
                       onTap: () {
                         Localization.setLanguage(
-                            Localization.languages[index]['code']);
+                            Localization.languages[index].code);
                         setState(
                           () {
                             Localization.language.currentLanguage =
-                                '${Localization.languages[index]['title']}';
+                                '${Localization.languages[index].title}';
                           },
                         );
                       },
@@ -65,7 +65,7 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              '${Localization.languages[index]['title']}',
+                              '${Localization.languages[index].title}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
@@ -73,7 +73,7 @@ class _SettingsLanguagePageState extends State<SettingsLanguagePage> {
                               ),
                             ),
                             Localization.language.currentLanguage ==
-                                    '${Localization.languages[index]['title']}'
+                                    '${Localization.languages[index].title}'
                                 ? Icon(
                                     Icons.done,
                                     color: darkPrimaryColor,

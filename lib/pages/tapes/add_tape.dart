@@ -6,7 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indigo24/main.dart';
+import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
@@ -90,7 +91,7 @@ class _AddTapePageState extends State<AddTapePage> {
                 padding: EdgeInsets.all(5),
                 child: Image(
                   image: AssetImage(
-                    'assets/images/add.png',
+                    '${assetsPath}add.png',
                   ),
                 ),
               ),
@@ -194,7 +195,7 @@ class _AddTapePageState extends State<AddTapePage> {
                   _action();
                 },
                 heroTag: 'image',
-                child: Image.asset("assets/images/camera.png", width: 30),
+                child: Image.asset("${assetsPath}camera.png", width: 30),
               ),
             ),
             Padding(
@@ -206,7 +207,7 @@ class _AddTapePageState extends State<AddTapePage> {
                   _action();
                 },
                 heroTag: 'video',
-                child: Image.asset("assets/images/video.png", width: 30),
+                child: Image.asset("${assetsPath}video.png", width: 30),
               ),
             ),
           ],

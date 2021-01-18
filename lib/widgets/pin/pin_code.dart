@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:vibration/vibration.dart';
 
@@ -118,8 +119,8 @@ class _PasscodeScreenState extends State<PasscodeScreen>
             image:
                 // user.chatBackground == 'ligth' //
                 // ?
-                AssetImage("assets/images/mainBack.png")
-            // : AssetImage("assets/images/background_chat_2.png"),
+                AssetImage("${assetsPath}mainBack.png")
+            // : AssetImage("${assetsPath}background_chat_2.png"),
             ),
       );
 

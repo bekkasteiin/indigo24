@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:app_settings/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +13,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
 import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
 import 'package:indigo24/pages/chat/chat_pages/chat.dart';
-import 'package:indigo24/pages/chat/chat_pages/chat_contacts.dart';
 import 'package:indigo24/pages/chat/chat_pages/chats/chats.dart';
 import 'package:indigo24/pages/chat/chat_pages/chats/chats_element.dart';
 import 'package:indigo24/pages/profile/profile.dart';
-import 'package:indigo24/pages/tapes/tapes/tapes.dart';
+import 'package:indigo24/pages/tapes/tapes_widgets/tapes.dart';
 import 'package:indigo24/pages/wallet/wallet/wallet.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/services/helpers/contacts.dart';
 import 'package:indigo24/services/helpers/message_type_helper.dart';
 import 'package:indigo24/services/helpers/user_helper.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
@@ -36,8 +34,9 @@ import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import '../../db/contact.dart';
-import '../../db/contacts_db.dart';
+import 'package:indigo24/services/db/contact/contact_model.dart';
+import 'package:indigo24/services/db/contact/contacts_repo.dart';
+
 import '../../services/my_connectivity.dart';
 import 'indigo_bottom_nav.dart';
 
@@ -46,80 +45,8 @@ class Tabs extends StatefulWidget {
   _TabsState createState() => _TabsState();
 }
 
-List<MyContact> myContacts = [];
 bool closeMainChat = false;
 bool isInAppPushActive = false;
-String _formatPhone(String phone) {
-  String r = phone.replaceAll(" ", "");
-  r = r.replaceAll("(", "");
-  r = r.replaceAll(")", "");
-  r = r.replaceAll("+", "");
-  r = r.replaceAll("-", "");
-  if (r.startsWith("8")) {
-    r = r.replaceFirst("8", "7");
-  }
-  return r;
-}
-
-getContactsTemplate(context) async {
-  return await getContacts(context).then((getContactsResult) {
-    var result = getContactsResult is List ? false : !getContactsResult;
-
-    for (int i = 0; i < getContactsResult.length; i++) {
-      ChatRoom.shared.userCheck(getContactsResult[i]['phone']);
-    }
-
-    if (result) {
-      showIndigoDialog(
-        context: context,
-        builder: CustomDialog(
-          description: Localization.language.allowContacts,
-          yesCallBack: () {
-            Navigator.pop(context);
-            AppSettings.openAppSettings();
-          },
-          noCallBack: () {
-            Navigator.pop(context);
-          },
-        ),
-      );
-    }
-  });
-}
-
-getContacts(context) async {
-  try {
-    contacts.clear();
-    if (await Permission.contacts.request().isGranted) {
-      Iterable<Contact> phonebook =
-          await ContactsService.getContacts(withThumbnails: false);
-      if (phonebook != null) {
-        phonebook.forEach((el) {
-          if (el.displayName != null) {
-            el.phones.forEach((phone) {
-              if (!contacts.contains(_formatPhone(phone.value))) {
-                phone.value = _formatPhone(phone.value);
-                if (contacts.every((user) => user['phone'] != phone.value)) {
-                  contacts.add({
-                    'name': el.displayName,
-                    'phone': phone.value,
-                    'label': phone.label,
-                  });
-                }
-              }
-            });
-          }
-        });
-      }
-      return contacts.toSet().toList();
-    } else {
-      return false;
-    }
-  } catch (_) {
-    print(_);
-    return "disconnect";
-  }
-}
 
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   TabController _tabController;
@@ -228,6 +155,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
 
     bool isValid = '${user.pin}' == enteredPasscode;
+
     if (isValid) {
       Future.delayed(const Duration(milliseconds: 250), () {
         _verificationNotifier.add(isValid);
@@ -236,22 +164,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     } else {
       _verificationNotifier.add(isValid);
     }
-  }
-
-  _showLockScreen(BuildContext context, String title, {bool withPin}) {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => PasscodeScreen(
-          title: title,
-          withPin: withPin,
-          passwordEnteredCallback: _onPasscodeEntered,
-          shouldTriggerVerification: _verificationNotifier.stream,
-          backgroundColor: milkWhiteColor,
-          cancelCallback: _onPasscodeCancelled,
-        ),
-      ),
-    );
   }
 
   _onPasscodeCancelled() {
@@ -265,10 +177,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
   }
 
-  permissionForPush() async {
-    await Permission.notification.request();
-  }
-
   permissions() async {
     if (!await Permission.microphone.isGranted) {
       PermissionStatus status = await Permission.microphone.request();
@@ -276,7 +184,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         return false;
       }
     }
-    permissionForPush();
+    await Permission.notification.request();
   }
 
   pushPermission() async {
@@ -286,10 +194,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         return false;
       }
     }
-  }
-
-  getUserSettings() {
-    ChatRoom.shared.getUserSettings();
   }
 
   @override
@@ -309,10 +213,19 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
     Timer.run(() {
       '${user.pin}' == 'false'
-          ? _showLockScreen(
+          ? Navigator.push(
               context,
-              '${Localization.language.createPin}',
-              withPin: false,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    PasscodeScreen(
+                  title: Localization.language.createPin,
+                  withPin: false,
+                  passwordEnteredCallback: _onPasscodeEntered,
+                  shouldTriggerVerification: _verificationNotifier.stream,
+                  backgroundColor: milkWhiteColor,
+                  cancelCallback: _onPasscodeCancelled,
+                ),
+              ),
             )
           : Text('');
     });
@@ -346,7 +259,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             break;
         }
       });
-      getContactsTemplate(context);
+      IndigoContacts.getContactsTemplate(context);
       setState(() {});
     });
     super.initState();
@@ -356,7 +269,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     ChatRoom.shared.connect(context);
     _listen();
     ChatRoom.shared.init();
-    getUserSettings();
+    ChatRoom.shared.getUserSettings();
   }
 
   inAppPush(m) {
@@ -488,7 +401,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         builder: (BuildContext context) {
           return CupertinoActionSheet(
             title: Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(5),
               child: Material(
                 color: transparentColor,
                 child: Row(
@@ -507,7 +420,18 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
                               ),
                     Container(width: 10),
                     Flexible(
-                      child: TextField(),
+                      child: TextField(
+                        textCapitalization: TextCapitalization.sentences,
+                        maxLines: 6,
+                        minLines: 1,
+                        decoration: InputDecoration(
+                          hintText: Localization.language.enterMessage,
+                          hintStyle: TextStyle(
+                            color: greyColor2,
+                          ),
+                          contentPadding: EdgeInsets.all(0),
+                        ),
+                      ),
                     )
                   ],
                 ),

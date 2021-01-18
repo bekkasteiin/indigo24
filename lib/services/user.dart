@@ -1,4 +1,4 @@
-bool identified = false;
+int identified = 0;
 
 String id = "";
 String avatar = "";
@@ -14,4 +14,6 @@ String country = '';
 String city = '';
 String avatarUrl = "https://indigo24.com/uploads/avatars/";
 String sound = 'message_in.mp3';
+String version = '0';
+
 Map<String, dynamic> settings;

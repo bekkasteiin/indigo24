@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/main.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/models/transfer_model.dart';
+import 'package:indigo24/pages/wallet/transfers/transfer_model.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/alerts/voucher.dart';
@@ -10,6 +10,7 @@ import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import '../filter.dart';
+import 'package:indigo24/services/constants.dart';
 import 'transfer.dart';
 
 class TransferHistoryPage extends StatefulWidget {
@@ -116,7 +117,7 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                       children: <Widget>[
                         Container(
                           child: Image.asset(
-                            'assets/images/filter.png',
+                            '${assetsPath}filter.png',
                             width: 20,
                             height: 20,
                           ),
@@ -228,8 +229,8 @@ class _TransferHistoryPageState extends State<TransferHistoryPage> {
                 Padding(
                   padding: EdgeInsets.all(8),
                   child: type == 'in'
-                      ? Image.asset('assets/images/in.png')
-                      : Image.asset('assets/images/out.png'),
+                      ? Image.asset('${assetsPath}in.png')
+                      : Image.asset('${assetsPath}out.png'),
                 ),
                 if (comment != null)
                   SizedBox(

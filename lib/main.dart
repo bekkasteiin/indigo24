@@ -8,26 +8,24 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:indigo24/pages/tabs/tabs.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/localization/localization.dart';
-import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/chat/chat_models/chat_model.dart';
 import 'pages/chat/chat_models/hive_names.dart';
 import 'pages/chat/chat_models/messages.g_model.dart';
 import 'pages/chat/chat_models/messages_model.dart';
-import 'services/api/socket/socket.dart';
 
 import 'package:indigo24/style/colors.dart';
-import 'widgets/alerts/indigo_alert.dart';
+import 'services/shared_preference/shared_strings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences _preferences = await SharedPreferences.getInstance();
 
-  String _languageCode = _preferences.getString('languageCode');
+  String _languageCode = _preferences.getString(SharedStrings.languageCode);
   Localization.setLanguage(_languageCode);
-  String phone = _preferences.getString('phone');
-  String domen2 = _preferences.getString('domen');
+  String phone = _preferences.getString(SharedStrings.phone);
+  String domen2 = _preferences.getString(SharedStrings.domen);
 
   if ('$domen2' == 'null') {
     domen = 'com';
@@ -66,9 +64,8 @@ class MyApp extends StatelessWidget {
         title: 'Indigo24',
         builder: (context, child) {
           return MediaQuery(
-            child: child,
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-          );
+              child: child,
+              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0));
         },
         theme: ThemeData(
           primarySwatch: blueColor,
@@ -77,30 +74,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-}
-
-logOut(BuildContext context) async {
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  ChatRoom.shared.channel = null;
-  preferences.setString('phone', 'null');
-  preferences.setString('pin', 'false');
-  Hive.box<MessageModel>(HiveBoxes.messages).clear();
-  Hive.box<ChatModel>(HiveBoxes.chats).clear();
-
-  showIndigoDialog(
-    barrierDismissible: false,
-    context: context,
-    builder: CustomDialog(
-      description: "${Localization.language.sessionIsOver}",
-      yesCallBack: () {
-        Navigator.pop(context);
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => IntroPage(),
-          ),
-          (r) => false,
-        );
-      },
-    ),
-  );
 }

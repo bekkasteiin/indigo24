@@ -1,5 +1,4 @@
 String domen = 'com';
-// String domen = 'xyz';
 
 String avatarUrl = domen == 'com'
     ? 'https://media.indigo24.com/avatars/'
@@ -17,6 +16,8 @@ String imageUrl = 'https://media.chat.indigo24.$domen/media/images/';
 String videoUrl = 'https://media.chat.indigo24.$domen/media/video/';
 String stickerUrl = 'https://media.chat.indigo24.$domen/media/stickers/';
 String logos = 'https://api.indigo24.$domen/logos/';
+
+String assetsPath = 'assets/images/';
 
 const String ownerRole = '100';
 const String adminRole = '50';

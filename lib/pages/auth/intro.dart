@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/db/country_dao.dart';
-import 'package:indigo24/db/country_model.dart';
+import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/services/db/country/country_repo.dart';
+import 'package:indigo24/services/db/country/country_model.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/pages/auth/registration/registration.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/localization/localization.dart';
+import 'package:indigo24/services/shared_preference/shared_strings.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/document/pdf_viewer.dart';
 import 'package:indigo24/style/colors.dart';
@@ -27,6 +29,7 @@ class _IntroPageState extends State<IntroPage> {
   Api _api;
   CountryDao _countryDao;
   int _tempCounter = 0;
+  bool hided = true;
 
   _showLanguages() {
     Size size = MediaQuery.of(context).size;
@@ -58,15 +61,15 @@ class _IntroPageState extends State<IntroPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text('${Localization.languages[index]['title']}'),
-                        Text('${Localization.languages[index]['code']}'),
+                        Text('${Localization.languages[index].title}'),
+                        Text('${Localization.languages[index].code}'),
                       ],
                     ),
                     onPressed: () {
                       isLanguageSelected = true;
                       setState(() {
                         Localization.setLanguage(
-                            Localization.languages[index]['code']);
+                            Localization.languages[index].code);
                       });
                       Navigator.pop(context);
                     },
@@ -149,7 +152,6 @@ class _IntroPageState extends State<IntroPage> {
   //     },a
   //   );
   // }
-  bool hided = true;
   @override
   void initState() {
     super.initState();
@@ -202,7 +204,7 @@ class _IntroPageState extends State<IntroPage> {
 
   getDomen() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    String domen = preferences.getString('domen');
+    String domen = preferences.getString(SharedStrings.domen);
     return domen;
   }
 
@@ -213,298 +215,226 @@ class _IntroPageState extends State<IntroPage> {
       color: whiteColor,
       child: SafeArea(
         child: Scaffold(
-            backgroundColor: transparentColor,
-            body: Stack(
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: introBackgroundProvider,
-                      fit: BoxFit.cover,
-                    ),
+          backgroundColor: transparentColor,
+          body: Stack(
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: introBackgroundProvider,
+                    fit: BoxFit.cover,
                   ),
                 ),
-                AppBar(
-                  backgroundColor: transparentColor,
-                  elevation: 0,
-                  centerTitle: true,
-                  title: FittedBox(
-                    child: GestureDetector(
-                      onTap: () async {
-                        _tempCounter++;
-                        SharedPreferences preferences =
-                            await SharedPreferences.getInstance();
-                        if (_tempCounter == 9) {
-                          if ('$_domen3' == null) {
-                            preferences.setString('domen', 'com');
+              ),
+              AppBar(
+                backgroundColor: transparentColor,
+                elevation: 0,
+                centerTitle: true,
+                title: FittedBox(
+                  child: GestureDetector(
+                    onTap: () async {
+                      _tempCounter++;
+                      SharedPreferences preferences =
+                          await SharedPreferences.getInstance();
+                      if (_tempCounter == 9) {
+                        if ('$_domen3' == null) {
+                          preferences.setString(SharedStrings.domen, 'com');
+                        } else {
+                          if ('$_domen3' == 'xyz') {
+                            preferences.setString(SharedStrings.domen, 'com');
                           } else {
-                            if ('$_domen3' == 'xyz') {
-                              preferences.setString('domen', 'com');
-                            } else {
-                              preferences.setString('domen', 'xyz');
-                            }
+                            preferences.setString(SharedStrings.domen, 'xyz');
                           }
                         }
-                      },
-                      child: Text(
-                        '${Localization.language.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
-                        style: TextStyle(
-                          color: _domen3 == 'xyz' ? redColor : milkWhiteColor,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 22,
-                        ),
-                        textAlign: TextAlign.center,
+                      }
+                    },
+                    child: Text(
+                      '${Localization.language.appVersion} ${_packageInfo.version}:${_packageInfo.buildNumber}',
+                      style: TextStyle(
+                        color: _domen3 == 'xyz' ? redColor : milkWhiteColor,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 22,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-                Center(
-                  child: Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Center(
-                            child: Image.asset(
-                              'assets/images/intro_logo.png',
-                            ),
+              ),
+              Center(
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Center(
+                          child: Image.asset(
+                            '${assetsPath}intro_logo.png',
                           ),
                         ),
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            children: [
-                              _signInButton(size),
-                              SizedBox(height: 10),
-                              _signUpButton(size),
-                              SizedBox(height: 20),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 0,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: whiteColor,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(6.0),
-                                  ),
-                                ),
-                                child: Container(
-                                  width: 100,
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      GestureDetector(
-                                        onTap: () => setState(
-                                          () {
-                                            hided = !hided;
-                                          },
-                                        ),
-                                        child: Container(
-                                          color: transparentColor,
-                                          child: Row(
-                                            children: [
-                                              Transform.rotate(
-                                                angle: hided ? pi * 2 : pi,
-                                                child: Image.asset(
-                                                  'assets/images/dropDown.png',
-                                                  width: 15,
-                                                  height: 15,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Text(
-                                                "${Localization.language.currentLanguage}",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: blackPurpleColor,
-                                                  fontWeight: FontWeight.w300,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      AnimatedContainer(
-                                        duration:
-                                            const Duration(milliseconds: 120),
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            children: [
-                                              for (var language
-                                                  in Localization.languages)
-                                                GestureDetector(
-                                                  onTap: () => setState(
-                                                    () {
-                                                      hided = !hided;
-                                                      Localization.setLanguage(
-                                                        language['code'],
-                                                      );
-                                                      Localization.language
-                                                              .currentLanguage =
-                                                          '${language['title']}';
-                                                    },
-                                                  ),
-                                                  child: Container(
-                                                    height: 30,
-                                                    width: 100,
-                                                    color: transparentColor,
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          '${language['code']}',
-                                                          textAlign:
-                                                              TextAlign.justify,
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            color: primaryColor,
-                                                            fontWeight:
-                                                                FontWeight.w300,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          '${language['title']}',
-                                                          textAlign:
-                                                              TextAlign.justify,
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            color:
-                                                                blackPurpleColor,
-                                                            fontWeight:
-                                                                FontWeight.w300,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                        height: hided ? 0 : size.height * 0.15,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                              // Container(
-                              //   height: 30,
-
-                              //   child: Directionality(
-                              //     textDirection: TextDirection.rtl,
-                              //     child: DropdownButtonHideUnderline(
-                              //       child: CustomDropdownButton(
-                              //         isExpanded: false,
-                              //         hint: Text(
-                              //           "${Localization.language.currentLanguage}",
-                              //           style: TextStyle(
-                              //             color: blackPurpleColor,
-                              //             fontWeight: FontWeight.w300,
-                              //           ),
-                              //         ),
-                              //         items:
-                              //             Localization.languages.map((value) {
-                              //           return DropdownMenuItem(
-                              //             child: Container(
-                              //               height: 30,
-                              //               child: Row(
-                              //                 mainAxisAlignment:
-                              //                     MainAxisAlignment
-                              //                         .spaceBetween,
-                              //                 children: [
-                              //                   Text(
-                              //                     '${value['code']}',
-                              //                     textAlign: TextAlign.justify,
-                              //                     style: TextStyle(
-                              //                       color: primaryColor,
-                              //                       fontWeight: FontWeight.w300,
-                              //                     ),
-                              //                   ),
-                              //                   Text(
-                              //                     '${value['title']}',
-                              //                     textAlign: TextAlign.justify,
-                              //                     style: TextStyle(
-                              //                       color: blackPurpleColor,
-                              //                       fontWeight: FontWeight.w300,
-                              //                     ),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //             value: value,
-                              //           );
-                              //         }).toList(),
-                              //         onChanged: (value) {
-                              //           Localization.language.setLanguage(
-                              //             value['code'],
-                              //           );
-                              //           setState(() {
-                              //             Localization.language.currentLanguage =
-                              //                 '${value['title']}';
-                              //           });
-                              //         },
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ),
-                        Column(
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: Column(
                           children: [
-                            FlatButton(
-                              child: Text(
-                                "${Localization.language.terms}".toUpperCase(),
-                                style: TextStyle(
-                                  color: brightGreyColor5,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w300,
-                                  decoration: TextDecoration.underline,
+                            _signInButton(size),
+                            SizedBox(height: 10),
+                            _signUpButton(size),
+                            SizedBox(height: 20),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 0,
+                              ),
+                              decoration: BoxDecoration(
+                                color: whiteColor,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(6.0),
                                 ),
                               ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PDFViewer(
-                                      'assets/terms.pdf',
-                                      text: Localization.language.terms,
+                              child: Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    GestureDetector(
+                                      onTap: () => setState(
+                                        () {
+                                          hided = !hided;
+                                        },
+                                      ),
+                                      child: Container(
+                                        color: transparentColor,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Transform.rotate(
+                                              angle: hided ? pi * 2 : pi,
+                                              child: Image.asset(
+                                                '${assetsPath}dropDown.png',
+                                                width: 15,
+                                                height: 15,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 20,
+                                            ),
+                                            Text(
+                                              "${Localization.language.currentLanguage}",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: blackPurpleColor,
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
+                                    AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 120),
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          children: [
+                                            for (var language
+                                                in Localization.languages)
+                                              GestureDetector(
+                                                onTap: () => setState(
+                                                  () {
+                                                    hided = !hided;
+                                                    Localization.setLanguage(
+                                                      language.code,
+                                                    );
+                                                    Localization.language
+                                                            .currentLanguage =
+                                                        '${language.title}';
+                                                  },
+                                                ),
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 100,
+                                                  color: transparentColor,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        '${language.code}',
+                                                        textAlign:
+                                                            TextAlign.justify,
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: primaryColor,
+                                                          fontWeight:
+                                                              FontWeight.w300,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        '${language.title}',
+                                                        textAlign:
+                                                            TextAlign.justify,
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color:
+                                                              blackPurpleColor,
+                                                          fontWeight:
+                                                              FontWeight.w300,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      height: hided ? 0 : size.height * 0.15,
+                                    )
+                                  ],
+                                ),
+                              ),
                             )
                           ],
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          FlatButton(
+                            child: Text(
+                              "${Localization.language.terms}".toUpperCase(),
+                              style: TextStyle(
+                                color: brightGreyColor5,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w300,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PDFViewer(
+                                    'assets/terms.pdf',
+                                    text: Localization.language.terms,
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        ],
+                      )
+                    ],
                   ),
                 ),
-              ],
-            )),
-      ),
-    );
-  }
-
-  dioError(context) async {
-    showIndigoDialog(
-      context: context,
-      builder: CustomDialog(
-        description: "${Localization.language.httpError}",
-        yesCallBack: () {
-          Navigator.pop(context);
-        },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -512,7 +442,15 @@ class _IntroPageState extends State<IntroPage> {
   _getCountries() async {
     await _api.getCountries().then((response) async {
       if (response == false) {
-        dioError(context);
+        showIndigoDialog(
+          context: context,
+          builder: CustomDialog(
+            description: "${Localization.language.httpError}",
+            yesCallBack: () {
+              Navigator.pop(context);
+            },
+          ),
+        );
       } else {
         response['countries'].forEach((element) async {
           Country country = Country(

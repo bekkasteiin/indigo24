@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/constants.dart';
-import 'package:indigo24/services/models/payment_history_model.dart';
+import 'package:indigo24/pages/wallet/payments/payments_history/payment_history_model.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -201,7 +201,7 @@ class PaymentVoucher extends StatelessWidget {
                     //             children: <Widget>[
                     //               Container(
                     //                 child: Image.asset(
-                    //                   'assets/images/repeat.png',
+                    //                   '${assetsPath}repeat.png',
                     //                   width: 20,
                     //                   height: 20,
                     //                 ),
@@ -235,7 +235,7 @@ class PaymentVoucher extends StatelessWidget {
                                 children: <Widget>[
                                   Container(
                                     child: Image.asset(
-                                      'assets/images/share.png',
+                                      '${assetsPath}share.png',
                                       width: 20,
                                       height: 20,
                                     ),
@@ -247,16 +247,18 @@ class PaymentVoucher extends StatelessWidget {
                               _screenshotController
                                   .capture()
                                   .then((File image) async {
-                                //Capture Done
-
                                 final documentDirectory =
-                                    (await getExternalStorageDirectory()).path;
+                                    (await getApplicationDocumentsDirectory())
+                                        .path;
+
                                 File imgFile =
                                     new File('$documentDirectory/flutter.png');
+
                                 image.copy(imgFile.path);
                                 final RenderBox box =
                                     context.findRenderObject();
                                 print(documentDirectory);
+                                Navigator.pop(context);
                                 Share.shareFiles(
                                     ['$documentDirectory/flutter.png'],
                                     sharePositionOrigin:

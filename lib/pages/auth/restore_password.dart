@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:indigo24/db/country_dao.dart';
-import 'package:indigo24/db/country_model.dart';
+
+import 'package:indigo24/services/db/country/country_model.dart';
+import 'package:indigo24/services/db/country/country_repo.dart';
 import 'package:indigo24/pages/auth/login/login.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/localization/localization.dart';

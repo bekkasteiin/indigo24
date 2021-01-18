@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/widgets/document/file_manager.dart';
 
 class DownloadManager {
   DownloadManager(this._api);
@@ -11,7 +10,7 @@ class DownloadManager {
     @required Function onReceiveProgress,
     @required String type,
   }) async {
-    dynamic response = await _api.downloadFileNetworkawait(
+    Response<ResponseBody> response = await _api.downloadFileNetworkawait(
       type: type,
       url: url,
       onReceiveProgress: onReceiveProgress,
@@ -23,8 +22,6 @@ class DownloadManager {
         },
       ),
     );
-    FileManager fileManager = FileManager();
-    bool stored = await fileManager.storeFile(response);
-    return stored;
+    return response.statusCode == 200 ? true : false;
   }
 }

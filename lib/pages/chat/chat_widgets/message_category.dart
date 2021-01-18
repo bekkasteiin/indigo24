@@ -46,8 +46,8 @@ class _MessageCategoryWidgetState extends State<MessageCategoryWidget> {
     super.initState();
   }
 
-  final bgChat = AssetImage("assets/images/background_chat.png");
-  final bgChat2 = AssetImage("assets/images/background_chat_2.png");
+  final bgChat = AssetImage("${assetsPath}background_chat.png");
+  final bgChat2 = AssetImage("${assetsPath}background_chat_2.png");
 
   @override
   Widget build(BuildContext context) {

@@ -71,8 +71,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                       Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image:
-                                AssetImage("assets/images/wallet_header.png"),
+                            image: AssetImage("${assetsPath}wallet_header.png"),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -92,7 +91,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                   padding: EdgeInsets.all(10),
                                   child: Image(
                                     image: AssetImage(
-                                      'assets/images/backWhite.png',
+                                      '${assetsPath}backWhite.png',
                                     ),
                                   ),
                                 ),
@@ -137,7 +136,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                                             ),
                                             Image(
                                               image: AssetImage(
-                                                  "assets/images/tenge.png"),
+                                                  "${assetsPath}tenge.png"),
                                               height: 12,
                                               width: 12,
                                             ),

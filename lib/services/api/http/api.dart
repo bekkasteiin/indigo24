@@ -6,12 +6,13 @@ import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/services/localization/localization.dart';
+import 'package:indigo24/services/shared_preference/shared_strings.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/progress_bar.dart';
 import 'package:package_info/package_info.dart';
 
-import '../../helper.dart';
+import '../../shared_preference/helper.dart';
 
 class Api {
   static BaseOptions _options = BaseOptions(
@@ -42,17 +43,25 @@ class Api {
     void Function(int, int) onReceiveProgress,
   }) async {
     Response response;
-    data['lang'] = Localization.language.code;
+    if (data is FormData) {
+    } else {
+      data['lang'] = Localization.language.code;
+    }
+
+    print(_dio.options.headers);
+
     try {
       response = await _dio.post(
         path,
         data: data,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
+        options: Options(headers: {"v": user.version}),
       );
-      print(_dio.options.baseUrl);
+      print(_dio.options.baseUrl + path);
       print(response.data);
       print(data);
+
       return response.data;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -118,26 +127,25 @@ class Api {
     // Directory appDocDir = await getApplicationDocumentsDirectory();
 
     // store the download directory like files/downloads
-    Directory appDocDir;
+    Directory appDocDir = await DownloadsPathProvider.downloadsDirectory;
 
-    try {
-      appDocDir = await DownloadsPathProvider.downloadsDirectory;
-    } on PlatformException {
+    try {} on PlatformException {
       print('Could not get the downloads directory');
     }
     String path = appDocDir.path;
     DateTime now = DateTime.now();
     String fullPath = "$path/${now.millisecondsSinceEpoch}.$type";
     print(fullPath);
-    return {
-      "data": await _getRequest(
-        url,
-        null,
-        onReceiveProgress: onReceiveProgress,
-        options: options,
-      ),
-      "fileName": fullPath,
-    };
+    return _dio.download(url, fullPath);
+    // return {
+    //   "data": await _getRequest(
+    //     url,
+    //     null,
+    //     onReceiveProgress: onReceiveProgress,
+    //     options: options,
+    //   ),
+    //   "fileName": fullPath,
+    // };
   }
 
   register(phone, name, password, email) async {
@@ -216,8 +224,6 @@ class Api {
     };
     return _postRequest('api/v2.1/get/profile', data);
   }
-  // getNews() async {
-  // }
 
   getHistoryBalance(page) async {
     dynamic data = {
@@ -288,7 +294,7 @@ class Api {
 
     var result = await _postRequest('api/v2.1/create/pin', data);
     if (result['success'] == true) {
-      SharedPreferencesHelper.setString('pin', '$pinCode');
+      SharedPreferencesHelper.setString(SharedStrings.pin, '$pinCode');
       user.pin = '$pinCode';
     }
     return result;
@@ -302,9 +308,9 @@ class Api {
     var result = await _postRequest('api/v2.1/get/balance', data);
     if (result['success'] == true) {
       SharedPreferencesHelper.setString(
-          'balance', '${result['result']['balance']}');
-      SharedPreferencesHelper.setString(
-          'balanceInBlock', '${result['result']['balanceInBlock']}');
+          SharedStrings.balance, '${result['result']['balance']}');
+      SharedPreferencesHelper.setString(SharedStrings.balanceInBlock,
+          '${result['result']['balanceInBlock']}');
       user.balance = '${result['result']['balance']}';
       user.balanceInBlock = '${result['result']['balanceInBlock']}';
     }
@@ -313,22 +319,27 @@ class Api {
 
   signIn(phone, password) async {
     final PackageInfo _packageInfo = await PackageInfo.fromPlatform();
+    user.version = _packageInfo.version;
     dynamic data = {
       'phone': '$phone',
       'password': '$password',
       'v': _packageInfo.version
     };
-
     var result = await _postRequest('api/v2.1/check/authentication', data);
 
     if (result['success'] == true) {
-      SharedPreferencesHelper.setString('customerID', '${result['ID']}');
-      SharedPreferencesHelper.setString('phone', '+$phone');
-      SharedPreferencesHelper.setString('name', '${result['name']}');
-      SharedPreferencesHelper.setString('email', '${result['email']}');
-      SharedPreferencesHelper.setString('avatar', '${result['avatar']}');
-      SharedPreferencesHelper.setString('unique', '${result['unique']}');
-      SharedPreferencesHelper.setString('pin', '${result['pin']}');
+      SharedPreferencesHelper.setString(
+          SharedStrings.customerID, '${result['ID']}');
+      SharedPreferencesHelper.setString(SharedStrings.phone, '+$phone');
+      SharedPreferencesHelper.setString(
+          SharedStrings.name, '${result['name']}');
+      SharedPreferencesHelper.setString(
+          SharedStrings.email, '${result['email']}');
+      SharedPreferencesHelper.setString(
+          SharedStrings.avatar, '${result['avatar']}');
+      SharedPreferencesHelper.setString(
+          SharedStrings.unique, '${result['unique']}');
+      SharedPreferencesHelper.setString(SharedStrings.pin, '${result['pin']}');
       user.identified = result['identified'];
       user.id = '${result['ID']}';
       user.phone = '+$phone}';
@@ -630,7 +641,8 @@ class Api {
         'unique': '${user.unique}',
         'file': await MultipartFile.fromFile(_path),
         'title': '$title',
-        'description': '$description'
+        'description': '$description',
+        'lang': Localization.language.code,
       });
 
       _sendingMsgProgressBar.show(context, '$p');
@@ -665,6 +677,7 @@ class Api {
       'customerID': '${user.id}',
       'unique': '${user.unique}',
       'file': await MultipartFile.fromFile(imagePath),
+      'lang': Localization.language.code,
     });
     return _postRequest(
       requestURL,
@@ -685,7 +698,8 @@ class Api {
       'user_id': '${user.id}',
       'userToken': '${user.unique}',
       'file': await MultipartFile.fromFile(imagePath),
-      'type': type
+      'type': type,
+      'lang': Localization.language.code,
     });
     return _postRequest('$mediaChat', data);
   }

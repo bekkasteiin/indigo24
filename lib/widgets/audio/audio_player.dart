@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 
 enum PlayerState { stopped, playing, paused }
@@ -82,7 +83,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ? InkWell(
                     onTap: _isPlaying ? () => _pause() : null,
                     child: Image.asset(
-                      'assets/images/pause.png',
+                      '${assetsPath}pause.png',
                       width: 30,
                       height: 30,
                     ),
@@ -90,7 +91,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 : InkWell(
                     onTap: _isPlaying ? null : () => _play(),
                     child: Image.asset(
-                      'assets/images/play.png',
+                      '${assetsPath}play.png',
                       width: 30,
                       height: 30,
                     ),

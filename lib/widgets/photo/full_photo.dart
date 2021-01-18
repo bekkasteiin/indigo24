@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:indigo24/style/colors.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
 import 'package:photo_view/photo_view.dart';
@@ -42,7 +43,7 @@ class FullPhoto extends StatelessWidget {
               padding: EdgeInsets.all(10),
               child: Image(
                 image: AssetImage(
-                  'assets/images/backWhite.png',
+                  '${assetsPath}backWhite.png',
                 ),
               ),
             ),
@@ -134,7 +135,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Image.asset(
-                          "assets/images/download.png",
+                          "${assetsPath}download.png",
                           width: 20,
                         )
                       ],
@@ -155,7 +156,7 @@ class FullPhotoScreenState extends State<FullPhotoScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Image.asset(
-                          "assets/images/upload.png",
+                          "${assetsPath}upload.png",
                           width: 20,
                         )
                       ],

@@ -10,14 +10,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
 import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
 import 'package:indigo24/pages/chat/chat_models/messages_model.dart';
-import 'package:indigo24/main.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/pages/auth/intro.dart';
 import 'package:indigo24/pages/profile/settings/settings_main.dart';
 import 'package:indigo24/services/api/http/api.dart';
-import 'package:indigo24/services/helper.dart';
+import 'package:indigo24/services/shared_preference/helper.dart';
 import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/services/localization/localization.dart';
+import 'package:indigo24/services/shared_preference/shared_strings.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
@@ -45,9 +46,19 @@ class _UserProfilePageState extends State<UserProfilePage>
   Api _api;
 
   dynamic response;
+  File _image;
+
+  final picker = ImagePicker();
 
   double uploadPercent = 0.0;
   bool isUploading = false;
+
+  PackageInfo _packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: 'Unknown',
+    buildNumber: 'Unknown',
+  );
 
   @override
   void dispose() {
@@ -91,12 +102,6 @@ class _UserProfilePageState extends State<UserProfilePage>
     _initPackageInfo();
   }
 
-  PackageInfo _packageInfo = PackageInfo(
-    appName: 'Unknown',
-    packageName: 'Unknown',
-    version: 'Unknown',
-    buildNumber: 'Unknown',
-  );
   Future<void> _initPackageInfo() async {
     final PackageInfo info = await PackageInfo.fromPlatform();
     if (mounted) {
@@ -171,10 +176,6 @@ class _UserProfilePageState extends State<UserProfilePage>
     );
   }
 
-  File _image;
-
-  final picker = ImagePicker();
-
   Future getImage(ImageSource imageSource) async {
     final pickedFile = await picker.getImage(
       source: imageSource,
@@ -214,7 +215,7 @@ class _UserProfilePageState extends State<UserProfilePage>
           } else {
             if (r["success"]) {
               await SharedPreferencesHelper.setString(
-                  'avatar', '${r["fileName"]}');
+                  SharedStrings.avatar, '${r["fileName"]}');
               setState(() {
                 user.avatar = r["fileName"];
               });
@@ -389,20 +390,18 @@ class _UserProfilePageState extends State<UserProfilePage>
                         Localization.language.email,
                         user.email,
                       ),
-                      user.country != ''
-                          ? _buildSection(
-                              screenSize,
-                              Localization.language.country,
-                              user.country,
-                            )
-                          : Center(),
-                      user.city != ''
-                          ? _buildSection(
-                              screenSize,
-                              Localization.language.city,
-                              user.city,
-                            )
-                          : Center(),
+                      if (user.country != '')
+                        _buildSection(
+                          screenSize,
+                          Localization.language.country,
+                          user.country,
+                        ),
+                      if (user.city != '')
+                        _buildSection(
+                          screenSize,
+                          Localization.language.city,
+                          user.city,
+                        ),
                       SizedBox(height: 30),
                     ],
                   ),
@@ -436,7 +435,8 @@ class _UserProfilePageState extends State<UserProfilePage>
                             child: RaisedButton(
                               onPressed: () async {
                                 if (await canLaunch(
-                                    'https://indigo24.com/contacts.html')) {
+                                  'https://indigo24.com/contacts.html',
+                                )) {
                                   await launch(
                                     'https://indigo24.com/contacts.html',
                                     forceSafariVC: false,
@@ -475,7 +475,8 @@ class _UserProfilePageState extends State<UserProfilePage>
                       ),
                       ConstrainedBox(
                         constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * 0.42),
+                          maxWidth: MediaQuery.of(context).size.width * 0.42,
+                        ),
                         child: Container(
                           decoration: BoxDecoration(
                             boxShadow: [
@@ -484,7 +485,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                                 blurRadius: 10.0,
                                 spreadRadius: -10,
                                 offset: Offset(0.0, 0.0),
-                              )
+                              ),
                             ],
                           ),
                           child: ButtonTheme(
@@ -506,7 +507,8 @@ class _UserProfilePageState extends State<UserProfilePage>
                                       Hive.box<ChatModel>(HiveBoxes.chats)
                                           .clear();
 
-                                      preferences.setString('phone', 'null');
+                                      preferences.setString(
+                                          SharedStrings.phone, 'null');
                                       ChatRoom.shared.channel = null;
                                       Navigator.of(context).pushAndRemoveUntil(
                                         MaterialPageRoute(
@@ -561,7 +563,7 @@ class _UserProfilePageState extends State<UserProfilePage>
               height: 120,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/cover.png'),
+                  image: AssetImage('${assetsPath}cover.png'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -587,7 +589,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                           },
                           child: Ink(
                             child: Image.asset(
-                              "assets/images/settings.png",
+                              "${assetsPath}settings.png",
                               width: 35,
                             ),
                           )),
@@ -615,15 +617,12 @@ class _UserProfilePageState extends State<UserProfilePage>
                                   child: _buildFullName(),
                                 ),
                                 SizedBox(height: 5),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Text(
-                                    "${user.identified ? Localization.language.identified : Localization.language.notIdentified}",
-                                    style: TextStyle(
-                                      color: whiteColor,
-                                    ),
+                                Text(
+                                  "${user.identified == 1 ? Localization.language.identified : user.identified == 0 ? Localization.language.notIdentified : user.identified == 1 ? Localization.language.simpleIdentified : Localization.language.notIdentified}",
+                                  style: TextStyle(
+                                    color: whiteColor,
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ),
@@ -637,7 +636,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                             padding: const EdgeInsets.all(15.0),
                             child: GestureDetector(
                               child: Image.asset(
-                                'assets/images/pencil.png',
+                                '${assetsPath}pencil.png',
                                 width: 20,
                                 height: 20,
                               ),

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:hive/hive.dart';
-import 'package:indigo24/db/country_dao.dart';
-import 'package:indigo24/db/country_model.dart';
+import 'package:indigo24/services/constants.dart';
+import 'package:indigo24/services/db/country/country_repo.dart';
+import 'package:indigo24/services/db/country/country_model.dart';
 import 'package:indigo24/pages/auth/restore_password.dart';
 import 'package:indigo24/pages/chat/chat_models/chat_model.dart';
 import 'package:indigo24/pages/chat/chat_models/hive_names.dart';
@@ -26,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   Api _api;
   TextEditingController loginController;
   TextEditingController passwordController;
+
   bool _obscureText;
   var _singInResult;
   int countryId;
@@ -243,8 +245,8 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Image(
                                     image: AssetImage(
                                       _obscureText
-                                          ? 'assets/images/eyeClose.png'
-                                          : 'assets/images/eyeOpen.png',
+                                          ? '${assetsPath}eyeClose.png'
+                                          : '${assetsPath}eyeOpen.png',
                                     ),
                                     height: 20,
                                     width: 20,

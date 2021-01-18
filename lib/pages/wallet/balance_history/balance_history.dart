@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indigo24/main.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../filter.dart';
+import 'package:indigo24/services/constants.dart';
 
 class BalanceHistoryPage extends StatefulWidget {
   @override
@@ -74,8 +75,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
           "${Localization.language.historyBalance}",
           style: TextStyle(
             fontSize: 22,
-                        color: blackPurpleColor,
-
+            color: blackPurpleColor,
             fontWeight: FontWeight.w400,
           ),
           textAlign: TextAlign.center,
@@ -176,8 +176,8 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
         child: type != null
             ? Image.asset(
                 '$type' == 'out'
-                    ? 'assets/images/payOut.png'
-                    : 'assets/images/payIn.png',
+                    ? '${assetsPath}payOut.png'
+                    : '${assetsPath}payIn.png',
                 width: 40,
                 height: 40,
               )
@@ -313,7 +313,7 @@ class _BalanceHistoryPageState extends State<BalanceHistoryPage>
                       children: <Widget>[
                         Container(
                           child: Image.asset(
-                            'assets/images/filter.png',
+                            '${assetsPath}filter.png',
                             width: 20,
                             height: 20,
                           ),

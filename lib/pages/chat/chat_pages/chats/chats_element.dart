@@ -82,7 +82,7 @@ class ChatsElement extends StatelessWidget {
                 child: Center(
                   child: chat.isMuted
                       ? Image.asset(
-                          'assets/images/unmuteChat.png',
+                          '${assetsPath}unmuteChat.png',
                           width: 10,
                           height: 10,
                         )

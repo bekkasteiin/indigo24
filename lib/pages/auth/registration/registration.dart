@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:indigo24/db/country_dao.dart';
-import 'package:indigo24/db/country_model.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/style/colors.dart';
@@ -14,6 +12,8 @@ import 'package:indigo24/widgets/indigo_ui_kit/indigo_auth_title.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../countries.dart';
 import 'phone_confirm.dart';
+import 'package:indigo24/services/db/country/country_model.dart';
+import 'package:indigo24/services/db/country/country_repo.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -32,12 +32,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var countryId = 0;
   Country country;
   var countries = new List<Country>();
-  var smsCode = 0;
-  List<DropdownMenuItem<String>> dropDownMenuItems;
   String _currentCountry = "Казахстан";
   String loginError = "";
 
-  var mask;
   var loginFormatter;
   String _hintText = '+77';
   var length;
@@ -71,34 +68,35 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0.0),
-          child: AppBar(
-            centerTitle: true,
-            backgroundColor: whiteColor,
-            brightness: Brightness.light,
-          ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: AppBar(
+          centerTitle: true,
+          backgroundColor: whiteColor,
+          brightness: Brightness.light,
         ),
-        body: GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
-          child: Stack(
-            children: <Widget>[
-              Container(
-                  decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: introBackgroundProvider,
-                  fit: BoxFit.cover,
-                ),
-              )),
-              _buildForeground()
-            ],
-          ),
-        ));
+      ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Stack(
+          children: <Widget>[
+            Container(
+                decoration: BoxDecoration(
+              image: DecorationImage(
+                image: introBackgroundProvider,
+                fit: BoxFit.cover,
+              ),
+            )),
+            _buildForeground()
+          ],
+        ),
+      ),
+    );
   }
 
   _getCountries() async {

@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/backgrounds.dart';
-import 'package:indigo24/widgets/video_player_widget.dart';
+import 'package:indigo24/widgets/video/video_player_widget.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:indigo24/services/constants.dart';
 
 class PreviewMedia extends StatefulWidget {
   final filePath;
@@ -103,7 +104,7 @@ class _PreviewMediaState extends State<PreviewMedia> {
                     heroTag: "btn1",
                     backgroundColor: whiteColor,
                     child: Image.asset(
-                      'assets/images/send.png',
+                      '${assetsPath}send.png',
                       width: 30,
                     ),
                     onPressed: () {

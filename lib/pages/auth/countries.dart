@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:indigo24/db/country_model.dart';
+import 'package:indigo24/services/db/country/country_model.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';

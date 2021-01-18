@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:indigo24/style/colors.dart';
 
-String downloadPercent = "0 %";
-
 class ProgressBar {
   OverlayEntry _progressOverlayEntry;
-  String percent = '0 %';
 
   void show(BuildContext context, percent) {
     _progressOverlayEntry = _createdProgressEntry(context);
     Overlay.of(context).insert(_progressOverlayEntry);
-  }
-
-  void change(p) {
-    percent = p;
   }
 
   void hide() {
@@ -37,9 +30,4 @@ class ProgressBar {
           ),
         ),
       );
-
-  double screenHeight(BuildContext context) =>
-      MediaQuery.of(context).size.height;
-
-  double screenWidth(BuildContext context) => MediaQuery.of(context).size.width;
 }

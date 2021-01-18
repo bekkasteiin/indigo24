@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
+import 'package:indigo24/services/shared_preference/shared_strings.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
@@ -66,7 +67,8 @@ class _SettingsSoundPageState extends State<SettingsSoundPage> {
                                 onTap: () async {
                                   final SharedPreferences prefs =
                                       await SharedPreferences.getInstance();
-                                  prefs.setString('sound', sounds[index]);
+                                  prefs.setString(
+                                      SharedStrings.sound, sounds[index]);
                                   setState(() {
                                     user.sound = sounds[index];
                                   });

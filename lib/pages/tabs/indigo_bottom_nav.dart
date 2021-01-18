@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indigo24/services/constants.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'indigo_bottom_tab.dart';
@@ -18,7 +19,7 @@ class IndigoBottomNav extends StatelessWidget {
       child: Container(
         height: 55,
         decoration: BoxDecoration(
-          color:whiteColor,
+          color: whiteColor,
         ),
         child: TabBar(
           indicatorPadding: EdgeInsets.all(1),
@@ -29,19 +30,19 @@ class IndigoBottomNav extends StatelessWidget {
           labelColor: primaryColor,
           tabs: [
             IndigoBottomTab(
-              path: "assets/images/chat.png",
+              path: "${assetsPath}chat.png",
               text: Localization.language.chat,
             ),
             IndigoBottomTab(
-              path: "assets/images/profile.png",
+              path: "${assetsPath}profile.png",
               text: Localization.language.profile,
             ),
             IndigoBottomTab(
-              path: "assets/images/tape.png",
+              path: "${assetsPath}tape.png",
               text: Localization.language.tape,
             ),
             IndigoBottomTab(
-              path: "assets/images/wallet.png",
+              path: "${assetsPath}wallet.png",
               text: Localization.language.wallet,
             ),
           ],

@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/chat/chat_pages/chat_info.dart';
-import 'package:indigo24/main.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/services/api/http/api.dart';
 import 'package:indigo24/services/user.dart' as user;
 import 'package:indigo24/services/localization/localization.dart';

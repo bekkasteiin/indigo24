@@ -1,15 +1,17 @@
-import 'package:indigo24/services/localization/default_lang.dart';
-import 'package:indigo24/services/localization/ru.dart';
-import 'package:indigo24/services/localization/kz.dart';
-import 'package:indigo24/services/localization/en.dart';
-import 'package:indigo24/services/localization/uzb.dart';
-import 'package:indigo24/services/localization/uz.dart';
+import 'package:indigo24/services/localization/language_interface.dart';
+import 'package:indigo24/services/localization/languages_impl/ru.dart';
+import 'package:indigo24/services/localization/languages_impl/kz.dart';
+import 'package:indigo24/services/localization/languages_impl/en.dart';
+import 'package:indigo24/services/localization/languages_impl/uzb.dart';
+import 'package:indigo24/services/localization/languages_impl/uz.dart';
+import 'package:indigo24/services/shared_preference/shared_strings.dart';
 
-import '../helper.dart';
+import '../shared_preference/helper.dart';
+import 'language_model.dart';
 
 class Localization {
-  static DefaultLanguage language = RU();
-  Localization();
+  static LanguageInterface language = RU();
+
   static List filters = [
     {'text': 'За неделю', 'code': 'week'},
     {'text': 'За месяц', 'code': 'month'},
@@ -17,33 +19,19 @@ class Localization {
     {'text': 'За пол года', 'code': 'halfYear'},
     {'text': 'За период', 'code': 'period'},
   ];
-  static var languages = [
-    {"title": "English", "code": "en"},
-    {"title": "Русский", "code": "ru"},
-    {"title": "Қазақша", "code": "kz"},
-    {'title': 'Ўзбекча', 'code': 'uz'},
-    {'title': 'O\'zbekcha', 'code': 'uzb'}
-  ];
 
+  static List<Language> languages = [
+    Language(title: "English", code: "en", languageInterface: EN()),
+    Language(title: "Русский", code: "ru", languageInterface: RU()),
+    Language(title: "Қазақша", code: "kz", languageInterface: KZ()),
+    Language(title: "Ўзбекча", code: "uz", languageInterface: UZ()),
+    Language(title: "O'zbekcha", code: "uzb", languageInterface: UZB()),
+  ];
   static setLanguage(code) {
-    SharedPreferencesHelper.setString('languageCode', '$code');
-    switch (code) {
-      case 'en':
-        language = EN();
-        break;
-      case 'ru':
-        language = RU();
-        break;
-      case 'kz':
-        language = KZ();
-        break;
-      case 'uz':
-        language = UZ();
-        break;
-      case 'uzb':
-        language = UZB();
-        break;
-      default:
+    SharedPreferencesHelper.setString(SharedStrings.languageCode, '$code');
+    for (int i = 0; i < Localization.languages.length; i++) {
+      if (code == Localization.languages[i].code)
+        language = Localization.languages[i].languageInterface;
     }
   }
 }

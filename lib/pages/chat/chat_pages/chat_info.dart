@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:indigo24/main.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/pages/wallet/wallet/wallet.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
@@ -296,7 +296,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
       height: 100,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/cover.png'),
+          image: AssetImage('${assetsPath}cover.png'),
           fit: BoxFit.cover,
         ),
       ),
@@ -581,7 +581,7 @@ class _ChatProfileInfoState extends State<ChatProfileInfo>
                                 padding: EdgeInsets.all(5),
                                 child: Image(
                                   image: AssetImage(
-                                    'assets/images/backWhite.png',
+                                    '${assetsPath}backWhite.png',
                                   ),
                                 ),
                               ),
