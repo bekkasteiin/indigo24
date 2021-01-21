@@ -191,4 +191,9 @@ abstract class LanguageInterface {
   String transferAmount;
   String infoAboutConfidentional;
   String confidentionalAgreement;
+  String simpleIdentification;
+  String fullIdentification;
+  String afterFullIdentification;
+  String currentlyNotWorking;
+  String infoAboutIdentification;
 }

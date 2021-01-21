@@ -25,7 +25,7 @@ class PaymentsServicePage extends StatefulWidget {
   final String account;
   final String amount;
   final int providerId;
-  final isConvertable;
+  final bool isConvertable;
 
   PaymentsServicePage(
     this.serviceID,
@@ -122,6 +122,8 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.isConvertable);
+
     return Container(
       color: whiteColor,
       child: SafeArea(
@@ -490,8 +492,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             sum = controllers[sumControllerIndex]['controller']
                 .text
                 .replaceAll(' ', '');
-
-            if (widget.isConvertable == 0 || isCalculated == true) {
+            if (!widget.isConvertable || isCalculated == true) {
               if (int.parse(sum) >= _service['service']['min']) {
                 if (int.parse(sum) <= _service['service']['max']) {
                   await _showLockScreen(
@@ -584,7 +585,7 @@ class _PaymentsServicePageState extends State<PaymentsServicePage> {
             width: 200,
             child: Center(
               child: Text(
-                '${isCalculated == false && widget.isConvertable == 1 ? Localization.language.calculate : Localization.language.pay}',
+                '${isCalculated == false && widget.isConvertable ? Localization.language.calculate : Localization.language.pay}',
                 style: TextStyle(
                   color: primaryColor,
                   fontWeight: FontWeight.w800,

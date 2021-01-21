@@ -191,13 +191,15 @@ class EN implements LanguageInterface {
   String iAgree = "I accept the user agreement";
   String paymentsHistory = 'Payments history';
   String transfersHistory = 'Transfers history';
-
   String reveiverPhone = 'Receiver phone';
-
   String transferAmount = 'Transfer amount';
-
   String infoAboutConfidentional = 'Privacy Information';
-
   String confidentionalAgreement =
       "The client undertakes to independently take all necessary measures to preserve confidentiality, prevent unauthorized use and protect his authentication data from unauthorized access by third parties. The client undertakes not to disclose his authentication data: login, password, PIN to third parties, ie. not to transfer his authentication data and confirms that he is independently responsible for the safety of confidential information and for the dissemination of data, as well as for possible financial losses as a result of the transfer of authentication data ";
+  String simpleIdentification = "Simplified identification";
+  String fullIdentification = "Full identification";
+  String afterFullIdentification =
+      "Complete identification, when you are already simplistically identified";
+  String currentlyNotWorking = "Currently not working";
+  String infoAboutIdentification = "Customer identification information";
 }

@@ -263,7 +263,7 @@ class _PaymentsCategoryPageState extends State<PaymentsCategoryPage> {
               index,
               logo,
               name,
-              isConvertable: isConvertable,
+              isConvertable: isConvertable == 1 ? true : false,
               providerId: null,
             ),
           ),

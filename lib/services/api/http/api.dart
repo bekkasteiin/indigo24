@@ -28,6 +28,7 @@ class Api {
   static const _configToken = 'D@Xo8b56r#7e1iZElhH39xK!WkB_42vYAG0p';
   static const _logoutToken = '0#!_kA8B@ncV2';
   static const _token = '1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2';
+  static const _identificationToken = "7Q96zaVd4X_uSDh5U0!ETj@NHfl31#b2Cyw8";
   String _tokenwhat = 'UGfbx#Du61zSNiXgjm4E!@M2OFJ98t3075_e';
   String _countryToken = '8F@RgTHf7Ae1_M#Lv0!K4kmcNb6por52QU39';
   String exchangeToken = '#8kX1xtDr4qSY8_C9!N@cC9bvT0Pilk85DS32';
@@ -47,8 +48,6 @@ class Api {
     } else {
       data['lang'] = Localization.language.code;
     }
-
-    print(_dio.options.headers);
 
     try {
       response = await _dio.post(
@@ -721,5 +720,14 @@ class Api {
       'blockedID': '$userId',
     };
     return _postRequest('api/v2.1/block/user', data);
+  }
+
+  identification(int type) async {
+    dynamic data = {
+      'customerID': user.id,
+      '_token': _identificationToken,
+      'type': type
+    };
+    return _postRequest('api/v0/identify', data);
   }
 }

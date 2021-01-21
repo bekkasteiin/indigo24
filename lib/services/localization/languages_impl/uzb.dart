@@ -196,4 +196,11 @@ class UZB implements LanguageInterface {
       'Mijoz maxfiylikni saqlash, ruxsasiz foydalanishni oldini olish va uning autentifikasiya ma\'lumotlarini uchinchi shaxslarning ruxsasiz kirishidan himoya qilish uchun mustaqil ravishda barcha zarur choralarni ko\'rishga majburdir. Mijoz o\'zining autentifikasiya ma\'lumotlarini oshkor qilmaslikni o\'z zimmasiga oladi: login, parol, PIN-kod uchinchi shaxslarga, ya\'ni. autentifikasiya ma\'lumotlarini o\'tkazmaslik va maxfiy ma\'lumotlarning xavfsizligi va ma\'lumotlarning tarqalishi uchun, shuningdek autentifikasiya ma\'lumotlarini uzatish natijasida yuzaga kelishi mumkin bo\'lgan moliyaviy zararlar uchun mustaqil ravishda javobgar ekanligini tasdiqlaydi';
   String paymentsHistory = 'To\'lov tarixi';
   String privacyPolicy = 'Xavfsizlik siyosati';
+  String simpleIdentification = "Soddalashtirilgan identifikatsiya";
+  String fullIdentification = "To'liq identifikatsiya qilish";
+  String afterFullIdentification =
+      "To'liq identifikatsiya qilish, qachonki siz allaqachon sodda tarzda aniqlangan bo'lsangiz";
+  String currentlyNotWorking = "Hozir ishlamayapti";
+  String infoAboutIdentification =
+      "Mijozni identifikatsiya qilish to'g'risida ma'lumot";
 }

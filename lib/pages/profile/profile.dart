@@ -32,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:indigo24/services/user.dart' as user;
 
+import 'identification/identification_list.dart';
 import 'profile_settings.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -414,7 +415,65 @@ class _UserProfilePageState extends State<UserProfilePage>
                           color: greyColor,
                         ),
                       ),
-                      SizedBox(height: 15),
+                      // if (user.identified != 1)
+                      //   Column(
+                      //     children: [
+                      //       SizedBox(height: 15),
+                      //       ConstrainedBox(
+                      //         constraints: BoxConstraints(
+                      //             maxWidth:
+                      //                 MediaQuery.of(context).size.width * 0.42),
+                      //         child: Container(
+                      //           decoration: BoxDecoration(
+                      //             boxShadow: [
+                      //               BoxShadow(
+                      //                 color: blackColor,
+                      //                 blurRadius: 10.0,
+                      //                 spreadRadius: -10,
+                      //                 offset: Offset(0.0, 0.0),
+                      //               )
+                      //             ],
+                      //           ),
+                      //           child: ButtonTheme(
+                      //             minWidth:
+                      //                 MediaQuery.of(context).size.width * 0.42,
+                      //             height: 50,
+                      //             child: RaisedButton(
+                      //               onPressed: () {
+                      //                 Navigator.push(
+                      //                   context,
+                      //                   MaterialPageRoute(
+                      //                     builder: (context) =>
+                      //                         InentificationListPage(),
+                      //                   ),
+                      //                 );
+                      //               },
+                      //               child: FittedBox(
+                      //                 fit: BoxFit.fitWidth,
+                      //                 child: Text(
+                      //                   "${Localization.language.identification}",
+                      //                   style: TextStyle(
+                      //                     color: primaryColor,
+                      //                     fontWeight: FontWeight.bold,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //               color: whiteColor,
+                      //               textColor: whiteColor,
+                      //               shape: RoundedRectangleBorder(
+                      //                 borderRadius: BorderRadius.circular(
+                      //                   10.0,
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       ConstrainedBox(
                         constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * 0.42),

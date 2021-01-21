@@ -3,7 +3,7 @@ description: A new Indigo24 project on flutter.
 
 publish_to: 'none' 
 
-version: 0.2.72+32
+version: 0.2.75+35
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

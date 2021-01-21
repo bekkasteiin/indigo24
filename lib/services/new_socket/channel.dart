@@ -10,7 +10,7 @@
 //   socket.stream.listen((data) {
 //     chatsStream._controller.add(data);
 //     chatStream._controller.add(data);
-//     print('main $data');
+//     print('main $data')
 //   });
 //   socket.channel.sink.add('Hello');
 //   runApp(MyApp());
@@ -19,7 +19,7 @@
 // class MyApp extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
-//     return MaterialApp(home: ChatsPage());
+//     return MaterialApp(home: ChatsPage())
 //   }
 // }
 
