@@ -155,7 +155,9 @@ class _InentificationListPageState extends State<InentificationListPage> {
               await launch(
                 result['URL'].toString() +
                     "?token=" +
-                    result['token'].toString(),
+                    result['token'].toString() +
+                    '&customerId=' +
+                    user.id,
                 forceSafariVC: false,
                 forceWebView: false,
               );
@@ -163,8 +165,7 @@ class _InentificationListPageState extends State<InentificationListPage> {
               showIndigoDialog(
                 context: context,
                 builder: CustomDialog(
-                  description:
-                      "${result['URL']} ${Localization.language.currentlyNotWorking}",
+                  description: "${result['message']}",
                   yesCallBack: () {
                     Navigator.of(context).pop();
                   },

@@ -45,7 +45,7 @@ dependencies:
   flutter_webview_plugin: ^0.3.11
   mask_text_input_formatter: ^1.0.7
   flutter_image_compress: ^0.6.8
-  app_settings: ^4.0.1+1
+  app_settings: ^4.0.4
   gallery_saver: ^2.0.1
   metadata_fetch: ^0.3.2
   flutter_interactive_keyboard: ^0.1.3
