@@ -196,4 +196,21 @@ abstract class LanguageInterface {
   String afterFullIdentification;
   String currentlyNotWorking;
   String infoAboutIdentification;
+  String instruction;
+  String identificationNote;
+
+  String step;
+  String identificationStepOne;
+
+  String identificationStepTwo;
+
+  String identificationStepThree;
+  String identificationStepFour;
+
+  String identificationStepFive;
+
+  String identificationStepSix;
+  String identificationStepSeven;
+  String identificationStepEight;
+  String infoAboutSimpleIdentification;
 }

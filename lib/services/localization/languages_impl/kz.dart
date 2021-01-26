@@ -202,4 +202,26 @@ class KZ implements LanguageInterface {
       "Сіз қарапайым түрде сәйкестендірілген кезде толық сәйкестендіру";
   String currentlyNotWorking = "Қазіргі уақытта жұмыс істемейді";
   String infoAboutIdentification = "Тұтынушының идентификациясы туралы ақпарат";
+
+  String instruction = 'Инструкция';
+  String identificationNote =
+      'Примечание: Стоимость упрощенной идентификации клиента (УИК) - 400 тенге. С вашего баланса спишется сумма 400 тенге за прохождение упрощенной идентификации.';
+  String step = 'Шаг ';
+  String identificationStepOne =
+      'Для упрощенной идентификации нажимаем на кнопку (смотреть ниже)';
+  String identificationStepTwo =
+      'Вас переносит в браузер, где просят ввести данные (смотреть ниже)';
+  String identificationStepThree = 'Введите свой ИИН';
+  String identificationStepFour =
+      'Нажимаете на “Выбрать файл” для загрузки фотографии лица';
+  String identificationStepFive =
+      'Нажимаете на “Выбрать файл” для загрузки видео лица';
+  String identificationStepSix =
+      'Нажимаете на “Выбрать файл” для загрузки фотографии удостоверения личности спереди';
+  String identificationStepSeven =
+      'Нажимаете на “Выбрать файл” для загрузки фотографии удостоверения личности сзади';
+  String identificationStepEight =
+      'После ввода и отправки всех данных, статус вашей заявки поступит на почту, указанную в приложении INDIGO24. Также вы можете проверить статус идентификации в профиле приложения INDIGO24';
+  String infoAboutSimpleIdentification =
+      'Инструкция по упрощенной идентификации';
 }

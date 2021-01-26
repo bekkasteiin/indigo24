@@ -3,7 +3,7 @@ description: A new Indigo24 project on flutter.
 
 publish_to: 'none' 
 
-version: 0.2.75+35
+version: 0.2.77+37
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -75,6 +75,7 @@ flutter:
   assets:
     - assets/sound/
     - assets/images/
+    - assets/images/identification/
     - assets/
 
   # fonts:

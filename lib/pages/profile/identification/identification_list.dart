@@ -8,6 +8,8 @@ import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:indigo24/services/user.dart' as user;
 
+import 'identification_info.dart';
+
 class InentificationListPage extends StatefulWidget {
   @override
   _InentificationListPageState createState() => _InentificationListPageState();
@@ -107,6 +109,46 @@ class _InentificationListPageState extends State<InentificationListPage> {
                         child: FittedBox(
                           child: Text(
                             "${Localization.language.infoAboutIdentification}",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InentificationInfoPage(),
+                    ),
+                  );
+                },
+                child: Container(
+                  color: transparentColor,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info,
+                        color: primaryColor,
+                      ),
+                      SizedBox(width: 5),
+                      Flexible(
+                        child: FittedBox(
+                          child: Text(
+                            "${Localization.language.infoAboutSimpleIdentification}",
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(

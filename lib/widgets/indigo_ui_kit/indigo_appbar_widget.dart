@@ -5,7 +5,7 @@ import 'package:indigo24/services/constants.dart';
 class IndigoAppBarWidget extends StatelessWidget
     implements PreferredSizeWidget {
   final bool centerTitle;
-  final Widget title;
+  final title;
   final Widget leading;
   final Brightness brightness;
   final List<Widget> actions;
@@ -40,7 +40,17 @@ class IndigoAppBarWidget extends StatelessWidget
             )
           : leading,
       brightness: brightness,
-      title: title,
+      title: title is String
+          ? Text(
+              "$title",
+              style: TextStyle(
+                color: blackPurpleColor,
+                fontWeight: FontWeight.w400,
+                fontSize: 22,
+              ),
+              textAlign: TextAlign.center,
+            )
+          : title,
       actions: actions,
       backgroundColor: backgroundColor,
       elevation: elevation,
