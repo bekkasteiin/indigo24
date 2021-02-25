@@ -14,6 +14,9 @@ import 'package:indigo24/widgets/indigo_ui_kit/indigo_appbar_widget.dart';
 import 'package:indigo24/services/user.dart' as user;
 
 class RefillPage extends StatefulWidget {
+  final provider;
+
+  const RefillPage(this.provider);
   @override
   _RefillPageState createState() => _RefillPageState();
 }
@@ -171,10 +174,10 @@ class _RefillPageState extends State<RefillPage> {
                                   });
                                 } else {
                                   if (double.parse(text) <=
-                                      double.parse(refillMax)) {
+                                      widget.provider['max']) {
                                     setState(() {
                                       _commission = (int.parse(text) *
-                                              double.parse(refillCommission) /
+                                              widget.provider['commission'] /
                                               100)
                                           .toStringAsFixed(2);
                                     });
@@ -182,9 +185,10 @@ class _RefillPageState extends State<RefillPage> {
                                 }
                               }
                               if (double.parse(_commission) <=
-                                  double.parse(refillMinCommission)) {
+                                  widget.provider['min_commission']) {
                                 setState(() {
-                                  _commission = '$refillMinCommission';
+                                  _commission =
+                                      '${widget.provider['min_commission']}';
                                 });
                               }
                             } else {
@@ -200,33 +204,34 @@ class _RefillPageState extends State<RefillPage> {
                       ),
                       Center(
                         child: Text(
-                          '${Localization.language.commission} $refillCommission%',
+                          '${Localization.language.commission} ${widget.provider['commission']}%',
                         ),
                       ),
                       Center(
                         child: Text(
-                            '${Localization.language.commission} $_commission KZT'),
-                      ),
-                      Center(
-                        child: Text(
-                          '${Localization.language.minCommission} $refillMinCommission KZT',
+                          '${Localization.language.commission} $_commission KZT',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${Localization.language.minAmount} $refillMin KZT',
+                          '${Localization.language.minCommission} ${widget.provider['min_commission']} KZT',
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${Localization.language.maxAmount} $refillMax KZT',
+                          '${Localization.language.minAmount} ${widget.provider['min']} KZT',
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          '${Localization.language.maxAmount} ${widget.provider['max']} KZT',
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
+                        padding: EdgeInsets.symmetric(vertical: 20),
                       ),
                       Container(
-                        margin: EdgeInsets.only(left: 20, right: 20, top: 20),
+                        margin: EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(boxShadow: [
                           BoxShadow(
                               color: blackColor,
@@ -247,19 +252,22 @@ class _RefillPageState extends State<RefillPage> {
                                 setState(() {
                                   _preloader = true;
                                 });
+
                                 _api
-                                    .refill(_amountController.text)
-                                    .then((refillResult) {
+                                    .refill(widget.provider['url'],
+                                        _amountController.text)
+                                    .then((withdrawResult) {
                                   setState(() {
                                     _preloader = false;
                                   });
-                                  if (refillResult['success'].toString() ==
+                                  if (withdrawResult['success'].toString() ==
                                       'true') {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => RefillWebView(
-                                          url: refillResult['redirectURL'],
+                                          url: withdrawResult['result']
+                                              ['redirectURL'],
                                         ),
                                       ),
                                     );
@@ -268,7 +276,7 @@ class _RefillPageState extends State<RefillPage> {
                                       context: context,
                                       builder: CustomDialog(
                                         description:
-                                            "${refillResult['message']}",
+                                            '${withdrawResult['message']}',
                                         yesCallBack: () {
                                           Navigator.pop(context);
                                         },

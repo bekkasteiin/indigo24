@@ -22,6 +22,7 @@ class Api {
   );
 
   Dio _dio = Dio(_options);
+
   static const _sendSmsToken = '2MSldk_7!FUh3zB18XoEfIe#nY69@0tcP5Q4';
   static const _registrationToken = 'BGkA2as4#h_J@5txId3fEq6e!F80UMj197ZC';
   static const _checkPhoneToken = 'EG#201wR8Wk6ZbvMFf_e@39h7V!tI5gBTx4a';
@@ -29,6 +30,7 @@ class Api {
   static const _logoutToken = '0#!_kA8B@ncV2';
   static const _token = '1E#cw!5yofLCB3b_DX07x@4uKT6FH9mta8J2';
   static const _identificationToken = "7Q96zaVd4X_uSDh5U0!ETj@NHfl31#b2Cyw8";
+
   String _tokenwhat = 'UGfbx#Du61zSNiXgjm4E!@M2OFJ98t3075_e';
   String _countryToken = '8F@RgTHf7Ae1_M#Lv0!K4kmcNb6por52QU39';
   String exchangeToken = '#8kX1xtDr4qSY8_C9!N@cC9bvT0Pilk85DS32';
@@ -388,7 +390,7 @@ class Api {
           'customerID': '${user.id}',
           'unique': '${user.unique}',
           'toID': '$toID',
-          'amount': '$amount',
+          'amount': '$amount'
         };
       }
       return _postRequest('api/v2.1/check/send/money', data);
@@ -556,15 +558,14 @@ class Api {
     return _postRequest('api/v2.2/get/histories', data);
   }
 
-  refill(amount) async {
+  refill(String path, amount) async {
     dynamic data = {
       '_token': '$_tokenwhat',
       'amount': '$amount',
       'customerID': '${user.id}',
       'unique': '${user.unique}'
     };
-
-    return _postRequest('api/v2.1/pay/in', data);
+    return _postRequest(path, data);
   }
 
   getCategories() async {
@@ -729,5 +730,15 @@ class Api {
       'type': type
     };
     return _postRequest('api/v0/identify', data);
+  }
+
+  checkIdentification() async {
+    dynamic data;
+    return _getRequest('api/v2.1/app/identification/partial', data);
+  }
+
+  checkVersion() async {
+    dynamic data;
+    return _getRequest('api/v2.1/app/version', data);
   }
 }

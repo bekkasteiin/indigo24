@@ -72,6 +72,7 @@ class _IntroPageState extends State<IntroPage> {
                             Localization.languages[index].code);
                       });
                       Navigator.pop(context);
+                      showUserInfo();
                     },
                   );
                 },
@@ -92,6 +93,7 @@ class _IntroPageState extends State<IntroPage> {
       barrierDismissible: false,
       builder: errorDialog,
     );
+    return true;
   }
 
   // _showNews(dynamic result) {
@@ -182,6 +184,125 @@ class _IntroPageState extends State<IntroPage> {
     //     _showNews(result);
     //   }
     // });
+  }
+
+  showUserInfo() {
+    showIndigoDialog(
+      context: context,
+      builder: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          child: Material(
+            borderRadius: BorderRadius.circular(
+              16.0,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Text(
+                          '${Localization.language.forUserInfoHeader}',
+                          style: TextStyle(),
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        '${Localization.language.forUserInfoDear}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Text('${Localization.language.forUserInfoBody}'),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Text('${Localization.language.forUserInfoFooter}'),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Text(
+                        '12.02.2021',
+                        style: TextStyle(),
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: blackColor,
+                            blurRadius: 10.0,
+                            spreadRadius: -10,
+                            offset: Offset(0.0, 0.0),
+                          )
+                        ],
+                      ),
+                      child: ButtonTheme(
+                        height: 40,
+                        child: RaisedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 200,
+                            child: Center(
+                              child: Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: whiteColor,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ),
+                          color: primaryColor,
+                          textColor: blackPurpleColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              10.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override

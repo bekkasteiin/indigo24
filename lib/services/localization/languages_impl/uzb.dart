@@ -225,4 +225,17 @@ class UZB implements LanguageInterface {
       'После ввода и отправки всех данных, статус вашей заявки поступит на почту, указанную в приложении INDIGO24. Также вы можете проверить статус идентификации в профиле приложения INDIGO24';
   String infoAboutSimpleIdentification =
       'Инструкция по упрощенной идентификации';
+  String forUserInfoHeader =
+      '"Indigo24" elektron pul egalarining ma\'lumotlari uchun';
+  String forUserInfoBody =
+      '"Indigo24" elektron pul tizimining operatori bo\'lgan "Indigo24" LLP, sizni "Indigo24" tizim emitenti - "AsiaCredit Bank" AK (AsiaCredit Bank) litsenziyasini bekor qilish to\'g\'risida vakolatli organ tomonidan qabul qilingan Qarori munosabati bilan sizga xabar beradi. Bank) qimmatli qog\'ozlar bozoridagi bank va boshqa operatsiyalar va faoliyat uchun operator amaldagi qonunchilik talablariga muvofiq ushbu emitent tomonidan chiqarilgan elektron pullardan foydalangan holda operatsiyalarni to\'xtatishi shart. Shu munosabat bilan "Indigo24" tizimidagi barcha operatsiyalar emitent bank "Alfa-Bank" OAJ Tizimga ulanmaguncha to\'xtatiladi. To\'lovni qaytarish bo\'yicha keyingi harakatlar qo\'shimcha ravishda https://indigo24.com rasmiy veb-saytimizda e\'lon qilinadi. Sizni qiziqtirgan barcha savollar bo\'yicha "AsiaCredit Bank" AJ vaqtinchalik ma\'muriyatiga quyidagi telefonlar orqali murojaat qilishingiz mumkin: +7 (727) 330 88 11, 355 05 35.';
+
+  String forUserInfoFooter = 'Hurmat bilan, "Indigo24" LLP rahbariyati';
+  String forUserInfoDear = "Hurmatli foydalanuvchilar!";
+
+  String alfaBank = 'Alfa-Bank';
+
+  String asiaCreditBank = r'AO "AsiaCredit Bank (AsiaCredit Bank)" ';
+
+  String eMoneyBalance = 'Elektron pul qoldig\'i';
 }

@@ -26,9 +26,11 @@ import 'package:indigo24/services/helpers/user_helper.dart';
 import 'package:indigo24/services/api/socket/socket.dart';
 import 'package:indigo24/style/colors.dart';
 import 'package:indigo24/widgets/alerts/indigo_alert.dart';
+import 'package:indigo24/widgets/alerts/indigo_logout.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/pin/pin_code.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:package_info/package_info.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:indigo24/services/localization/localization.dart';
 import 'package:indigo24/services/user.dart' as user;
@@ -212,22 +214,33 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     // });
 
     Timer.run(() {
-      '${user.pin}' == 'false'
-          ? Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    PasscodeScreen(
-                  title: Localization.language.createPin,
-                  withPin: false,
-                  passwordEnteredCallback: _onPasscodeEntered,
-                  shouldTriggerVerification: _verificationNotifier.stream,
-                  backgroundColor: milkWhiteColor,
-                  cancelCallback: _onPasscodeCancelled,
-                ),
+      api.checkVersion().then((result) async {
+        final PackageInfo _packageInfo = await PackageInfo.fromPlatform();
+        String appVersion =
+            _packageInfo.version + ':' + _packageInfo.buildNumber;
+        print(result);
+        print(appVersion);
+        if (result == appVersion) {
+          if ('${user.pin}' == 'false') print('TODO TURN ON');
+
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  PasscodeScreen(
+                title: Localization.language.createPin,
+                withPin: false,
+                passwordEnteredCallback: _onPasscodeEntered,
+                shouldTriggerVerification: _verificationNotifier.stream,
+                backgroundColor: milkWhiteColor,
+                cancelCallback: _onPasscodeCancelled,
               ),
-            )
-          : Text('');
+            ),
+          );
+        } else {
+          logOut(context);
+        }
+      });
     });
 
     _firebaseMessaging.configure(
@@ -262,6 +275,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       IndigoContacts.getContactsTemplate(context);
       setState(() {});
     });
+
     super.initState();
   }
 
@@ -373,6 +387,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         statusBarBrightness: Brightness.light,
       ),
     );
+
     return Scaffold(
       body: TabBarView(
         physics: NeverScrollableScrollPhysics(),

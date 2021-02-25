@@ -193,7 +193,6 @@ class ChatRoom {
 
       for (int i = 1; i < repeatCount + 1; i++) {
         text = wordsList.sublist(0, maxWordCount * i).join(' ');
-
         data = json.encode({
           "cmd": 'message:create',
           "data": {

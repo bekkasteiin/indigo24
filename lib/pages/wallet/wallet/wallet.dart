@@ -1,3 +1,4 @@
+import 'package:indigo24/pages/wallet/refill/refill_list.dart';
 import 'package:indigo24/services/constants.dart';
 import 'dart:async';
 
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indigo24/pages/wallet/balance_history/balance_history.dart';
 import 'package:indigo24/pages/wallet/payments/paymnets_category/payments_category.dart';
-import 'package:indigo24/pages/wallet/refill/refill.dart';
 import 'package:indigo24/pages/wallet/transfers/transfer_list.dart';
 import 'package:indigo24/pages/wallet/wallet/symbol/symbol_interface.dart';
 import 'package:indigo24/services/api/http/api.dart';
@@ -40,6 +40,8 @@ class WalletTab extends StatefulWidget {
 }
 
 double _amount = double.parse(user.balance);
+double _alfaAmount = double.parse(userAsiaBalance) * 2;
+dynamic userAsiaBalance = user.balance;
 
 class _WalletTabState extends State<WalletTab> {
   final StreamController<bool> _verificationNotifier =
@@ -50,6 +52,7 @@ class _WalletTabState extends State<WalletTab> {
 
   double _blockedAmount = 0;
   double _realAmount = 0;
+  double _alfaRealAmount = 0;
 
   SymbolInterface globalSymbol = TengeSymbol();
   SymbolInterface euroSymbol = EuroSymbol();
@@ -81,6 +84,7 @@ class _WalletTabState extends State<WalletTab> {
     });
 
     _realAmount = double.parse(user.balance);
+    _alfaRealAmount = double.parse(user.balance) * 2;
     _blockedAmount = double.parse(user.balanceInBlock);
     _api.getExchangeRate().then((v) {
       if (v['message'] == 'Not authenticated' &&
@@ -168,6 +172,7 @@ class _WalletTabState extends State<WalletTab> {
   @override
   Widget build(BuildContext context) {
     _amount = _realAmount / globalSymbol.coef;
+    _alfaAmount = _alfaRealAmount / globalSymbol.coef;
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: RefreshIndicator(
@@ -232,8 +237,15 @@ class _WalletTabState extends State<WalletTab> {
                               color: brightGreyColor,
                             ),
                             _balance(),
-                            SizedBox(height: 10),
-                            _balanceAmount(),
+                            Text(
+                              '${Localization.language.alfaBank}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            _balanceAmount(true),
                             _exchangeButtons(),
                             SizedBox(height: 10),
                             globalSymbol.type == Symbol.tenge
@@ -252,6 +264,26 @@ class _WalletTabState extends State<WalletTab> {
                         ),
                       ),
                       _blockedBalance(size),
+                      Container(
+                        width: size.width,
+                        color: darkPrimaryColor,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Column(
+                          children: [
+                            _balance(),
+                            Text(
+                              '${Localization.language.asiaCreditBank}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            _balanceAmount(false),
+                          ],
+                        ),
+                      ),
                       Container(
                         color: whiteColor,
                         padding: EdgeInsets.only(
@@ -373,7 +405,6 @@ class _WalletTabState extends State<WalletTab> {
             ).whenComplete(() async {
               await _api.getBalance();
               setState(() {
-                // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
                 _blockedAmount = double.parse(user.balanceInBlock);
               });
@@ -492,6 +523,7 @@ class _WalletTabState extends State<WalletTab> {
               setState(() {
                 // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
+                _alfaAmount = double.parse(userAsiaBalance) * 2;
                 _blockedAmount = double.parse(user.balanceInBlock);
               });
             });
@@ -526,17 +558,17 @@ class _WalletTabState extends State<WalletTab> {
 
   Text _balance() {
     return Text(
-      '${Localization.language.balance}',
+      '${Localization.language.eMoneyBalance}',
       style: fS18(c: 'ffffff'),
     );
   }
 
-  Widget _balanceAmount() {
+  Widget _balanceAmount(bool main) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
-          '${_amount.toStringAsFixed(2)}',
+          '${main ? _amount.toStringAsFixed(2) : _alfaAmount.toStringAsFixed(2)}',
           style: fS26(c: 'ffffff'),
         ),
         Image(
@@ -608,13 +640,14 @@ class _WalletTabState extends State<WalletTab> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RefillPage(),
+                    builder: (context) => RefillListPage(),
                   ),
                 ).whenComplete(() async {
                   await _api.getBalance();
                   setState(() {
-                    // _amount = double.parse(user.balance);
                     _realAmount = double.parse(user.balance);
+                    _alfaAmount = double.parse(userAsiaBalance) * 2;
+
                     _blockedAmount = double.parse(user.balanceInBlock);
                   });
                 });
@@ -662,6 +695,8 @@ class _WalletTabState extends State<WalletTab> {
                   setState(() {
                     // _amount = double.parse(user.balance);
                     _realAmount = double.parse(user.balance);
+                    _alfaAmount = double.parse(userAsiaBalance) * 2;
+
                     _blockedAmount = double.parse(user.balanceInBlock);
                   });
                 });
@@ -723,6 +758,9 @@ class _WalletTabState extends State<WalletTab> {
       onTap: () {
         setState(() {
           _amount = num.parse((_realAmount / symbol.coef).toStringAsFixed(2));
+          _alfaAmount =
+              num.parse((_alfaRealAmount / symbol.coef).toStringAsFixed(2));
+
           globalSymbol = symbol;
         });
       },

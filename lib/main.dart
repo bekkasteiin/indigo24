@@ -41,7 +41,7 @@ Future<void> main() async {
   runApp(MyApp(phone: phone, domen: domen));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final String domen;
   final String phone;
 
@@ -52,6 +52,11 @@ class MyApp extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -60,17 +65,18 @@ class MyApp extends StatelessWidget {
     return OverlaySupport(
       child: MaterialApp(
         themeMode: ThemeMode.light,
-        debugShowCheckedModeBanner: domen == 'com' ? false : true,
+        debugShowCheckedModeBanner: widget.domen == 'com' ? false : true,
         title: 'Indigo24',
         builder: (context, child) {
           return MediaQuery(
-              child: child,
-              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0));
+            child: child,
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          );
         },
         theme: ThemeData(
           primarySwatch: blueColor,
         ),
-        home: '$phone' == 'null' ? IntroPage() : Tabs(),
+        home: '${widget.phone}' != 'null' ? IntroPage() : Tabs(),
       ),
     );
   }

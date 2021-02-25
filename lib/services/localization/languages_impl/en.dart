@@ -224,4 +224,15 @@ class EN implements LanguageInterface {
       'После ввода и отправки всех данных, статус вашей заявки поступит на почту, указанную в приложении INDIGO24. Также вы можете проверить статус идентификации в профиле приложения INDIGO24';
   String infoAboutSimpleIdentification =
       'Инструкция по упрощенной идентификации';
+  String forUserInfoHeader =
+      'For the information of owners of electronic money "Indigo24"';
+  String forUserInfoBody =
+      '"Indigo24" LLP, which is the operator of the "Indigo24" electronic money system, notifies you that in connection with the Resolution adopted by the authorized body to revoke the license of the "Indigo24" System Issuer - "AsiaCredit Bank" JSC (AsiaCredit Bank) for banking and other operations and activities in the securities market, the operator is obliged to stop operations using electronic money issued by this issuer in accordance with the requirements of the current legislation. In this connection, all operations in the System "Indigo24" will be suspended until the connection of the issuing bank JSC SB "Alfa-Bank" to the System. Further actions for refund will be announced additionally on our official website https://indigo24.com. For all questions of interest, you can contact the temporary administration of AsiaCredit Bank JSC by phones: +7 (727) 330 88 11, 355 05 35.';
+  String forUserInfoFooter = 'Best regards, Management of "Indigo24" LLP';
+  String forUserInfoDear = "Dear Users!";
+  String alfaBank = 'Alfa-bank';
+
+  String asiaCreditBank = 'AO "AsiaCredit Bank (AsiaCredit Bank)" ';
+
+  String eMoneyBalance = 'Electronic money balance';
 }

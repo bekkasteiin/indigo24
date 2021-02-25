@@ -60,7 +60,9 @@ dependencies:
   screenshot: ^0.2.0
   downloads_path_provider: ^0.1.0
   flutter_cache_manager: ^2.1.0
-
+  #launch_review: ^2.0.0
+  open_appstore: ^1.0.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

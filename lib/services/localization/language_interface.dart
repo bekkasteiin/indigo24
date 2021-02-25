@@ -198,19 +198,21 @@ abstract class LanguageInterface {
   String infoAboutIdentification;
   String instruction;
   String identificationNote;
-
   String step;
   String identificationStepOne;
-
   String identificationStepTwo;
-
   String identificationStepThree;
   String identificationStepFour;
-
   String identificationStepFive;
-
   String identificationStepSix;
   String identificationStepSeven;
   String identificationStepEight;
   String infoAboutSimpleIdentification;
+  String forUserInfoHeader;
+  String forUserInfoBody;
+  String forUserInfoDear;
+  String forUserInfoFooter;
+  String eMoneyBalance;
+  String alfaBank;
+  String asiaCreditBank;
 }
