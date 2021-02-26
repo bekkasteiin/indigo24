@@ -314,6 +314,7 @@ class Api {
           '${result['result']['balanceInBlock']}');
       user.balance = '${result['result']['balance']}';
       user.balanceInBlock = '${result['result']['balanceInBlock']}';
+      user.balanceACB = '${result['result']['balanceACB']}';
     }
     return result;
   }
@@ -534,6 +535,14 @@ class Api {
       'unique': '${user.unique}',
     };
     return _postRequest('api/v2.1/withdraw/providers', data);
+  }
+
+  getRefills() async {
+    dynamic data = {
+      'customerID': '${user.id}',
+      'unique': '${user.unique}',
+    };
+    return _postRequest('api/v2.1/refill/providers', data);
   }
 
   getHistories(page) async {

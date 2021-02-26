@@ -23,7 +23,7 @@ class _RefillListPageState extends State<RefillListPage> {
     _isLoaded = false;
     _refillList = [];
     _api = Api();
-    _api.getWithdraws().then((refillResult) {
+    _api.getRefills().then((refillResult) {
       setState(() {
         _isLoaded = true;
         _refillList = refillResult;

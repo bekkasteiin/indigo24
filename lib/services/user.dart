@@ -7,6 +7,7 @@ String name = "";
 String unique = "";
 String phone = "";
 String balance = "";
+String balanceACB = "";
 String balanceInBlock = "";
 String pin = "false";
 String chatBackground = 'ligth';

@@ -40,7 +40,7 @@ class WalletTab extends StatefulWidget {
 }
 
 double _amount = double.parse(user.balance);
-double _alfaAmount = double.parse(userAsiaBalance) * 2;
+double _alfaAmount = double.parse(user.balanceACB);
 dynamic userAsiaBalance = user.balance;
 
 class _WalletTabState extends State<WalletTab> {
@@ -84,7 +84,7 @@ class _WalletTabState extends State<WalletTab> {
     });
 
     _realAmount = double.parse(user.balance);
-    _alfaRealAmount = double.parse(user.balance) * 2;
+    _alfaRealAmount = double.parse(user.balanceACB);
     _blockedAmount = double.parse(user.balanceInBlock);
     _api.getExchangeRate().then((v) {
       if (v['message'] == 'Not authenticated' &&
@@ -523,7 +523,7 @@ class _WalletTabState extends State<WalletTab> {
               setState(() {
                 // _amount = double.parse(user.balance);
                 _realAmount = double.parse(user.balance);
-                _alfaAmount = double.parse(userAsiaBalance) * 2;
+                _alfaAmount = double.parse(user.balanceACB);
                 _blockedAmount = double.parse(user.balanceInBlock);
               });
             });
@@ -646,7 +646,7 @@ class _WalletTabState extends State<WalletTab> {
                   await _api.getBalance();
                   setState(() {
                     _realAmount = double.parse(user.balance);
-                    _alfaAmount = double.parse(userAsiaBalance) * 2;
+                    _alfaAmount = double.parse(user.balanceACB);
 
                     _blockedAmount = double.parse(user.balanceInBlock);
                   });
@@ -695,7 +695,7 @@ class _WalletTabState extends State<WalletTab> {
                   setState(() {
                     // _amount = double.parse(user.balance);
                     _realAmount = double.parse(user.balance);
-                    _alfaAmount = double.parse(userAsiaBalance) * 2;
+                    _alfaAmount = double.parse(user.balanceACB);
 
                     _blockedAmount = double.parse(user.balanceInBlock);
                   });
