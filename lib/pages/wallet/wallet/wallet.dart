@@ -274,6 +274,7 @@ class _WalletTabState extends State<WalletTab> {
                             _balance(),
                             Text(
                               '${Localization.language.asiaCreditBank}',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,

@@ -24,7 +24,6 @@ import 'package:indigo24/widgets/alerts/indigo_alert.dart';
 import 'package:indigo24/widgets/alerts/indigo_show_dialog.dart';
 import 'package:indigo24/widgets/indigo_ui_kit/indigo_modal_action_widget.dart';
 import 'package:indigo24/widgets/photo/photo.dart';
-import 'package:open_appstore/open_appstore.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -539,14 +538,6 @@ class _UserProfilePageState extends State<UserProfilePage>
                       ),
                       SizedBox(
                         height: 10,
-                      ),
-                      FlatButton(
-                        child: Text('123'),
-                        onPressed: () {
-                          OpenAppstore.launch(
-                              androidAppId: "com.facebook.katana&hl=ko",
-                              iOSAppId: "284882215");
-                        },
                       ),
                       ConstrainedBox(
                         constraints: BoxConstraints(
