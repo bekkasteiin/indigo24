@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: blueColor,
         ),
-        home: '${widget.phone}' != 'null' ? IntroPage() : Tabs(),
+        home: '${widget.phone}' == 'null' ? IntroPage() : Tabs(),
       ),
     );
   }
