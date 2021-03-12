@@ -72,7 +72,7 @@ class KZ implements LanguageInterface {
   String save = 'Сақтау';
   String share = 'Бөлісу';
   String photo = 'Фото';
-  String sessionIsOver = 'Тіркелгіңізге басқа құрылғы арқылы кірді';
+  String sessionIsOver = 'Аутентификация белгісі ескірген, жүйеге кіріңіз';
   String cancel = 'Болдырмау';
   String allowContacts = 'Контактілерге рұқсат беріңіз';
   String openSettings = 'Параметрлерді ашу';

@@ -72,7 +72,8 @@ class RU implements LanguageInterface {
   String save = 'Сохранить';
   String share = 'Поделиться';
   String photo = 'Фото';
-  String sessionIsOver = 'На ваш аккаунт вошли через другое устройство';
+  String sessionIsOver =
+      'Аутентификационный токен устарел, пожалуйста авторизуйтесь';
   String cancel = 'Cancel';
   String allowContacts = 'Разрешить контакты';
   String openSettings = 'Открыть настройки';

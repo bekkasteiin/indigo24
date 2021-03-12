@@ -72,7 +72,8 @@ class EN implements LanguageInterface {
   String save = 'Save';
   String share = 'Share';
   String photo = 'Photo';
-  String sessionIsOver = 'Your account was signed in with a different device';
+  String sessionIsOver =
+      'The authentication token is out of date, please log in';
   String cancel = 'Cancel';
   String allowContacts = 'Allow contacts';
   String openSettings = 'Open settings';

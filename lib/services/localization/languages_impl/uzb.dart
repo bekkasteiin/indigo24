@@ -72,7 +72,9 @@ class UZB implements LanguageInterface {
   String save = 'Saqlash';
   String share = 'Bo\'lishish';
   String photo = 'Surat';
-  String sessionIsOver = 'Hisobingizga boshqa qurilma orqali kirish mumkin';
+  String sessionIsOver =
+      'Autentifikatsiya belgisi eskirgan, iltimos tizimga kiring';
+
   String cancel = 'Bekor qilish';
   String allowContacts = 'Kontaktlar ruxsat berish';
   String openSettings = 'Sozlamalarni ochish';

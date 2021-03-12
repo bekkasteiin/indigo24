@@ -72,7 +72,8 @@ class UZ implements LanguageInterface {
   String save = 'Сақлаш';
   String share = 'Бўлишиш';
   String photo = 'Сурат';
-  String sessionIsOver = 'Сизнинг ҳисоб бошқа қурилма орқали кирган';
+  String sessionIsOver =
+      'Аутентификатсия белгиси эскирган, илтимос тизимга киринг';
   String cancel = 'Бекор қилиш';
   String allowContacts = 'Контактларга рухсат бериш';
   String openSettings = 'Созламаларни очиш';
