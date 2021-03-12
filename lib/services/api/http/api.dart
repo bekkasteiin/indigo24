@@ -86,7 +86,6 @@ class Api {
     String path,
     dynamic queryParameters, {
     void Function(int, int) onReceiveProgress,
-    Options options,
   }) async {
     Response response;
     if (queryParameters != null)
@@ -97,7 +96,7 @@ class Api {
         path,
         queryParameters: queryParameters,
         onReceiveProgress: onReceiveProgress,
-        options: options,
+        options: Options(headers: {"v": user.version}),
       );
       print('this is get request ${response.data}');
       return response.data == String
@@ -321,11 +320,11 @@ class Api {
 
   signIn(phone, password) async {
     final PackageInfo _packageInfo = await PackageInfo.fromPlatform();
-    user.version = _packageInfo.version;
+    user.version = _packageInfo.version + ':' + _packageInfo.buildNumber;
     dynamic data = {
       'phone': '$phone',
       'password': '$password',
-      'v': _packageInfo.version
+      'v': user.version
     };
     var result = await _postRequest('api/v2.1/check/authentication', data);
 
