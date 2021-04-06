@@ -2,7 +2,7 @@ import '../language_interface.dart';
 
 class EN implements LanguageInterface {
   String code = 'en';
-
+  String getExtract = 'Get an extract';
   String signUp = 'Registration';
   String title = 'Title';
   String signIn = 'Sign In';

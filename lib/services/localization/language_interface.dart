@@ -1,6 +1,6 @@
 abstract class LanguageInterface {
   String code;
-
+  String getExtract;
   String signUp;
   String signIn;
   String title;

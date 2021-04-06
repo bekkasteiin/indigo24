@@ -2,7 +2,7 @@ import 'package:indigo24/services/localization/language_interface.dart';
 
 class KZ implements LanguageInterface {
   String code = 'kz';
-
+  String getExtract = 'Көшірмені алу';
   String signUp = 'Тіркелу';
   String title = 'Атауы';
   String signIn = 'Кіру';

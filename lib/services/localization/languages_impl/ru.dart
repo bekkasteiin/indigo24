@@ -2,7 +2,7 @@ import '../language_interface.dart';
 
 class RU implements LanguageInterface {
   String code = 'ru';
-
+  String getExtract = 'Получить выписку';
   String signUp = 'Регистрация';
   String title = 'Название';
   String signIn = 'Вход';

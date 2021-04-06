@@ -186,6 +186,7 @@ class _IntroPageState extends State<IntroPage> {
     // });
   }
 
+
   showUserInfo() {
     showIndigoDialog(
       context: context,

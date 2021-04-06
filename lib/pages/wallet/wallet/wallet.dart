@@ -67,6 +67,7 @@ class _WalletTabState extends State<WalletTab> {
   @override
   void initState() {
     _api.getBalance();
+    print(_api.getBalance());
     if ('${user.pin}'.toString() == 'false') {
       _withPin = false;
     }
@@ -396,6 +397,7 @@ class _WalletTabState extends State<WalletTab> {
       child: ButtonTheme(
         minWidth: size.width * 0.8,
         height: 70,
+        // ignore: deprecated_member_use
         child: RaisedButton(
           onPressed: () {
             Navigator.push(
@@ -455,6 +457,7 @@ class _WalletTabState extends State<WalletTab> {
       child: ButtonTheme(
         minWidth: size.width * 0.8,
         height: 70,
+        // ignore: deprecated_member_use
         child: RaisedButton(
           onPressed: () {
             Navigator.push(context,
@@ -512,6 +515,7 @@ class _WalletTabState extends State<WalletTab> {
       ),
       child: ButtonTheme(
         height: 70,
+        // ignore: deprecated_member_use
         child: RaisedButton(
           onPressed: () {
             Navigator.push(
@@ -636,6 +640,7 @@ class _WalletTabState extends State<WalletTab> {
           child: ButtonTheme(
             minWidth: size.width * 0.42,
             height: 50,
+            // ignore: deprecated_member_use
             child: RaisedButton(
               onPressed: () {
                 Navigator.push(
@@ -684,6 +689,7 @@ class _WalletTabState extends State<WalletTab> {
           child: ButtonTheme(
             minWidth: size.width * 0.42,
             height: 50,
+            // ignore: deprecated_member_use
             child: RaisedButton(
               onPressed: () {
                 Navigator.push(

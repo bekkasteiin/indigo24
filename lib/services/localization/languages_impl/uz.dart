@@ -2,7 +2,7 @@ import '../language_interface.dart';
 
 class UZ implements LanguageInterface {
   String code = 'uz';
-
+  String getExtract = 'Кўчирмани олинг';
   String signUp = 'Рўйхатдан ўтиш';
   String title = 'Номи';
   String signIn = 'Кириш';

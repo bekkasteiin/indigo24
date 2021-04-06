@@ -34,6 +34,7 @@ import 'package:indigo24/services/user.dart' as user;
 
 import 'identification/identification_list.dart';
 import 'profile_settings.dart';
+import 'package:intl/intl.dart' show DateFormat;
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -45,9 +46,14 @@ bool needToAskCity = true;
 class _UserProfilePageState extends State<UserProfilePage>
     with AutomaticKeepAliveClientMixin {
   Api _api;
-
+  var dateFormatShortRest = DateFormat('dd.MM.yyyy');
+  DateTime times;
+  DateTime startDate;
+  DateTime endDate;
   dynamic response;
   File _image;
+  String startTime = "";
+  CupertinoDatePickerMode mode;
 
   final picker = ImagePicker();
 
@@ -72,6 +78,7 @@ class _UserProfilePageState extends State<UserProfilePage>
   @override
   void initState() {
     super.initState();
+    endDate = DateTime.now();
     _api = Api();
     _api.getProfile().then((result) {
       if (result['message'] == 'Not authenticated' &&
@@ -110,6 +117,11 @@ class _UserProfilePageState extends State<UserProfilePage>
     _initPackageInfo();
   }
 
+  String formatShortly(DateTime val) {
+    if (val == null) return '';
+    return dateFormatShortRest.format(val);
+  }
+
   Future<void> _initPackageInfo() async {
     final PackageInfo info = await PackageInfo.fromPlatform();
     if (mounted) {
@@ -143,6 +155,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                 shrinkWrap: false,
                 itemCount: cities.length,
                 itemBuilder: (BuildContext context, int index) {
+                  // ignore: deprecated_member_use
                   return FlatButton(
                     child: Text('${cities[index]}'),
                     onPressed: () {
@@ -373,6 +386,164 @@ class _UserProfilePageState extends State<UserProfilePage>
     );
   }
 
+  downloadExtract(BuildContext context) {
+    return showDialog<void>(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(Localization.language.getExtract),
+          actions: [
+            CupertinoDialogAction(
+              child: Text('Oк'),
+              onPressed: () async {
+                if (await canLaunch(
+                  times != null
+                      ? 'https://indigo24.com/report.php?id=${user.id}&date_begin=${formatShortly(times)}&date_end=${formatShortly(endDate)}'
+                      : 'https://indigo24.com/report.php?id=${user.id}',
+                )) {
+                  await launch(
+                    times != null
+                        ? 'https://indigo24.com/report.php?id=${user.id}&date_begin=${formatShortly(times)}&date_end=${formatShortly(endDate)}'
+                        : 'https://indigo24.com/report.php?id=${user.id}',
+                    forceSafariVC: false,
+                    forceWebView: false,
+                    headers: <String, String>{
+                      'my_header_key': 'my_header_value'
+                    },
+                  );
+                } else {
+                  throw 'Could not launch \'https://indigo24.com\'';
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  showGetExtract() {
+    showDialog(
+      barrierColor: blackPurpleColor.withOpacity(0.2),
+      context: context,
+      builder: (BuildContext context) => Container(
+        padding: EdgeInsets.fromLTRB(30.0, 100, 30, 250),
+        child: Material(
+          borderRadius: BorderRadius.circular(
+            16.0,
+          ),
+          child: Column(
+            children: [
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    '${Localization.language.getExtract}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  showCupertinoDatePicker(context,
+                      backgroundColor:
+                          CupertinoTheme.of(context).scaffoldBackgroundColor,
+                      leftHanded: false,
+                      mode: mode ?? CupertinoDatePickerMode.date,
+                      initialDateTime: startDate ?? DateTime.now(),
+                      onDateTimeChanged: (date) {
+                    DateTime result;
+                    if (date.year > 0) {
+                      result = DateTime(date.year, date.month, date.day);
+                    } else {
+                      result = times;
+                    }
+                    setState(() {
+                      times = result;
+                      startTime = formatShortly(result);
+                    });
+                  });
+
+                },
+                title: Text("Дата с"),
+                subtitle:
+                     Text(startTime),
+              ),
+              Divider(
+                height: 5,
+                thickness: 2,
+                indent: 15,
+                endIndent: 15,
+              ),
+              ListTile(
+                title: Text("Дата по"),
+                subtitle: Text(formatShortly(endDate)),
+              ),
+              Divider(
+                height: 5,
+                thickness: 2,
+                indent: 15,
+                endIndent: 15,
+              ),
+              SizedBox(
+                height: 50.0,
+              ),
+              Center(
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: blackColor,
+                        blurRadius: 10.0,
+                        spreadRadius: -10,
+                        offset: Offset(0.0, 0.0),
+                      )
+                    ],
+                  ),
+                  child: ButtonTheme(
+                    // ignore: deprecated_member_use
+                    child: RaisedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        showGetExtract();
+                       downloadExtract(context);
+                      },
+                      child: Container(
+                        height: 50,
+                        width: 200,
+                        child: Center(
+                          child: Text(
+                            'OK',
+                            style: TextStyle(
+                              color: whiteColor,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                      color: primaryColor,
+                      textColor: blackPurpleColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          10.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -445,6 +616,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                                   minWidth:
                                       MediaQuery.of(context).size.width * 0.42,
                                   height: 50,
+                                  // ignore: deprecated_member_use
                                   child: RaisedButton(
                                     onPressed: () {
                                       Navigator.push(
@@ -498,6 +670,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                           child: ButtonTheme(
                             minWidth: MediaQuery.of(context).size.width * 0.42,
                             height: 50,
+                            // ignore: deprecated_member_use
                             child: RaisedButton(
                               onPressed: () async {
                                 if (await canLaunch(
@@ -541,6 +714,52 @@ class _UserProfilePageState extends State<UserProfilePage>
                       ),
                       ConstrainedBox(
                         constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.42),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: blackColor,
+                                blurRadius: 10.0,
+                                spreadRadius: -10,
+                                offset: Offset(0.0, 0.0),
+                              )
+                            ],
+                          ),
+                          child: ButtonTheme(
+                            minWidth: MediaQuery.of(context).size.width * 0.42,
+                            height: 50,
+                            // ignore: deprecated_member_use
+                            child: RaisedButton(
+                              onPressed: () async {
+                                showGetExtract();
+                              },
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Text(
+                                  "${Localization.language.getExtract}",
+                                  style: TextStyle(
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              color: whiteColor,
+                              textColor: whiteColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  10.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 0.42,
                         ),
                         child: Container(
@@ -557,6 +776,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                           child: ButtonTheme(
                             minWidth: MediaQuery.of(context).size.width * 0.42,
                             height: 50,
+                            // ignore: deprecated_member_use
                             child: RaisedButton(
                               onPressed: () async {
                                 showIndigoDialog(
